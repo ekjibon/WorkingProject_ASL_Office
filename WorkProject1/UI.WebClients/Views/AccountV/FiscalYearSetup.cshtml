@@ -1,0 +1,412 @@
+﻿
+@{
+    ViewBag.Title = "Fiscal Year Setup";
+}
+
+<div class="kt-container  kt-container--fluid  kt-grid__item kt-grid__item--fluid" ng-controller="FisYear">
+    <!-- Begin: life time stats -->
+    <div class="row">
+        <div class="kt-portlet kt-portlet--mobile">
+            <div class="kt-portlet__head kt-portlet__head--lg">
+                <div class="kt-portlet__head-label">
+                    <span class="kt-portlet__head-icon">
+                        @*<i class="kt-font-brand flaticon2-line-chart"></i>*@
+                    </span>
+                    <h3 class="kt-portlet__head-title">
+                        <!----Titel Text-->
+                        <span class="caption-subject font-green sbold uppercase">@ViewBag.Title</span>
+                        <!----Titel Text -->
+                    </h3>
+                </div>
+                <div class="kt-portlet__head-toolbar">
+                    <div class="kt-portlet__head-wrapper">
+                        <div class="dropdown dropdown-inline">
+                            <button type="button" class="btn btn-brand btn-icon-sm" ng-click="resetForm()" data-toggle="modal" data-target="#addmodal" aria-haspopup="true" aria-expanded="false">
+                                <!----Add Button -->
+                                <i class="flaticon2-plus"></i> Add New
+                                <!----Add Button -->
+                            </button>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="kt-portlet__body">
+                <div class="row">
+                    <div class="col-md-4 col-sm-5 col-xs-6">
+                        <div class="form-group">
+                            <div class="col-lg-3 col-md-5 col-sm-4 col-xs-8" style="padding-left:0px">
+                                <select class="form-control" ng-model="pageSize" ng-options="P.value as P.text for P in pageSizeArray"></select>
+                            </div>                            
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-sm-3 col-xs-1">
+                    </div>
+                    <div class="col-md-4 col-sm-4 col-xs-5">
+                        <div id="sample_3_filter" class="pull-right">
+                            <input ng-model="q" id="search" class="form-control" placeholder="Filter text">
+                        </div>
+                    </div>
+                </div>
+                <div class="table-scrollable"> </div>
+                <table class="table table-bordered table-hover rounded">
+                    <thead>
+                        <tr class="btn-primary">
+                            <th>Fiscal Year Name</th>
+                            <th>Start Date</th>
+                            <th>End Date</th>
+                            <th>Status</th>
+                            <th style="text-align:center">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-show="FisYears.results.length <= 0"><td colspan="5" style="text-align:center;"><i class="fa fa-refresh"></i> No Data Exists!!</td></tr>
+                        <tr dir-paginate="item in FisYears.results| filter:q  | itemsPerPage: pageSize" current-page="currentPage">
+                            <td>{{item.Name}}</td>
+                            <td>{{item.StartDate | date:'dd-MM-yyyy'}}</td>
+                            <td>{{item.EndDate | date:'dd-MM-yyyy'}}</td>
+                            <td ng-show="item.Status=='A'">Active</td>
+                            <td ng-show="item.Status=='I'">Inactive</td>
+                            <td ng-show="item.Status=='C'">Closed</td>
+                            <td align="center">
+                                <div class="input-group-btn">
+                                    <button type="button" class="btn btn-label-success" data-toggle="dropdown" ng-disabled="item.Status=='C'">
+                                        Options
+                                        <span class="caret"></span>
+                                    </button>
+                                    <ul class="dropdown-menu pull-right">
+                                        <li>
+                                            <a ng-show="item.Status=='A'" ng-click="inactive(item)"><i class="fa fa-ban"></i> Inactive</a>
+                                        </li>
+                                        <li>
+                                            <a ng-show="item.Status=='I'" ng-click="active(item)"><i class="fa fa-check"></i> Active</a>
+                                        </li>
+                                        <li>
+                                            <a ng-hide="item.Status=='C'" ng-click="close(item)"><i class="fa fa-times"></i> Close</a>
+                                        </li>
+                                        <li>
+                                            <a ng-click="edit(item)" data-target="#addmodal" data-toggle="modal"><i class="fa fa-edit"></i> Edit</a>
+                                        </li>
+                                        <li>
+                                            <a ng-click="deleteFiscals(item)"><i class="fa fa-trash"></i> Delete</a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="row">
+                    <dir-pagination-controls boundary-links="true" template-url="~/assets/angular/lib/dirPagination.tpl.html"></dir-pagination-controls>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- End: life time stats -->
+    <!--Modal Area Start-->
+    <div id="addmodal" class="modal fade" tabindex="-1" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form name="addform" ng-submit="save()" class="form-horizontal" id="form_sample_1" novalidate autocomplete="off">
+                    <div class="modal-header">
+                        <h4 class="modal-title">{{modalTitle}}</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true" ng-click="getFisYears()"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-body">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group row" ng-class="{ 'has-error' : submitted && addform.name.$invalid}">
+                                        <label class="col-md-4 control-label"style="text-align:right">
+                                            Fiscal Year Name:
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-8">
+                                            <input type="text" ng-model="FisYear.Name" class="form-control" placeholder="Fiscal Year Name" name="name" required>
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted &&  addform.name.$error.required" class="help-block">Name Required</span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group row" ng-class="{ 'has-error' : submitted && addform.StartDate.$invalid}">
+                                        <label class="col-md-4 control-label"style="text-align:right">
+                                            Start Date
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-8">
+                                            <input class="form-control" type="text" ng-click="p1=true" is-open="p1" readonly ng-model="FisYear.StartDate" placeholder="Start Date" uib-datepicker-popup="dd/MM/yyyy" name="StartDate" required />
+                                            <span ng-show="submitted &&  addform.StartDate.$error.required" class="help-block">Start Date Required</span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group row" ng-class="{ 'has-error' : submitted && addform.EndDate.$invalid}">
+                                        <label class="col-md-4 control-label"style="text-align:right">
+                                            End Date
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-8">
+                                            <input class="form-control" type="text" readonly ng-click="p2=true" is-open="p2" ng-model="FisYear.EndDate" placeholder="End Date" min-date="FisYear.StartDate" uib-datepicker-popup="dd/MM/yyyy" name="EndDate" required />
+                                            <span ng-show="submitted &&  addform.EndDate.$error.required" class="help-block">End Date Required</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" data-dismiss="modal" class="btn  btn-secondary" ng-click="getFisYears();resetForm();submitted=false">Cancel</button>
+                        <button type="submit" ng-click="submitted=true" class="btn btn-success">Save</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!--Modal Area End-->
+
+</div>
+
+@section Scripts{
+
+    <script type="text/javascript">
+        OEMSApp.controller("FisYear", ["$scope", "$http", "SweetAlert", "$filter",
+              function ($scope, $http, SweetAlert, $filter) {
+
+                  init();
+                  function init() {
+                      initialize();
+                      getFisYears();
+
+                  }
+                  function initialize() {
+                      $scope.modalTitle = "Add Tags";
+                      $scope.FisYear = {};
+                      $scope.FisYear.Id = 0;
+                      $scope.Tagss = [];
+                      $scope.branchs = [];
+                      $scope.currentPage = 1;
+                      $scope.pageno = 1;
+                      $scope.pagesize = 10;
+                      $scope.total_count = 12;
+                      $scope.search = '';
+                      $scope.Id = '';
+                      $scope.getFisYears = getFisYears;
+                      $scope.res = {};
+                      $scope.data = {};
+                      $scope.resetForm = resetForm;
+                      $scope.hstep = 1;
+                      $scope.mstep = 15;
+
+                      $scope.pageSizeArray = [];
+                      $scope.pageSizeArray.push({ value: 5, text: 5 });
+                      $scope.pageSizeArray.push({ value: 10, text: 10 });
+                      $scope.pageSizeArray.push({ value: 20, text: 20 });
+                      $scope.pageSizeArray.push({ value: 50, text: 50 });
+                      $scope.currentPage = 1;
+                      $scope.pageSize = 10;
+
+                  }
+                  function resetForm() {
+                      $scope.modalTitle = "Add Fiscal Year";
+
+                      $scope.FisYear = {};
+                      $scope.FisYear.Id = 0;
+                      $scope.addform.$setUntouched();
+                      $scope.addform.$setPristine();
+                      $scope.submitted = false;
+                  }
+
+                  function getFisYears() {
+                      $scope.FisYears = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Accounts/GetAllFiscalYear/'
+                      }).then(function successCallback(response) {
+                          $scope.FisYears = response.data;
+                      }, function errorCallback(response) {
+                          //toastr["warning"](response.data.Message);
+                      });
+                  }
+                  $scope.searchData = function () {
+                      getTagss(1);
+                  };
+
+                  $scope.inactive = function inactive(item) {
+                      
+                      SweetAlert.swal({
+                          title: "Are you sure  ?", type: "warning", showCancelButton: true, confirmButtonColor: "#DD6B55",
+                          confirmButtonText: "Yes, Inactive it!",
+                          
+                      },
+               function (isConfirm) {
+                   if (isConfirm) {
+
+                 
+                              if (item.Id != 0) {
+                                  item.Status = 'I';
+                                  $http({
+                                      method: 'PUT',
+                                      url: baseUrl + 'Accounts/ActiveInactiveFY/',
+                                      data: item
+                                  }).then(function successCallback(response) {
+                                      getFisYears();
+                                      toastr["info"]("Successfully Inactivated!");
+                                      resetForm();
+                                  }, function errorCallback(response) {
+                                      toastr["warning"](response.data.Message);
+                                      resetForm();
+                                      getFisYears();
+                                  });
+                              }
+                   }
+               });
+                          }
+                      
+                      
+              
+
+                  $scope.active = function (item) {
+
+                            SweetAlert.swal({
+                          title: "Are you sure  ?", type: "warning", showCancelButton: true, confirmButtonColor: "#DD6B55",
+                          confirmButtonText: "Yes, Active it!",
+                          
+                      },
+
+                        function (isConfirm) {
+                            if (isConfirm) {
+                      if (item.Id != 0) {
+                          item.Status = 'A';
+                          $http({
+                              method: 'PUT',
+                              url: baseUrl + 'Accounts/ActiveInactiveFY/',
+                              data: item
+                          }).then(function successCallback(response) {
+                              getFisYears();
+                              toastr["info"]("Successfully Activated!");
+                              resetForm();
+                          }, function errorCallback(response) {
+                              toastr["warning"](response.data.Message);
+                              resetForm();
+                              getFisYears();
+                          });
+                      }
+                            }
+                        });
+                  }
+
+                  $scope.close = function close(item) {
+                      SweetAlert.swal({
+                          title: "Are you sure ?", type: "warning", showCancelButton: true, confirmButtonColor: "#DD6B55",
+                          confirmButtonText: "Yes, Close it!",
+                         
+                      },
+                      function (isConfirm) {
+                         
+                          if (isConfirm) {
+                              if (item.Id != 0) {
+                                  item.Status = 'C';
+                                  $http({
+                                      method: 'PUT',
+                                      url: baseUrl + 'Accounts/ActiveInactiveFY/',
+                                      data: item
+                                  }).then(function successCallback(response) {
+                                      getFisYears();
+                                      toastr["info"]("Successfully Closed!");
+
+                                  }, function errorCallback(response) {
+                                      toastr["warning"](response.data.Message);
+                                      
+                                      resetForm();
+                                      getFisYears();
+                                  });
+                              }
+                          }
+                      });
+                      }
+                      
+              
+
+                  $scope.edit = function (n) {
+                      $scope.modalTitle = "Edit Fiscal Year";
+                      $scope.FisYear = n;
+                      $scope.Id = n.Id;
+                      $scope.FisYear.StartDate = new Date(n.StartDate);
+                      $scope.FisYear.EndDate = new Date(n.EndDate);
+                  };
+                  $scope.save = function save() {
+                      if ($scope.addform.$invalid)
+                          return;
+                      
+                      $scope.FisYear.StartDate = $filter('date')($scope.FisYear.StartDate, "yyyy-MM-dd");
+                      $scope.FisYear.EndDate = $filter('date')($scope.FisYear.EndDate, "yyyy-MM-dd");
+                      if ($scope.FisYear.StartDate > $scope.FisYear.EndDate) {
+                          toastr["warning"]("From Date should be greater then To Date");
+                          return;
+                      }
+                      if ($scope.FisYear.Id != 0) /// For Update
+                      {
+                          if ($scope.FisYear != '') {
+                              $http({
+                                  method: 'PUT',
+                                  url: baseUrl + 'Accounts/UpdateFiscalYear/',
+                                  data: $scope.FisYear
+                              }).then(function successCallback(response) {
+
+                                  $('#addmodal').modal('toggle');
+                                  getFisYears();
+                                  toastr["info"](response.data.message);
+                                  resetForm();
+                              }, function errorCallback(response) {
+                                  toastr["warning"](response.data.Message);
+                                  $('#addmodal').modal('toggle');
+                                  resetForm();
+                                  getFisYears();
+                              });
+                          }
+                      }else {  //  For Add
+                          if ($scope.FisYear != {}) {
+                              $http({
+                                  method: 'POST',
+                                  url: baseUrl + 'Accounts/AddFiscal/',
+                                  data: $scope.FisYear
+                              }).then(function successCallback(response) {
+                                  resetForm();
+                                  $('#addmodal').modal('toggle');
+                                  getFisYears();
+                                  toastr["info"](response.data.message);
+                                  
+                              }, function errorCallback(response) {
+                                  toastr["warning"](response.data.Message);
+                              });
+                          }
+                      }
+                  };
+                  $scope.deleteFiscals = function deleteFiscals(n) {
+                      SweetAlert.swal({
+                          title: "Are you sure to delete it ?", type: "warning", showCancelButton: true, confirmButtonColor: "#DD6B55",
+                          confirmButtonText: "Yes, delete it!",
+                          closeOnConfirm: false
+                      },
+                      function (isConfirm) {
+                          if (isConfirm) {
+                              if (n.Id != 0) {
+                                  n.IsDeleted = true;
+                                  $http({
+                                      method: 'POST',
+                                      url: baseUrl + 'Accounts/DeleteFiscal/',
+                                      data: n
+                                  }).then(function successCallback(response) {
+                                      getFisYears();
+                                      SweetAlert.swal("Deleted!", "Your data has been deleted.", "success");
+                                  }, function errorCallback(response) {
+                                      toastr["warning"](response.data.Message);
+                                      getFisYears();
+                                  });
+                              }
+                          }
+                      });
+                  };
+              }]);
+    </script>
+}

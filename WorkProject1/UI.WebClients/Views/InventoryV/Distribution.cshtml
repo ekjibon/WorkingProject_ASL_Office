@@ -1,0 +1,245 @@
+﻿
+
+@{
+    ViewBag.Title = "Distribution";
+}
+<div class="kt-container  kt-container--fluid  kt-grid__item kt-grid__item--fluid" ng-controller="distributionCrlt">
+    <div class="row">
+        <div class="kt-portlet kt-portlet--mobile">
+            <div class="kt-portlet__head kt-portlet__head--lg">
+                <div class="kt-portlet__head-label">
+                    <h3 class="kt-portlet__head-title">
+                        <!----Titel Text-->
+                        @ViewBag.Title
+                        <!----Titel Text -->
+                    </h3>
+                </div>
+            </div>
+
+            <div class="kt-portlet__body">
+                <form name="addform" novalidate class="form-horizontal">
+                    <div class="form-body">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group row" ng-class="{ 'has-error' : submitted && addform.ProductId.$invalid}">
+                                    <label class="col-lg-4 control-label text-right">Product</label>
+                                    <div class="col-lg-8">
+                                        <input type="text" ng-model="Product"
+                                               typeahead-on-select='onSelect($item, $model, $label)' name="ProductId" required
+                                               placeholder="Search Product By Name Or Code"
+                                               uib-typeahead="i  as i.Text for i in Search($viewValue)"
+                                               typeahead-loading="loading" typeahead-no-results="noResults" class="form-control">
+                                        <i ng-show="loading" class="glyphicon glyphicon-refresh"></i>
+                                        <div ng-show="noResults"><i class="glyphicon glyphicon-remove"></i> No Results Found</div>
+                                        <input type="hidden" ng-model="ProductId" ng-value="Product.Value" />
+                                        <span ng-show="submitted && addform.ProductId.$error.required" class="help-block">Product Required</span>
+                                    </div>
+                                </div>
+                                <div class="form-group row" ng-class="{ 'has-error' : submitted && addform.Product.$invalid}">
+                                    <label class="col-md-4 control-label text-right">
+                                        Quantity:
+                                        <span class="required">*</span>
+                                    </label>
+                                    <div class="col-md-8">
+                                        <input class="form-control" type="text" ng-keyup="Check()" onkeypress='return event.charCode >= 48 && event.charCode <= 57' ng-model="Distribution.Qty" required placeholder="Product Quantity" name="Product" />
+                                        <div class="form-control-focus"> </div>
+                                        <span ng-show="submitted && addform.Product.$error.required" class="help-block">Product Quantity Required</span>
+                                    </div>
+                                </div>
+                                <div class="form-group row" ng-class="{ 'has-error' : submitted && addform.StudentId.$invalid}">
+                                    <label class="col-sm-4 control-label text-right">
+                                        Emp.
+                                    </label>
+                                    <div class="col-md-8">
+                                        @*<input type="text" ng-model="employeeInfo.EmpID" class="form-control" placeholder="EmpID" name="EmpID">*@
+                                        <input type="text" name="StudentId" ng-model="Std" required typeahead-on-select='onSelectEmp($item, $model, $label)'
+                                               placeholder="Search name/ID SMS Notification"
+                                               uib-typeahead="i  as i.Text for i in EmpSearch($viewValue)"
+                                               typeahead-loading="loadingLocations" typeahead-no-results="noResult" class="form-control">
+                                        <i ng-show="loadingLocations" class="glyphicon glyphicon-refresh"></i>
+                                        <div ng-show="noResult"><i class="glyphicon glyphicon-remove"></i> No Results Found</div>
+                                        <input type="hidden" name="StudentIID" ng-value="Std.Value" />
+                                        <div class="form-control-focus"> </div>
+                                        <span ng-show="submitted && addform.StudentId.$error.required" class="help-block">Emp Required</span>
+
+                                    </div>
+                                </div>
+
+                                <div class="form-group row">
+                                    <div class="col-md-4">
+
+                                    </div>
+                                    <div class="col-md-8 text-right">
+
+                                        <button class="btn btn-success" ng-click="save();submitted=true">Save</button>
+                                        <button class="btn btn-danger" ng-click="Reset();submitted=false">Reset</button>
+
+                                    </div>
+
+                                </div>
+                            </div>
+                            @*<div class="col-md-4">
+
+                    </div>*@
+                            <div class="col-md-8">
+
+                                <table class="table table-bordered table-inverse">
+                                    <thead class="btn-primary">
+                                        <tr>
+                                            <th>Product Name</th>
+                                            <th>Stock Qty</th>
+                                            <th>Product Unit</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr><td colspan="6" style="text-align:center" ng-hide="ProductList.length > 0">No Data Found</td></tr>
+                                        <tr ng-show="ProductList.length > 0" ng-repeat="item in ProductList">
+                                            <td>{{item.ProductName}}</td>
+                                            <td>{{item.StockQuantity}}</td>
+                                            <td>{{item.UnitCode}}</td>
+
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    <script type="text/javascript">
+        OEMSApp.controller("distributionCrlt", ["$scope", "$http", "SweetAlert", "filterFilter", "$filter",
+          function ($scope, $http, SweetAlert, filterFilter, $filter) {
+              init();
+              function init() {
+                  initialize();
+                
+              }
+              function initialize() {
+                  $scope.Quota = {};
+                  $scope.Distribution = {};
+                  $scope.Suppliers = [];
+        
+                  $scope.ProductId = 0;
+                  $scope.ProductList = [];
+                  $scope.Quota.Product = '';
+                  $scope.Reset = Reset;
+                  /////
+                  $scope.pageSizeArray = [];
+                  $scope.pageSizeArray.push({ value: 5, text: 5 });
+                  $scope.pageSizeArray.push({ value: 10, text: 10 });
+                  $scope.pageSizeArray.push({ value: 20, text: 20 });
+                  $scope.pageSizeArray.push({ value: 50, text: 50 });
+                  $scope.currentPage = 1;
+                  $scope.pageno = 1;
+                  $scope.pagesize = 10;
+                  $scope.total_count = 12;
+                  
+              };
+           function Reset() {
+                  $scope.Distribution = {};
+                  $scope.ProductList = [];
+                  $scope.Product = null;
+                  $scope.submitted = false;
+              };
+              
+              $scope.save = function () {
+                  if ($scope.addform.$invalid) {
+                      return;
+                  }
+                  if ($scope.ProductList.length == 0) {
+                      toastr["warning"]('Please Choose Product.');
+                      return;
+                  }
+                  if ($scope.Distribution.Qty > $scope.ProductList[0].StockQuantity) {
+                      toastr["warning"]('Distributed Product Quantity Invalid.');
+                      return;
+                  }
+                  if ($scope.ProductList[0].StockQuantity < 0 || $scope.ProductList[0].StockQuantity == 0) {
+                      toastr["warning"]('Stock Quantity does not Available.');
+                      return;
+                  }
+                  $http({
+                      method: 'POST',
+                      url: baseUrl + '/Inventory/AddDistribution/',
+                      data: $scope.Distribution
+                  }).then(function successcallback(response) {
+                      
+                      Reset();
+                      toastr["info"](response.data.message);
+                  }, function errorcallback(response) {
+                      toastr["warning"](response.data.Message);
+                  });
+              }
+              $scope.Search = function (val) {
+                  if (val.length >= 3)
+                      return $http.get(baseUrl + 'Inventory/SearchDistributionProduct/' + val, {
+                          params: {}
+                      }).then(function (response) {
+                          return response.data.results.map(function (item) {
+                              return item;
+                          });
+                      });
+              };
+              // for droupdown select list event....
+              $scope.onSelect = function onSelect($item, $model, $label) {
+                  $scope.Quota.ProductId = Number($item.Value);
+                  $scope.Product = $item.Text;
+                  $http({
+                      method: 'GET',
+                      url: baseUrl + '/Inventory/GetProductListById/' + $scope.Quota.ProductId
+
+                  }).then(function successCallback(response) {
+                      $scope.ProductList = response.data.results;
+                      $scope.Distribution.ProductId = response.data.results[0].ProductId;
+                      //console.log(response.data.results);
+                  }, function errorCallback(response) {
+                      toastr["warning"](response.data.Message);
+                  });
+
+              };
+              $scope.EmpSearch = function (val) {
+                  return $http.get(baseUrl + 'Employee/SearchEmployee/' + val, {
+                      params: {
+
+                      }
+                  }).then(function (response) {
+                      return response.data.results.map(function (item) {
+                          return item;
+                      });
+                  });
+              };
+
+              $scope.onSelectEmp = function onSelectEmp($item, $model, $label) {
+                  $scope.Distribution.EmployeeId = Number($item.Value);
+                  //SearchEmployeeId($item.Value);
+              };
+              //This method is calling from dropDown
+
+              $scope.Check = function () {
+                  if ($scope.ProductList[0].StockQuantity < 0 || $scope.ProductList[0].StockQuantity==0) {
+                      toastr["warning"]('Stock Quantity does not Available.');
+                      return;
+                  }
+                  angular.forEach($scope.ProductList, function (item) {
+                      if ($scope.Distribution.Qty > item.StockQuantity) {
+                          toastr["warning"]('Distributed Product Quantity Invalid.');
+                          return;
+                      }
+                  });
+              }
+              $scope.changePageSize = function () {
+                  $scope.studentSearch.pageIndex = 1;
+                  Search();
+              };
+
+          }]);
+    </script>
+}
+
+

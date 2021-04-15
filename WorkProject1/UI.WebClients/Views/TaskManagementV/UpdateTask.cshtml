@@ -1,0 +1,177 @@
+﻿@using UI.Admin.Models.Task;
+@{
+    TaskInfo task = ViewData["TaskInfo"] as TaskInfo;
+    List<Project> projectlist = ViewData["ProjectList"] as List<Project>;
+}
+@{
+    ViewBag.Title = "UpdateTask";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Update Task</h2>
+
+<div ng-controller="taskEditClt">
+    <form name="frm" class="form-horizontal" role="form">
+        <div class="portlet-body form" style="display: block;">
+            <div class="form-body">
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">Ticket</label>
+                            <div class="col-md-9">
+
+                                <input type="text" ng-model="TaskInfo.TicketId" class="form-control input-lg" placeholder="Ticket">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">Project</label>
+                            <div class="col-md-9">
+                                <select class="form-control input-lg" ng-model="TaskInfo.ProjectId">
+                                    <option value="">Select Please</option>
+                                    @foreach (var item in projectlist)
+                                    {
+                                        if (item.Id == task.ProjectId)
+                                        {
+                                            <option selected value="@item.Id">@item.ProjectName</option>
+                                        }
+                                        else
+                                        {
+                                        <option value="@item.Id">@item.ProjectName</option>
+                                        }
+                                    }
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">Sprint</label>
+                            <div class="col-md-9">
+
+                                <input type="text" ng-model="TaskInfo.SprintId" class="form-control input-lg" placeholder="Sprint">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">Task Name</label>
+                            <div class="col-md-9">
+                                <input type="text" ng-model="TaskInfo.Id" hidden />
+                                <input type="text" ng-model="TaskInfo.TaskName" class="form-control input-lg" placeholder="Task Name">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">Description</label>
+                            <textarea class="form-control input-lg" ng-model="TaskInfo.Description" rows="3" style="margin: 0px -4px 0px 0px; width: 427px; height: 83px;"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">Coments</label>
+                            <div class="col-md-9">
+
+                                <input type="text" ng-model="TaskInfo.Comments" class="form-control input-lg" placeholder="Coments">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">Start Date</label>
+                            <div class="col-md-9">
+                                <input type="date" class="form-control input-lg" ng-model="TaskInfo.StartDate" placeholder="">
+                            </div>
+
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">Due Date</label>
+                            <div class="col-md-9">
+                                <input type="date" class="form-control input-lg" ng-model="TaskInfo.DueDate" placeholder="">
+                            </div>
+
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">Is Closed</label>
+                            <div class="col-md-9">
+                                <select class="form-control input-lg" ng-model="Project.Status">
+                                    <option value="">Select Please</option>
+                                    <option value="1">Yes</option>
+                                    <option value="0">No</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">Priority</label>
+                            <div class="col-md-9">
+                                <select class="form-control input-lg" ng-model="TaskInfo.Priority">
+                                      @{ 
+                                          if (task.Priority==1)
+                                          {
+                                              <option>High</option>
+                                          }
+                                          else if (task.Priority == 2)
+                                          {
+                                            <option>Medium</option>
+                                          }
+                                          else
+                                          {
+                                            <option>Low</option>
+
+                                          }
+                                    }
+	
+                                    <option value="">Select Please</option>
+                                    <option value="1">High</option>
+                                    <option value="2">Medium</option>
+                                    <option value="3">Low</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="reset" class="btn dark btn-outline" data-dismiss="modal">Close</button>
+                            @*<button type="button" ng-click="Update(TaskInfo)" class="btn green">Update</button>*@
+                            <a href="@Url.Action("TaskInfo","Home")" ng-click="Update(TaskInfo)"  class="btn green">Update</a>
+                        </div>
+                    </div>
+                </div>
+
+
+            </div>
+        </div>
+
+
+    </form>
+</div>
+
+<script type="text/javascript">
+    AddieApp.controller("taskEditClt", ["$scope", "$http", "SweetAlert",
+        function ($scope,$http,SweetAlert) {
+            init();
+            function init() {
+                initialze();
+            }
+
+            function initialze() {
+
+                $scope.TaskInfo.DueDate = @task.DueDate;
+                $scope.TaskInfo.StartDate = @task.StartDate;
+                $scope.TaskInfo.TaskName = @task.TaskName;
+                $scope.TaskInfo.Comments = @task.Comments;
+                $scope.TaskInfo.Description = @task.Description;
+                $scope.TaskInfo.SprintId =@task.SprintId;
+                $scope.TaskInfo.TicketId = @task.TicketId;
+
+
+                //$scope.TaskInfo=@task;
+                //console.log($scope.TaskInfo);
+            }
+
+            $scope.Update = function(taskInfo){
+                $http.post(baseUrl+'Task/UpdateTask',$scope.taskInfo).then(function(response){
+                    if (response==0) {
+                        toastr.error('Not Updated.');
+                    }
+                    toastr.success('Updated Successfully');
+                });
+            }
+
+        }]);
+</script>

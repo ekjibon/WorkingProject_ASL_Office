@@ -1,0 +1,469 @@
+﻿
+@{
+    ViewBag.Title = "Fouth Subject Rules";
+}
+
+<style type="text/css">
+    .table thead tr th {
+        font-size: 12px !important;
+        color: white !important;
+        font-weight: 600 !important;
+    }
+</style>
+<div ng-controller="fouthSubjectRules">
+    <!-- Begin: life time stats -->
+    <div class="portlet light bordered">
+        <div class="portlet-title">
+            <div class="caption">
+                <i class="icon-settings font-green"></i>
+                <span class="caption-subject font-green sbold uppercase">@ViewBag.Title</span>
+            </div>
+            <div class="actions">
+                <div class="btn-group btn-group-solid">
+                    <button ng-click="resetForm()" class="btn green" data-target="#addmodal" data-toggle="modal"> <i class="fa fa-plus"></i> Add Fouth Subject Rule</button>
+                </div>
+            </div>
+        </div>
+        <div class="portlet-body">
+
+            <form class="form-horizontal" ng-submit="getFouthSubjectRules()" id="frmCommon" name="formCommonFeilds" novalidate>
+                <div class="form-body">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="form-group" ng-class="{ 'has-error' : submitted1 && formCommonFeilds.Session.$invalid}">
+                                <label class="col-md-5 control-label">
+                                    Session :
+                                    <span class="required">*</span>
+                                </label>
+                                <div class="col-md-7">
+                                    <select class="form-control" ng-model="FouthSubjectRules.SessionID" required name="Session" ng-options="FouthSubjectRule.SessionId as FouthSubjectRule.SessionName for FouthSubjectRule in CommonFeilds.Session">
+                                        <option value="" selected="selected">Select</option>
+                                    </select>
+                                    <div class="form-control-focus"> </div>
+                                    <span ng-show="submitted1 && formCommonFeilds.Session.$error.required" class="help-block">Session Required</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group" ng-class="{ 'has-error' : submitted1 && formCommonFeilds.Class.$invalid}">
+                                <label class="col-md-5 control-label">
+                                    Class :
+                                    <span class="required">*</span>
+                                </label>
+                                <div class="col-md-7">
+                                    <select class="form-control" ng-model="FouthSubjectRules.ClassID" name="Class" required ng-change="GetGroup(FouthSubjectRules.ClassID)" ng-options="FouthSubjectRule.ClassId as FouthSubjectRule.ClassName for FouthSubjectRule in CommonFeilds.ClassInfo">
+                                        <option value="" selected="selected">Select</option>
+                                    </select>
+                                    <div class="form-control-focus"> </div>
+                                    <span ng-show="submitted1 && formCommonFeilds.Class.$error.required" class="help-block">Class Required</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                    </div>
+                    <div class="btn-group btn-group-solid pull-right" style="margin-bottom:5px">
+                        <button ng-click="submitted1=true" class="btn btn-primary btn-large">&nbsp;&nbsp; <i class="fa fa-search"></i> Show &nbsp;&nbsp;&nbsp;&nbsp;</button>
+                       <a style="margin-left: 5px;" ng-click="generateReport()" class="btn btn-success">Report</a>
+                     </div>
+
+                </div>
+            </form>
+
+            <div class="table-container">
+                <div id="sample_3_wrapper" class="dataTables_wrapper no-footer">
+                    <div class="table-scrollable"> </div>
+                    <table class="table table-bordered table-hover">
+                        <thead>
+                            <tr class="bg-primary">
+                                <th width="12%">Class</th>
+                            
+                                <th width="15%">Attendance Pass Fail Impact</th>
+                                <th width="15%">Is Fail Impact</th>
+                                <th width="15%">Deduct Marks</th>
+                                <th width="15%">Deduct GP</th>  
+                                <th width="10%">Action</th>                               
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-show="FouthSubjectRuless.results.length ==0"><td colspan="5" style="text-align:center;"><i class="fa fa-refresh"></i> Data not found!</td></tr>
+                            <tr dir-paginate="item in FouthSubjectRuless.results|itemsPerPage:pagesize" total-items="total_count"> 
+                                <td>{{item.ClassName}}</td>
+                              
+                                <td><input type="checkbox" id="AttendancePassFailimpact" class="form-control" ng-model="item.AttendancePassFailimpact" value="AttendancePassFailimpact" ng-checked="item.AttendancePassFailimpact==true" /></td>                      
+                                <td><input type="checkbox" id="IsFailImpact" class="form-control" ng-model="item.IsFailImpact" value="IsFailImpact" ng-checked="item.IsFailImpact==true" /></td>
+                                <td><input type="text"  ng-model="item.DeductMarks" class="form-control" placeholder="Deduct Marks"></td>
+                                <td><input type="text"  ng-model="item.DeductGP" class="form-control" placeholder="Deduct GP"></td>                                 
+                                <td>
+                                    <a href="javascript:;" class="btn btn-icon-only green" ng-click="edit(item)" data-target="#addmodal" data-toggle="modal">
+                                        <i class="fa fa-edit"></i>
+                                    </a>
+                                    <a ng-click="deleteFouthSubjectRules(item)" href="javascript:;" class="btn btn-icon-only red">
+                                        <i class="fa fa-trash"></i>
+                                    </a>
+
+
+                                </td>
+
+                            </tr>
+                            <tr ng-show="FouthSubjectRuless.results.length > 0">
+                                <td colspan="10">
+                                    <button ng-click="bulkUpdate()" class="btn btn-primary pull-right">&nbsp;<i class="fa fa-floppy-o"></i> Save &nbsp;</button>
+                                </td>
+                            </tr>
+                        </tbody>
+
+                    </table>
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- End: life time stats -->
+    <!--Modal Area Start-->
+    <div id="addmodal" class="modal fade" tabindex="-1" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <form name="addform" ng-submit="save()" class="form-horizontal" id="form_sample_1" novalidate>
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                        <h4 class="modal-title">{{modalTitle}}</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group" ng-class="{ 'has-error' : submitted && addform.Version.$invalid}">
+                                        <label class="col-md-4 control-label">
+                                            Version :
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-8">
+                                            <select class="form-control" ng-disabled="FouthSubjectRules.ID !=0" ng-model="FouthSubjectRules.VersionID" required name="Version" ng-options="FouthSubjectRules.VersionId as FouthSubjectRules.VersionName for FouthSubjectRules in CommonFeilds.Version">
+                                                <option value="" selected="selected">Select</option>
+                                            </select>
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted && addform.Version.$error.required" class="help-block">Version Required</span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group" ng-class="{ 'has-error' : submitted && addform.Session.$invalid}">
+                                        <label class="col-md-4 control-label">
+                                            Session :
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-8">
+                                            <select class="form-control" ng-disabled="FouthSubjectRules.ID !=0" ng-model="FouthSubjectRules.SessionID" required name="Session" ng-options="FouthSubjectRules.SessionId as FouthSubjectRules.SessionName for FouthSubjectRules in CommonFeilds.Session">
+                                                <option value="" selected="selected">Select</option>
+                                            </select>
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted && addform.Session.$error.required" class="help-block">Session Required</span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group" ng-class="{ 'has-error' : submitted && addform.Class.$invalid}">
+                                        <label class="col-md-4 control-label">
+                                            Class :
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-8">
+                                            <select class="form-control" ng-disabled="FouthSubjectRules.ID !=0" ng-model="FouthSubjectRules.ClassID" ng-change="GetGroup(FouthSubjectRules.ClassID)" name="Class" required ng-options="FouthSubjectRules.ClassId as FouthSubjectRules.ClassName for FouthSubjectRules in CommonFeilds.ClassInfo | filter:{VersionId:FouthSubjectRules.VersionID}:true">
+                                                <option value="" selected="selected">Select</option>
+                                            </select>
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted && addform.Class.$error.required" class="help-block">Class Required</span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-4 control-label">
+                                            Attendance Pass/Fail impact:
+                                        </label>
+                                        <div class="col-md-2" style="margin-top: 8px;">
+                                            <input type="checkbox" id="IsAbsent" class="form-control" ng-model="FouthSubjectRules.AttendancePassFailimpact" ng-checked="FouthSubjectRules.AttendancePassFailimpact==true" />
+                                        </div>
+                                    </div>
+                                    
+                                </div>                                  
+                                <div class="col-md-6">                                      
+                                    <div class="form-group">
+                                        <label class="col-md-4 control-label">
+                                            Group :
+                                        </label>
+                                        <div class="col-md-8">
+                                            <select class="form-control" ng-disabled="FouthSubjectRules.ID !=0" ng-model="FouthSubjectRules.GroupID" name="Group" ng-options="G.GroupId as G.GroupName for G in Groups">
+                                                <option value="" selected="selected">Select</option>
+                                            </select>
+                                            <div class="form-control-focus"> </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group" ng-class="{ 'has-error' : submitted && addform.DeductMarks.$invalid}">
+                                        <label class="col-md-4 control-label">
+                                            DeductMarks :
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-8">
+                                            <input type="text" ng-model="FouthSubjectRules.DeductMarks" class="form-control" placeholder="Deduct Marks" name="DeductMarks" required>
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted && addform.DeductMarks.$error.required" class="help-block">Deduct Mark Required</span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group" ng-class="{ 'has-error' : submitted && addform.DeductGP.$invalid}">
+                                        <label class="col-md-4 control-label">
+                                            Deduct GP :
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-8">
+                                            <input type="text" ng-model="FouthSubjectRules.DeductGP" class="form-control" placeholder="Deduct GP" name="DeductGP" required>
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted && addform.DeductGP.$error.required" class="help-block">Deduct GP Required</span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-4 control-label">
+                                            Is Fail Impact:
+                                        </label>
+                                        <div class="col-md-2" style="margin-top: 8px;">
+                                            <input type="checkbox" id="IsFail" class="form-control" ng-model="FouthSubjectRules.IsFailImpact" ng-checked="FouthSubjectRules.IsFailImpact==true" />
+                                        </div>
+                                    </div>                                
+                                </div>
+                            </div>                             
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" data-dismiss="modal" class="btn dark btn-outline" ng-click="resetForm();submitted=false">Cancel</button>
+                        <button type="submit" ng-click="submitted=true" class="btn green-haze">Save</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!--Modal Area End-->
+
+</div>
+
+@section Scripts{
+    <script type="text/javascript">
+        OEMSApp.controller("fouthSubjectRules", ["$scope", "$http", "SweetAlert","$window",
+              function ($scope, $http, SweetAlert, $window) {
+
+                  init();
+                  function init() {
+                      initialize();                        
+                      getAllCommons();
+                      getAllFouthSubjectRules();
+
+                  }
+                  function initialize() {
+                      $scope.modalTitle = "Add Fouth Subject Rule";
+                      $scope.FouthSubjectRules = {};
+                      $scope.FouthSubjectRules.ID = 0;
+                      $scope.FouthSubjectRules.DeductMarks = 40;
+                      $scope.FouthSubjectRules.DeductGP = 2;
+                      $scope.currentPage = 1;
+                      $scope.pageno = 1;
+                      $scope.pagesize = 20;
+                      $scope.total_count = 12;
+                      $scope.search = '';
+                      $scope.FouthSubjectRuless = [];
+
+                      $scope.CommonFeilds = [];
+
+                      $scope.getFouthSubjectRules = getFouthSubjectRules;
+                      $scope.getAllFouthSubjectRules = getAllFouthSubjectRules;
+                      $scope.res = {};
+                      $scope.data = {};
+                      $scope.resetForm = resetForm;
+                      $scope.getAllCommons = getAllCommons;
+
+                  }
+                  function resetForm() {
+                      $scope.modalTitle = "Add Fouth Subject Rule";
+                     // $scope.FouthSubjectRules = {};
+                      $scope.FouthSubjectRules.DeductMarks = 40;
+                      $scope.FouthSubjectRules.DeductGP = 2;
+                      $scope.FouthSubjectRules.ID = 0;
+                      $scope.submitted1 = false;
+                      $scope.submitted = false;
+                      $scope.Id = '';
+                  }
+                  $scope.GetGroup = function GetGroup(classid) {
+                      $scope.Groups = [];
+
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Common/GetGroup/' + classid
+                      }).then(function successCallback(response) {
+                          $scope.Groups = response.data.results;
+
+
+                      }, function errorCallback(response) {
+                          toastr["error"](response.data.Message);
+                      });
+
+                  }
+                  function getAllCommons() {
+                      //$scope.CommonFeilds = [];
+
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Common/GetCommonItem/'
+                      }).then(function successCallback(response) {
+                          $scope.CommonFeilds = response.data.results;
+                      }, function errorCallback(response) {
+                          toastr["error"](response.data.Message);
+                      });
+                  }
+
+                  function getAllFouthSubjectRules() {
+                      $scope.FouthSubjectRuless = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'ExamSetup/GetFouthSubjectRules/'
+                      }).then(function successCallback(response) {
+                          $scope.FouthSubjectRuless = response.data;
+                          toastr["info"](response.data.message);
+                          $scope.total_count = response.data.totalcount;
+                          if ($scope.pagesize == -1)
+                              $scope.pagesize = 500;
+
+                      }, function errorCallback(response) {
+                          toastr["error"](response.data.Message);
+                      });
+
+                  }
+                  function getFouthSubjectRules() {
+                      $scope.FouthSubjectRuless = [];    
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'ExamSetup/GetFouthSubjectRules/' + $scope.FouthSubjectRules.VersionID + '/' + $scope.FouthSubjectRules.SessionID + '/' + $scope.FouthSubjectRules.ClassID + '/' + $scope.FouthSubjectRules.GroupID
+                      }).then(function successCallback(response) {
+                          $scope.FouthSubjectRuless = response.data;
+                          toastr["info"](response.data.message);
+                          $scope.total_count = response.data.totalcount;
+                          if ($scope.pagesize == -1)
+                              $scope.pagesize = 500;
+
+                      }, function errorCallback(response) {
+                          toastr["error"](response.data.Message);
+                      });
+
+                  } 
+                  $scope.searchData = function () {
+                     getFouthSubjectRules();
+                  };
+
+                  $scope.edit = function (n) {
+                      $scope.modalTitle = "Update Subject";
+                      $scope.FouthSubjectRules = n;
+                      $scope.SubID = n.SubID;
+                      $scope.NoEffectOnExam;
+
+                  };
+
+                  $scope.save = function save() {
+
+                      if ($scope.addform.$invalid)
+                          return;
+
+                      if ($scope.FouthSubjectRules.ID != 0) /// For Update
+                      {
+                          if ($scope.FouthSubjectRules != '') {
+                              $http({
+                                  method: 'PUT',
+                                  url: baseUrl + '/ExamSetup/UpdateFouthSubjectRules/',
+                                  data: $scope.FouthSubjectRules
+                              }).then(function successCallback(response) {
+                                  $('#addmodal').modal('toggle');                                
+                                 getFouthSubjectRules();
+                                  toastr["info"](response.data.message);
+                                  //resetForm();
+                              }, function errorCallback(response) {
+                                  toastr["error"](response.data.Message);
+                              });
+                          }
+                      } else {  //  For Add
+                          if ($scope.FouthSubjectRules != {}) {
+                              $http({
+                                  method: 'POST',
+                                  url: baseUrl + '/ExamSetup/AddFouthSubjectRules/',
+                                  data: $scope.FouthSubjectRules
+                              }).then(function successCallback(response) {
+                                  $('#addmodal').modal('show');
+                                  toastr["info"](response.data.message);
+                                 getFouthSubjectRules();
+                                  resetForm();
+                              }, function errorCallback(response) {
+                                  toastr["error"](response.data.Message);
+                              });
+                          }
+                      }
+
+                  };
+
+                  $scope.bulkUpdate = function bulkUpdate() {
+                      //if ($scope.SelectiveFouthSubjectRuless.SelectiveSetup.length > 0) /// For Update
+                      //{
+                      $http({
+                          method: 'PUT',
+                          url: baseUrl + 'ExamSetup/BulkUpdateFouthSubjectRules/',
+                          data: $scope.FouthSubjectRuless.results
+                      }).then(function successCallback(response) {
+                         getFouthSubjectRules();
+                         toastr["info"](response.data.message);
+                         getFouthSubjectRules();                            
+                      }, function errorCallback(response) {
+                          toastr["error"](response.data.Message);
+                      });
+                      //}
+
+                  };
+
+                  $scope.deleteFouthSubjectRules = function deleteFouthSubjectRules(n) {
+
+                      // SweetAlert.swal("Good job!", "You clicked the button!", "success");
+                      SweetAlert.swal({
+                          title: "Are you sure to delete it ?", type: "warning", showCancelButton: true, confirmButtonColor: "#DD6B55",
+                          confirmButtonText: "Yes, delete it!",
+                          closeOnConfirm: false
+                      },
+                      function (isConfirm) {
+                          if (isConfirm) {
+                              $http({
+                                  method: 'DELETE',
+                                  url: baseUrl + '/ExamSetup/DeleteFouthSubjectRules/' + n.ID
+                              }).then(function successCallback(response) {
+                                  SweetAlert.swal("Deleted!", "Your data has been deleted.", "success");
+                                 getFouthSubjectRules();
+                              }, function errorCallback(response) {
+                                  toastr["error"](response.data.Message);
+                              });
+
+                          }
+                      });
+
+
+                  };
+
+                  //for class ways report ........
+             
+                  $scope.generateReport = function generateReport() {
+                      if ($scope.FouthSubjectRules.VersionID == null) {
+                          toastr["info"]("Select a Version.");
+                      }
+                      else if ($scope.FouthSubjectRules.SessionID == null) {
+                          toastr["info"]("Select a Session.");
+                      }
+                      else {
+                          $scope.uri = "@Url.Action("FourthSubjectRulesReport", "Report")?VersionID=" + $scope.FouthSubjectRules.VersionID + "&SessionID=" + $scope.FouthSubjectRules.SessionID;
+                          $window.open($scope.uri, '_blank');
+                      }
+                     
+                  }
+
+              }]);
+        $(document).ready(function () {
+            $('[data-toggle="tooltip"]').tooltip();
+        });
+    </script>
+
+}
+

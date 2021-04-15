@@ -1,0 +1,638 @@
+﻿@{
+    ViewBag.Title = "Seat Card Setup";
+}
+<style type="text/css">
+    input[type="number"]::-webkit-outer-spin-button,
+    input[type="number"]::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+    input[type="number"] {
+    -moz-appearance: textfield;
+}
+     input[type="checkbox"] {
+    width:22px;
+}
+</style>
+@section Styles{
+    <link href="~/assets/global/plugins/bootstrap-fileinput/bootstrap-fileinput.css" rel="stylesheet" type="text/css" />
+}
+<div ng-controller="SeatCardSetup">
+    <!-- Begin: life time stats -->
+    <div class="portlet light bordered">
+        <div class="portlet-title">
+            <div class="caption">
+                <i class="icon-settings font-green"></i>
+                <span class="caption-subject font-green sbold uppercase">@ViewBag.Title</span>
+            </div>
+            <div class="actions">
+                <div class="btn-group btn-group-solid">
+                    <button ng-click="resetForm()" class="btn green" data-target="#addmodal" data-toggle="modal"> <i class="fa fa-plus"></i>Add Seat Card</button>
+                </div>
+            </div>
+        </div>
+        <form class="form-horizontal" ng-submit="getSeatCardSetup()" name="frmCommonFeilds" novalidate  >
+            <div class="form-body">
+                <div class="row"  style="margin-right: 1%;">
+                    <div class="col-md-6">
+                        <div class="form-group" ng-class="{ 'has-error' : submitted1 && frmCommonFeilds.BranchId.$invalid}">
+                            <label class="col-md-4 control-label" style="padding-right:0px!important">
+                                Branch:<span class="required">*</span>
+                            </label>
+                            <div class="col-md-8">
+                                <select class="form-control" name="BranchId" ng-model="CommonFeild.BranchId" ng-options="CommonFeild.BranchId as CommonFeild.BranchName for CommonFeild in CommonFeilds.Branch" required>
+                                    <option value="" selected="selected">Select</option>
+                                </select>
+                                <div class="form-control-focus"> </div>
+                                <span ng-show="submitted1 && frmCommonFeilds.BranchId.$error.required" class="help-block">Branch Required</span>
+                            </div>
+                        </div>
+                        <div class="form-group" ng-class="{ 'has-error' :submitted1 && frmCommonFeilds.SessionId.$invalid}">
+                            <label class="col-md-4 control-label" style="padding-right:0px!important">
+                                Session:  <span class="required">*</span>
+                            </label>
+                            <div class="col-md-8">
+                                <select class="form-control" name="SessionId" ng-model="CommonFeild.SessionId" required ng-options="CommonFeild.SessionId as CommonFeild.SessionName for CommonFeild in CommonFeilds.Session | filter:{VersionId:CommonFeild.VersionId}:true">
+                                    <option value="" selected="selected">Please Select</option>
+                                </select>
+                                <span ng-show="submitted1 && frmCommonFeilds.SessionId.$error.required" class="help-block">Session Required</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group" ng-class="{ 'has-error' :submitted1 && frmCommonFeilds.ShiftId.$invalid}">
+                            <label class="col-md-4 control-label" style="padding-right:0px!important">
+                                Shift:<span class="required">*</span>
+                            </label>
+                            <div class="col-md-8">
+                                <select class="form-control" name="ShiftId" ng-disabled="CommonFeild.BranchId==null"  ng-model="CommonFeild.ShiftId" ng-options="CommonFeild.ShiftId as CommonFeild.ShiftName for CommonFeild  in CommonFeilds.Shift  | filter:{BranchId:CommonFeild.BranchId}:true" required>
+                                    <option value="" selected="selected">Please Select</option>
+                                </select>
+                                <span ng-show="submitted1 && frmCommonFeilds.ShiftId.$error.required " class="help-block">Shift Required</span>
+                            </div>
+                        </div>
+                        <div class="form-group" ng-class="{ 'has-error' :submitted1 && frmCommonFeilds.ClassId.$invalid}">
+                            <label class="col-md-4 control-label" style="padding-right:0px!important">
+                                Class:<span class="required">*</span>
+                            </label>
+                            <div class="col-md-8">
+                                <select class="form-control" name="ClassId"  ng-model="CommonFeild.ClassId" ng-options="CommonFeild.ClassId as CommonFeild.ClassName for CommonFeild in CommonFeilds.ClassInfo | filter:{VersionId:CommonFeild.VersionID}:true" required>
+                                    <option value="" selected="selected">Please Select</option>
+                                </select>
+                                <span ng-show="submitted1 && frmCommonFeilds.ClassId.$error.required " class="help-block">Class Required</span>
+                            </div>
+                        </div>
+                    </div>
+                    </div>
+                <div class="row">
+                    <div class="col-md-8">
+                    
+                    </div>
+                   <div class="col-md-4">
+                        <div class="btn-group btn-group-solid pull-right" style="margin-bottom:5px;margin-right: 7%;">
+                            <button ng-click="submitted1=true" class="btn btn-info btn-large">&nbsp;&nbsp; <i class="fa fa-search"></i> Show &nbsp;&nbsp;&nbsp;&nbsp;</button>
+                        </div>
+                    </div>
+                </div>
+               
+            </div>
+        </form>
+        <div class="portlet-body" ng-show="SeatCardSetups.length > 0">
+            <div class="table-container">
+                <div id="sample_3_wrapper" class="dataTables_wrapper no-footer">
+                    <div class="row">
+                        <div class="col-md-4 col-sm-5 col-xs-6">
+                            <div class="form-group">
+                                <div class="col-lg-3 col-md-5 col-sm-4 col-xs-8" style="padding-left:0px">
+                                    <select class="form-control" ng-model="pageSize" ng-options="P.value as P.text for P in pageSizeArray"></select>
+                                </div>
+                                <div class="col-md-7  col-sm-8  col-xs-4">
+                                    @*<label for="search" class="control-label" style="padding-top:5px">Items</label>*@
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 col-sm-3 col-xs-1">
+                        </div>
+                        <div class="col-md-4 col-sm-4 col-xs-5">
+                            <div id="sample_3_filter" class="pull-right">
+                                <input ng-model="q" id="search" class="form-control" placeholder="Filter text">
+                            </div>
+                        </div>
+                    </div>
+                    <br />
+                    <div class="" style="width:100%;overflow-x:scroll">
+                        <table class="table table-bordered table-hover">
+                            <thead>
+                                <tr class="bg-primary">
+                                    <th style="width:10%">Branch</th>
+                                    <th style="width:10%">Session</th>
+                                   
+                                    <th style="width:10%">Shift</th>
+                                    <th style="width:10%">Class</th>
+                                    <th style="width:20%!important">Title</th>
+                                    <th style="width:10%">Signature1</th>
+                                    <th style="width:10%">Signature2</th>
+                                    <th style="width:10%">Signature3</th>
+                                    <th style="width:10%">Signature4</th>
+                                    <th style="width:10%">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+
+                                <tr dir-paginate="item in SeatCardSetups| filter:q  | itemsPerPage: pageSize" current-page="currentPage">
+                                    <td style="width:10%"> {{item.BranchName}} </td>
+                                    <td style="width:10%"> {{item.SessionName}} </td>
+                                  
+                                    <td style="width:10%"> {{item.ShiftName}} </td>
+                                    <td style="width:10%"> {{item.ClassName}} </td>
+                                    <td style="width:10%"> {{item.Title}} </td>
+                                    <td style="width:10%">
+                                        <a ng-click="image(item,1)" ng-hide="item.SignatureImage1==null" class="btn btn-primary btn-xs" data-target="#addmodal2" data-toggle="modal">View</a>
+                                        <span ng-show="(item.SignatureImage1==null) && (item.SignatureID_1==true)">No Signature</span>
+                                        <span ng-show="item.SignatureID_1==false">Not Selected</span>
+                                    </td>
+                                    <td style="width:10%">
+                                        <a ng-click="image(item,2)" ng-hide="item.SignatureImage2==null" class="btn btn-primary btn-xs" data-target="#addmodal2" data-toggle="modal">View</a>
+                                        <span ng-show="(item.SignatureImage2==null) && (item.SignatureID_2==true)">No Signature</span>
+                                        <span ng-show="item.SignatureID_2==false">Not Selected</span>
+                                    </td>
+                                    <td style="width:10%">
+                                        <a ng-click="image(item,3)" ng-hide="item.SignatureImage3==null" class="btn btn-primary btn-xs" data-target="#addmodal2" data-toggle="modal">View</a>
+                                        <span ng-show="(item.SignatureImage3==null) && (item.SignatureID_3==true)">No Signature</span>
+                                        <span ng-show="item.SignatureID_3==false">Not Selected</span>
+                                    </td>
+                                    <td style="width:10%">
+                                        <a ng-click="image(item,4)" ng-hide="item.SignatureImage4==null" class="btn btn-primary btn-xs" data-target="#addmodal2" data-toggle="modal">View</a>
+                                        <span ng-show="(item.SignatureImage4==null) && (item.SignatureID_4==true)">No Signature</span>
+                                        <span ng-show="item.SignatureID_4==false">Not Selected</span>
+                                    </td>
+                                    <td style="width:10%">
+                                        <a class="btn btn-icon-only green" ng-click="edit(item)" data-target="#addmodal" data-toggle="modal">
+                                            <i class="fa fa-edit"></i>
+                                        </a>
+                                        <a ng-click="deleteSeatCardSetup(item)"  class="btn btn-icon-only red">
+                                            <i class="fa fa-trash"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="row">
+                        <dir-pagination-controls boundary-links="true" template-url="~/assets/angular/lib/dirPagination.tpl.html"></dir-pagination-controls>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--Modal Area Start-->
+        <div id="addmodal" class="modal fade" tabindex="-1" data-backdrop="static" data-keyboard="false">
+            <div class="modal-dialog">
+                <div class="modal-content modal-lg">
+                    <form name="frmSeatCardSetup" ng-submit="save()" class="form-horizontal" novalidate enctype="multipart/form-data">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                            <h4 class="modal-title">{{modalTitle}}</h4>
+                        </div>
+                        <div class="modal-body">
+                            <div class="form-body">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="form-group" ng-class="{ 'has-error' :submitted && frmSeatCardSetup.BranchId.$invalid}">
+                                            <label class="col-md-4 control-label">
+                                                Branch :
+                                                <span class="required">*</span>
+                                            </label>
+                                            <div class="col-md-8">
+                                                <select class="form-control" name="BranchId" ng-model="SeatCard.BranchID" required ng-options="SeatCardSetup.BranchId as SeatCardSetup.BranchName for SeatCardSetup in CommonFeilds.Branch">
+                                                    <option value="" selected="selected">Please Select</option>
+                                                </select>
+                                                <span ng-show="submitted && frmSeatCardSetup.BranchId.$error.required" class="help-block">Branch Required</span>
+                                            </div>
+                                        </div>
+                                        <div class="form-group" ng-class="{ 'has-error' :submitted && frmSeatCardSetup.SessionId.$invalid}">
+                                            <label class="col-md-4 control-label">
+                                                Session :
+                                                <span class="required">*</span>
+                                            </label>
+                                            <div class="col-md-8">
+                                                <select class="form-control" name="SessionId" ng-model="SeatCard.SessionID" required ng-options="SeatCardSetup.SessionId as SeatCardSetup.SessionName for SeatCardSetup in CommonFeilds.Session">
+                                                    <option value="" selected="selected">Please Select</option>
+                                                </select>
+                                                <span ng-show="submitted && frmSeatCardSetup.SessionId.$error.required" class="help-block">Session Required</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group" ng-class="{ 'has-error' :submitted && frmSeatCardSetup.ShiftId.$invalid}">
+                                            <label class="col-md-4 control-label">
+                                                Shift :
+                                                <span class="required">*</span>
+                                            </label>
+                                            <div class="col-md-8">
+                                                <select class="form-control" name="ShiftId"  ng-model="SeatCard.ShiftID" ng-options="SeatCardSetup.ShiftId as SeatCardSetup.ShiftName for SeatCardSetup in CommonFeilds.Shift | filter:{BranchId:SeatCard.BranchID}:true" required>
+                                                    <option value="" selected="selected">Please Select</option>
+                                                </select>
+                                                <span ng-show="submitted && frmSeatCardSetup.ShiftId.$error.required " class="help-block">Shift Required</span>
+                                            </div>
+                                        </div>
+                                        <div class="form-group" ng-class="{ 'has-error' :submitted && frmSeatCardSetup.ClassId.$invalid}">
+                                            <label class="col-md-4 control-label">
+                                                Class :
+                                                <span class="required">*</span>
+                                            </label>
+                                            <div class="col-md-8">
+                                                <select class="form-control" name="ClassId"  ng-model="SeatCard.ClassID" ng-change="GetTemplate()" ng-options="SeatCardSetup.ClassId as SeatCardSetup.ClassName for SeatCardSetup in CommonFeilds.ClassInfo " required>
+                                                    <option value="" selected="selected">Please Select</option>
+                                                </select>
+                                                <span ng-show="submitted && frmSeatCardSetup.ClassId.$error.required " class="help-block">Class Required</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group" ng-class="{ 'has-error' : submitted && frmSeatCardSetup.TemplateId.$invalid}">
+                                            <label class="col-md-4 control-label">
+                                                Template:
+                                                <span class="required">*</span>
+                                            </label>
+                                            <div class="col-md-8">
+                                                <select class="form-control" name="TemplateId" ng-model="SeatCard.TemplateId" required ng-options="item as item for item in [1,2,3,4]">
+                                                    <option value="" selected="selected">Please Select</option>
+                                                </select>
+                                                <span ng-show="submitted && frmSeatCardSetup.TemplateId.$error.required " class="help-block">Template Required</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                  </div>
+                      <div class="row col-md-12">
+                                    <div class="col-md-3">
+                                        <div class="form-group" ng-class="{ 'has-error' : submitted && frmSeatCardSetup.SignatureId1.$invalid}">
+                                            <div class="md-checkbox">
+                                                <input type="checkbox" id="checkbox300" name="SignatureId1" ng-required="(SeatCard.SignatureID_1 == null) && (SeatCard.SignatureID_2 == null) && (SeatCard.SignatureID_3 == null)&& (SeatCard.SignatureID_3 == null)"
+                                                       ng-model="SeatCard.SignatureID_1" class="md-check">
+                                                <label for="checkbox300">
+                                                    <span></span>
+                                                    <span class="check"></span>
+                                                    <span class="box"></span>
+                                                    Signature1
+                                                </label>
+                                            </div>
+                                            <span ng-show="submitted && frmSeatCardSetup.SignatureId1.$error.required " class="help-block">Signature1 Required</span>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="form-group" ng-class="{ 'has-error' : submitted && frmSeatCardSetup.SignatureId2.$invalid}">
+                                            <div class="md-checkbox">
+                                                <input type="checkbox" id="checkbox301" name="SignatureId2" ng-required="(SeatCard.SignatureID_2 == null) && (SeatCard.SignatureID_1 == null) && (SeatCard.SignatureID_3 == null)&& (SeatCard.SignatureID_4 == null)"
+                                                       ng-model="SeatCard.SignatureID_2" class="md-check">
+                                                <label for="checkbox301">
+                                                    <span></span>
+                                                    <span class="check"></span>
+                                                    <span class="box"></span>
+                                                    Signature2
+                                                </label>
+                                            </div>
+                                            <span ng-show="submitted && frmSeatCardSetup.SignatureId2.$error.required " class="help-block">Signature2 Required</span>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="form-group" ng-class="{ 'has-error' : submitted && frmSeatCardSetup.SignatureId3.$invalid}">
+                                            <div class="md-checkbox">
+                                                <input type="checkbox" id="checkbox302" name="SignatureId3" ng-required="(SeatCard.SignatureID_1 == null) && (SeatCard.SignatureID_2 == null) && (SeatCard.SignatureID_4 == null)"
+                                                       ng-model="SeatCard.SignatureID_3" class="md-check">
+                                                <label for="checkbox302">
+                                                    <span></span>
+                                                    <span class="check"></span>
+                                                    <span class="box"></span>
+                                                    Signature3
+                                                </label>
+                                            </div>
+                                            <span ng-show="submitted && frmSeatCardSetup.SignatureId3.$error.required " class="help-block">Signature3 Required</span>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="form-group" ng-class="{ 'has-error' : submitted && frmSeatCardSetup.SignatureId4.$invalid}">
+                                            <div class="md-checkbox">
+                                                <input type="checkbox" id="checkbox303" name="SignatureId4" ng-required="(SeatCard.SignatureID_1 == null) &&
+                                                   (SeatCard.SignatureID_2 == null) && (SeatCard.SignatureID_3 == null)"
+                                                       ng-model="SeatCard.SignatureID_4" class="md-check">
+                                                <label for="checkbox303">
+                                                    <span></span>
+                                                    <span class="check"></span>
+                                                    <span class="box"></span>
+                                                    Signature4
+                                                </label>
+                                            </div>
+                                            <span ng-show="submitted && frmSeatCardSetup.SignatureId3.$error.required " class="help-block">Signature3 Required</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row col-md-12">
+                                    <div class="col-md-6">
+                                        <div class="form-group" ng-class="{ 'has-error' : submitted && frmSeatCardSetup.Title.$invalid}">
+                                            <label class="col-md-4 control-label" style="padding-right:0px;">
+                                                Card Title:
+                                                <span class="required">*</span>
+                                            </label>
+                                            <div class="col-md-8">
+                                                <input type="text" ng-model="SeatCard.Title" class="form-control" placeholder="Title.." name="Title" required />
+                                                <div class="form-control-focus"> </div>
+                                                <span ng-show="submitted &&  frmSeatCardSetup.Title.$error.required" class="help-block">Title Required</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group pull-left">
+                                            <label class="col-md-5 control-label">
+                                                Watarmark Image :
+                                            </label>
+                                            <div class="col-md-7">
+                                                <input type="hidden" value="A4Portrait" name="ImgType" />
+                                                <div class="fileinput fileinput-new" data-provides="fileinput">
+                                                    <div class="fileinput-new thumbnail" style="width: 200px; height: 150px;">
+                                                        <img src="@String.Format("data:image/jpg;base64,{0}", "{{SeatCard.WatermarkImage}}")" width="200" height="150" alt="">
+                                                    </div>
+                                                    <div class="fileinput-preview fileinput-exists thumbnail" style="max-width: 200px; max-height: 150px;"> </div>
+                                                    <div>
+                                                        <span class="btn default btn-file blue">
+                                                            <span class="fileinput-new "> Select image </span>
+                                                            <span class="fileinput-exists "> Change </span>
+                                                            <input type="file" name="..." id="WatarmarkImage" accept=".jpg, .png, .jpeg, .gif, .bmp, .tif, .tiff|images/*">
+                                                        </span>
+                                                        <a href="javascript:;" class="btn default fileinput-exists red" data-dismiss="fileinput"> Remove </a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="submit" ng-click="submitted=true" class="btn green-haze" ng-disabled="btnDis">{{btn}} <i ng-show="spin" class="fa fa-spinner fa-spin" style="font-size:20px"></i></button>
+                            <button type="button" data-dismiss="modal" class="btn dark btn-outline" ng-click="reset();submitted=false">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <!--Modal Area End-->
+        <!--Modal Area Start-->
+        <div id="addmodal2" class="modal fade" tabindex="-1" data-backdrop="static" data-keyboard="false">
+            <div class="modal-dialog modal-sm">
+                <div class="modal-content">
+                    <form class="form-horizontal" novalidate enctype="multipart/form-data">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                            <h4 class="modal-title">Signature Image</h4>
+                        </div>
+                        <div class="modal-body">
+                            <div class="">
+                                <label class="sbold">
+                                    Person Name :
+                                </label>{{PersonName}}
+                            </div>
+                            <div class="">
+                                <label class="sbold">
+                                    Designation :
+                                </label>
+                                {{Designation}}
+                            </div>
+                            <img ng-src="data:image/jpg;base64,{{SignatureImg}}" style="height:100px;width:270px">
+                        </div>
+                        <div class="modal-footer">
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <!--Modal Area End-->
+    </div>
+    <!-- End: life time stats -->
+</div>
+
+@section Scripts{
+<script src="~/assets/global/plugins/bootstrap-fileinput/bootstrap-fileinput.js" type="text/javascript"></script>
+    <script type="text/javascript">
+        OEMSApp.controller("SeatCardSetup", ["$scope", "$http", "SweetAlert", "$window",
+              function ($scope, $http, SweetAlert, $window) {
+                  init();
+                  function init() {
+                      initialize();
+                      getAllDropdowns();
+                      getAllCommons();
+                      getAllSeatCardSetup();
+                  }
+                  function initialize() {
+                      $scope.modalTitle = "Add Seat Card Setup";
+                      $scope.btn = "Save";
+                      $scope.SeatCardSetup = {};
+                      $scope.SeatCardSetups = [];
+                      $scope.CommonFeild = {};
+                      $scope.res = {};
+                      $scope.data = {};
+                      $scope.resetForm = resetForm;
+
+                      $scope.btnDis = false;
+                      $scope.spin = false;
+                      $scope.getSeatCardSetup = getSeatCardSetup;
+                      $scope.SeatCardSetup.ID = 0;
+                    
+                      $scope.SignatureImg = null;
+                      $scope.PersonName = null;
+                      $scope.Designation = null;
+                      $scope.pageSizeArray = [];
+                      $scope.pageSizeArray.push({ value: 5, text: 5 });
+                      $scope.pageSizeArray.push({ value: 10, text: 10 });
+                      $scope.pageSizeArray.push({ value: 20, text: 20 });
+                      $scope.pageSizeArray.push({ value: 50, text: 50 });
+                      $scope.currentPage = 1;
+                      $scope.pageno = 1;
+                      $scope.pageSize = 10;
+                  }
+                  
+                  function resetForm() {
+                      $scope.modalTitle = "Add Seat Card Setup";
+                      $scope.SeatCard = {};
+                      $scope.SeatCard.ID = 0;
+                      $scope.submitted = false;
+                      $scope.submitted1 = false;
+                      $scope.Id = '';
+                     
+                  }
+                  function reset() {
+                      $scope.modalTitle = "Add Seat Card Setup";
+                      $scope.btn = "Save";
+                      $scope.SeatCard = [];
+                      $scope.submitted = false;
+                      $scope.submitted1 = false;                       
+                      $(".fileinput").fileinput("clear");
+                      document.getElementById("WatarmarkImage").value = '';
+                      getAllSeatCardSetup();
+                  }
+                  $scope.FromReload = function FromReload() {
+                      document.getElementById("WatarmarkImage").value = '';
+                  }
+                  $scope.image = function image(n, s) {
+                      if (s == 1) {
+                          $scope.SignatureImg = n.SignatureImage1;
+                          $scope.PersonName = n.PersonName1;
+                          $scope.Designation = n.SignatureDesignation_1;
+                      }
+                      else if (s == 2) {
+                          $scope.SignatureImg = n.SignatureImage2;
+                          $scope.PersonName = n.PersonName2;
+                          $scope.Designation = n.SignatureDesignation_2;
+                      }
+                      else if (s == 3) {
+                          $scope.SignatureImg = n.SignatureImage3;
+                          $scope.PersonName = n.PersonName3;
+                          $scope.Designation = n.SignatureDesignation_3;
+                      }
+                      else if (s == 4) {
+                          $scope.SignatureImg = n.SignatureImage4;
+                          $scope.PersonName = n.PersonName4;
+                          $scope.Designation = n.SignatureDesignation_4;
+                      }
+
+                  }
+             
+                  function getAllDropdowns() {
+                      $scope.Dropdowns = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Common/GetAllDropDown/'
+                      }).then(function successCallback(response) {
+                          $scope.Dropdowns = response.data.results;
+                      }, function errorCallback(response) {
+                          toastr["warning"](response.data.Message);
+                      });
+                  }
+                  function getAllCommons() {
+                      $scope.CommonFeilds = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Common/GetCommonItem/'
+                      }).then(function successCallback(response) {
+                          $scope.CommonFeilds = response.data.results;
+                      }, function errorCallback(response) {
+                          toastr["warning"](response.data.Message);
+                      });
+                  }
+                  function getSeatCardSetup() {
+                      if ($scope.frmCommonFeilds.$invalid)
+                          return;
+                      $scope.SeatCardSetups = [];
+                      $http({
+                          method: 'POST',
+                          url: baseUrl + 'SetupInstitution/GetSeatCardSetupInfo/',
+                          data: $scope.CommonFeild
+                      }).then(function successCallback(response) {
+                          $scope.SeatCardSetups = response.data.results;
+                          toastr["success"](response.data.message);
+                      }, function errorCallback(response) {
+                          toastr["warning"](response.data.Message);
+                      });
+                  };
+                  
+                  function getAllSeatCardSetup() {
+                      $scope.SeatCardSetups = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'SetupInstitution/getSeatCardExam/' + null + '/' + null + '/' + null + '/' + null
+                      }).then(function successCallback(response) {
+                          $scope.SeatCardSetups = response.data.results;
+                          toastr["success"](response.data.message);
+                      }, function errorCallback(response) {
+                          toastr["warning"](response.data.Message);
+                      });
+                  };
+                  $scope.searchData = function () {
+                      getBranchs(1);
+                  };
+                  $scope.edit = function (n) {
+                      $scope.modalTitle = "Update Seat Card Setup";
+                      $scope.btn = "Update";
+                      $scope.SeatCard = n;
+                      $scope.getSignature();
+                      //getSubjectsWhenEdit(n.VersionId, n.ClassId, n.SessionId, n.GroupId);
+                      $scope.Id = n.Id;
+                  };
+                  $scope.save = function save() {
+                      if ($scope.frmSeatCardSetup.$invalid)
+                          return;
+                      if ($("input[type='checkbox']:checked").length > 2) {
+                          toastr["warning"]("Please Select Only Two Signature");
+                          return;
+                      }
+                      if ($scope.SeatCard != {}) {
+                          var files = $("#WatarmarkImage").get(0).files;
+                          $http({
+                              method: 'POST',
+                              url: baseUrl + '/SetupInstitution/AddSeatCardSetup/',
+                              headers: { 'Content-Type': undefined },
+                              transformRequest: function (data) {
+                                  var formData = new FormData();
+                                  formData.append('SeatCardInfo', JSON.stringify($scope.SeatCard));
+                                  if (files.length > 0)
+                                      formData.append("WImg", files[0]);
+                                  return formData;
+                              },
+                              data: { SeatCardInfo: $scope.SeatCard }
+                          }).then(function successCallback(response) {
+                                  $scope.SeatCardSetups = response.data.results;
+                                  toastr["success"](response.data.message);
+                                  $('#addmodal').modal('toggle');
+                                  reset();
+                              }, function errorCallback(response) {
+                                  toastr["warning"](response.data.Message);
+                          });
+                      }                         
+                  };
+                  $scope.deleteSeatCardSetup = function deleteSeatCardSetup(n) {
+                      // SweetAlert.swal("Good job!", "You clicked the button!", "success");
+                      SweetAlert.swal({
+                          title: "Are you sure to delete it ?", type: "warning", showCancelButton: true, confirmButtonColor: "#DD6B55",
+                          confirmButtonText: "Yes, delete it!",
+                          closeOnConfirm: false
+                      },
+                      function (isConfirm) {
+                          if (isConfirm) {
+                              $http({
+                                  method: 'DELETE',
+                                  url: baseUrl + 'SetupInstitution/deleteSeatCardSetup/' + n.ID
+                              }).then(function successCallback(response) {
+                                  SweetAlert.swal("Deleted!", "Your data has been deleted.", "success");
+                                  $scope.SeatCardSetups = response.data.results;
+                                  getAllSeatCardSetup();
+                              }, function errorCallback(response) {
+                                  toastr["warning"](response.data.Message);
+                              });
+                          }
+                      });
+                  };
+                  $scope.getSignature = function getSignature() {
+                      $scope.signatures = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'SetupInstitution/getSignature/' + $scope.SeatCard.SessionID + '/' + $scope.SeatCard.BranchID + '/' + $scope.SeatCard.ShiftID + '/' + $scope.SeatCard.ClassID
+                      }).then(function successCallback(response) {
+                          $scope.signatures = response.data.results;
+                      }, function errorCallback(response) {
+                          toastr["error"](response.data.message);
+                      });
+                  }
+                  function getSubjectsWhenEdit(vid, sid, seid, gid ) {
+                      $scope.Subjects = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'SubjectSetup/GetAllSubject/' +vid + '/' + sid + '/' + seid + '/' + gid
+                      }).then(function successCallback(response) {
+                          $scope.Subjects = response.data.results;
+                      }, function errorCallback(response) {
+                          toastr["error"](response.data.message);
+                      });
+                  }
+              }]);
+    </script>
+
+}

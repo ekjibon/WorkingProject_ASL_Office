@@ -1,0 +1,354 @@
+﻿
+@{
+    ViewBag.Title = "ReportConfig";
+}
+
+<div class="portlet light bordered" ng-controller="MEGR">
+    <div class="portlet-title">
+        <div class="caption">
+            <i class="icon-settings font-green"></i>
+            <span class="caption-subject font-green sbold uppercase">Report Config</span>
+        </div>
+        <div class="actions">
+            <div class="btn-group btn-group-solid">
+                <button ng-click="Reset()" class="btn green" data-target="#addmodal" data-toggle="modal"> <i class="fa fa-plus"></i> Add Report Config</button>
+                <a style="margin:0 15px;" ng-click="generateReport()" class="btn btn-primary">View Report</a>
+            </div>
+        </div>
+    </div>
+    <div class="portlet-body">
+        <div class="table-container">
+            <div id="sample_3_wrapper" class="dataTables_wrapper no-footer">
+                <div class="row">
+                    <div class="col-md-4 col-sm-5 col-xs-6">
+                        <div class="form-group">
+                            <div class="col-lg-3 col-md-5 col-sm-4 col-xs-8" style="padding-left:0px;width:80px">
+                                <select class="form-control" ng-model="pageSize" ng-options="P.value as P.text for P in pageSizeArray"></select>
+                            </div>
+                            <div class="col-md-7  col-sm-8  col-xs-4">
+                                @*<label for="search" class="control-label" style="padding-top:5px">Items</label>*@
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-sm-3 col-xs-1">
+                    </div>
+                    <div class="col-md-4 col-sm-4 col-xs-5">
+                        <div id="sample_3_filter" class="pull-right">
+                            <input ng-model="q" id="search" class="form-control" placeholder="Filter text">
+                        </div>
+                    </div>
+                </div>
+                <div class="table-scrollable"> </div>
+                <table class="table table-bordered">
+                    <thead>
+                        <tr class="btn-primary">
+                            <th>Class</th>
+                            <th>Report Name</th>
+                            <th>Exam Name</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-show="ReportConfigs.length <= 0"><td colspan="5" style="text-align:center;"><i class="fa fa-refresh"></i> Loading new data!!</td></tr>
+                        <tr dir-paginate="item in ReportConfigs| filter:q  | itemsPerPage: pageSize" current-page="currentPage"">
+                             <td>{{item.ClassName}}</td>
+                            <td>{{item.ReportName}}</td>
+                            <td>{{item.Exam}}</td>
+
+                            <td>
+                                <a href="javascript:;" class="btn btn-icon-only green" ng-click="edit(item)" data-target="#addmodal" data-toggle="modal">
+                                    <i class="fa fa-edit"></i>
+                                </a>
+                                <a ng-click="deleteReport(item)" href="javascript:;" class="btn btn-icon-only red">
+                                    <i class="fa fa-trash"></i>
+                                </a>
+
+
+                            </td>
+
+                        </tr>
+                    </tbody>
+
+                </table>
+                <div class="row">
+                    <dir-pagination-controls boundary-links="true" template-url="/assets/angular/lib/dirPagination.tpl.html"></dir-pagination-controls>
+                </div>
+
+            </div>
+        </div>
+
+        <!--Modal Area Start-->
+        <div id="addmodal" class="modal fade" tabindex="-1" data-backdrop="static" data-keyboard="false">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <form class="form-horizontal" name="formCommonFeilds" ng-submit="Save()" novalidate>
+
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                            <h4 class="modal-title">{{modalTitle}}</h4>
+                        </div>
+                        <div class="modal-body" style="padding:13px">
+                            <div class="form-body">
+                                <div class="row">
+                                    <div class="col-md-12">
+                            <div class="form-group" ng-class="{ 'has-error' : submitted && formCommonFeilds.Class.$invalid}">
+                                            <label class="col-md-3 control-label">
+                                                Class :
+                                                <span class="required">*</span>
+                                            </label>
+                                            <div class="col-md-8">
+                                                <select class="form-control" ng-model="ReportConfig.ClassId" name="Class" required ng-options="ReportConfig.ClassId as ReportConfig.ClassName for ReportConfig in CommonFeilds.ClassInfo">
+                                                    <option value="" selected="selected">Choose Option</option>
+                                                </select>
+                                                <div class="form-control-focus"> </div>
+                                                <span ng-show="submitted && formCommonFeilds.Class.$error.required" class="help-block">Class Required</span>
+                                            </div>
+                                        </div>
+                                        <div class="form-group" ng-class="{ 'has-error' : submitted && formCommonFeilds.ExamType.$invalid}">
+                                            <label class="col-md-3 control-label">
+                                                Exam Type :
+                                                <span class="required">*</span>
+                                            </label>
+                                            <div class="col-md-8">
+                                                <select class="form-control" ng-model="ReportConfig.Type" name="ExamType" required>
+                                                    <option value="" selected="selected">Choose Option</option>
+                                                    <option value="S">Sub Exam</option>
+                                                    <option value="M">Main Exam</option>
+                                                   <option value="MME">Main Merit</option>
+                                                    <option value="MF">Main Fail</option>
+                                                </select>
+                                                <div class="form-control-focus"> </div>
+                                                <span ng-show="submitted && formCommonFeilds.ExamType.$error.required" class="help-block"> Exam Type</span>
+                                            </div>
+                                        </div>
+                                        <div class="form-group" ng-class="{ 'has-error' : submitted && formCommonFeilds.ReportName.$invalid}">
+                                            <label class="col-md-3 control-label">
+                                                Report Name :
+                                                <span class="required">*</span>
+                                            </label>
+                                            <div class="col-md-8">
+                                                <select class="form-control" ng-model="ReportConfig.ReportId" name="ReportName" ng-options="ReportConfig.ReportId as ReportConfig.ReportName for ReportConfig in ReportNames | filter:{Type:ReportConfig.Type}:true" required>
+                                                    <option value="" selected="selected">Choose Option</option>
+                                                </select>
+                                                <div class="form-control-focus"> </div>
+                                                <span ng-show="submitted && formCommonFeilds.ReportName.$error.required" class="help-block">Report Name Required</span>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <div class="col-md-11">
+                                <button ng-click="submitted=true" class="btn green">{{btnTitle}}</button>
+                                <a ng-click="Reset()" class="btn info">Reset</a>
+                                <button type="button" data-dismiss="modal" class="btn dark btn-outline" ng-click="Reset();submitted=false">Cancel</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <!--Modal Area End-->
+
+    </div>
+
+
+</div>
+
+@section Scripts{
+    <script type="text/javascript">
+        OEMSApp.controller("MEGR", ["$scope", "$http", "SweetAlert", "$window",
+          function ($scope, $http, SweetAlert, $window) {
+
+              init();
+              function init() {
+                  initialize();
+                  getAllDropdowns();
+                  getAllCommons();
+                  getReportConfig();
+
+              }
+              function initialize() {
+                  $scope.ReportConfig = {};
+                  $scope.btnTitle = "Save";
+                  $scope.modalTitle = "Add Report Config";
+                  $scope.ReportConfig = {};
+                  $scope.ReportConfigs = [];
+                  $scope.StudentInfos = [];
+                  $scope.Dropdowns = [];
+                  $scope.CommonFeilds = [];
+                  $scope.currentPage = 1;
+                  $scope.pageno = 1;
+                  $scope.pagesize = 10;
+                  $scope.total_count = 12;
+                  $scope.txtsearch = '';
+                  $scope.getAllDropdowns = getAllDropdowns;
+                  $scope.GetReportName = GetReportName;
+                  $scope.getReportConfig = getReportConfig;
+                  GetReportName();
+
+                  $scope.pageSizeArray = [];
+                  $scope.pageSizeArray.push({ value: 5, text: 5 });
+                  $scope.pageSizeArray.push({ value: 10, text: 10 });
+                  $scope.pageSizeArray.push({ value: 20, text: 20 });
+                  $scope.pageSizeArray.push({ value: 50, text: 50 });
+                  $scope.currentPage = 1;
+                  $scope.pageSize = 10;
+              };
+
+              //for class ways report ........
+              $scope.generateReport = function generateReport() {
+                  $scope.uri = "@Url.Action("ReportConfigurReport", "Report")";
+                  $window.open($scope.uri, '_blank');
+              }
+              $scope.Reset = function Reset() {
+                  $scope.modalTitle = "Add Report Config";
+                  $scope.btnTitle = "Save";
+                  $scope.ReportConfig = {};
+                  $scope.submitted = false;
+
+              };
+
+              $scope.edit = function edit(item) {
+                  $scope.modalTitle = "Update Report Config";
+                  $scope.btnTitle = "Update";
+                  $scope.ReportConfig.VersionID = item.VersionID;
+                  $scope.ReportConfig.ClassId = item.ClassId;
+                  $scope.ReportConfig.Type = item.Type;
+                  // GetReportName();
+                  $scope.ReportConfig.ReportId = item.ReportId;
+                  $scope.ReportConfig.ReportConfigId = item.ReportConfigId;
+              }
+              function GetReportName() {
+                  $scope.ReportNames = [];
+
+                  $http({
+                      method: 'GET',
+                      url: baseUrl + 'Result/GetReportList/',
+                  }).then(function successCallback(response) {
+                      $scope.ReportNames = response.data.results;
+                  }, function errorCallback(response) {
+                      toastr["error"](response.data.message);
+                  });
+
+              }
+
+
+              $scope.Save = function Save() {
+                  if ($scope.formCommonFeilds.$invalid == true)
+                      return;
+
+                  if ($scope.ReportConfig != {}) {
+
+                      if ($scope.ReportConfig.ReportConfigId > 0) {
+                          $http({
+                              method: 'PUT',
+                              url: baseUrl + 'Result/UpdateReportConfig/',
+                              data: $scope.ReportConfig
+                          }).then(function successCallback(response) {
+
+                              //getSession(1);
+                              getReportConfig()
+                              toastr["info"](response.data.message);
+                              resetForm();
+
+                          }, function errorCallback(response) {
+                              toastr["info"](response.data.message);
+                          });
+                      }
+                      else {
+                          $http({
+                              method: 'POST',
+                              url: baseUrl + 'Result/AddReportConfig/',
+                              data: $scope.ReportConfig
+                          }).then(function successCallback(response) {
+
+                              //getSession(1);
+                              getReportConfig()
+                              toastr["info"](response.data.message);
+                              resetForm();
+
+                          }, function errorCallback(response) {
+                              toastr["info"](response.data.message);
+                          });
+                      }
+
+
+                  }
+
+              };
+
+              function getReportConfig() {
+                  $scope.ReportConfigs = [];
+                  $http({
+                      method: 'GET',
+                      url: baseUrl + 'Result/GetReportConfig/',
+                  }).then(function successCallback(response) {
+                      $scope.ReportConfigs = response.data.results;
+                  }, function errorCallback(response) {
+                      toastr["info"](response.data.message);
+                  });
+              }
+
+              function getAllDropdowns() {
+                  $scope.Dropdowns = [];
+
+                  $http({
+                      method: 'GET',
+                      url: baseUrl + 'Common/GetAllDropDown/'
+                  }).then(function successCallback(response) {
+                      $scope.Dropdowns = response.data.results;
+
+
+                  }, function errorCallback(response) {
+                      toastr["info"](response.data.message);
+                  });
+              }
+
+              function getAllCommons() {
+                  $scope.CommonFeilds = [];
+
+                  $http({
+                      method: 'GET',
+                      url: baseUrl + 'Common/GetCommonItem/'
+                  }).then(function successCallback(response) {
+                      $scope.CommonFeilds = response.data.results;
+                  }, function errorCallback(response) {
+                      toastr["info"](response.data.message);
+                  });
+              }
+
+
+              $scope.deleteReport = function deleteReport(n) {
+
+                  SweetAlert.swal({
+                      title: "Are you sure to delete it ?", type: "warning", showCancelButton: true, confirmButtonColor: "#DD6B55",
+                      confirmButtonText: "Yes, delete it!",
+                      closeOnConfirm: false
+                  },
+                  function (isConfirm) {
+
+
+                      if (isConfirm) {
+                          $http({
+                              method: 'DELETE',
+                              url: baseUrl + 'Result/DeleteReportConfig/' + n.ReportConfigId,
+                              data: $scope.session
+                          }).then(function successCallback(response) {
+                              SweetAlert.swal("Deleted!", "Your data has been deleted.", "success");
+                              getReportConfig()
+                          }, function errorCallback(response) {
+                              toastr["info"](response.data.message);
+                          });
+
+                      }
+                  });
+
+
+              };
+
+          }]);
+    </script>
+} 

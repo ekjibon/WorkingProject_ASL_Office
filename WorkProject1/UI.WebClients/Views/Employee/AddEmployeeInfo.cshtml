@@ -1,0 +1,1426 @@
+﻿@{
+    ViewBag.Title = "Student Info Add";
+}
+@section Styles{
+    <link href="~/assets/global/plugins/bootstrap-fileinput/bootstrap-fileinput.css" rel="stylesheet" type="text/css" />
+}
+<div class="portlet box blue-hoki" style="width: 100%" ng-controller="employeeInfo">
+    <div class="portlet-title">
+        <div class="caption">
+            <i class="fa fa-user-plus"></i>Employee Information
+        </div>
+        <div class="tools">
+            <a href="javascript:;" class="collapse"> </a>
+        </div>
+    </div>
+    <div class="portlet-body">
+       
+     
+           <div class="portlet box">
+            <div class="tools">
+                <a href="javascript:;" class="collapse"> </a>
+            </div>
+            <div class="portlet-body">
+                <div class="tabbable-custom nav-justified">
+                    <ul class="nav nav-tabs nav-justified">
+                        <li class="active" ng-hide="employeeInfo.EmpID==null">
+                          <a href="#employeeInfo" data-toggle="tab"> Employee Info </a>
+                        </li>
+
+                        <li class="" ng-hide="employeeInfo.EmpID==null" ng-class="{active: $scope.activetab == 'EmpContact'}">
+                            <a href="#employeeContact" data-toggle="tab"> Contact </a>
+
+                        </li>
+                        <li ng-hide="employeeInfo.EmpID==null" ng-class="{'active':selectedTab === 'users'}" >
+                            <a href="#Educational" data-toggle="tab"> Educational </a>
+                        </li>
+                        <li ng-hide="employeeInfo.EmpID==null">
+                            <a href="#JobInfo" data-toggle="tab">Job Info  </a>
+                        </li>
+                        <li ng-hide="employeeInfo.EmpID==null">
+                            <a href="#Work" data-toggle="tab"> Work </a>
+                        </li>
+                        <li ng-hide="employeeInfo.EmpID==null">
+                            <a href="#Training" data-toggle="tab"> Training </a>
+                        </li>
+                        <li ng-hide="employeeInfo.EmpID==null">
+                            <a href="#Attendance" data-toggle="tab"> Attendance  </a>
+                        </li>
+                        <li ng-hide="employeeInfo.EmpID==null">
+                            <a href="#others" data-toggle="tab"> Others </a>
+                        </li>
+                    </ul>
+                     <div class="tab-content">
+                        <div class="tab-pane active" id="employeeInfo">
+                            <!-- BEGIN FORM-->
+                            <form name="addBasic" ng-submit="save()" class="form-horizontal">
+                                <div class="portlet-body">
+                                    @*    <h4> Basic Info </h4> <br />*@
+                                    @*Emp Must selective options*@
+                                    <div class="form-body">
+                                        <div class="row">
+                                            <div class="col-md-4">
+                                                <div class="form-group" ng-class="{ 'has-error' : submitted1 && formCommonFeilds.Designation.$invalid}">
+                                                    <label class="col-md-5 control-label">
+                                                        Designation :
+                                                        <span class="required">*</span>
+                                                    </label>
+                                                    <div class="col-md-7">
+                                                        <select class="form-control" ng-model="employeeInfo.DesignationID" required name="Designation" ng-options="employeeInfo.DesignationID as employeeInfo.DesignationName for employeeInfo in CommonFeilds.Designation">
+                                                            <option value="" selected="selected">Choose Option</option>
+                                                        </select>
+                                                        <div class="form-control-focus"> </div>
+                                                        <span ng-show="submitted1 && formCommonFeilds.Designation.$error.required" class="help-block">Designation Required</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-4">
+                                                <div class="form-group" ng-class="{ 'has-error' : submitted1 && formCommonFeilds.Class.$invalid}">
+                                                    <label class="col-md-5 control-label">
+                                                        Category
+                                                        <span class="required">*</span>
+                                                    </label>
+                                                    <div class="col-md-7">
+                                                        <select class="form-control" ng-model="employeeInfo.CategoryID" name="Class" ng-change="" required ng-options="employeeInfo.CategoryID as employeeInfo.CategoryName for employeeInfo in CommonFeilds.Category">
+                                                            <option value="" selected="selected">Choose Option</option>
+                                                        </select>
+                                                        <div class="form-control-focus"> </div>
+                                                        <span ng-show="submitted1 && formCommonFeilds.Class.$error.required" class="help-block">Class Required</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="form-group" ng-class="{ 'has-error' : submitted1 && formCommonFeilds.AdmissionDate.$invalid}">
+                                                    <label class="col-md-5 control-label" style="padding-left:2px">
+                                                        Status
+                                                        <span class="required">*</span>
+                                                    </label>
+                                                    <div class="col-md-7">
+                                                        <select class="form-control" ng-model="employeeInfo.StatusID" name="Class" ng-change="" required ng-options="employeeInfo.StatusID as employeeInfo.StatusName for employeeInfo in CommonFeilds.Status">
+                                                            <option value="" selected="selected">Choose Option</option>
+                                                        </select>
+                                                        <div class="form-control-focus"> </div>
+                                                        <span ng-show="submitted1 && formCommonFeilds.AdmissionDate.$error.required" class="help-block">Admission Date Required</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-4">
+                                                <div class="form-group" ng-class="{ 'has-error' : submitted1 && formCommonFeilds.Version.$invalid}">
+                                                    <label class="col-md-5 control-label">
+                                                        Version :
+                                                        <span class="required">*</span>
+                                                    </label>
+                                                    <div class="col-md-7">
+                                                        @*ng-options="employeeInfo.VersionId as employeeInfo.VersionName for employeeInfo in CommonFeilds.Version"*@
+
+                                                        <select class="form-control" ng-model="employeeInfo.VersionID" required name="Version" ng-options="employeeInfo.VersionId as employeeInfo.VersionName for employeeInfo in CommonFeilds.Version">
+                                                            <option value="" selected="selected">Choose Option</option>
+                                                        </select>
+
+                                                        <div class="form-control-focus"> </div>
+                                                        <span ng-show="submitted1 && formCommonFeilds.Version.$error.required" class="help-block">Version Required</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="form-group" ng-class="{ 'has-error' : submitted1 && formCommonFeilds.Branch.$invalid}">
+                                                    <label class="col-md-5 control-label">
+                                                        Branch
+                                                    </label>
+                                                    <div class="col-md-7">
+                                                        <select class="form-control" ng-model="employeeInfo.BranchID" name="Branch" ng-options="employeeInfo.BranchId as employeeInfo.BranchName for employeeInfo in CommonFeilds.Branch">
+                                                            <option value="" selected="selected">Choose Option</option>
+                                                        </select>
+                                                        <div class="form-control-focus"> </div>
+                                                        <span ng-show="submitted1 && formCommonFeilds.Branch.$error.required" class="help-block">Branch Name Required</span>
+
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="form-group" >
+                                                    <label class="col-md-5 control-label">
+                                                        Shift
+                                                    </label>
+                                                    <div class="col-md-7">
+                                                        <select class="form-control" ng-model="employeeInfo.ShiftID" name="Shift" ng-options="employeeInfo.ShiftID as employeeInfo.ShiftName for employeeInfo in CommonFeilds.Shift">
+                                                            <option value="" selected="selected">Choose Option</option>
+                                                        </select>                              
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="col-md-4">
+                                                <div class="form-group" ng-class="{ 'has-error' : submitted1 && formCommonFeilds.Department.$invalid}">
+                                                    <label class="col-md-5 control-label">
+                                                        Department :
+                                                        <span class="required">*</span>
+                                                    </label>
+                                                    <div class="col-md-7">
+                                                        <select class="form-control" ng-model="employeeInfo.DepartmentID" required name="Department" ng-options="employeeInfo.DepartmentID as employeeInfo.DepartmentName for employeeInfo in CommonFeilds.Department">
+                                                            <option value="" selected="selected">Choose Option</option>
+                                                        </select>
+                                                        <div class="form-control-focus"> </div>
+                                                        <span ng-show="submitted1 && formCommonFeilds.Department.$error.required" class="help-block">Department Name Required</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="form-group" ng-class="{ 'has-error' : submitted1 && formCommonFeilds.Subject.$invalid}">
+                                                    <label class="col-md-5 control-label">
+                                                        Subject
+                                                        <span class="required">*</span>
+                                                    </label>
+                                                    <div class="col-md-7">
+                                                        <select class="form-control" ng-model="employeeInfo.SubjectID" name="Subject" ng-options="employeeInfo.SubjectID as employeeInfo.SubjectName for employeeInfo in CommonFeilds.Subject">
+                                                            <option value="" selected="selected">Choose Option</option>
+                                                        </select>
+                                                        <div class="form-control-focus"> </div>
+                                                        <span ng-show="submitted1 && formCommonFeilds.Subject.$error.required" class="help-block">Subject Name Required</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="form-group">
+                                                    <label class="col-md-5 control-label">
+                                                        Section
+                                                       
+                                                    </label>
+                                                    <div class="col-md-7">
+                                                        <select class="form-control" ng-model="employeeInfo.SectionID" name="Section" ng-options="employeeInfo.SectionID as employeeInfo.SectionName for employeeInfo in CommonFeilds.Section">
+                                                            <option value="" selected="selected">Choose Option</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="col-md-4">
+                                                <div class="form-group" ng-class="{ 'has-error' : submitted1 && formCommonFeilds.AdmissionDate.$invalid}">
+                                                    <label class="col-md-5 control-label" style="padding-left:2px">
+                                                        Joining Date:
+                                                        <span class="required">*</span>
+                                                    </label>
+                                                    <div class="col-md-7">
+                                                        <input class="form-control" name="JoiningDate" type="datetime" placeholder="Joining Date" readonly ng-change="getOrderbydate()" ng-click="p1=true" is-open="p1" uib-datepicker-popup="dd-MM-yyyy" ng-model="employeeInfo.JoiningDate" />
+                                                        <div class="form-control-focus"> </div>
+                                                        <span ng-show="submitted1 && formCommonFeilds.JoiningDate.$error.required" class="help-block">Joining Date Required</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="form-group" ng-class="{ 'has-error' : submitted1 && formCommonFeilds.ProbationPeriodEndDate.$invalid}">
+                                                    <label class="col-md-5 control-label" style="padding-left:2px">
+                                                        Probition End Date:
+                                                        <span class="required">*</span>
+                                                    </label>
+                                                    <div class="col-md-7">
+                                                        <input class="form-control" name="ProbationPeriodEndDate" type="datetime" placeholder="Probation Period End Date" readonly ng-change="getOrderbydate()" ng-click="p4=true" is-open="p4" uib-datepicker-popup="dd-MM-yyyy" ng-model="employeeInfo.ProbationPeriodEndDate" />
+                                                        <div class="form-control-focus"> </div>
+                                                        <span ng-show="submitted1 && formCommonFeilds.ProbationPeriodEndDate.$error.required" class="help-block">Joining Date Required</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="form-group" ng-class="{ 'has-error' : submitted1 && formCommonFeilds.ConfirmationDate.$invalid}">
+                                                    <label class="col-md-5 control-label" style="padding-left:2px">
+                                                        Confirmation Date:
+                                                        <span class="required">*</span>
+                                                    </label>
+                                                    <div class="col-md-7">
+                                                        <input class="form-control" name="ConfirmationDate" type="datetime" placeholder="Joining Date" readonly ng-change="getOrderbydate()" ng-click="p3=true" is-open="p3" uib-datepicker-popup="dd-MM-yyyy" ng-model="employeeInfo.ConfirmationDate" />
+                                                        <div class="form-control-focus"> </div>
+                                                        <span ng-show="submitted1 && formCommonFeilds.ConfirmationDate.$error.required" class="help-block">Confirmation Date Required</span>
+                                                    </div>
+                                                </div>
+
+                                            </div>
+
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="col-md-4">
+                                                <div class="form-group" ng-class="{ 'has-error' : submitted1 && formCommonFeilds.EmpID.$invalid}">
+                                                    <label class="col-md-5 control-label">
+                                                        Employee ID:
+                                                    </label>
+                                                    <div class="col-md-7">
+                                                        <input type="text" ng-model="employeeInfo.EmpID" class="form-control" placeholder="EmpID" name="EmpID" disabled="disabled">
+                                                        <div class="form-control-focus"> </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="form-group" ng-class="{ 'has-error' : submitted1 && formCommonFeilds.MPOIndexNo.$invalid}">
+                                                    <label class="col-md-5 control-label">
+                                                        Index No:
+                                                    </label>
+                                                    <div class="col-md-7">
+                                                        <input type="text" ng-model="employeeInfo.MPOIndexNo" class="form-control" placeholder="MPOIndexNo" name="MPOIndexNo">
+                                                        <div class="form-control-focus"> </div>
+                                                    </div>
+                                                </div>
+
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label class="col-md-5 control-label">
+                                                    Is Class teacher:
+                                                </label>
+                                                <div class="col-md-7">
+
+                                                    <input type="checkbox" name='IsClassTeacher' ng-model="employeeInfo.IsClassTeacher" ng-checked="employeeInfo.IsClassTeacher==true" style="width:20px;height:20px;">
+                                               
+                                                 </div>
+                                           </div>
+
+                                            <div class="col-md-2 pull-right">
+                                                <button type="button" ng-click="GenerateID()" ng-disabled="employeeInfo.EmpID!=null" class="btn green pull-right">Generate Employee ID</button>
+                                            </div>
+                                        </div>
+
+                                      
+
+                                        <hr />
+
+                                    </div>
+
+                                    @*Emp Name and others*@
+
+                                    <div class="col-md-8">
+
+                                        <div class="form-group" ng-class="{ 'has-error' : submitted && addBasic.Name.$invalid}">
+                                            <label class="col-md-3 control-label">
+                                                Employee Name :
+                                                <span class="required">*</span>
+                                            </label>
+                                            <div class="col-md-9">
+                                                <input type="text" ng-model="employeeInfo.FullName" class="form-control" placeholder="Employee Name" name="FullName" required>
+                                                <div class="form-control-focus"> </div>
+                                                <span ng-show="submitted &&  addBasic.Name.$error.required" class="help-block">Full Name Required</span>
+                                            </div>
+                                        </div>
+                                        <div class="form-group" ng-class="{ 'has-error' : submitted && addBasic.NameBangla.$invalid}">
+                                            <label class="col-md-3 control-label">
+                                                Father's Name :
+                                                <span class="required">*</span>
+                                            </label>
+                                            <div class="col-md-9">
+                                                <input type="text" ng-model="employeeInfo.FatherName" class="form-control" placeholder="Father Name Name" name="FatherName" required>
+                                                <div class="form-control-focus"> </div>
+                                                <span ng-show="submitted &&  addBasic.FatherName.$error.required" class="help-block">Father Name Required</span>
+                                            </div>
+                                        </div>
+                                        <div class="form-group" ng-class="{ 'has-error' : submitted && addBasic.NameBangla.$invalid}">
+                                            <label class="col-md-3 control-label">
+                                                Mother's Name :
+                                                <span class="required">*</span>
+                                            </label>
+                                            <div class="col-md-9">
+                                                <input type="text" ng-model="employeeInfo.MotherName" class="form-control" placeholder="Mother Name Name" name="MotherName" required>
+                                                <div class="form-control-focus"> </div>
+                                                <span ng-show="submitted &&  addBasic.MotherName.$error.required" class="help-block">Mother Name Required</span>
+                                            </div>
+                                        </div>
+
+                                    </div>
+
+                                    <div class="col-md-4">
+                                        <div class="form-group" ng-class="{ 'has-error' : submitted && addBasic.stuimage.$invalid}">
+                                            <div class="col-md-8">
+                                                <div class="fileinput fileinput-new" data-provides="fileinput">
+                                                    <div class="row">
+                                                        <div class="col-md-4">
+                                                            <div class="fileinput-preview thumbnail" data-trigger="fileinput" style="width: 80px; height: 82px;"> </div>
+                                                        </div>
+                                                        <div style="float:right !important" class="col-md-4">
+                                                            <span class="btn red btn-outline btn-file">
+                                                                <span class="fileinput-new"> Select image </span>
+                                                                <span class="fileinput-exists"> Change </span>
+                                                                <input type="file" id="imgs" name="Image" required>
+                                                            </span>
+                                                            <a href="javascript:;" style="margin-top:10px !important" class="btn red fileinput-exists" data-dismiss="fileinput"> Remove </a>
+                                                            <div class="form-control-focus"> </div>
+                                                            <span ng-show="submitted &&  addBasic.stuimage.$error.required" class="help-block">Photo Required</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                            </div>
+
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="form-group" ng-class="{ 'has-error' : submitted && addBasic.Gender.$invalid}">
+                                                <label class="col-md-4 control-label">
+                                                    Gender :
+                                                    <span class="required">*</span>
+                                                </label>
+                                                <div class="col-md-8">
+                                                    <select class="form-control" ng-model="employeeInfo.Gender" required name="Gender" ng-options="employeeInfo.Value as employeeInfo.Text for employeeInfo in Dropdowns | filter:Type='Gender'">
+                                                        <option value="" selected="selected">Choose Option</option>
+                                                    </select>
+                                                    <div class="form-control-focus"> </div>
+                                                    <span ng-show="submitted && addBasic.Gender.$error.required" class="help-block">Gender Required</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group" ng-class="{ 'has-error' : submitted && addBasic.Religion.$invalid}">
+                                                <label class="col-md-4 control-label">
+                                                    Religion :
+                                                    <span class="required">*</span>
+                                                </label>
+                                                <div class="col-md-8">
+                                                    <select class="form-control" ng-model="employeeInfo.Religion" required name="Religion" ng-options="employeeInfo.Value as employeeInfo.Text for employeeInfo in Dropdowns | filter:Type='Religion'">
+                                                        <option value="" selected="selected">Choose Option</option>
+                                                    </select>
+                                                    <div class="form-control-focus"> </div>
+                                                    <span ng-show="submitted && addBasic.Religion.$error.required" class="help-block">Religion Required</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="form-group" ng-class="{ 'has-error' : submitted && addBasic.Blood.$invalid}">
+                                                <label class="col-md-4 control-label">
+                                                    Blood Group :
+                                                    <span class="required">*</span>
+                                                </label>
+                                                <div class="col-md-8">
+                                                    <select class="form-control" ng-model="employeeInfo.BloodGroup" required name="Blood" ng-options="employeeInfo.Value as employeeInfo.Text for employeeInfo in Dropdowns | filter:Type='Blood Group'">
+                                                        <option value="" selected="selected">Choose Option</option>
+                                                    </select>
+                                                    <div class="form-control-focus"> </div>
+                                                    <span ng-show="submitted && addBasic.Blood.$error.required" class="help-block">Blood Group Required</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label class="col-md-4 control-label">
+                                                    Nationality:
+                                                </label>
+                                                <div class="col-md-8">
+                                                    <input type="text" ng-model="employeeInfo.Nationality" class="form-control" placeholder="Nationality" name="Nationality">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+
+                                        <div class="col-md-6">
+                                            <div class="form-group" ng-class="{ 'has-error' : submitted && addBasic.DOB.$invalid}">
+                                                <label class="col-md-4 control-label">
+                                                    Date of Birth:
+                                                    <span class="required">*</span>
+                                                </label>
+                                                <div class="col-md-8">
+                                                    <input class="form-control" type="text" ng-change="getOrderbydate()" ng-click="p2=true" is-open="p2" uib-datepicker-popup="dd-MM-yyyy" ng-model="employeeInfo.DateOfBirth" readonly placeholder="Date of Birth" name="DateOfBirth" />
+                                                    <div class="form-control-focus"> </div>
+                                                    <span ng-show="submitted && addBasic.DOB.$error.required" class="help-block">Date of Birth Required</span>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label class="col-md-4 control-label">
+                                                    National ID:
+                                                </label>
+                                                <div class="col-md-8">
+                                                    <input type="text" ng-model="employeeInfo.NationalID" class="form-control" placeholder="National ID" name="NationalID">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label class="col-md-4 control-label" style="padding-left: 1px;">
+                                                    Marital Status
+                                                </label>
+                                                <div class="col-md-8">
+                                                    <select class="form-control" ng-model="employeeInfo.MaritalStatus">
+                                                        <option value="" selected="selected">Choose Option</option>
+                                                        <option value="Single">Single</option>
+                                                        <option value="Married">Married</option>
+                                                        <option value="Divorced">Divorced</option>
+                                                        <option value="Widowed">Widowed</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label class="col-md-4 control-label">
+                                                    Passport NO:
+                                                </label>
+                                                <div class="col-md-8">
+                                                    <input type="text" ng-model="employeeInfo.PassportNo" name="PassportNo" class="form-control" placeholder="Passport No">
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                   
+                                     <div class="form-actions top">
+                                        <div class="row">
+                                            <div class="col-md-offset-3 col-md-9">
+                                                <button type="button" data-dismiss="modal" class="btn dark btn-outline" ng-click="resetForm();submitted=false">Cancel</button>
+                                                <button type="submit" ng-click="submitted=true" class="btn green-haze" >Save and Continue</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            
+                            </form>
+                        </div>
+                         
+                   
+
+                        @*Tabs Start*@
+@*------------------------------------------------------------------------------------------------*@
+                         @*employeeContact*@
+                         <div class="tab-pane" id="employeeContact">
+
+                             <div class="panel panel-info">
+
+                                 <div class="panel-heading">
+                                     <h4 class="panel-title">
+                                         <a class="accordion-toggle accordion-toggle-styled collapsed" data-toggle="collapse" data-parent="#accordion4" href="#collapse_3_3"> Contact Information </a>
+                                     </h4>
+                                 </div>
+
+                                 <div class="form-horizontal">
+
+                                     <div id="collapse_3_3" class="panel-collapse collapse in">
+
+                                         <div class="panel-body" overflow-y:auto;">
+
+                                             <div class="row">
+                                                <div class="col-md-6">
+                                                    <div class="col-md-12">
+                                                        <div class="form-group">
+                                                            <label class="col-md-4 control-label">
+                                                                Office Email
+                                                            </label>
+                                                            <div class="col-md-8">
+                                                                <input type="email" ng-model="employeeInfo.ContactOfficeEmail" name="ContactOfficeEmail" class="form-control" placeholder="Office Email">
+
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-12">
+                                                        <div class="form-group">
+                                                            <label class="col-md-4 control-label">
+                                                                Other Email
+                                                            </label>
+                                                            <div class="col-md-8">
+                                                                <input type="email" ng-model="employeeInfo.ContactOtherEmail" name="ContactOtherEmail" class="form-control" placeholder="Other Email">
+
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="col-md-12">
+                                                        <div class="form-group">
+                                                            <label class="col-md-4 control-label">
+                                                                SMS Notification Number
+                                                            </label>
+                                                            <div class="col-md-8">
+                                                                <input type="text" ng-model="employeeInfo.SMSNotificationNo" name="SMSNotificationNo" class="form-control" placeholder="SMS Notification Number">
+
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                 <div class="col-md-6">
+                                                     <div class="col-md-12">
+                                                         <div class="form-group">
+                                                             <label class="col-md-4 control-label">
+                                                                 Mobile
+                                                             </label>
+                                                             <div class="col-md-8">
+                                                                 <input type="text" ng-model="employeeInfo.MobileNo" name="Mobile No" class="form-control" placeholder="Mobile No">
+                                                             </div>
+                                                         </div>
+                                                     </div>
+                                                     <div class="col-md-12">
+                                                         <div class="form-group">
+                                                             <label class="col-md-4 control-label">
+                                                                 Office
+                                                             </label>
+                                                             <div class="col-md-8">
+                                                                 <input type="text" ng-model="employeeInfo.ContactOfficeNo" name="ContactOfficeNo" class="form-control" placeholder="Contact Offic eNo">
+                                                             </div>
+                                                         </div>
+                                                     </div>
+                                                     <div class="col-md-12">
+                                                         <div class="form-group">
+                                                             <label class="col-md-4 control-label">
+                                                                 Home
+                                                             </label>
+                                                             <div class="col-md-8">
+                                                                 <input type="text" ng-model="employeeInfo.ContactHomeNo" name="ContactHomeNo" class="form-control" placeholder="Contact Home No">
+                                                             </div>
+                                                         </div>
+                                                     </div>
+                                                 </div>
+
+                                             </div>
+
+                                         </div>
+                                     </div>
+
+                                 </div>   
+                                 
+                                  
+                              
+                                    @*Emergency Contact*@
+
+                                 <div class="panel-heading">
+                                     <h4 class="panel-title">
+                                         <a class="accordion-toggle accordion-toggle-styled collapsed" data-toggle="collapse" data-parent="#accordion4" href="#collapse_3_4"> Emergency Contact  </a>
+                                     </h4>
+                                 </div>
+
+                                 <div class="form-horizontal">
+                                     <div id="collapse_3_4" class="panel-collapse collapse in">
+                                        <br/>
+                                         <div class="row">
+
+                                             <div class="col-md-6">
+                                                 <div class="col-md-12">
+                                                     <div class="form-group">
+                                                         <label class="col-md-4 control-label">
+                                                             Name:
+                                                         </label>
+                                                         <div class="col-md-8">
+                                                             <input type="text" ng-model="employeeInfo.EmergencyContactName" name="EmergencyContactName" class="form-control" placeholder="Emergency Contact Name">
+                                                         </div>
+                                                     </div>
+                                                 </div>
+                                                 <div class="col-md-12">
+                                                     <div class="form-group">
+                                                         <label class="col-md-4 control-label">
+                                                             Relation
+                                                         </label>
+                                                         <div class="col-md-8">
+                                                             <input type="text" ng-model="employeeInfo.EmergencyContactRelation" name="EmergencyContactRelation" class="form-control" placeholder="Emergency Contact Relation">
+                                                         </div>
+                                                     </div>
+                                                 </div>
+                                             </div>
+
+                                             <div class="col-md-6">
+                                                 <div class="col-md-12">
+                                                     <div class="form-group">
+                                                         <label class="col-md-4 control-label">
+                                                           Address 
+                                                         </label>
+                                                         <div class="col-md-8">
+                                                             <input type="text" ng-model="employeeInfo.EmergencyContactAddress" name="EmergencyContactAddress" class="form-control" placeholder="Emergency Contact Address">
+                                                         </div>
+                                                     </div>
+                                                 </div>
+                                                 <div class="col-md-12">
+                                                     <div class="form-group">
+                                                         <label class="col-md-4 control-label">
+                                                             T & T:
+                                                         </label>
+                                                         <div class="col-md-8">
+                                                             <input type="text" ng-model="employeeInfo.EmergencyTandTNo" name="EmergencyTandTNo" class="form-control" placeholder="Emergency TandT No">
+                                                         </div>
+                                                     </div>
+                                                 </div>
+                                             </div>
+                                         
+                                         </div>
+                                     </div>
+
+                                 </div>     
+                                 
+                                  <hr/>
+                                
+                                  @*Address*@
+
+                                 <div class="panel-heading">
+                                     <h4 class="panel-title">
+                                         <a class="accordion-toggle accordion-toggle-styled" data-toggle="collapse" data-parent="#accordion5" href="#collapse_5_1"> Present Address Information </a>
+                                     </h4>
+                                 </div>
+
+                                 <div  id="collapse_5_1" class="panel-collapse collapse in form-horizontal">
+                                     <div class="panel-body" overflow-y:auto;">
+
+                                         <div class="row">
+                                             <div class="col-md-6">
+                                                 <div class="form-group">
+                                                     <label class="col-md-4">
+                                                       Present  Address
+                                                     </label>
+                                                     <div class="col-md-8">
+                                                         <textarea rows="5" ng-model="employeeInfo.PresentAddress" name="PresentAddress" class="form-control" placeholder="Present Address"> </textarea>
+
+                                                     </div>
+                                                 </div>
+                                             </div>
+
+                                             <div class="col-md-6">
+
+                                                 <div class="col-md-12">
+                                                     <div class="form-group">
+                                                         <label class="col-md-4 control-label">
+                                                             District
+                                                         </label>
+                                                         <div class="col-md-8">
+
+                                                             <select class="form-control" ng-model="employeeInfo.PresentDistrict" ng-options="contact1.DistrictId as contact1.DistrictName for contact1 in Districts" ng-change="getPStations1()"></select>
+
+                                                         </div>
+                                                     </div>
+                                                 </div>
+                                                 <div class="col-md-12">
+                                                     <div class="form-group">
+                                                         <label class="col-md-4 control-label">
+                                                             Thana
+                                                         </label>
+                                                         <div class="col-md-8">
+                                                             <select class="form-control" ng-model="employeeInfo.PresentThana" ng-options="x.PsName as x.PsName for x in PStations1"></select>
+
+                                                             @*<input type="text" ng-model="employeeInfo.PresentThana" name="PresentThana" class="form-control" placeholder="Present Thana">*@
+                                                         </div>
+                                                     </div>
+                                                 </div>
+
+                                                 <div class="col-md-12">
+                                                     <div class="form-group">
+                                                         <label class="col-md-4 control-label">
+                                                             Post
+                                                         </label>
+                                                         <div class="col-md-8">
+                                                             <input type="text" ng-model="employeeInfo.PresentPost" name="PresentPost" class="form-control" placeholder="Present Post">
+                                                         </div>
+                                                     </div>
+                                                 </div>
+                                             </div>
+                                         </div>
+ 
+                                     </div>
+                                 </div>  <hr />
+
+                                 @*Permanent*@
+                             
+                                 <div class="panel-heading">
+                                     <h4 class="panel-title">
+                                         <a class="accordion-toggle accordion-toggle-styled collapsed" data-toggle="collapse" data-parent="#accordion5" href="#collapse_5_2"> Permanent Address Information </a>
+                                     </h4>
+                                 </div>
+                                 <div id="collapse_5_2" class="panel-collapse collapse in">
+                                     <div class="panel-body" overflow-y:auto;">
+
+                                         <div class="row form-horizontal">
+                                             <div class="col-md-6">
+                                                 <div class="form-group">
+                                                     <label class="col-md-4 control-label">
+                                                         Permanent Address
+                                                     </label>
+                                                     <div class="col-md-8">
+                                                         <textarea rows="5" ng-model="employeeInfo.PermanentAddress" name="PermanentAddress" class="form-control" placeholder="Permanent Address"> </textarea>
+
+                                                     </div>
+                                                 </div>
+                                             </div>
+                                             <div class="col-md-6">
+                                                 <div class="col-md-12">
+                                                     <div class="form-group">
+                                                         <label class="col-md-4 control-label">
+                                                             District
+                                                         </label>
+                                                         <div class="col-md-8">
+
+                                                             <select class="form-control" ng-model="employeeInfo.PermanentDistrict" ng-options="contact2.DistrictId as contact2.DistrictName for contact2 in Districts" ng-change="getPStations2()"></select>
+
+                                                         </div>
+                                                     </div>
+                                                 </div>
+
+                                                 <div class="col-md-12">
+                                                     <div class="form-group">
+                                                         <label class="col-md-4 control-label">
+                                                             Thana
+                                                         </label>
+                                                         <div class="col-md-8">
+
+                                                             <select class="form-control" ng-model="employeeInfo.PermanentThana" ng-options="x.PsName as x.PsName for x in PStations2"></select>
+
+                                                         </div>
+                                                     </div>
+                                                 </div>
+
+                                                 <div class="col-md-12">
+                                                     <div class="form-group">
+                                                         <label class="col-md-4 control-label">
+                                                             Post
+                                                         </label>
+                                                         <div class="col-md-8">
+                                                             <input type="text" ng-model="employeeInfo.PermanentPost" name="PermanentPost" class="form-control" placeholder="PermanentPost">
+                                                         </div>
+                                                     </div>
+                                                 </div>
+                                                 <input type="button" ng-click="UpdateAllOthers()" class="btn green-haze pull-right" value="Save" />
+                                             </div>
+
+                                         </div>
+
+                                     </div>
+
+                                 </div>
+
+                               
+                                </div>
+                         </div>   
+
+
+                         @*JobInfo*@
+                         <div class="tab-pane" id="JobInfo">
+                             <div class="panel-heading">
+                                 <h4 class="panel-title">
+                                     <a class="accordion-toggle accordion-toggle-styled" data-toggle="collapse" data-parent="#accordion6" href="#collapse_6_1"> Jobe Info </a>
+                                 </h4>
+                             </div>
+                             <br/>
+                             <div id="collapse_6_1">
+                                 <div class="row">
+                                     <div class="col-md-4">
+                                         <div class="form-group" ng-class="{ 'has-error' : submitted1 && formCommonFeilds.house.$invalid}">
+                                             <label class="col-md-5 control-label">
+                                                 Account No
+
+                                             </label>
+                                             <div class="col-md-7">
+                                                 <input type="text" ng-model="employeeInfo.InstituteAccount" class="form-control" placeholder="InstituteAccount" name="InstituteAccount">
+                                                 <div class="form-control-focus"> </div>
+                                             </div>
+                                         </div>
+                                     </div>
+                                     <div class="col-md-4">
+                                         <div class="form-group" ng-class="{ 'has-error' : submitted1 && formCommonFeilds.BankName.$invalid}">
+                                             <label class="col-md-5 control-label">
+                                                 Bank Name
+
+                                             </label>
+                                             <div class="col-md-7">
+                                                 <input type="text" ng-model="employeeInfo.BankName" class="form-control" placeholder="Bank Name" name="BankName">
+                                                 <div class="form-control-focus"> </div>
+                                             </div>
+                                         </div>
+                                     </div>
+                                     <div class="col-md-4">
+                                         <div class="form-group" ng-class="{ 'has-error' : submitted1 && formCommonFeilds.BranchName.$invalid}">
+                                             <label class="col-md-5 control-label">
+                                                 Branch Name
+
+                                             </label>
+                                             <div class="col-md-7">
+                                                 <input type="text" ng-model="employeeInfo.BranchName" class="form-control" placeholder="Branch Name" name="BranchName">
+                                                 <div class="form-control-focus"> </div>
+                                             </div>
+                                         </div>
+                                     </div>
+
+                                 </div>
+
+                                 
+                             </div>
+                         </div>
+
+                    
+                        @*Educational*@
+
+                         <div class="tab-pane" id="Educational">
+                             <div class="panel panel-info">
+                                 <div class="panel-heading">
+                                     <h4 class="panel-title">
+                                         <a class="accordion-toggle accordion-toggle-styled collapsed" data-toggle="collapse" data-parent="#accordion5" href="#collapse_5_2"> Educational Information </a>
+                                     </h4>
+                                 </div>
+                                 <div id="collapse_5_2" class="panel-collapse collapse in">
+                                     <div class="panel-body" overflow-y:auto;">
+                                         
+                                         <div class="actions">
+                                             <div class="btn-group btn-group-solid">
+                                                 <button @*ng-click="resetForm()"*@ class="btn green" data-target="#addmodal" data-toggle="modal"> <i class="fa fa-plus"></i> Add Education </button>
+                                             </div>
+
+                                         </div>
+
+
+                                            <table class="table table-bordered" >
+                                                <tr>
+                                                    <td>SN </td>
+                                                    <td>Exam Name </td>
+                                                    <td>Group </td>
+                                                    <td> Exam Board</td>
+                                                    <td> Pass Year:</td>
+                                                    <td> Institute Name</td>
+                                                    <td> Obtained CGPA: </td>
+                                                    <td> Action </td>
+                                                </tr>
+                                                <tr ng-repeat="x in educationInfos ">
+                                                    <td> {{$Index+1}}</td>
+
+                                                    <td>{{x.ExamName}} </td>
+                                                    <td>{{x.GroupName }}  </td>
+                                                    <td>{{x.BoardName }}  </td>
+                                                    <td>{{x.ExamPasYear}}  </td>
+                                                    <td>{{x.ExamInstituteName }}  </td>
+                                                    <td>{{x.ExamTotal  }}  </td>
+                                                    <td>
+                                                        @*<a href="javascript:;" class="btn btn-icon-only green" ng-click="EditEducation(x)" data-target="#addmodal" data-toggle="modal">
+                                                            <i class="fa fa-edit"></i>
+                                                        </a>*@
+                                                        <a ng-click="deleteEducation(x)" href="javascript:;" class="btn btn-icon-only red">
+                                                            <i class="fa fa-trash"></i>
+                                                        </a>
+
+                                                    </td>
+                                                </tr>
+                                            </table> 
+                                         <br/>
+                                         <button type="submit" class="btn btn-info" ng-click="AddEducationalInfo()">Save</button>
+
+                                         </div>
+                                     </div>
+                                 </div>
+                                
+
+                             </div>
+                        </div>
+                       
+                                            
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    <!--Modal Area Start-->
+    <div id="addmodal" class="modal fade" tabindex="-1" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form name="addform" @*ng-submit="AddEducationInObject(educationInfo)"*@ class="form-horizontal" id="form_sample_1" novalidate>
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                        <h4 class="modal-title">{{modalTitle}}</h4>
+                    </div>
+                    <div class="modal-body">
+                        
+                                 <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label class="col-md-3 control-label">
+                                                Exam Name
+                                            </label>
+                                            <div class="col-md-9">
+
+                                                <select class="form-control" id="eName" required ng-model="educationInfo.ExamID" ng-options="x.EmployeeExam_ID as x.EmployeeExam_Name for x in ExamNames">
+                                                    <option value="" selected="selected">Select</option>
+                                                </select>
+
+                                            </div>
+                                        </div>
+                                    </div>
+
+
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label class="col-md-3 control-label">
+                                                Pass Year:
+                                            </label>
+                                            <div class="col-md-9">
+                                                <input type="text" ng-model="educationInfo.ExamPasYear" required name="ExamPasYear" class="form-control" placeholder="Exam Pass Year">
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label class="col-md-3 control-label">
+                                                Group
+                                            </label>
+                                            <div class="col-md-9">
+
+                                                <select class="form-control" id="eGName" required ng-model="educationInfo.ExamGroupID" ng-options="x.EmployeeExamGroup_ID as x.EmployeeExamGroup_Name for x in EmpExamGroups">
+                                                    <option value="" selected="selected">Select</option>
+                                                </select>
+
+                                            </div>
+                                        </div>
+                                    </div>
+
+
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label class="col-md-3 control-label">
+                                                Institute Name
+                                            </label>
+                                            <div class="col-md-9">
+                                                <input type="text" required ng-model="educationInfo.ExamInstituteName" name="ExamInstituteName" class="form-control" placeholder="Exam Institute Name">
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label class="col-md-3 control-label">
+                                                Exam Board
+                                            </label>
+                                            <div class="col-md-9">
+
+                                                <select class="form-control" id="eBName" required ng-model="educationInfo.ExamBoard" ng-options="x.EmployeeExamBoard_ID as x.EmployeeExamBoard_Name for x in EmpExamBoards">
+                                                    <option value="" selected="selected">Select</option>
+
+                                                </select>
+
+                                            </div>
+                                        </div>
+                                    </div>
+
+
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label class="col-md-3 control-label">
+                                                Obtained CGPA:
+                                            </label>
+                                            <div class="col-md-9">
+                                                <input type="text" required ng-model="educationInfo.ExamTotal" name="ExamTotal" class="form-control" placeholder="ExamTotal">
+
+                                            </div>
+                                        </div>
+                                    </div>
+                              </div>
+
+
+                        
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" data-dismiss="modal" class="btn dark btn-outline" submitted=false">Cancel</button>
+                        <button type="submit" class="btn btn-info" ng-click="AddEducationInObject(educationInfo)">Add</button>
+
+                        @*<button type="submit" ng-click="submitted=true" class="btn green-haze" >Save <i ng-show="spin" class="fa fa-spinner fa-spin" style="font-size:20px"></i></button>*@
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!--Modal Area End-->
+
+
+
+
+    </div>
+
+
+    <!-- END FORM-->
+
+
+@section Scripts{
+    <script src="~/assets/global/plugins/jquery-repeater/jquery.repeater.min.js"></script>
+    <script src="~/assets/global/plugins/bootstrap-fileinput/bootstrap-fileinput.js" type="text/javascript"></script>
+    <script src="~/assets/pages/scripts/form-repeater.min.js"></script>
+    <script type="text/javascript">
+        for (i = new Date().getFullYear() ; i > 1900; i--) {
+            $('#yearpicker').append($('<option />').val(i).html(i));
+        }
+
+    </script>
+
+    <script type="text/javascript">
+        OEMSApp.controller("employeeInfo", ["$scope", "$http", "SweetAlert",
+              function ($scope, $http, SweetAlert) {
+
+                  init();
+                  function init() {
+                      initialize();
+
+                      getAllDropdowns();
+                      getAllCommons();
+                      getDistricts();
+                      getExamName();
+                      GetEmpExamGroup();
+
+                      GetEmpExamBoard();
+                  }
+                  function initialize() {
+
+                      $scope.activetab = '';
+
+                      $scope.GenerateID = GenerateID;
+
+                      $scope.employeeInfo = {};
+                   
+                    
+                      $scope.EmpID = '';
+                      $scope.employeeInfos = [];
+                      $scope.Dropdowns = [];
+                      $scope.CommonFeilds = [];
+                      $scope.getAllDropdowns = getAllDropdowns;
+
+                      $scope.UpdateAllOthers = UpdateAllOthers;
+
+                      //Education
+                      $scope.educationInfo = {};
+                      $scope.educationInfos = [];
+                      $scope.ExamName = {};
+                      $scope.getExamName = getExamName;
+                      $scope.ExamNames = [];
+                      $scope.EmpExamBoard = {};
+                      $scope.EmpExamBoards = [];
+                      $scope.AddEducationalInfo = AddEducationalInfo;
+                      $scope.AddEducationInObject = AddEducationInObject;
+                      $scope.deleteEducation = deleteEducation;
+                      $scope.ClickedExam = {};
+                      $scope.EditEducation = EditEducation;
+
+
+                      $scope.GetEmpExamGroup = GetEmpExamGroup;
+                      $scope.EmpExamGroup = {};
+                      $scope.EmpExamGroups = [];
+
+                      $scope.getDistricts = getDistricts;
+                      $scope.PStations1 = [];
+                      $scope.contact1 = {};
+                      $scope.contact2 = {};
+                      $scope.getPStations1 = getPStations1;
+                      $scope.getPStations2 = getPStations2;
+                      $scope.contact1.ContactIID = 0;
+                      $scope.contact2.ContactIID = 0;
+                      $scope.getContacts1 = getContacts1;
+                      $scope.getContacts2 = getContacts2;
+
+                      $scope.currentPage = 1;
+                      $scope.pageno = 1;
+                      $scope.pagesize = 10;
+                      $scope.total_count = 12;
+                      $scope.search = '';
+
+                      $scope.Districts = [];
+                      $scope.res = {};
+                      $scope.data = {};
+                      $scope.resetForm = resetForm;
+                        
+                  }
+
+                  function resetForm() {
+                      $scope.employeeInfo = {};
+                      $scope.employeeInfo.EmpID = '';
+                      $scope.submitted = false;
+                      $scope.Id = '';
+
+                  }
+                  
+
+                  // for Employee ID Create
+                  function GenerateID() {
+
+                      if ($scope.employeeInfo.DesignationID != null && $scope.employeeInfo.JoiningDate != null)
+                      {
+
+                          $http({
+                              method: 'POST',
+                              url: baseUrl + 'Employee/GetEmployeeID/',
+                              data: $scope.employeeInfo
+                          }).then(function successCallback(response) {
+                              $scope.employeeInfo.EmpID = response.data[0].EmpID;
+                              $scope.employeeInfo.EmpBasicInfoID = response.data[0].EmpBasicInfoID
+                          }, function errorCallback(response) {
+
+                          });
+                      }
+                      else
+                      {
+                          alert("Employee Designation and Joining Date is Needed");
+                      }
+                      
+                  }
+                  
+                  $scope.edit = function (n) {
+                      $scope.employeeInfo = n;
+                      $scope.Id = n.Id;
+                  };
+
+                  $scope.save = function save() {
+
+                      if ($scope.employeeInfo.EmpID == null || $scope.employeeInfo.EmpID == 'undefined') {
+                          toastr["warning"]("Please Generate Student ID!!");
+                          return;
+                      }
+                    
+                      var files = $("#imgs").get(0).files;
+                      $http({
+                          method: 'POST',
+                          url: baseUrl + '/Employee/AddEmployee/',
+
+                          headers: { 'Content-Type': undefined },
+                          transformRequest: function (data) {
+                              var formData = new FormData();
+                              formData.append('studentBasicInfo', JSON.stringify($scope.employeeInfo));
+                              if (files.length > 0)
+                                  formData.append("Img", files[0]);
+                              return formData;
+                          },
+                          data: { studentBasicInfo: $scope.employeeInfo }
+
+                      }).then(function successCallback(response) {
+                          //$scope.employeeInfo.EmpBasicInfoID = response.data.results[0];
+                          $scope.activetab = 'EmpContact';
+                          toastr["info"](response.data.message);
+                      });
+
+
+                  };
+
+
+
+                  function UpdateAllOthers()
+                  {
+                      if ($scope.employeeInfo.EmpID == null || $scope.employeeInfo.EmpID == 'undefined') {
+                          toastr["warning"]("Please Generate Employee ID!!");
+                          return;
+                      }
+                           
+                      $http({
+                          method: 'PUT',
+                          url: baseUrl + '/Employee/UpdateAllOthers/',
+
+                          data: $scope.employeeInfo 
+
+                      }).then(function successCallback(response) {
+
+                          //$scope.employeeInfo.EmpBasicInfoID = response.data.returnvalue;
+                         // $scope.StudentIID = response.data.returnvalue;
+                          toastr["info"](response.data.message);
+                      });
+
+
+                  }
+
+
+
+                  function getAllDropdowns() {
+                      $scope.Dropdowns = [];
+
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Common/GetAllDropDown/'
+                      }).then(function successCallback(response) {
+                          $scope.Dropdowns = response.data.results;
+                      }, function errorCallback(response) {
+                      });
+                  }
+
+                  function getAllCommons() {
+                      $scope.CommonFeilds = [];
+
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Common/GetCommonItemEmp/'
+                      }).then(function successCallback(response) {
+                          $scope.CommonFeilds = response.data.results;
+                      }, function errorCallback(response) {
+                      });
+                  }
+
+
+
+                  //contact info
+
+                  function getDistricts() {
+                      $scope.Districts = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Common/GetDistrict/'
+                      }).then(function successCallback(response) {
+                          $scope.Districts = response.data.results;
+
+
+                      }, function errorCallback(response) {
+
+                      });
+
+                  }
+
+                  //exam
+
+                  function getExamName() {
+                      $scope.ExamNames = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Employee/GetExamName/'
+                      }).then(function successCallback(response) {
+                          $scope.ExamNames = response.data.results;
+
+
+                      }, function errorCallback(response) {
+
+                      });
+
+                  }
+
+                  function GetEmpExamGroup()
+                  {
+                      $scope.EmpExamGroups = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Employee/GetEmpExamGroup/'
+                      }).then(function successCallback(response) {
+                          $scope.EmpExamGroups = response.data.results;
+
+
+                      }, function errorCallback(response) {
+
+                      });
+                  }
+
+                  function GetEmpExamBoard()
+                  {
+                      $scope.EmpExamBoards = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Employee/GetEmpExamBoard/'
+                      }).then(function successCallback(response) {
+                          $scope.EmpExamBoards = response.data.results;
+
+
+                      }, function errorCallback(response) {
+
+                      });
+                  }
+
+                  function AddEducationInObject(educationInfo) {
+
+                      if ($scope.employeeInfo.EmpBasicInfoID != undefined && $scope.employeeInfo.EmpID != 'undefined') {
+
+                          $scope.educationInfo.ExamName = $("#eName option:selected").text();
+                          $scope.educationInfo.GroupName = $("#eGName option:selected").text();
+                          $scope.educationInfo.BoardName = $("#eBName option:selected").text();
+
+                          $scope.educationInfo.IsDeleted = false;
+                          $scope.educationInfo.EmployeeID = $scope.employeeInfo.EmpBasicInfoID;
+                          $scope.educationInfos.push(educationInfo);
+                          $scope.educationInfo = {};
+
+                      }
+                  }
+
+                  function AddEducationalInfo()
+                  {
+
+                      if ($scope.employeeInfo.EmpID == null || $scope.employeeInfo.EmpID == 'undefined') {
+                          toastr["warning"]("Please Generate Employee ID!!");
+                          return;
+                      }
+
+                      $http({
+                          method: 'POST',
+                          url: baseUrl + '/Employee/AddEducationalInfo/',
+
+                          data: $scope.educationInfos
+
+                      }).then(function successCallback(response) {
+
+                         toastr["info"](response.data.message);
+                      });
+                  }
+                  
+                  function deleteEducation(n)
+                  {
+                      $scope.ClickedExam = n;
+                      $scope.educationInfos.splice($scope.educationInfos.indexOf($scope.ClickedExam), 1);
+                  }
+                      
+                  function EditEducation(n)
+                  {
+                      $scope.educationInfo = n;
+                      
+                  }
+
+                  function getPStations1() {
+                      $scope.PStations1 = [];
+                      $http.get(baseUrl + 'Common/GetPoliceStaionByDId/' + $scope.employeeInfo.PresentDistrict).then(function (response) {
+                          $scope.PStations1 = response.data.results;
+                      });
+                  }
+
+                  function getPStations2() {
+                      $scope.PStations2 = [];
+                      $http.get(baseUrl + 'Common/GetPoliceStaionByDId/' + $scope.employeeInfo.PermanentDistrict).then(function (response) {
+                          $scope.PStations2 = response.data.results;
+                      });
+                  }
+
+
+                  function getContacts1() {
+                      //$scope.Contacts = [];
+
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Student/GetContactInfoByID/'+ $scope.StudentIID
+                      }).then(function successCallback(response) {
+
+                          $scope.contact1.Address = response.data.results[0].Address;
+                          $scope.contact1.DistrictId = response.data.results[0].DistrictId;
+                          $scope.contact1.PsId = response.data.results[0].PsId;
+                          $scope.contact1.PostOffice = response.data.results[0].PostOffice;
+                          $scope.contact1.PostalCode = response.data.results[0].PostalCode;
+
+                      }, function errorCallback(response) {
+
+                      });
+
+                  }
+
+                  function getContacts2() {
+                      //$scope.Contacts = [];
+
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Student/GetStudentContactByID/' + $scope.StudentIID
+                      }).then(function successCallback(response) {
+
+                          $scope.contact2.Address = response.data.results[0].Address;
+                          $scope.contact2.DistrictId = response.data.results[0].DistrictId;
+                          $scope.contact2.PsId = response.data.results[0].PsId;
+                          $scope.contact2.PostOffice = response.data.results[0].PostOffice;
+                          $scope.contact2.PostalCode = response.data.results[0].PostalCode;
+
+
+                      }, function errorCallback(response) {
+
+                      });
+
+                  }
+
+
+              }]);
+    </script>
+}

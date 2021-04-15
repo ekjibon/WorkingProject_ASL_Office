@@ -1,0 +1,335 @@
+﻿
+@{
+    ViewBag.Title = "Purchase Entry";
+}
+<div class="kt-container  kt-container--fluid  kt-grid__item kt-grid__item--fluid" ng-controller="requisitionEntryCrlt">
+    <div class="row">
+        <div class="kt-portlet kt-portlet--mobile">
+            <div class="kt-portlet__head kt-portlet__head--lg">
+                <div class="kt-portlet__head-label">
+                    <h3 class="kt-portlet__head-title">
+                        <!----Titel Text-->
+                        Local Datasource
+                        <!----Titel Text -->
+                    </h3>
+                </div>
+            </div>
+
+            <div class="kt-portlet__body">
+                <form name="addform" novalidate class="form-horizontal">
+                    <div class="form-body">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group row" ng-class="{ 'has-error' : submitted && addform.Supplier.$invalid}">
+                                    <label class="col-md-4 control-label text-right">
+                                        Supplier:
+                                        <span class="required">*</span>
+                                    </label>
+                                    <div class="col-md-8">
+                                        <select class="form-control" required name="Supplier" ng-model="PurchaseOrder.SupplierId" ng-options="p.SupplierId  as p.SupplierName for p in Suppliers.results">
+                                            <option selected value="">Choose Options</option>
+                                        </select>
+                                        <div class="form-control-focus"> </div>
+                                        <span ng-show="submitted && addform.Supplier.$error.required" class="help-block">Supplier Required</span>
+                                    </div>
+                                </div>
+                                <div class="form-group row" ng-class="{ 'has-error' : submitted && addform.Date.$invalid}">
+                                    <label class="col-md-4 control-label text-right">
+                                        Due Date:
+                                        <span class="required">*</span>
+                                    </label>
+                                    <div class="col-md-8">
+                                        <input class="form-control" type="text" ng-click="p1=true" is-open="p1" readonly ng-model="PurchaseOrder.Date" placeholder="Due Date" uib-datepicker-popup="dd/MM/yyyy" name="Date" required />
+                                        <div class="form-control-focus"> </div>
+                                        <span ng-show="submitted && addform.Date.$error.required" class="help-block">Date Required</span>
+                                    </div>
+                                </div>
+                                <div class="form-group row" ng-class="{ 'has-error' : submitted && addform.Description.$invalid}">
+                                    <label class="col-md-4 control-label text-right">
+                                        Description:
+                                        @*<span class="required">*</span>*@
+                                    </label>
+                                    <div class="col-md-8">
+                                        <textarea type="text" ng-model="PurchaseOrder.Description" class="form-control" placeholder="Description" name="Description"></textarea>
+                                        <div class="form-control-focus"> </div>
+                                        <span ng-show="submitted && addform.Description.$error.required" class="help-block">Description Required</span>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <div class="col-md-4">
+
+                                    </div>
+                                    <div class="col-md-8 text-right">
+
+                                        <button class="btn btn-success" ng-click="save();submitted=true">Save</button>
+                                        <button class="btn btn-danger" ng-click="Reset();">Reset</button>
+
+                                    </div>
+
+                                </div>
+                            </div>
+                            @*<div class="col-md-4">
+
+                    </div>*@
+                            <div class="col-md-8">
+                                <div class="row">
+                                    <div class="col-md-5">
+                                        <div class="form-group row">
+                                            <label class="col-lg-4 control-label text-right">Product</label>
+                                            <div class="col-lg-8">
+                                                <input type="text" ng-model="Product" typeahead-on-select='onSelect($item, $model, $label)' placeholder="Search Product By Name Or Code"
+                                                       uib-typeahead="i  as i.Text for i in Search($viewValue)" typeahead-loading="loadingLocations" typeahead-no-results="noResults" class="form-control">
+                                                <i ng-show="loadingLocations" class="glyphicon glyphicon-refresh"></i>
+                                                <div ng-show="noResults"><i class="glyphicon glyphicon-remove"></i> No Results Found</div>
+                                                <input type="hidden" name="ProductId" ng-model="ProductId" ng-value="Product.Value" />
+                                            </div>
+                                        </div>
+                                        <div class="form-group row" ng-class="{ 'has-error' : submitted && addform.OpeningBalance.$invalid}">
+                                            <label class="col-md-4 control-label text-right">
+                                                Quantity:
+                                                @*<span class="required">*</span>*@
+                                            </label>
+                                            <div class="col-md-8">
+                                                <input type="text" ng-model="Purchase.Quantity" ng-disabled="Product==null" onkeypress='return event.charCode >= 48 && event.charCode <= 57' class="form-control" placeholder="Quantity" name="OpeningBalance">
+                                                <div class="form-control-focus"> </div>
+                                                <span ng-show="submitted && addform.OpeningBalance.$error.required" class="help-block">Opening Balance Required</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-5">
+                                        <div class="form-group row" ng-class="{ 'has-error' : submitted && addform.UnitPrice.$invalid}">
+                                            <label class="col-md-4 control-label text-right">
+                                                Unit Price:
+                                                @*<span class="required">*</span>*@
+                                            </label>
+                                            <div class="col-md-8">
+                                                <input type="text" ng-model="Purchase.UnitPrice" ng-disabled="Purchase.Quantity==null" class="form-control" onkeypress='return event.charCode >= 48 && event.charCode <= 57' placeholder="Unit Price" name="UnitPrice">
+                                                <div class="form-control-focus"> </div>
+                                                <span ng-show="submitted && addform.UnitPrice.$error.required" class="help-block">Unit Price Required</span>
+                                            </div>
+                                        </div>
+                                        <div class="form-group row" ng-class="{ 'has-error' : submitted && addform.Discount.$invalid}">
+                                            <label class="col-md-4 control-label text-right">
+                                                Dis. Price:
+                                                @*<span class="required">*</span>*@
+                                            </label>
+                                            <div class="col-md-8">
+                                                <input type="text" ng-model="Purchase.Discount" class="form-control" onkeypress='return event.charCode >= 48 && event.charCode <= 57' placeholder="Discount Price" name="Discount">
+                                                <div class="form-control-focus"> </div>
+                                                <span ng-show="submitted && addform.Discount.$error.required" class="help-block">Unit Price Required</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <div class="col-md-9">
+
+                                        </div>
+                                        <div class="col-md-4">
+                                            <button class="btn btn-success" ng-disabled="Purchase.UnitPrice==null" ng-click="addProduct()">Add</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <table class="table table-bordered table-inverse">
+                                    <thead class="btn-primary">
+                                        <tr>
+                                            <th> Name</th>
+                                            <th>Unit</th>
+                                            <th> Quantity</th>
+                                            <th> Unit Price</th>
+                                            <th> Discount Price</th>
+                                            <th> Total Price</th>
+                                            <th> Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr><td colspan="7" style="text-align:center" ng-hide="PurchaseList.length > 0">No Data Found</td></tr>
+                                        <tr ng-show="PurchaseList.length > 0" ng-repeat="item in PurchaseList">
+                                            <td>{{item.ProductName}}</td>
+                                            <td>{{item.UnitCode}}</td>
+                                            <td>{{item.Quantity}}</td>
+                                            <td>{{item.UnitPrice}}</td>
+                                            <td>{{item.Discount}}</td>
+                                            <td>{{item.TotalPrice}}</td>
+                                            <td><a class="btn btn-danger" ng-click="deleteProduct($index)"><i class="fa fa-trash" aria-hidden="true"></i> </a></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    <script type="text/javascript">
+        OEMSApp.controller("requisitionEntryCrlt", ["$scope", "$http", "SweetAlert", "filterFilter", "$filter",
+          function ($scope, $http, SweetAlert, filterFilter, $filter) {
+              init();
+              function init() {
+                  initialize();
+
+              }
+              function initialize() {
+                  $scope.Purchase = {};
+                  $scope.PurchaseOrder = {};
+                  $scope.Suppliers = [];
+                  $scope.ProductId = 0;
+                  $scope.PurchaseList = [];
+                  $scope.Purchase.Product = null;
+                  $scope.Reset = Reset;
+                  /////
+                  $scope.pageSizeArray = [];
+                  $scope.pageSizeArray.push({ value: 5, text: 5 });
+                  $scope.pageSizeArray.push({ value: 10, text: 10 });
+                  $scope.pageSizeArray.push({ value: 20, text: 20 });
+                  $scope.pageSizeArray.push({ value: 50, text: 50 });
+                  $scope.currentPage = 1;
+                  $scope.pageSize = 10;
+                  $scope.pageno = 1;
+                  $scope.total_count = 12;
+                  getSuppliers(1);
+
+              };
+              function Reset() {
+                  $scope.Purchase = {};
+                  $scope.PurchaseOrder = {};
+                  $scope.submitted = false;
+                  $scope.Suppliers = [];
+                  $scope.ProductId = 0;
+                  $scope.PurchaseList = [];
+                  $scope.Purchase.Product = null;
+                  getSuppliers(1);
+              };
+              //Active Inactive student
+
+              function getSuppliers(pageno) {
+                  $scope.Suppliers = [];
+                  $http({
+                      method: 'GET',
+                      url: baseUrl + 'Inventory/GetSuppliers'
+                  }).then(function successCallback(response) {
+                      $scope.Suppliers = response.data;
+                      toastr["info"](response.data.message);
+                  }, function errorCallback(response) {
+                      toastr["warning"](response.data.Message);
+                  });
+              }
+
+              $scope.addProduct = function () {
+
+                  if ($scope.PurchaseList.length > 0) {
+                      if (IsExists($scope.Purchase.ProductId)) {
+                          $scope.PurchaseList.push({
+                              'ProductName': $scope.Product, 'UnitCode': $scope.Unit
+                                 , 'Quantity': $scope.Purchase.Quantity
+                                 , 'ProductId': $scope.Purchase.ProductId
+                                , 'UnitPrice': $scope.Purchase.UnitPrice
+                                , 'Discount': $scope.Purchase.Discount
+                                   , 'TotalPrice': (($scope.Purchase.Quantity * $scope.Purchase.UnitPrice) - ($scope.Purchase.Quantity * $scope.Purchase.Discount))
+                                 , 'done': false
+                          });
+                      } else {
+                          toastr["warning"]('Product Already Exist.');
+                          return;
+                      }
+               
+                  } else {
+                      $scope.PurchaseList.push({
+                          'ProductName': $scope.Product, 'UnitCode': $scope.Unit
+                            , 'Quantity': $scope.Purchase.Quantity
+                            , 'ProductId': $scope.Purchase.ProductId
+                           , 'UnitPrice': $scope.Purchase.UnitPrice
+                           , 'Discount': $scope.Purchase.Discount
+                              , 'TotalPrice': (($scope.Purchase.Quantity * $scope.Purchase.UnitPrice) - ($scope.Purchase.Quantity * $scope.Purchase.Discount))
+                            , 'done': false
+                      });
+                  }
+
+                  $scope.Product = null;
+                  $scope.Purchase.Quantity = null;
+                  $scope.Purchase.UnitPrice = null;
+                  $scope.Purchase.Discount = null;
+                  $scope.Purchase.ProductId = 0;
+              }
+
+              function IsExists(pro) {
+                  var res = true;
+                  angular.forEach($scope.PurchaseList, function (value, key) {
+                      if (value.ProductId == pro)
+                          res = false;
+                  });
+                  return res;
+              }
+              $scope.deleteProduct = function (index) {
+                  $scope.PurchaseList.splice(index, 1);
+              }
+              $scope.Search = function (val) {
+                  if (val.length >= 3)
+                      return $http.get(baseUrl + 'Inventory/SearchProduct/' + val, {
+                          params: {}
+                      }).then(function (response) {
+                          return response.data.results.map(function (item) {
+                              return item;
+                          });
+                      });
+              };
+              $scope.save = function () {
+                  if (Validation()) {
+                      if ($scope.PurchaseList.length == 0) {
+                          toastr["warning"]('Please Choose Product.');
+                          return;
+                      }
+                      $scope.PurchaseOrder.OrderDetails = $scope.PurchaseList;
+                      $http({
+                          method: 'POST',
+                          url: baseUrl + '/Inventory/AddPurchaseOrder/',
+                          data: $scope.PurchaseOrder
+                      }).then(function successCallback(response) {
+                          Reset();
+                          toastr["info"](response.data.message);
+                          window.location = '/InventoryV/PurchaseOrderList';
+                      }, function errorCallback(response) {
+                          toastr["warning"](response.data.Message);
+                      });
+                  }
+             
+                  //console.log($scope.Req);
+              }
+              // for droupdown select list event....
+              $scope.onSelect = function onSelect($item, $model, $label) {
+                  $scope.Purchase.ProductId = Number($item.Value);
+                  $scope.Product = $item.Text;
+                  $http({
+                      method: 'GET',
+                      url: baseUrl + '/Inventory/GetProductListById/' + $scope.Purchase.ProductId
+
+                  }).then(function successCallback(response) {
+                      $scope.Unit = response.data.results[0].UnitCode;
+  
+                  }, function errorCallback(response) {
+                      toastr["warning"](response.data.Message);
+                  });
+
+              };
+              function Validation() {
+                  if ($scope.addform.$invalid) {
+                      return false;
+                  }
+                  if ($scope.addform.$valid) {
+                      return true;
+                  }
+              }
+              //This method is calling from dropDown
+              $scope.changePageSize = function () {
+                  $scope.studentSearch.pageIndex = 1;
+                  Search();
+              };
+
+          }]);
+    </script>
+}
+

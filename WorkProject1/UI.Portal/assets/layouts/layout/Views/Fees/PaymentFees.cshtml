@@ -1,0 +1,200 @@
+﻿@{
+    ViewBag.Title = "PaymentFees";
+}
+@model OEMS.Models.Model.FeesSetting
+<!-- Begin: life time stats -->
+<div class="portlet light bordered" ng-controller="FeesCtrl">
+    <div class="portlet-title">
+        <div class="caption">
+            <i class="icon-settings font-green"></i>
+            <span class="caption-subject font-green sbold uppercase">Fees Payment Detail</span>
+        </div>
+    </div>
+    <div class="portlet-body">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="jumbotron">
+                    <div class="label label-primary">Fees Payment History </div>
+                    <div class="row">
+                        <table class="table table-bordered table-hover" style="overflow-x:scroll; width:100%;">
+                            <thead style="background-color:#F4D03F">
+                                <tr>
+                                    <th width="10%">Money Receipt</th>
+                                    <th width="10%">Month Name</th>
+                                    <th width="10%">Payment Date</th>
+                                    <th width="10%" class="text-center">Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-hide="Collection.length > 0">
+                                    <td class="" colspan="4"><span class=""></span> Data Not Found</td>
+                                </tr>
+                                <tr ng-repeat="item in Collection">
+                                    <td class=""><strong>{{item.MoneyReceipt}}</strong> </td>
+                                    <td class=""><strong>{{item.MonthName}}</strong> </td>
+                                    <td style="text-align:right"><strong>{{item.PaymentDate| date : format : 'dd-MM-yyyy'}}</strong></td>
+                                    <td style="text-align:right"><strong>{{item.TotalAmount}}</strong></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="jumbotron">
+                    <div class="label label-danger">Fees Payment Due</div>
+                    <form ng-submit="ReceiveCollection(0)" name="frmCommonFeilds2" novalidate>
+                        <div class="row">
+                            <table class="table table-bordered table-hover" style="overflow-x:scroll; width:100%;">
+                                <thead style="background-color:#F4D03F">
+                                    <tr>
+                                        <th width="10%">Month Name</th>
+                                        <th width="10%" class="text-center">Amount</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-hide="CollectionDue.length > 0">
+                                        <td class="text-center text-capitalize" colspan="2"><span class=""></span> Due Amount Not Found</td>
+                                    </tr>
+                                    <tr ng-repeat="item in CollectionDue">
+                                        <td class=""><strong>{{item.MonthName}}</strong> </td>
+                                        <td style="text-align:right"> {{item.TotalAmount}}</td>
+                                    </tr>
+                                </tbody>
+                                <tfoot style="background-color:#F4D03F" ng-show="CollectionDue.length > 0">
+                                    <tr style="text-align:right">
+                                        <td>Total(.tk)</td>
+                                        <td>{{totalDue}}</td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                        <div class="row" ng-show="CollectionDue.length > 0">
+                            <div class="form-group">
+                                <div class="col-md-12 text-center">
+                                    <div style="margin:0 auto;width:150px;">
+                                        <button type="submit" ng-click="Payments()" class="btn btn-info btn-sm btn-block">Payment</button>&nbsp;&nbsp;&nbsp;
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+<!-- End: life time stats -->
+@section Scripts{
+    <script type="text/javascript">
+        OEMSApp.controller("FeesCtrl", ["$scope", "$http", "$window", 'blockUI',
+        function ($scope, $http, $window, blockUI) {
+            init();
+            function init() {
+                GetCollectionInfo();
+                $scope.pageSizeArray = [];
+                $scope.pageSizeArray.push({ value: 5, text: 5 });
+                $scope.pageSizeArray.push({ value: 10, text: 10 });
+                $scope.pageSizeArray.push({ value: 20, text: 20 });
+                $scope.pageSizeArray.push({ value: 50, text: 50 });
+                $scope.currentPage = 1;
+                $scope.pageSize = 10;
+                $scope.CollectionDue = [];
+                $scope.Collection = [];
+
+                $scope.totalReceive = 0;
+                $scope.totalPayment = 0;
+                $scope.totalDelrecive = 0;
+                $scope.totalAmount = 0;
+
+
+
+            }
+            function GetCollectionInfo() {
+                blockUI.start();
+                $scope.CollectionDue = [];
+                $http({
+                    method: 'GET',
+                    url: baseUrl + 'PortalFees/GetCollectionInfoById/'
+                }).then(function successCallback(response) {
+                    GetCollectionHistoryId();
+                    // when the response is available
+                    $scope.CollectionDue = response.data.results;
+                    GettotalReceive();
+                    // $scope.AspNetRoles = response.data;
+                    $scope.total_count = response.data.totalcount;
+                    blockUI.stop();
+                    //console.log(response.data);
+                }, function errorCallback(response) {
+                    blockUI.stop();
+                    toastr["warning"](response.data.Message);
+                });
+            }
+            function GetCollectionHistoryId() {
+                blockUI.start();
+                $scope.Collection = [];
+                $http({
+                    method: 'GET',
+                    url: baseUrl + 'PortalFees/GetCollectionHistoryId/'
+                }).then(function successCallback(response) {
+                    // when the response is available
+                    $scope.Collection = response.data.results;
+                    GettotalReceive();
+                    // $scope.AspNetRoles = response.data;
+                    $scope.total_count = response.data.totalcount;
+                    blockUI.stop();
+                    //console.log(response.data);
+                }, function errorCallback(response) {
+                    blockUI.stop();
+                    toastr["warning"](response.data.Message);
+                });
+            }
+            function FnCollectionDetails(item) {
+                $scope.colectionDetails = [];
+                $scope.colectionDetails = item.FeesStudents;
+                $scope.disTotalDue = item.DueAmount;
+                $scope.totalDelrecive = item.ReceiveAmount;
+                $scope.totalDelAdv = item.AdvanceAmount;
+                $scope.totaldis = item.DiscountAmount;
+                $scope.HeadId = item.HeadId;
+
+            }
+            function GettotalReceive() {
+                $scope.totalDue = 0;
+                $scope.totalrecive = 0;
+                $scope.totalAdv = 0;
+                $scope.totaldis = 0;
+                $scope.totalAmount = 0;
+                angular.forEach($scope.CollectionDue, function (value, key) {
+                    $scope.totaldis += num(value.DiscountAmount);
+                    $scope.totalAdv += num(value.AdvanceAmount);
+                    $scope.totalDue += num(value.TotalAmount);
+                    $scope.totalrecive += num(value.ReceiveAmount);
+                    $scope.totalAmount += num(value.TotalAmount);
+                });
+            }
+            $scope.Payments = function Payments() {
+                blockUI.start();
+                $http({
+                    method: 'Post',
+                    url: baseUrl + 'PortalFees/Pay2FeeCreate/'
+                }).then(function successCallback(response) {
+                    $scope.PayData = response.data;
+                    window.location.href = $scope.PayData.gatewayUrl;
+                    blockUI.stop();
+                }, function errorCallback(response) {
+                    blockUI.stop();
+                    toastr["warning"](response.data.Message);
+                });
+            }
+            function num(val) {
+                if ($.isNumeric(val)) {
+                    return parseFloat(val);
+                } else {
+                    return 0;
+                }
+            }
+        }]);
+    </script>
+}

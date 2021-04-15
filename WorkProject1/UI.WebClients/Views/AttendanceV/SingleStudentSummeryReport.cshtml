@@ -1,0 +1,116 @@
+﻿@{
+    ViewBag.Title = "Single Student Summary";
+}
+<div class="row" ng-controller="ctrlStdLeaveApply">
+    <div class="col-md-12">
+        <div class="portlet-title" style="background-color:#18979b;height:35px">
+            <div class="caption" style="font-size:20px;color:white;padding-top:3px">
+                &nbsp;<i class="fa fa-bar-chart-o" style="color:white"></i> Individual Student Attendance Details Report
+            </div>
+        </div>
+        <div class="portlet light bordered">
+            <!-- BEGIN SEARCH BOX-->
+            <div class="portlet-body form" style="margin:0px;padding:0px">
+                <form class="form-horizontal" ng-submit="" id="formCommonFeilds" name="formCommonFeilds" novalidate>
+                    <div class="row">
+                        <div class="col-lg-offset-1 col-md-8">
+                            <div class="form-body" style="padding-bottom: 0px;">
+                                <div class="form-group" ng-class="{ 'has-error' : submitted && formCommonFeilds.stdId.$invalid}">
+                                    <label class="col-md-3 control-label">
+                                        Search Box
+                                        <span class="required">*</span>
+                                    </label>
+                                    <div class="col-md-9">
+                                        <input type="text" required name="stdId" ng-model="Std" typeahead-on-select='onSelect($item, $model, $label)' placeholder="Search Student By ID or Name or SMS Notification No." uib-typeahead="i  as i.Text for i in Search($viewValue)" typeahead-loading="loadingLocations" typeahead-no-results="noResults" class="form-control">
+                                        <i ng-show="loadingLocations" class="glyphicon glyphicon-refresh"></i>
+                                        <div ng-show="noResults"><i class="glyphicon glyphicon-remove"></i> No Results Found</div>
+                                        <input type="hidden" name="StudentIID" ng-model="StudentIID" ng-value="Std.Value" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-10">
+                            <div class="form-group">
+                                <label class="col-md-4 control-label">
+                                    Month Range:
+                                    <span class="required">*</span>
+                                </label>
+                                <div class="col-md-3" ng-class="{ 'has-error' : submitted && formCommonFeilds.FromDate.$invalid}">
+                                    <input class="form-control" required name="FromDate" type="datetime" placeholder="From Month" readonly ng-click="p1=true" is-open="p1" datepicker-options="{minMode: 'month'}" datepicker-mode="'month'" uib-datepicker-popup="MM/yyyy" ng-model="From" />
+                                </div>
+                                <div class="col-md-3" ng-class="{ 'has-error' : submitted && formCommonFeilds.ToDate.$invalid}">
+                                    <input class="form-control" required name="ToDate" type="datetime" placeholder="To Month" readonly ng-click="p2=true" is-open="p2" datepicker-options="{minMode: 'month'}" datepicker-mode="'month'" uib-datepicker-popup="MM/yyyy" ng-model="To" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+
+                        </div>
+
+                    </div>
+                    <div class="col-md-offset-4">
+                        <button style="margin-left:8%" type="button" ng-click="submitted=true;Report(formCommonFeilds.$valid)" class="btn btn-circle green btn-large">Click for Report</button>
+                        <button type="button" ng-click="Reset()" class="btn btn-circle grey btn-large">Reset</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+
+    <script type="text/javascript">
+
+        OEMSApp.controller("ctrlStdLeaveApply", ["$scope", "$http", "SweetAlert", "blockUI", "$window", "$filter",
+                  function ($scope, $http, SweetAlert, blockUI, $window, $filter) {
+                      init();
+                      function init() {
+                          initialize();
+                      }
+                      function initialize() {
+
+
+                      };
+                      $scope.Reset = function Reset() {
+
+                          $scope.submitted = false;
+                          $scope.From = null;
+                          $scope.To = null;
+                          $scope.Std = {};
+                          $scope.Std.Text = null;
+                          $scope.Std.Value = null;
+                      };
+                      //for Student Search for auto complit text box ......
+                      $scope.Search = function (val) {
+
+                          if (val.length >= 3)
+                              return $http.get(baseUrl + 'Student/SearchStudent/' + val, {
+                                  params: {
+
+                                  }
+                              }).then(function (response) {
+                                  blockUI.stop();
+                                  return response.data.results.map(function (item) {
+                                      return item;
+                                  });
+                              });
+                      };
+
+                      $scope.Report = function Report(valid) {
+                          if (!valid)
+                              return;
+                          var FromDate = $filter('date')($scope.From, "MM/dd/yyyy");
+                          var ToDate = $filter('date')($scope.To, "MM/dd/yyyy");
+                          //here the Version Id as a rapper for student id
+                          $scope.uri = "@Url.Action("SingleStudentSummeryReport", "Report")?FromDate=" + FromDate + '&ToDate=' + ToDate;
+                          $window.open($scope.uri, '_blank');                         
+                      };
+
+                  }]);
+    </script>
+}
+
+

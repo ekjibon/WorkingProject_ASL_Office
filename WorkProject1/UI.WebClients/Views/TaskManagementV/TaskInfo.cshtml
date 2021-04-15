@@ -1,0 +1,696 @@
+﻿@{
+    ViewBag.Title = "TaskInfo";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@using UI.Admin.Models
+<style>
+    .dropdown-submenu {
+        position: relative;
+    }
+
+        .dropdown-submenu .dropdown-menu {
+            top: 0;
+            left: 100%;
+            margin-top: -1px;
+        }
+
+    .high {
+        color: red;
+    }
+
+    .medium {
+        color: green;
+    }
+</style>
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('ul.dropdown-menu li.dropdown-submenu').hover(function () {
+            $(this).find('.dropdown-menu').stop(true, true).delay(200).fadeIn(500);
+        }, function () {
+            $(this).find('.dropdown-menu').stop(true, true).delay(200).fadeOut(500);
+        });
+    });
+</script>
+<link href="http://cdn.addiesoft.com/admin/assets/global/plugins/bootstrap-daterangepicker/daterangepicker.min.css" rel="stylesheet" type="text/css" />
+<link href="http://cdn.addiesoft.com/admin/assets/global/plugins/bootstrap-datepicker/css/bootstrap-datepicker3.min.css" rel="stylesheet" type="text/css" />
+<link href="http://cdn.addiesoft.com/admin/assets/global/plugins/bootstrap-timepicker/css/bootstrap-timepicker.min.css" rel="stylesheet" type="text/css" />
+<link href="http://cdn.addiesoft.com/admin/assets/global/plugins/bootstrap-datetimepicker/css/bootstrap-datetimepicker.min.css" rel="stylesheet" type="text/css" />
+<script src="http://cdn.addiesoft.com/admin/assets/global/plugins/bootstrap-daterangepicker/daterangepicker.min.js" type="text/javascript"></script>
+<script src="http://cdn.addiesoft.com/admin/assets/global/plugins/bootstrap-datepicker/js/bootstrap-datepicker.min.js" type="text/javascript"></script>
+<script src="http://cdn.addiesoft.com/admin/assets/global/plugins/bootstrap-timepicker/js/bootstrap-timepicker.min.js" type="text/javascript"></script>
+<script src="http://cdn.addiesoft.com/admin/assets/global/plugins/bootstrap-datetimepicker/js/bootstrap-datetimepicker.min.js" type="text/javascript"></script>
+<script src="http://cdn.addiesoft.com/admin/assets/pages/scripts/components-date-time-pickers.min.js" type="text/javascript"></script>
+
+<h3 style="text-align: left;
+        background: #ddd;
+        margin-right: 1.5%;
+        margin-left: 0.5px;
+        margin-top: -5px;
+        padding-left: 2%;padding: 4px;">
+    Task List
+</h3>
+@if (User.IsInRole("Admin") || User.IsInRole("Manager"))
+{
+    <div class="text-right" style="margin-top: -44px;">
+        <a title="Add Task" class="btn btn-primary fa-item" href="@Url.Action("AddTask","Home")" style="margin-bottom: 2%;">
+            <i class="fa fa-plus-square"></i> Add Task
+        </a>
+    </div>
+}
+else
+{
+    <div class="text-right" style="margin-top: -44px;">
+        <a title="Add Task" class="btn btn-primary fa-item" href="@Url.Action("MyTask","Home")" style="margin-bottom: 2%;">
+            <i class="fa fa-plus-square"></i> My Task
+        </a>
+    </div>
+}
+<div ng-controller="taskInfoClt">
+    <div class="panel-body" style="margin-top: -3%;">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="portlet light bordered">
+                    <div class="row">
+                        <div class="portlet-body">
+                            <ul class="nav nav-tabs" style="margin-top: 32px;">
+                                <li class="active">
+                                    <a href="#tab_1_1" data-toggle="tab"> All Task ({{TaskList.length}}) </a>
+                                </li>
+                                <li>
+                                    <a href="#tab_1_2" data-toggle="tab"> My Task ({{MyTaskList.length}})</a>
+                                </li>
+                            </ul>
+                            <div class="row" style="margin-top: 1%;">
+
+                                <div class="col-md-2 pull-right" style="width: 10%;">
+                                    <select class="form-control" ng-model="pageSize" ng-options="P.value as P.text for P in pageSizeArray"></select>
+                                </div>
+                                <div class="col-lg-2 pull-right" style="width:13%;">
+                                    <input ng-model="q" id="search" step="margin-left: 16%;" class="form-control" placeholder="Filter text">
+                                </div>
+                                <div class="col-md-2 pull-right">
+                                    <table style="margin-left:-300%;">
+                                        <tr>
+                                            <td style="padding: 1px;">
+                                                <div class="dropdown">
+                                                    <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">
+                                                        Create Time
+                                                        <span class="caret"></span>
+                                                    </button>
+                                                    <ul class="dropdown-menu">
+                                                        <li><a tabindex="-1" href="#" ng-click="TimeFilter('Anytime')">Anytime</a></li>
+                                                        <li><a tabindex="-1" href="#" ng-click="TimeFilter('Today')">Today</a></li>
+                                                        <li><a tabindex="-1" href="#" ng-click="TimeFilter('Yesterday')">Yesterday</a></li>
+                                                        <li><a tabindex="-1" href="#" ng-click="TimeFilter('This Month')">This Month</a></li>
+                                                        <li><a tabindex="-1" href="#" ng-click="TimeFilter('Past Month')">Past Month</a></li>
+                                                        <li><a tabindex="-1" href="#" ng-click="TimeFilter('This Year')">This Year</a></li>
+                                                        <li><a tabindex="-1" href="#" ng-click="TimeFilter('Past Year')">Past Year</a></li>
+                                                    </ul>
+                                                </div>
+                                            </td>
+                                            <td style="padding: 1px;">
+                                                <div class="dropdown">
+                                                    <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">
+                                                        Due date
+                                                        <span class="caret"></span>
+                                                    </button>
+                                                    <ul class="dropdown-menu">
+                                                        <li><a tabindex="-1" href="#" ng-click="CloseDateFilter('Anytime')">Anytime</a></li>
+                                                        <li><a tabindex="-1" href="#" ng-click="CloseDateFilter('Yesterday')">Tomorrow</a></li>
+                                                        <li><a tabindex="-1" href="#" ng-click="CloseDateFilter('Today')">Today</a></li>
+                                                        <li><a tabindex="-1" href="#" ng-click="CloseDateFilter('Yesterday')">Yesterday</a></li>
+                                                        <li><a tabindex="-1" href="#" ng-click="CloseDateFilter('This Month')">This Month</a></li>
+                                                        <li><a tabindex="-1" href="#" ng-click="CloseDateFilter('Past Month')">Past Month</a></li>
+                                                        <li><a tabindex="-1" href="#" ng-click="CloseDateFilter('This Year')">This Year</a></li>
+                                                        <li><a tabindex="-1" href="#" ng-click="CloseDateFilter('Past Year')">Past Year</a></li>
+                                                    </ul>
+                                                </div>
+                                            </td>
+                                            <td style="padding: 1px;">
+                                                <div class="dropdown">
+                                                    <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">
+                                                        Task Status
+                                                        <span class="caret"></span>
+                                                    </button>
+                                                    <ul class="dropdown-menu">
+                                                        <li><a tabindex="-1" href="#" ng-click="TaskStatusFilter('Pending')">Pending</a></li>
+                                                        <li><a tabindex="-1" href="#" ng-click="TaskStatusFilter('In Progress')">In Progress</a></li>
+                                                        <li><a tabindex="-1" href="#" ng-click="TaskStatusFilter('Paused')">Paused</a></li>
+                                                        <li><a tabindex="-1" href="#" ng-click="TaskStatusFilter('Resolved')">Resolved</a></li>
+
+                                                    </ul>
+                                                </div>
+                                            </td>
+                                            <td style="padding: 1px;">
+
+                                                <div class="dropdown">
+                                                    <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">
+                                                        Priority
+                                                        <span class="caret"></span>
+                                                    </button>
+                                                    <ul class="dropdown-menu">
+                                                        <li><a tabindex="-1" href="#" ng-click="PriorityFilter('High')">High</a></li>
+                                                        <li><a tabindex="-1" href="#" ng-click="PriorityFilter('Medium')">Medium</a></li>
+                                                        <li><a tabindex="-1" href="#" ng-click="PriorityFilter('Low')">Low</a></li>
+                                                    </ul>
+                                                </div>
+                                            </td>
+                                            <td style="padding: 1px;">
+                                                <div class="dropdown">
+                                                    <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">
+                                                        Assign To
+                                                        <span class="caret"></span>
+                                                    </button>
+                                                    <ul class="dropdown-menu">
+                                                        <li ng-repeat="item in AllUserList | filter: { DepartmentId:MyDeptId}">
+                                                            <a tabindex="-1" href="#" ng-click="AssignFilter(item.FullName)">{{item.FullName}}</a>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </td>
+                                            <td style="padding: 1px;">
+                                                <div class="dropdown">
+                                                    <button class="btn btn-danger dropdown-toggle" title="Clear" ng-click="TaskListClear()" type="button" data-toggle="dropdown">
+                                                        <i class="far fa-times-circle"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="tab-content">
+                                <div class="tab-pane fade active in" id="tab_1_1">
+                                    <table class="table table-checkable table-inverse table-hover">
+                                        <thead class="">
+                                            <tr class="text-center">
+                                                <th>Task#</th>
+                                                <th>Action</th>
+                                                <th class="text-center">Title</th>
+                                                <th class="text-center">Status</th>
+                                                <th class="text-center">Priority</th>
+                                                <th class="text-center">Ticket</th>
+                                                <th class="text-center">Assinged To</th>
+                                                <th class="text-center">Due Date</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr ng-show="TaskList.length <= 0"><td colspan="7" style="text-align:center;"><i class="fa fa-refresh"></i> No Data Exist!!</td></tr>
+                                            <tr dir-paginate="item in TaskList| filter:q | itemsPerPage: pageSize" current-page="currentPage">
+                                                <td class="text-center" style="vertical-align:middle"> {{item.Id}} </td>
+                                                <!--action menu-->
+                                                @if (User.IsInRole(Role.Admin) || User.IsInRole(Role.Manager))
+                                                {
+                                                    <td>
+                                                        <div class="dropdown">
+                                                            <a data-toggle="dropdown" href="#"><img src="~/assets/global/img/action.png" style="height: 45px;" /></a>
+                                                            <ul ng-hide="item.Status=='Closed'" class="dropdown-menu" style="">
+                                                                <li><a tabindex="-1" href="#" ng-click="TaskStatusStart(item.Id)">Start</a></li>
+                                                                <li><a tabindex="-1" href="#" ng-click="TaskStatusPause(item.Id)">Pause</a></li>
+                                                                <li><a tabindex="-1" href="#" ng-click="TaskStatusResolve(item.Id)">Resolve</a></li>
+                                                                <li><a tabindex="-1" href="#" ng-click="TaskStatusClose(item.Id)">Close</a></li>
+                                                            </ul>
+                                                        </div>
+                                                    </td>
+                                                }
+                                                else
+                                                {
+                                                    <td>
+                                                        <div class="dropdown">
+                                                            <a data-toggle="dropdown" href="#"><img src="~/assets/global/img/action.png" style="height: 45px;" /></a>
+
+                                                            <ul ng-hide="item.Status=='Closed'" class="dropdown-menu" style="">
+                                                                <li><a tabindex="-1" href="#" ng-click="TaskStatusStart(item.Id)">Start</a></li>
+                                                                <li><a tabindex="-1" href="#" ng-click="TaskStatusPause(item.Id)">Pause</a></li>
+                                                                <li><a tabindex="-1" href="#" ng-click="TaskStatusResolve(item.Id)">Resolve</a></li>
+                                                            </ul>
+                                                        </div>
+                                                    </td>
+                                                }
+                                                @*<td ng-show="item.Status=='Closed'"></td>*@
+                                                <td class="text-left">
+                                                    <a target="_blank" style="font-size:15px;text-decoration: none;font-weight:bold" href="@Url.Action("TaskDetails","Home")?TaskId={{item.Id}}">{{item.TaskName | capitalize}}</a>
+                                                    <p style="color:darkgray;font-size:12px;">Updated by {{item.AddBy | capitalize}} at {{item.AddDate.replace('/Date(','').replace(')/','') |   date:'dd-MM-yyyy HH:mm a'}}.</p>
+                                                </td>
+
+                                                <!--task status-->
+                                                <td class="text-center" ng-show="item.Status=='In Progress'"><span class="label label-info" style="padding-left: 13%;padding-right: 13%;">{{item.Status}}</span></td>
+                                                <td class="text-center" ng-show="item.Status=='N/A'"><span class="label label-warning">{{item.Status}}</span></td>
+                                                <td class="text-center" ng-show="item.Status=='Pending'"><span class="label label-primary" style="padding-left: 20%;padding-right: 20%;">{{item.Status}}</span></td>
+                                                <td class="text-center" ng-show="item.Status=='Paused'"><span class="label label-warning" style="padding-left: 24%;padding-right: 24%;">{{item.Status}}</span></td>
+                                                <td class="text-center" ng-show="item.Status=='Resolved'"><span class="label label-success" style="padding-left: 18%;padding-right: 18%;">{{item.Status}}</span></td>
+                                                <td class="text-center" ng-show="item.Status=='Closed'"><span class="label label-default">{{item.Status}}</span></td>
+
+                                                <!--ticket column-->
+                                                <td ng-show="item.Priority=='High'"><span class="text-center label label-danger" style="padding-left: 27%;padding-right: 27%;">{{item.Priority}}</span>  </td>
+                                                <td ng-show="item.Priority=='Medium'"><span class="text-center label btn-success" style="padding-left: 14%;padding-right: 14%;">{{item.Priority}}</span>  </td>
+                                                <td ng-show="item.Priority=='Low'"><span class="text-center label label-warning" style="padding-left: 28%;padding-right: 28%;">{{item.Priority}}</span>  </td>
+                                                <td ng-show="item.Priority==null"><span class="text-center label label-warning" style="padding-left: 30%;padding-right: 30%;">N/A</span>  </td>
+
+                                                <td class="text-center" ng-show="item.TicketId==0">
+                                                    <label style="font-size:14px">N/A</label>
+                                                </td>
+                                                <td class="text-center" ng-show="item.TicketId!=0">
+                                                    <a target="_blank" class="label label-success" style="font-size:14px;" href="@Url.Action("TicketDetails","Home")?TicketId={{item.TicketId}}">T-({{item.TicketId}})</a>
+                                                </td>
+                                                <td class="text-right">
+                                                    <div class="dropdown">
+                                                        <button ng-show="item.AssignUserName!=null" class="btn dropdown-toggle" id="dropdownMenu1" data-toggle="dropdown">
+                                                            {{item.AssignUserName | capitalize}}
+                                                            <span class="caret"></span>
+                                                        </button>
+                                                        <button ng-show="item.AssignUserName==null" class="btn dropdown-toggle" id="dropdownMenu1" data-toggle="dropdown">
+                                                            Not Assigned
+                                                            <span class="caret"></span>
+                                                        </button>
+
+                                                        @if (User.IsInRole("Admin"))
+                                                        { <ul class="dropdown-menu pull-right" role="menu" aria-labelledby="dropdownMenu1">
+                                                            <li role="presentation" ng-repeat="user in AllUserList" ng-bind-html-unsafe="user.FullName">
+                                                                <a role="menuitem" tabindex="-1" ng-click="AssingnTaskToUser(item.Id,user.UserName)">{{ user.FullName | capitalize}}</a>
+                                                            </li>
+                                                        </ul>
+                                                        }
+                                                        else
+                                                        {<ul class="dropdown-menu pull-right" role="menu" aria-labelledby="dropdownMenu1">
+                                                            <li role="presentation" ng-repeat="user in AllUserList | filter: { DepartmentId:MyDeptId}" ng-bind-html-unsafe="user.FullName">
+                                                                <a role="menuitem" tabindex="-1" ng-click="AssingnTaskToUser(item.Id,user.UserName)">{{ user.FullName | capitalize}}</a>
+                                                            </li>
+                                                        </ul>
+                                                        }
+
+
+                                                    </div>
+                                                </td>
+                                                <td class="text-center">{{item.DueDate.replace('/Date(','').replace(')/','') |   date:'dd-MM-yyyy'}}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <div class="row" ng-show="TaskList.length>1">
+                                        <dir-pagination-controls boundary-links="true" template-url="~/assets/dirPagination.tpl.html"></dir-pagination-controls>
+                                    </div>
+                                </div>
+                                <div class="tab-pane fade" id="tab_1_2">
+                                    <table class="table table-checkable table-inverse table-hover">
+                                        <thead class="">
+                                            <tr class="text-center">
+                                                <th>Task#</th>
+                                                <th>Action</th>
+                                                <th class="text-center">Title</th>
+                                                <th class="text-center">Status</th>
+                                                <th class="text-center">Priority</th>
+                                                <th class="text-center">Ticket</th>
+                                                <th class="text-center">Assinged To</th>
+                                                <th class="text-center">Due Date</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr ng-show="MyTaskList.length <= 0"><td colspan="7" style="text-align:center;"><i class="fa fa-refresh"></i> No Data Exist!!</td></tr>
+                                            <tr dir-paginate="item in MyTaskList| filter:q | itemsPerPage: pageSize" current-page="currentPage">
+                                                <td class="text-center" style="vertical-align:middle"> {{item.Id}} </td>
+                                                <!--action menu-->
+
+                                                @if (User.IsInRole(Role.Admin) || User.IsInRole(Role.Manager))
+                                                {
+                                                    <td>
+                                                        <div class="dropdown">
+                                                            <a data-toggle="dropdown" href="#"><img src="~/assets/global/img/action.png" style="height: 45px;" /></a>
+
+                                                            <ul ng-hide="item.Status=='Closed'" class="dropdown-menu" style="">
+                                                                <li><a tabindex="-1" href="#" ng-click="TaskStatusStart(item.Id)">Start</a></li>
+                                                                <li><a tabindex="-1" href="#" ng-click="TaskStatusPause(item.Id)">Pause</a></li>
+                                                                <li><a tabindex="-1" href="#" ng-click="TaskStatusResolve(item.Id)">Resolve</a></li>
+                                                                <li><a tabindex="-1" href="#" ng-show="item.TicketId==0" ng-click="TaskStatusClose(item.Id)">Close</a></li>
+                                                            </ul>
+                                                        </div>
+                                                    </td>
+                                                }
+                                                else
+                                                {
+                                                    <td>
+                                                        <div class="dropdown">
+                                                            <a data-toggle="dropdown" href="#"><img src="~/assets/global/img/action.png" style="height: 45px;" /></a>
+
+                                                            <ul ng-hide="item.Status=='Closed'" class="dropdown-menu" style="">
+                                                                <li><a tabindex="-1" href="#" ng-click="TaskStatusStart(item.Id)">Start</a></li>
+                                                                <li><a tabindex="-1" href="#" ng-click="TaskStatusPause(item.Id)">Pause</a></li>
+                                                                <li><a tabindex="-1" href="#" ng-click="TaskStatusResolve(item.Id)">Resolve</a></li>
+                                                            </ul>
+                                                        </div>
+                                                    </td>
+                                                }
+
+                                                @*<td ng-show="item.Status=='Closed'"></td>*@
+                                                <td class="text-left">
+                                                    <a target="_blank" style="font-size:15px;text-decoration: none;font-weight:bold" href="@Url.Action("TaskDetails","Home")?TaskId={{item.Id}}">{{item.TaskName | capitalize}}</a>
+                                                    <p style="color:darkgray;font-size:12px;">Updated by {{item.AddBy | capitalize}} at {{item.AddDate.replace('/Date(','').replace(')/','') |   date:'dd-MM-yyyy HH:mm a'}}.</p>
+                                                </td>
+                                                <!--task status-->
+                                                <td class="text-center" ng-show="item.Status=='In Progress'"><span class="label label-info" style="padding-left: 13%;padding-right: 13%;">{{item.Status}}</span></td>
+                                                <td class="text-center" ng-show="item.Status=='N/A'"><span class="label label-warning">{{item.Status}}</span></td>
+                                                <td class="text-center" ng-show="item.Status=='Pending'"><span class="label label-primary" style="padding-left: 20%;padding-right: 20%;">{{item.Status}}</span></td>
+                                                <td class="text-center" ng-show="item.Status=='Paused'"><span class="label label-warning" style="padding-left: 20%;padding-right: 20%;">{{item.Status}}</span></td>
+                                                <td class="text-center" ng-show="item.Status=='Resolved'"><span class="label label-success" style="padding-left: 18%;padding-right: 18%;">{{item.Status}}</span></td>
+                                                <td class="text-center" ng-show="item.Status=='Closed'"><span class="label label-default">{{item.Status}}</span></td>
+
+                                                <!--ticket column-->
+                                                <td ng-show="item.Priority=='High'"><span class="text-center label label-danger" style="padding-left: 27%;padding-right: 27%;">{{item.Priority}}</span>  </td>
+                                                <td ng-show="item.Priority=='Medium'"><span class="text-center label btn-success" style="padding-left: 14%;padding-right: 14%;">{{item.Priority}}</span>  </td>
+                                                <td ng-show="item.Priority=='Low'"><span class="text-center label label-warning" style="padding-left: 28%;padding-right: 28%;">{{item.Priority}}</span>  </td>
+                                                <td ng-show="item.Priority==null"><span class="text-center label label-warning" style="padding-left: 30%;padding-right: 30%;">N/A</span>  </td>
+
+                                                <td class="text-center" ng-show="item.TicketId==0">
+                                                    <label style="font-size:14px">N/A</label>
+                                                </td>
+                                                <td class="text-center" ng-show="item.TicketId!=0">
+                                                    <a target="_blank" style="font-size:14px" href="@Url.Action("TicketDetails","Home")?TicketId={{item.TicketId}}">View</a>
+                                                </td>
+                                                <td class="text-right">
+                                                    <div class="dropdown">
+                                                        <button ng-show="item.AssignUserName!=null" class="btn dropdown-toggle" id="dropdownMenu1" data-toggle="dropdown">
+                                                            {{item.AssignUserName | capitalize}}
+                                                            <span class="caret"></span>
+                                                        </button>
+                                                        <button ng-show="item.AssignUserName==null" class="btn dropdown-toggle" id="dropdownMenu1" data-toggle="dropdown">
+                                                            Not Assigned
+                                                            <span class="caret"></span>
+                                                        </button>
+                                                        <ul class="dropdown-menu pull-right" role="menu" aria-labelledby="dropdownMenu1">
+                                                            <li role="presentation" ng-repeat="user in AllUserList | filter: { DepartmentId: item.TicketDeptId}" ng-bind-html-unsafe="user.FullName">
+                                                                <a role="menuitem" tabindex="-1" ng-click="AssingnTaskToUser(item.Id,user.UserName)">{{ user.FullName | capitalize}}</a>
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                                </td>
+                                                <td class="text-center">{{item.DueDate.replace('/Date(','').replace(')/','') |   date:'dd-MM-yyyy'}}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+
+                                </div>
+                            </div>
+                            <div class="clearfix margin-bottom-20"> </div>
+
+
+                        </div>
+                    </div>
+
+
+                </div>
+            </div>
+
+        </div>
+        <!-- Table -->
+    </div>
+</div>
+
+
+
+
+
+<script type="text/javascript">
+    AddieApp.filter('capitalize', function () {
+        return function (input) {
+            return (!!input) ? input.charAt(0).toUpperCase() + input.substr(1).toLowerCase() : '';
+        }
+    });
+    AddieApp.controller("taskInfoClt", ["$scope", "$http", "SweetAlert",
+      function ($scope, $http, SweetAlert) {
+          init();
+          function init() {
+              initialize();
+          }
+          function initialize() {
+              $scope.pageSizeArray = [];
+              $scope.pageSizeArray.push({ value: 5, text: 5 });
+              $scope.pageSizeArray.push({ value: 10, text: 10 });
+              $scope.pageSizeArray.push({ value: 20, text: 20 });
+              $scope.pageSizeArray.push({ value: 50, text: 50 });
+              $scope.currentPage = 1;
+              $scope.pageSize = 10;
+              $scope.IsEdit = 0;
+              $scope.btnTitle = 'Save';
+              LoadMyTaskList();
+              LoadTaskList();
+              LoadAllUserList();
+          };
+
+          //start filtering function here
+
+          $scope.TimeFilter = function (item) {
+              $http.get(baseUrl + 'Task/FilterTask?FilterType=TimeFilter' + '&FilterId=' + item).
+             then(function (response) {
+                 $scope.TaskList = response.data;
+             });
+          }
+
+          $scope.TaskStatusFilter = function (item) {
+              $http.get(baseUrl + 'Task/FilterTask?FilterType=StatusFilter' + '&FilterId=' + item).
+           then(function (response) {
+               $scope.TaskList = response.data;
+           });
+          }
+
+          $scope.CloseDateFilter = function (item) {
+              $http.get(baseUrl + 'Task/FilterTask?FilterType=DueDateFilter' + '&FilterId=' + item).
+             then(function (response) {
+                 $scope.TaskList = response.data;
+             });
+          }
+          $scope.PriorityFilter = function (item) {
+              $http.get(baseUrl + 'Task/FilterTask?FilterType=PriorityFilter' + '&FilterId=' + item).
+               then(function (response) {
+                   $scope.TaskList = response.data;
+               });
+          }
+
+          $scope.AssignFilter = function (item) {
+              $http.get(baseUrl + 'Task/FilterTask?FilterType=AssignFilter' + '&FilterId=' + item).
+               then(function (response) {
+                   $scope.TaskList = response.data;
+               });
+          }
+
+          //filter end
+          $scope.TaskStatusStart = function TaskStatusStart(TaskId) {
+              $http.get(baseUrl + 'Task/UpdateTaskStatus?TaskId=' + TaskId + '&Status=In Progress').
+                then(function (response) {
+                    if (response.data == 2) {
+                        toastr.error('Task is already closed.');
+                    }
+                    else if (response.data == 3) {
+                        toastr.error('Task already started.');
+                    }
+                    else if (response.data == 4) {
+                        toastr.error('Task has not started yet.');
+                    }
+                    else if (response.data == 5) {
+                        toastr.error('Task is not assign to you. Only assign user can start the task.');
+                    }
+                    else if (response.data == 7) {
+                        toastr.error('Task has not resolved yet.');
+                    }
+                    else if (response.data == 6) {
+                        toastr.error('Task resolved already.');
+                    }
+                    else {
+                        toastr.success('Task started successfully.');
+                        LoadTaskList();
+                        LoadMyTaskList();
+                    }
+                });
+          }
+          $scope.TaskStatusPause = function TaskStatusPause(TaskId) {
+              $http.get(baseUrl + 'Task/UpdateTaskStatus?TaskId=' + TaskId + '&Status=Paused').
+                then(function (response) {
+                    if (response.data == 2) {
+                        toastr.error('Task is already closed.');
+                    }
+                    else if (response.data == 3) {
+                        toastr.error('Task already started.');
+                    }
+                    else if (response.data == 4) {
+                        toastr.error('Task has not started yet.');
+                    }
+                    else if (response.data == 7) {
+                        toastr.error('Task has not resolved yet.');
+                    }
+                    else if (response.data == 5) {
+                        toastr.error('Task is not assign to you. Only assign user can start the task.');
+                    }
+                    else if (response.data == 6) {
+                        toastr.error('Task resolved already.');
+                    }
+                    else {
+                        toastr.success('Task paused successfully.');
+                        LoadTaskList();
+                        LoadMyTaskList();
+                    }
+                });
+          }
+          $scope.TaskStatusResolve = function TaskStatusResolve(TaskId) {
+              $http.get(baseUrl + 'Task/UpdateTaskStatus?TaskId=' + TaskId + '&Status=Resolved').
+                then(function (response) {
+                    if (response.data == 2) {
+                        toastr.error('Task is already closed.');
+                    }
+                    else if (response.data == 3) {
+                        toastr.error('Task already started.');
+                    }
+                    else if (response.data == 4) {
+                        toastr.error('Task has not started yet.');
+                    }
+                    else if (response.data == 7) {
+                        toastr.error('Task has not resolved yet.');
+                    }
+                    else if (response.data == 5) {
+                        toastr.error('Task is not assign to you. Only assign user can start the task.');
+                    }
+                    else if (response.data == 6) {
+                        toastr.error('Task resolved already.');
+                    }
+                    else {
+                        toastr.success('Task Resolved successfully.');
+                        LoadTaskList();
+                        LoadMyTaskList();
+                    }
+                });
+          }
+          $scope.TaskStatusClose = function TaskStatusClose(TaskId) {
+              $http.get(baseUrl + 'Task/UpdateTaskStatus?TaskId=' + TaskId + '&Status=Closed').
+                then(function (response) {
+                    if (response.data == 2) {
+                        toastr.error('Task is already closed.');
+                    }
+                    else if (response.data == 3) {
+                        toastr.error('Task already started.');
+                    }
+                    else if (response.data == 4) {
+                        toastr.error('Task has not started yet.');
+                    }
+                    else if (response.data == 5) {
+                        toastr.error('Task is not assign to you. Only assign user can start the task.');
+                    }
+                    else if (response.data == 6) {
+                        toastr.error('Task resolved already.');
+                    }
+                    else if (response.data == 7) {
+                        toastr.error('Task has not resolved yet.');
+                    }
+                    else {
+                        toastr.success('Task Resolved successfully.');
+                        LoadTaskList();
+                        LoadMyTaskList();
+                    }
+                });
+          }
+
+          $scope.TaskListClear = function () {
+              LoadTaskList();
+              LoadMyTaskList();
+          }
+          $scope.Delete = function (taskInfo) {
+              swal({
+                  title: "Are you sure?",
+                  text: "Once deleted, you will not be able to recover this data!",
+                  icon: "warning",
+                  buttons: true,
+                  dangerMode: true,
+              })
+                .then((willDelete) => {
+                    if (willDelete) {
+                        $http.post(baseUrl + 'Task/DeleteTask', taskInfo).
+                          then(function (response) {
+                              if (response.data == '0') {
+                                  toastr.warning('Not found');
+                                  LoadProjectList();
+                                  return;
+                              }
+                              toastr.success('Deleted Successfully');
+                              LoadTaskList();
+                          });
+
+                    } else {
+
+                    }
+                });
+
+          }
+          $scope.ResetFrm = function () {
+              $scope.Project = {};
+              $scope.btnTitle = 'Save';
+              $scope.IsEdit = 0;
+              $scope.submitted = false;
+
+          }
+          function Dateconvert(str) {
+              var re = /\/Date\(([0-9]*)\)\//;
+              var m = str.match(re);
+              var datestring = new Date(parseInt(m[1]));
+              var date = new Date(datestring),
+                  mnth = ("0" + (date.getMonth() + 1)).slice(-2),
+                  day = ("0" + date.getDate()).slice(-2);
+              return new Date([date.getFullYear(), mnth, day].join("-"));
+          }
+          $scope.selectAll = function () {
+              angular.forEach($scope.TaskList, function (item) {
+                  item.Selected = $scope.selectedAll;
+              });
+          };
+          $scope.AssingnTaskToUser = function AssingnTaskToUser(taskid, userid) {
+              $http.get(baseUrl + 'Task/AssignTaskToUser?TaskId=' + taskid + '&UserName=' + userid).
+               then(function (response) {
+                   console.log(response.data);
+
+                   if (response.data == 3) {
+                       toastr.warning('Task not found.');
+                   }
+                   else if (response.data == 2) {
+                       toastr.warning('Selected assign user is not in the department of task->ticket department.');
+                   }
+                   else if (response.data == 0) {
+                       toastr.warning('Assign failed. Something wrong!');
+                   }
+                   else if (response.data == 4) {
+                       toastr.warning('Task resolved / close!');
+                   }
+                   else if (response.data == 7) {
+                       toastr.warning('You do not have the permission to assign user!');
+                   }
+                   else if (response.data == 1) {
+                       toastr.success('Task Assign Success.');
+                       LoadTaskList();
+                       LoadMyTaskList();
+                   }
+                   else {
+
+                   }
+               });
+          }
+          function LoadAllUserList() {
+
+              $http.get(baseUrl + 'Setup/LoadAllUserList').
+                then(function (response) {
+                    $scope.AllUserList = response.data;
+                    angular.forEach($scope.AllUserList, function (item) {
+                        if (item.UserName === '@User.Identity.Name') {
+                            $scope.MyDeptId = item.DepartmentId;
+                        }
+                    });
+                });
+          }
+          function LoadMyTaskList() {
+              $http.get(baseUrl + 'Task/LoadMyTaskList').
+                then(function (response) {
+                    $scope.MyTaskList = response.data;
+                });
+          }
+          function LoadTaskList() {
+              $http.get(baseUrl + 'Task/LoadTaskList').
+                then(function (response) {
+                    $scope.TaskList = response.data;
+                });
+          }
+
+      }]);
+</script>

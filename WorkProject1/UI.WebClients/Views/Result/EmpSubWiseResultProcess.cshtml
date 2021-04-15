@@ -1,0 +1,311 @@
+﻿@{
+    ViewBag.Title = "Subject Wise Result Process";
+
+    var SessionId = Request.QueryString["SessionId"];
+    var BranchID = Request.QueryString["BranchID"];
+    var ShiftID = Request.QueryString["ShiftID"];
+    var ClassId = Request.QueryString["ClassId"];
+
+    var SectionId = Request.QueryString["SectionId"];
+    var SubjectID = Request.QueryString["SubjectID"];
+    var MainExamId = Request.QueryString["MainExamId"];
+    var TermId = Request.QueryString["TermId"];
+    var SubExamId = Request.QueryString["SubExamId"];
+
+    var SessionName = Request.QueryString["SessionName"];
+    var BranchName = Request.QueryString["BranchName"];
+    var ShiftName = Request.QueryString["ShiftName"];
+    var ClassName = Request.QueryString["ClassName"];
+
+    var SectionName = Request.QueryString["SectionName"];
+    var SubjectName = Request.QueryString["SubjectName"];
+    var MainExamName = Request.QueryString["MainExamName"];
+    var TermName = Request.QueryString["TermName"];
+    var SubExamName = Request.QueryString["SubExamName"];
+    
+    Layout = "~/Views/Shared/_EmpLayout.cshtml";
+}
+<style>
+    .purple{
+            color: #fff;
+    background-color: #8E44AD;
+    border-color: #8E44AD;
+    }
+ 
+        .yellow-mint{
+            color: #fff;
+    background-color: #c5b96b;
+    border-color: #c5b96b;
+    }
+</style>
+<div ng-controller="subResultProcessClt">
+    <div class="portlet light bordered card">
+        <div class="portlet-title">
+            <div class="emp-header">
+                <i class="icon-settings font-green"></i>
+                <span class="caption-subject font-green sbold uppercase size">@ViewBag.Title</span>
+            </div>
+        </div>
+        <div class="card-body">
+            <!-- BEGIN FORM-->
+            <div class="form-body">
+                <table class="table table-bordered table-inverse fixed-table-toolbar">
+                    <tr>
+                        <td style="color:#ff6a00">Session</td>
+                        <td>@SessionName</td>
+                        <td style="color:#ff6a00">Branch</td>
+                        <td>@BranchName</td>
+                        <td style="color:#ff6a00">Shift</td>
+                        <td>@ShiftName</td>
+                    </tr>
+                    <tr>
+                        <td style="color:#ff6a00">Class</td>
+                        <td>@ClassName</td>
+                        <td style="color:#ff6a00">Section</td>
+                        <td>@SectionName</td>
+                        <td style="color:#ff6a00">Subject Name</td>
+                        <td> @SubjectName</td>
+                    </tr>
+                    <tr>
+                        <td style="color:#ff6a00">Term Name</td>
+                        <td> @TermName</td>
+                        <td style="color:#ff6a00">Main Exam Name</td>
+                        <td>@MainExamName</td>
+                    </tr>
+                </table>
+                <div class="row" style="margin-right:0 !important">
+                    <div class="pull-right">
+                        <button ng-click="SubWiseProcess();submitted1=true" class="btn btn-info green">Process</button>
+                        <button ng-click="submitted=true;ClearProccess()" class="btn yellow-mint">Process Clear</button>
+                        @*<button type="reset" ng-click="submitted1=false" class="btn btn-danger red">Reset</button>*@
+                        <button ng-click="SubjectLock();submitted1=true" class="btn purple">Lock</button>
+                        <button ng-click="submitted=true;isShowLog=true;GetLog()" class="btn btn-primary blue">Log </button>
+                    </div>
+                </div>
+            </div>
+            <div class="panel" ng-show="isShowLog">
+                <div class="panel-body scrollHeight">
+                    <table class="table table-bordered table-inverse logtableStyle">
+                        <thead class="btn-primary">
+                            <tr>
+                                <th colspan="2" class="text-center" style="padding:5px 10px;text-transform:uppercase"> Logs </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="item in Logs">
+                                <td style="width:25%">{{item.LogTime | date:'medium'}}</td>
+                                <td>{{item.Msg}} ( Section Name: {{item.SectionName}} )</td>
+                              
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts{
+    <script type="text/javascript">
+        OEMSApp.controller("subResultProcessClt", ["$scope", "$http", "SweetAlert", "blockUI",
+           function ($scope, $http, SweetAlert, blockUI) {
+               init();
+               function init() {
+                   initialize();
+                   getAllCommons();
+                   getmainExams(1);
+                   getTerms(1);
+               }
+               function initialize() {
+                   $scope.aemodalTitle = "Add Main Exam";
+                   $scope.currentPage = 1;
+                   $scope.pageno = 1;
+                   $scope.pagesize = 10;
+                   $scope.total_count = 12;
+                   $scope.search = '';
+
+                   $scope.ResultProcess = {};
+                   $scope.ResultProcess.SessionId =@SessionId
+                   $scope.ResultProcess.TermId =@TermId
+                   $scope.ResultProcess.SubjectId =@SubjectID
+                   $scope.ResultProcess.ClassId =@ClassId
+                   $scope.ResultProcess.MainExamId =@MainExamId
+                   $scope.ResultProcess.SectionId =@SectionId
+                   $scope.mainExams = [];
+                   $scope.SubjectSetups = [];
+
+                   $scope.res = {};
+                   $scope.data = {};
+                   $scope.resetForm = resetForm;
+
+
+                   $scope.Classes = [];
+                   $scope.CommonFeilds = [];
+
+                   $scope.pageSizeArray = [];
+                   $scope.pageSizeArray.push({ value: 5, text: 5 });
+                   $scope.pageSizeArray.push({ value: 10, text: 10 });
+                   $scope.pageSizeArray.push({ value: 20, text: 20 });
+                   $scope.pageSizeArray.push({ value: 50, text: 50 });
+                   $scope.currentPage = 1;
+                   $scope.pageSize = 10;
+
+               }
+               function resetForm() {
+                   $scope.aemodalTitle = "Add Main Exam";
+                   $scope.mainExam = {};
+                   $scope.addform.$setUntouched();
+                   $scope.addform.$setPristine();
+                   $scope.submitted = false;
+                   $scope.MainExamId = '';
+                   $scope.mainExam.MainExamId = 0;
+                   getmainExams(1);
+               }
+               function getmainExams() {
+                   $scope.mainExams = [];
+                   $http({
+                       method: 'GET',
+                       url: baseUrl + 'ExamSetup/GetAllMainExam/'
+                   }).then(function successCallback(response) {
+                       $scope.mainExams = response.data.results;
+
+                       $scope.total_count = response.data.totalcount;
+                       //console.log(response.data);
+                   }, function errorCallback(response) {
+                       toastr["warning"](response.data.Message);
+                   });
+                   //$scope.AspNetRoles = $scope.data;
+                   //console.log($scope.data.totalcount);
+                   // $scope.totalcount = 3; //$scope.data.totalcount;
+               }
+               $scope.getSubject = function getSubject() { // Get Subject List By VSCG
+                   //if ($scope.mform.$invalid)
+                   //    return;
+                   //blockUI.start(); // spinning Start
+                   $scope.SubjectSetups = [];
+                   var searchtxt = $scope.search;
+                   if ($scope.search == 'undefined' || $scope.search == '') {
+                       searchtxt = 'null';
+                   }
+                   $http({
+                       method: 'GET',
+                       url: baseUrl + 'SubjectSetup/GetAllSubject/' + $scope.ResultProcess.ClassId + '/' + $scope.ResultProcess.SessionId
+                   }).then(function successCallback(response) {
+                       $scope.SubjectSetups = response.data;
+                       $scope.total_count = response.data.totalcount;
+                       if ($scope.pagesize == -1)
+                           $scope.pagesize = 500;
+                       //blockUI.stop();  // spinning Finished
+                   }, function errorCallback(response) {
+                       toastr["info"](response.data.message);
+                       blockUI.stop();
+                   });
+               }
+
+
+
+               $scope.SubWiseProcess = function SubWiseProcess() {
+
+                   blockUI.start("Proccessing");
+                   $http({
+                       method: 'POST',
+                       url: baseUrl + 'Result/SubResultProcess/',
+                       data: $scope.ResultProcess
+                   }).then(function successCallback(response) {
+                       $scope.Classes = response.data.results;
+                       toastr["success"](response.data.message);
+                       blockUI.stop();
+                   }, function errorCallback(response) {
+                       toastr["error"](response.data.Message);
+                       blockUI.stop();
+                   });
+               }
+
+               $scope.SubjectLock = function SubjectLock() {
+
+                   blockUI.start("Proccessing");
+                   $http({
+                       method: 'POST',
+                       url: baseUrl + 'Result/SubWiseResultLock/',
+                       data: $scope.ResultProcess
+                   }).then(function successCallback(response) {
+                       toastr["success"](response.data.message);
+                       blockUI.stop();
+                   }, function errorCallback(response) {
+                       toastr["error"](response.data.Message);
+                       blockUI.stop();
+                   });
+               }
+               $scope.ClearProccess = function ClearProccess() {
+
+                   blockUI.start("Proccessing");
+                   $http({
+                       method: 'POST',
+                       url: baseUrl + 'Result/SubWiseResultProcessClear/',
+                       data: $scope.ResultProcess
+                   }).then(function successCallback(response) {
+                       toastr["success"](response.data.message);
+                       blockUI.stop();
+                   }, function errorCallback(response) {
+                       toastr["error"](response.data.Message);
+                       blockUI.stop();
+                   });
+
+               };
+               $scope.GetLog = function GetLog() {
+
+                   $scope.Logs = [];
+                   blockUI.start("Getting Log");
+                   $http({
+                       method: 'POST',
+                       url: baseUrl + 'Result/GetProccesSubjectLog/',
+                       data: $scope.ResultProcess
+                   }).then(function successCallback(response) {
+                       $scope.Logs = response.data.results;
+                       toastr["success"](response.data.message);
+                       blockUI.stop();
+                   }, function errorCallback(response) {
+                       toastr["error"](response.data.message);
+                       blockUI.stop();
+                   });
+
+               };
+               function getAllClasses() {
+                   $http({
+                       method: 'GET',
+                       url: baseUrl + 'SetupInstitution/GetClass/'
+                   }).then(function successCallback(response) {
+                       $scope.Classes = response.data.results;
+                   }, function errorCallback(response) {
+                       toastr["info"](response.data.message);
+                   });
+               }
+
+               function getAllCommons() {
+                   $scope.CommonFeilds = [];
+                   $http({
+                       method: 'GET',
+                       url: baseUrl + 'Common/GetCommonItem/'
+                   }).then(function successCallback(response) {
+                       $scope.CommonFeilds = response.data.results;
+                   }, function errorCallback(response) {
+                       toastr["info"](response.data.message);
+                   });
+               }
+               function getTerms() {
+                   $scope.Terms = [];
+                   $http({
+                       method: 'GET',
+                       url: baseUrl + 'SetupInstitution/GetAllTerm/'
+                   }).then(function successCallback(response) {
+                       // this callback will be called asynchronously
+                       // when the response is available
+                       $scope.Terms = response.data.results;
+                       $scope.total_count = response.data.totalcount;
+                       //console.log(response.data);
+                   }, function errorCallback(response) {
+                       toastr["warning"](response.data.Message);
+                   });
+               }
+           }]);
+    </script>
+}

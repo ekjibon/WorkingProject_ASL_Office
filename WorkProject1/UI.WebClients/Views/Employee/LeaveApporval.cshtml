@@ -1,0 +1,684 @@
+﻿
+@{
+    ViewBag.Title = "Leave Approval";
+}
+
+<style>
+    .Approved {
+        background: #009933;
+        color: #009DB8;
+        padding: 8px 16px;
+        border-radius: 27px !important;
+        color: white;
+    }
+
+    .Pending {
+        background: #33bbff;
+        color: #FC7B52;
+        padding: 8px 16px;
+        border-radius: 27px !important;
+        color: white;
+    }
+
+    .Rejected {
+        background: #dc3545;
+        color: white;
+        padding: 8px 16px;
+        border-radius: 27px !important;
+        color: white;
+    }
+
+    .rowColor {
+        background: #1BE7DC;
+    }
+</style>
+
+<link href="~/assets/timeline.css" rel="stylesheet" />
+
+<div class="kt-container  kt-container--fluid  kt-grid__item kt-grid__item--fluid" ng-controller="LeaveApporval">
+    <div class="row">
+        <div class="kt-portlet kt-portlet--mobile">
+            <div class="kt-portlet__head kt-portlet__head--lg">
+                <div class="kt-portlet__head-label">
+                    <h3 class="kt-portlet__head-title">
+                        <!----Title Text-->
+                        Leave Approval
+                        <!----Title Text -->
+                    </h3>
+                </div>
+            </div>
+
+            <div class="kt-portlet__body">
+                <form class="form-horizontal" ng-submit="Show(formLeaveApporval.$valid)" id="formLeaveApporval" name="formLeaveApporval" novalidate>
+                    <div class="form-body">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group row" ng-class="{ 'has-error' : submitted && formLeaveApporval.Title.$invalid}">
+                                    <label class="col-md-5 control-label" style="text-align:right">
+                                        Calendar Title :
+                                        @*<span class="required">*</span>*@
+                                    </label>
+                                    <div class="col-md-7">
+                                        <select class="form-control" ng-model="LeaveApporval.CalendarId" name="Title" ng-options="item.Id as item.Title for item in EmpCalenderList">
+                                            <option value="" selected="selected">Choose Option</option>
+                                        </select>
+                                        <div class="form-control-focus"> </div>
+                                        <span ng-show="submitted && formLeaveApporval.Title.$error.required " class="help-block">Calendar Title Required</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group row" ng-class="{ 'has-error' : submitted && formLeaveApporval.Status.$invalid}">
+                                    <label class="col-md-5 control-label" style="text-align:right">
+                                        Status :
+                                        @*<span class="required">*</span>*@
+                                    </label>
+                                    <div class="col-md-7">
+                                        <select class="form-control" ng-model="LeaveApporval.Status" name="Status">
+                                            <option value="" selected="selected">Choose Option</option>
+                                            <option value="Pending">Pending</option>
+                                            <option value="Approved">Approved</option>
+                                            <option value="Rejected">Rejected</option>
+                                        </select>
+                                        <div class="form-control-focus"> </div>
+                                        <span ng-show="submitted && formLeaveApporval.Status.$error.required" class="help-block">Status Required</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-4 pull-left">
+                                <div class="form-group row">
+                                    <label class="col-md-5 control-label">
+                                    </label>
+                                    <div class="col-md-7">
+                                        <button ng-click="submitted=true" class="btn btn-primary">Show</button>
+                                        <button type="button" ng-click="Reset()" class="btn btn-danger">Reset</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4 col-sm-5 col-xs-6">
+                                <div class="form-group">
+                                    <div class="col-lg-3 col-md-5 col-sm-4 col-xs-8" style="padding-left:0px">
+
+                                        <select class="form-control kt-font-brand" ng-model="pageSize" ng-options="P.value as P.text for P in pageSizeArray"></select>
+                                    </div>
+
+                                </div>
+
+                            </div>
+                            <div class="col-md-4 col-sm-3 col-xs-1">
+                            </div>
+                            <div class="col-md-4 col-sm-4 col-xs-5">
+                                <div id="sample_3_filter" class="pull-right">
+                                    <input ng-model="q" id="search" class="form-control" placeholder="Filter text">
+                                </div>
+                            </div>
+                        </div>
+                        <table class="table table-bordered table-hover rounded">
+                            <thead>
+                                <tr class="btn-primary">
+                                    <th>Employee</th>
+                                    <th>Leave Type</th>
+                                    <th>Date Range</th>
+                                    <th style="text-align:center">Duration</th>
+                                    <th>Reason</th>
+                                    <th style="text-align:center">Route Status</th>
+                                    <th style="text-align:center">Final Status</th>
+                                    <th style="text-align:center">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+
+                                <tr dir-paginate="item in LeaveInfos| filter:q  | itemsPerPage: pageSize" current-page="currentPage">
+
+                                    <td>{{item.RequestedBy}} <br />{{item.DesignationName}}</td>
+                                    <td>{{item.CategoryName}}</td>
+                                    <td>{{item.FromDate| date:'mediumDate'}} to <br />{{item.ToDate| date:'mediumDate'}}</td>
+                                    <td align="center">{{item.Duration}}</td>
+                                    <td width="20%">{{item.Reason}}</td>
+
+                                    <td align="center"><span ng-class="(item.UserStatus== 'Pending')? 'Pending' : (item.UserStatus== 'Approved') ? 'Approved' : (item.UserStatus== 'Rejected') ? 'Rejected' : 'Pending'">{{item.UserStatus}}</span></td>
+                                    <td align="center"><span ng-class="(item.Status== 'Pending')? 'Pending' : (item.Status== 'Approved') ? 'Approved' : (item.Status== 'Rejected') ? 'Rejected' : 'Pending'">{{item.Status}}</span></td>
+
+                                    <td align="center">
+                                        <div class="btn-group ">
+                                            <button class="btn btn-success dropdown-toggle" type="button" data-toggle="dropdown" aria-expanded="false">
+                                                Options
+                                            </button>
+                                            <ul class="dropdown-menu" role="menu" style="left: -111%;">
+                                                <li ng-show="item.Status=='Pending'">
+                                                    <a ng-show="item.IsFinalApprove" data-toggle="modal" aria-expanded="false" data-target="#addmodal" ng-click="LeaveDetails(item)">
+                                                        <i class="fa fa-search-plus"></i> Final Approve
+                                                    </a>
+                                                </li>
+                                                <li ng-show="item.UserStatus=='Pending' && item.IsReadyLeaveApprove==1 && item.IsFinalApprove==0">
+                                                    <a data-toggle="modal" aria-expanded="false" data-target="#routingmodal" ng-click="LeaveRoutingApproval(item.LeaveHistoryId)">
+                                                        <i class="fas fa-route"></i> Routing Approve
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a href="@Url.Action("LeaveApplicationForm", "Report")?LeaveId={{item.Id}}" target="_blank">
+                                                        <i class="far fa-file-pdf"></i> Application
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a data-toggle="modal" aria-expanded="false" data-target="#viewModal" ng-click="ViewLeaveDetails(item)">
+                                                        <i class="far fa-eye"></i> View Details
+                                                    </a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </form>
+                <div class="row">
+                    <dir-pagination-controls boundary-links="true" template-url="~/assets/angular/lib/dirPagination.tpl.html"></dir-pagination-controls>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--Modal Area Start-->
+    <div id="addmodal" class="modal fade" tabindex="-1" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog">
+            <div class="modal-content" style="width:800px;">
+                <div class="modal-header">
+                    <h4 class="modal-title">Leave Details</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                </div>
+
+                <div class="modal-body">
+                    <div class="form-body">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <b>Category:</b> {{EmpLeaveSummary.CategoryName}}
+                            </div>
+                            <div class="col-md-3">
+                                <b>Days Applied :</b>  {{EmpLeaveSummary.Duration}}
+                            </div>
+                            <div class="col-md-3">
+                                <b>Adjustable :</b> {{EmpLeaveSummary.Adjustable}}
+                            </div>
+                            <div class="col-md-3">
+                                <b>Unadjusted :</b>  {{EmpLeaveSummary.Unadjusted}}
+                            </div>
+                        </div>
+                        <br />
+                        <div class="row">
+                            <div class="col-md-12">
+                                <table class="table table-bordered table-inverse">
+                                    <thead>
+                                        <tr class="btn-primary">
+                                            <th>Leave Category </th>
+                                            <th>Eligible Leave </th>
+                                            <th>Leave Availed </th>
+                                            <th>Leave in Hand </th>
+                                            <th>Adjust With </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr ng-repeat="item in EmpLeaveSummary.LeaveRequestDetailsList" ng-class="{ 'bg-soft-primary' : EmpLeaveSummary.LeaveCategoryId == item.LeaveCategoryId}">
+                                            <td> <strong>{{item.CategoryName}}</strong>  </td>
+                                            <td> {{item.EligibleDays}} </td>
+                                            <td> {{item.LeaveAvailed}} </td>
+                                            <td> {{item.LeaveInHand}} </td>
+                                            <td width="20%">
+                                                <input ng-hide="(item.LeaveInHand == 0 || item.LeaveInHand <= 0)" type="text" ng-model="item.AdjustLeave" ng-change="checkUnadjustedLeave(item)" />
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="4" align="right">
+                                                <strong>Unadjusted Remaining </strong>
+                                            </td>
+
+                                            <td>
+                                                {{EmpLeaveSummary.RemainingUnadjusted}}
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="4" align="right">
+                                                <strong>With pay</strong>
+                                            </td>
+
+                                            <td>
+                                                <input type="text" ng-model="EmpLeaveSummary.Withpay" name="Withpay" placeholder="Enter days">
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="4" align="right">
+                                                <strong>Without pay </strong>
+                                            </td>
+
+                                            <td>
+                                                <input type="text" ng-model="EmpLeaveSummary.WithOutpay" name="WithOutpay" placeholder="Enter days">
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <strong>Comments</strong>
+                                            </td>
+                                            <td colspan="4">
+                                                <textarea class="form-control" ng-model="EmpLeaveSummary.Comments" rows="2" placeholder="Leave Comments" name="Comments"></textarea>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+                            </div>
+                        </div>
+                        <div class="container-fluid">
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <div class="card">
+                                        <div class="card-body">
+                                            <h4 class="card-title mb-5">Leave Routing Timeline</h4>
+
+                                            <div class="hori-timeline" dir="ltr">
+                                                <ul class="list-inline events">
+                                                    <li class="list-inline-item event-list" ng-repeat="item in EmpLeaveSummary.LeaveRoutingHistoryList">
+                                                        <div class="px-4">
+                                                            <div class="event-date " ng-class="(item.ApprovedStatus=='Pending' )? 'bg-soft-primary text-primary' : (item.ApprovedStatus=='Approved') ? 'bg-soft-success  text-success' : (item.ApprovedStatus=='Rejected') ? 'bg-soft-danger text-danger' : 'bg-soft-warning text-warning'">{{item.ApprovedStatus}}</div>
+                                                            <h5 class="font-size-16">{{item.FullName}}</h5>
+                                                            <p class="text-muted">{{item.Comments}}</p>
+                                                        </div>
+                                                    </li>
+
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- end card -->
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" ng-click="LeaveReject()" data-dismiss="modal" class="btn btn-danger">Reject</button>
+                    <button type="button" ng-click="LeaveApporve()" class="btn btn-success">Approve</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--Modal Area End-->
+    <!--Route Modal Area Start-->
+    <div id="routingmodal" class="modal fade" tabindex="-1" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form name="addBasicRoute" @*ng-submit="updateRouteStatus()"*@ class="form-horizontal" id="form_sample_2" novalidate>
+                    <div class="modal-header">
+                        <h4 class="modal-title">Leave Approval Routing</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true" ng-click="resetForm2();submitted2=false"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-body">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group row " ng-class="{ 'has-error' : submitted2 && addBasicRoute.Comments.$invalid}">
+                                        <label class="col-md-3 control-label text-right">
+                                            Comments :
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-9">
+                                            <textarea class="form-control" ng-model="LeaveRouteHistory.Comments" rows="3" placeholder="Leave Comments" name="Comments" required></textarea>
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted2 &&  addBasicRoute.Comments.$error.required" class="help-block">Comments Required</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" ng-click="LeaveRouteApporve('A');submitted2=true" class="btn btn-success">Approve</button>
+                        <button type="button" ng-click="LeaveRouteApporve('R');submitted2=true" class="btn btn-danger">Reject</button>
+                        <button type="button" data-dismiss="modal" class="btn btn-secondary" ng-click="resetForm2();submitted2=false">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!--Route Modal Area End-->
+    <!--View Modal Area Start-->
+    <div id="viewModal" class="modal fade" tabindex="-1" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <form name="viewform" class="form-horizontal" id="form_sample_3" novalidate>
+                    <div class="modal-header">
+                        <h4 class="modal-title">View Details</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true" ng-click="resetForm3();submitted3=false"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-body">
+
+                            <div class="row">
+                                <div class="col-md-9">
+                                    <strong>Leave type &nbsp;:</strong>  {{EmpLeaveSummary.CategoryName}} <br />
+                                    <strong>Durataion &nbsp;&nbsp;: </strong> {{EmpLeaveSummary.Duration}} days({{EmpLeaveSummary.FromDate| date:'mediumDate'}} to {{EmpLeaveSummary.ToDate| date:'mediumDate'}}) <br />
+                                </div>
+                                <div class="col-md-3">
+                                    <a href="@Url.Action("LeaveApplicationForm", "Report")?LeaveId={{EmpLeaveSummary.Id}}" target="_blank" class="btn btn-sm btn-primary">Download Leave Form</a>
+                                </div>
+                                <div class="col-md-12">
+                                    <strong>Reason  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;:</strong> {{EmpLeaveSummary.Reason}} <br /><br />
+                                </div>
+
+                                <div class="col-md-12">
+                                    <h5><strong class="text-center">Leave Summary</strong></h5>
+                                    <table class="table table-bordered table-inverse">
+                                        <thead>
+                                            <tr class="btn-primary">
+                                                <th>Category </th>
+                                                <th>Eligible Days </th>
+                                                <th>Leave Availed</th>
+                                                <th>Leave in Hand </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr ng-repeat="item in EmpLeaveSummary.LeaveRequestDetailsList" ng-class="{ 'bg-soft-primary' : EmpLeaveSummary.LeaveCategoryId == item.LeaveCategoryId}">
+                                                <td> {{item.CategoryName}} </td>
+                                                <td> {{item.EligibleDays}} </td>
+                                                <td> {{item.LeaveAvailed}} </td>
+                                                <td> {{item.LeaveInHand}} </td>
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                                <div class="col-lg-12">
+                                    <div class="card">
+                                        <div class="card-body">
+                                            <h5 class="mb-5"><strong class="text-center">Leave Routing Timeline</strong></h5>
+                                            <div class="hori-timeline" dir="ltr">
+                                                <ul class="list-inline events">
+                                                    <li class="list-inline-item event-list" ng-repeat="item in EmpLeaveSummary.LeaveRoutingHistoryList">
+                                                        <div class="px-4">
+                                                            <div class="event-date " ng-class="(item.ApprovedStatus=='Pending' )? 'bg-soft-primary text-primary' : (item.ApprovedStatus=='Approved') ? 'bg-soft-success  text-success' : (item.ApprovedStatus=='Rejected') ? 'bg-soft-danger text-danger' : 'bg-soft-warning text-warning'">{{item.ApprovedStatus}}</div>
+                                                            <h5 class="font-size-16">{{item.FullName}}</h5>
+                                                            <p class="text-muted">{{item.Comments}}</p>
+                                                        </div>
+                                                    </li>
+
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" data-dismiss="modal" class="btn btn-secondary" ng-click="resetForm3();submitted3=false">Close</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!--View Modal Area End-->
+</div>
+
+
+@section Scripts{
+    <script type="text/javascript">
+        OEMSApp.controller("LeaveApporval", ["$scope", "$http", "SweetAlert", "$filter", "$window",
+          function ($scope, $http, SweetAlert, $filter, $window) {
+
+              init();
+              function init() {
+                  initialize();
+                  // getAllCommons();
+                  getEmpClanderList();
+              }
+              function initialize() {
+                  $scope.LeaveApporval = {};
+                  $scope.EmpLeaveDetails = {};
+                  $scope.EmpLeaveSummary = {};
+                  $scope.detailsList = [];
+                  $scope.SummaryList = [];
+                  $scope.pagesize = 10;
+                  $scope.pageSizeArray = [];
+                  $scope.pageSizeArray.push({ value: 5, text: 5 });
+                  $scope.pageSizeArray.push({ value: 10, text: 10 });
+                  $scope.pageSizeArray.push({ value: 20, text: 20 });
+                  $scope.pageSizeArray.push({ value: 50, text: 50 });
+                  $scope.currentPage = 1;
+                  $scope.pageSize = 10;
+                  $scope.Status = '';
+                  //   $scope.LeaveDetails = LeaveDetails;
+                  $scope.LeaveRoute = {};
+                  $scope.LeaveRouteHistory = {};
+                  $scope.resetForm2 = resetForm2;
+                  $scope.submitted2 = false;
+                  $scope.EmpCalenderList = [];
+                  //$scope.LeaveInfos.IsReadyLeaveApprove = false;
+                  $scope.Show = Show;
+              };
+              $scope.Reset = function Reset() {
+
+                  $scope.submitted = false;
+                  $scope.LeaveApporval = {};
+                  $scope.LeaveInfos = [];
+              };
+
+              function resetForm2() {
+                  $scope.LeaveRouteHistory = {};
+                  $scope.addBasicRoute.$setUntouched();
+                  $scope.addBasicRoute.$setPristine();
+                  $scope.submitted2 = false;
+              }
+
+              function Show(valid) {
+                  if (valid) {
+                      $scope.LeaveApporval.FromDate = $filter('date')($scope.LeaveApporval.fromDate, "MM/dd/yyyy");
+                      $scope.LeaveApporval.ToDate = $filter('date')($scope.LeaveApporval.toDate, "MM/dd/yyyy");
+                      $scope.LeaveInfos = [];
+                      $http({
+                          method: 'POST',
+                          url: baseUrl + 'Employee/GetEmployeeLeaveRequestList/',
+                          data: $scope.LeaveApporval
+                      }).then(function successCallback(response) {
+                          $scope.LeaveInfos = response.data.results;
+
+                      }, function errorCallback(response) {
+                          toastr["error"](response.data.Message);
+                      });
+                  }
+              };
+
+              $scope.LeaveDetails = function LeaveDetails(n) {
+
+                  $scope.EmpLeaveDetails.EmpRequestId = n.Id;
+                  $scope.EmpLeaveDetails.EmpId = n.EmpId;
+
+                  $http({
+                      method: 'POST',
+                      url: baseUrl + 'Employee/LeaveDetailsEmpWise/',
+                      data: $scope.EmpLeaveDetails //+ Id
+                  }).then(function successCallback(response) {
+
+                      $scope.detailsList = response.data.results;
+                      $scope.EmpLeaveSummary = response.data.results;
+                      $scope.EmpLeaveSummary.EmpRequestId = n.Id;
+                      $scope.EmpLeaveSummary.LeaveHistoryId = n.LeaveHistoryId;
+
+                      //$scope.EmpLeaveSummary.LeaveCategoryId = response.data.results[0].LeaveCategoryId;
+                      //$scope.EmpLeaveSummary.Duration = response.data.results[0].Duration;
+                      //$scope.EmpLeaveSummary.CategoryName = response.data.results[0].CategoryName;
+                      //$scope.EmpLeaveSummary.Adjustable = response.data.results[0].Adjustable;
+                      //$scope.EmpLeaveSummary.Unadjusted = response.data.results[0].Unadjusted;
+                      //$scope.EmpLeaveSummary.EmpRequestId = response.data.results[0].Id;
+                      //$scope.EmpLeaveSummary.RemainingUnadjusted = response.data.results[0].RemainingUnadjusted;
+
+                      if ($scope.EmpLeaveSummary.RemainingUnadjusted < 0 || $scope.EmpLeaveSummary.RemainingUnadjusted == null) {
+                          $scope.EmpLeaveSummary.RemainingUnadjusted = 0;
+                      }
+
+                      if ($scope.EmpLeaveSummary.Adjustable < 0) {
+                          $scope.EmpLeaveSummary.Adjustable = 0;
+                      }
+                      if ($scope.EmpLeaveSummary.Unadjusted < 0) {
+                          $scope.EmpLeaveSummary.Unadjusted = 0;
+                      }
+
+                      //LeaveSummary();
+
+                  }, function errorCallback(response) {
+
+                      // toastr["error"](response.data.message);
+                  });
+
+              }
+              function LeaveSummary() {
+
+                  $http({
+                      method: 'POST',
+                      url: baseUrl + 'Employee/LeaveSummaryEmpWise/',
+                      data: $scope.EmpLeaveSummary //+ Id
+                  }).then(function successCallback(response) {
+
+                      $scope.SummaryList = response.data.results;
+
+
+                  }, function errorCallback(response) {
+
+                      // toastr["error"](response.data.message);
+                  });
+
+              }
+
+              $scope.ViewLeaveDetails = function ViewLeaveDetails(n) {
+
+                  $scope.EmpLeaveDetails.EmpRequestId = n.Id;
+                  $scope.EmpLeaveDetails.EmpId = n.EmpId;
+
+                  $http({
+                      method: 'POST',
+                      url: baseUrl + 'Employee/ViewLeaveDetailsEmpWise/',
+                      data: $scope.EmpLeaveDetails //+ Id
+                  }).then(function successCallback(response) {
+                      //LeaveSummary();
+                      $scope.detailsList = response.data.results;
+                      $scope.EmpLeaveSummary = response.data.results;
+                      $scope.EmpLeaveSummary.EmpRequestId = n.Id;
+                      $scope.EmpLeaveSummary.LeaveHistoryId = n.LeaveHistoryId;
+
+                      if ($scope.EmpLeaveSummary.RemainingUnadjusted < 0 || $scope.EmpLeaveSummary.RemainingUnadjusted == null) {
+                          $scope.EmpLeaveSummary.RemainingUnadjusted = 0;
+                      }
+
+                      if ($scope.EmpLeaveSummary.Adjustable < 0) {
+                          $scope.EmpLeaveSummary.Adjustable = 0;
+                      }
+                      if ($scope.EmpLeaveSummary.Unadjusted < 0) {
+                          $scope.EmpLeaveSummary.Unadjusted = 0;
+                      }
+
+                  }, function errorCallback(response) {
+
+                      // toastr["error"](response.data.message);
+                  });
+
+              }
+
+
+              //Final
+              $scope.LeaveApporve = function LeaveApporve() {
+
+                  $http({
+                      method: 'POST',
+                      url: baseUrl + 'Employee/LeaveApproveEmpWise/',
+                      data: $scope.EmpLeaveSummary
+                  }).then(function successCallback(response) {
+                      $('#addmodal').modal('hide');
+                      toastr["info"](response.data.message);
+                      Show(true);
+                  }, function errorCallback(response) {
+                      toastr["error"](response.data.Message);
+                  });
+
+              }
+              //Final
+              $scope.LeaveReject = function LeaveReject() {
+
+                  $http({
+                      method: 'POST',
+                      url: baseUrl + 'Employee/LeaveRejectEmpWise/',
+                      data: $scope.EmpLeaveSummary
+                  }).then(function successCallback(response) {
+                      $('#addmodal').modal('hide');
+                      toastr["info"](response.data.message);
+                      Show(true);
+                  }, function errorCallback(response) {
+
+                      toastr["error"](response.data.message);
+                  });
+
+              }
+
+              $scope.LeaveRoutingApproval = function LeaveRoutingApproval(n) {
+                  $scope.LeaveRouteHistory.LeaveHistoryId = n;
+              }
+
+              $scope.LeaveRouteApporve = function LeaveRouteApporve(type) {
+                  if ($scope.addBasicRoute.$invalid) {
+                      return;
+                  }
+                  $scope.LeaveRouteHistory.LeaveStatus = type;
+                  $http({
+                      method: 'PUT',
+                      url: baseUrl + 'Employee/LeaveRouteApprove/',
+                      data: $scope.LeaveRouteHistory
+                  }).then(function successCallback(response) {
+                      $('#routingmodal').modal('hide');
+                      toastr["info"](response.data.message);
+                      resetForm2();
+                      Show(true);
+                  }, function errorCallback(response) {
+
+                      toastr["error"](response.data.Message);
+                  });
+
+              }
+
+              function getEmpClanderList() {
+                  $scope.EmpCalenderList = [];
+
+                  $http({
+                      method: 'GET',
+                      url: baseUrl + 'Attendance/GetEmpCalendarList/'
+                  }).then(function successCallback(response) {
+                      $scope.EmpCalenderList = response.data.results;
+
+                  }, function errorCallback(response) {
+
+                  });
+              }
+
+              $scope.checkUnadjustedLeave = function checkUnadjustedLeave(n) {
+                  console.log(n);
+                  //debugger;
+                  var unadjusted = $scope.EmpLeaveSummary.Unadjusted;
+                  var adjustLeave = parseFloat(n.AdjustLeave);
+                  var leaveInHand = parseFloat(n.LeaveInHand);
+
+                  if (adjustLeave > leaveInHand) {
+                      toastr["warning"]('Insufficient leave in hand to adjust.');
+                      n.AdjustLeave = 0;
+                      return;
+                  }
+                  else {
+                      n.AdjustLeave = adjustLeave;
+                  }
+              }
+
+          }]);
+    </script>
+}
+

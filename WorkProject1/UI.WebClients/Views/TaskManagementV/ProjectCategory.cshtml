@@ -1,0 +1,296 @@
+﻿@{
+    ViewBag.Title = "Project Category";
+}
+
+<div class="kt-container  kt-container--fluid  kt-grid__item kt-grid__item--fluid" ng-controller="ctrlProjectCategory">
+    <div class="row">
+        <div class="kt-portlet kt-portlet--mobile">
+            <div class="kt-portlet__head kt-portlet__head--lg">
+                <div class="kt-portlet__head-label">
+                    <h3 class="kt-portlet__head-title">
+                        All Project Category
+                    </h3>
+                </div>
+                <div class="kt-portlet__head-toolbar">
+                    <div class="kt-portlet__head-wrapper">
+                        <div class="dropdown dropdown-inline">
+                            <button type="button" class="btn btn-brand btn-icon-sm" data-toggle="modal" data-target="#addmodal" aria-haspopup="true" aria-expanded="false">
+                                <i class="flaticon2-plus"></i> Add New
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="kt-portlet__body">
+
+                <div class="row">
+                    <div class="col-md-4 col-sm-5 col-xs-6">
+                        <div class="form-group">
+                            <div class="col-lg-3 col-md-5 col-sm-4 col-xs-8" style="padding-left:0px">
+
+                                <select class="form-control kt-font-brand" ng-model="pageSize" ng-options="P.value as P.text for P in pageSizeArray"></select>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="col-md-4 col-sm-3 col-xs-1">
+                    </div>
+                    <div class="col-md-4 col-sm-4 col-xs-5">
+                        <div id="sample_3_filter" class="pull-right">
+                            <input ng-model="q" id="search" class="form-control" placeholder="Filter text">
+                        </div>
+                    </div>
+                </div>
+                <table class="table table-bordered table-hover rounded">
+                    <thead>
+                        <tr class="btn-primary">
+                            <th width="30%">Category Name</th>
+                            <th>Description</th>
+                            <th style="text-align:center" width="10%">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-show="ProjectCategoryList.length <= 0"><td colspan="4" style="text-align:center;"><i class="fa fa-refresh"></i> No Data found!!</td></tr>
+                        <tr dir-paginate="item in ProjectCategoryList| filter:q  | itemsPerPage: pageSize" current-page="currentPage">
+                            <td>{{item.CategoryName}}</td>
+                            <td>{{item.Description}}</td>
+
+                            <td align="center">
+                                <a class="btn btn-outline-brand btn-elevate btn-icon" ng-click="editProjectCategory(item)" data-target="#addmodal" data-toggle="modal">
+                                    <i class="fa fa-edit"></i>
+                                </a>
+                                <a class="btn btn-outline-danger btn-elevate btn-icon" id="kt_sweetalert_demo_9" ng-click="deleteProjectCategory(item.Id)" href="#">
+                                    <i class="fa fa-trash"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="row">
+                    <dir-pagination-controls boundary-links="true" template-url="~/assets/angular/lib/dirPagination.tpl.html"></dir-pagination-controls>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--Modal Area Start-->
+    <div id="addmodal" class="modal fade" tabindex="-1" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <form name="addBasic" ng-submit="save()" class="form-horizontal" id="form_sample_1" novalidate autocomplete="off">
+
+
+                    <div class="modal-header">
+                        <h4 class="modal-title">{{modalTitle}}</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true" ng-click="resetForm();submitted=false"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-body">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    
+                                    <div class="form-group row" ng-class="{ 'has-error' : submitted && addBasic.CategoryName.$invalid}">
+                                        <label class="col-md-4 control-label text-right">
+                                            Category Name :
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-8">
+                                            <input type="text" ng-model="ProjectCategoryInfo.CategoryName" class="form-control" placeholder="Project Category Name" name="CategoryName" required>
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted &&  addBasic.CategoryName.$error.required" class="help-block">Project Category Name Required</span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group row" ng-class="{ 'has-error' : submitted && addBasic.Description.$invalid}">
+                                        <label class="col-md-4 control-label text-right">
+                                            Description :
+                                        </label>
+                                        <div class="col-md-8">
+                                            <textarea class="form-control" ng-model="ProjectCategoryInfo.Description" id="exampleFormControlTextarea1" rows="1" placeholder="Description.."></textarea>
+                                        </div>
+                                    </div> 
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" data-dismiss="modal" class="btn btn-secondary" ng-click="resetForm();submitted=false">Cancel</button>
+                        <button type="submit" ng-click="submitted=true" class="btn btn-success">{{modalbutton}}</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!--Modal Area End-->
+
+</div>
+<!-- END FORM-->
+@section Scripts{
+
+    <script type="text/javascript">
+        OEMSApp.controller("ctrlProjectCategory", ["$scope", "$http", "SweetAlert",
+              function ($scope, $http, SweetAlert) {
+                  init();
+                  function init() {
+                      initialize();
+                      getAllProjectCategory();
+                  }
+
+                  function initialize() {
+                      $scope.modalbutton = 'Save';
+                      $scope.modalTitle = 'Add New Project Category';
+
+                      $scope.RiceCook = {};
+                      $scope.RiceCook.Temp = 5.0;
+                      $scope.RiceCook.RiceQuantity = 10;
+
+                      $scope.PolauCook = {};
+                      $scope.PolauCook.Temp = 100;
+                      $scope.PolauCook.RiceQuantity = 25;
+
+                      $scope.RiceList = [];
+                      $scope.RiceList.push($scope.RiceCook);
+                      $scope.RiceList.push($scope.PolauCook);
+
+                      $scope.ProjectCategoryInfo = {};
+                      $scope.ProjectCategoryInfo.Id = 0;
+                      $scope.ProjectCategoryInfos = [];
+                      $scope.ProjectCategoryList = [];
+                      $scope.resetForm = resetForm;
+
+
+                      $scope.pagesize = 10;
+                      $scope.pageSizeArray = [];
+                      $scope.pageSizeArray.push({ value: 5, text: 5 });
+                      $scope.pageSizeArray.push({ value: 10, text: 10 });
+                      $scope.pageSizeArray.push({ value: 20, text: 20 });
+                      $scope.pageSizeArray.push({ value: 50, text: 50 });
+                      $scope.currentPage = 1;
+                      $scope.pageSize = 10;
+
+                      $scope.minDate = $scope.minDate ? null : new Date(new Date().getTime() + (1 * 24 * 60 * 60 * 1000));
+                  }
+
+                  $scope.disabled = function (date, mode) {
+                      console.log(date, mode)
+                      return (mode === 'day' && (date.getDay() === 5));
+                  };
+
+                  function resetForm() {
+                      $scope.modalTitle = "Add New Project Category";
+                      $scope.ProjectCategoryInfo = {};
+                      $scope.ProjectCategoryInfo.Id = 0;
+                      $scope.addBasic.$setUntouched();
+                      $scope.addBasic.$setPristine();
+                      $scope.submitted = false;
+                      $scope.modalbutton = 'Save';
+                  }
+
+                  
+                  $scope.save = function save() {
+                      if ($scope.addBasic.$invalid)
+                          return;
+                      else {
+                          var result = validation();
+                          if (result) {
+                              if ($scope.ProjectCategoryInfo.Id == 0) { // Add
+                                  $http({
+                                      method: 'POST',
+                                      url: baseUrl + 'TaskManagement/AddProjectCategory',
+                                      data: $scope.ProjectCategoryInfo
+                                  }).then(function successCallback(response) {
+                                      $('#addmodal').modal('toggle');
+                                      toastr["info"](response.data.message);
+                                      getAllProjectCategory();
+                                      resetForm();
+                                  }, function errorCallback(response) {
+                                      toastr["warning"](response.data.Message);
+                                  });
+                              } else { // Update
+                                  $http({
+                                      method: 'PUT',
+                                      url: baseUrl + 'TaskManagement/UpdateProjectCategory',
+                                      data: $scope.ProjectCategoryInfo
+                                  }).then(function successCallback(response) {
+                                      toastr["info"](response.data.message);
+                                      if (response.data.httpStatusCode != 305) {
+                                          $('#addmodal').modal('toggle');
+                                          getAllProjectCategory();
+                                          resetForm();
+                                      }
+
+                                  }, function errorCallback(response) {
+                                      toastr["warning"](response.data.Message);
+                                  });
+                              }
+
+
+                          }
+                      }
+                  }
+
+                  $scope.deleteProjectCategory = function deleteProjectCategory(id) {
+                      SweetAlert.swal({
+                          title: "Are you sure to delete it ?", type: "warning", showCancelButton: true, confirmButtonColor: "#DD6B55",
+                          confirmButtonText: "Yes, delete it!",
+                          closeOnConfirm: false
+                      },
+                        function (isConfirm) {
+                            if (isConfirm) {
+                                $http({
+                                    method: 'DELETE',
+                                    url: baseUrl + 'TaskManagement/DeleteProjectCategory/' + id,
+                                }).then(function successCallback(response) {
+                                    SweetAlert.swal("Deleted!", "Your data has been deleted.", "success");
+                                    getAllProjectCategory();
+                                }, function errorCallback(response) {
+                                    toastr["error"](response.data.Message);
+                                });
+                            }
+                        });
+                  }
+
+                  $scope.editProjectCategory = function editProjectCategory(item) {
+                      $scope.ProjectCategoryInfo = {};
+                      $scope.modalTitle = "Update Project Category";
+                      $scope.modalbutton = 'Update';
+                      $scope.ProjectCategoryInfo.Id = item.Id;
+                      $scope.ProjectCategoryInfo.CategoryName = item.CategoryName;
+                      $scope.ProjectCategoryInfo.Description = item.Description;
+
+                      $scope.checkUpdateId = 10002;
+                  }
+
+                  function getAllProjectCategory() {
+                      $scope.ProjectCategoryList = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'TaskManagement/GetAllProjectCategory/'
+                      }).then(function successCallback(response) {
+                          $scope.ProjectCategoryList = response.data.results;
+                      }, function errorCallback(response) {
+                          toastr["info"](response.data.Message);
+                      });
+                  }
+
+
+                  function validation() {
+
+                      if ($scope.ProjectCategoryInfo.Id == undefined) {
+                          return true;
+                      }
+                      else {
+                          if ($scope.ProjectCategoryInfo.CategoryName == null) {
+                              toastr["info"]("Please Enter Project Category Name");
+                              return false;
+                          }
+                          else {
+                              return true;
+                          }
+                      }
+                  }
+              }]);
+
+    </script>
+}
+

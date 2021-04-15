@@ -1,0 +1,481 @@
+﻿
+@{
+    ViewBag.Title = "Employee Calendar Setup";
+}
+@*<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.18/css/bootstrap-select.min.css">*@
+
+
+<div class="kt-container  kt-container--fluid  kt-grid__item kt-grid__item--fluid" ng-controller="ctrlEmpCalendarSetup">
+    <div class="row">
+        <div class="kt-portlet kt-portlet--mobile">
+            <div class="kt-portlet__head kt-portlet__head--lg">
+                <div class="kt-portlet__head-label">
+                    <h3 class="kt-portlet__head-title">
+                        <!----Title Text-->
+                        @ViewBag.Title
+                        <!----Title Text -->
+                    </h3>
+                </div>
+                <div class="kt-portlet__head-toolbar">
+                    <div class="kt-portlet__head-wrapper">
+                        <div class="dropdown dropdown-inline">
+                            <button type="button" ng-click="resetForm()" class="btn btn-brand btn-icon-sm" data-toggle="modal" data-target="#addmodal" aria-haspopup="true" aria-expanded="false">
+                                <!----Add Button -->
+                                <i class="flaticon2-plus"></i> Add New
+                                <!----Add Button -->
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="kt-portlet__body">
+                <div class="row">
+                    <div class="col-md-4 col-sm-5 col-xs-6">
+                        <div class="form-group">
+                            <div class="col-lg-3 col-md-5 col-sm-4 col-xs-8" style="padding-left:0px">
+                                <select class="form-control kt-font-brand" ng-model="pageSize" ng-options="P.value as P.text for P in pageSizeArray"></select>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="col-md-4 col-sm-3 col-xs-1">
+                    </div>
+                    <div class="col-md-4 col-sm-4 col-xs-5">
+                        <div id="sample_3_filter" class="pull-right">
+                            <input ng-model="q" id="search" class="form-control" placeholder="Filter text">
+                        </div>
+                    </div>
+                </div>
+                <table class="table table-bordered table-hover rounded">
+                    <thead>
+                        <tr class="btn-primary">
+                            <th>Calender Title</th>
+                            <th>From Date</th>
+                            <th>To Date</th>
+                            <th>In Time</th>
+                            <th>Out Time</th>
+                            <th style="text-align:center">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-show="EmpCalenderList.length <= 0"><td colspan="5" style="text-align:center;"><i class="fa fa-refresh"></i> Loading new data!!</td></tr>
+                        <tr dir-paginate="item in EmpCalenderList | filter:q  | itemsPerPage: pageSize" current-page="currentPage">
+                            <td>{{item.Title}}</td>
+                            <td>{{item.StartDate | date:'dd/MM/yyyy'}}</td>
+                            <td>{{item.EndDate | date:'dd/MM/yyyy'}}</td>
+                            <td>{{item.InTime | date: 'shortTime'}}</td>
+                            <td>{{item.OutTime | date: 'shortTime'}}</td>
+                            <td align="center">
+                                <a href="@Url.Action("EmpCalendarView", "AttendanceV")?id={{item.Id}}" class="btn btn-outline-success btn-elevate btn-icon" target="_blank">
+                                    <i class="far fa-calendar-alt"></i>
+                                </a>
+                                <a href="javascript:;" class="btn btn-outline-brand btn-elevate btn-icon" ng-click="edit(item)" data-target="#addmodal" data-toggle="modal">
+                                    <i class="fa fa-edit"></i>
+                                </a>
+                                <a ng-click="deletesession(item)" class="btn btn-outline-danger btn-elevate btn-icon">
+                                    <i class="fa fa-trash"></i>
+                                </a>
+
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="row">
+                    <dir-pagination-controls boundary-links="true" template-url="~/assets/angular/lib/dirPagination.tpl.html"></dir-pagination-controls>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--Modal Area Start-->
+    <div id="addmodal" class="modal fade" tabindex="-1" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <form name="addform" ng-submit="save()" class="form-horizontal" id="form_sample_1" novalidate>
+                    <div class="modal-header">
+                        <h4 class="modal-title">{{aemodalTitle}}</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group row" ng-class="{ 'has-error' : submitted && addform.CalenderTitle.$invalid}">
+                                        <label class="col-md-4 control-label" style="text-align:right">
+                                            Calender Title :
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-8">
+                                            <input type="text" ng-model="EmpCalender.Title" class="form-control" placeholder="Calender Title" name="CalenderTitle" required>
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted && addform.CalenderTitle.$error.required" class="help-block">Calender Title Required</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group row" ng-class="{ 'has-error' : submitted && addform.Branch.$invalid}">
+                                        <label class="col-md-4 control-label" style="text-align:right">
+                                            Branch :
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-8">
+                                            <select class="form-control" ng-model="EmpCalender.EmpBranchId" required name="Branch" ng-options="D.BranchId as D.BranchName for D in CommonFeilds.Branch">
+                                                <option value="" selected="selected">Choose Option</option>
+                                            </select>
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted && addform.Branch.$error.required" class="help-block">Branch Required</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group row" ng-class="{ 'has-error' : submitted && addform.Session_StartDate.$invalid}">
+                                        <label class="col-md-4 control-label" style="text-align:right">
+                                            Start Date
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-8">
+                                            <input class="form-control" type="text" ng-click="p1=true" is-open="p1" readonly ng-model="EmpCalender.Session_StartDate1" placeholder="Start Date" uib-datepicker-popup="dd/MM/yyyy" name="Session_StartDate" required />
+                                            <span ng-show="submitted &&  addform.Session_StartDate.$error.required" class="help-block">Start Date Required</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group row" ng-class="{ 'has-error' : submitted && addform.Session_EndDate.$invalid}">
+                                        <label class="col-md-4 control-label" style="text-align:right">
+                                            End Date
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-8">
+                                            <input class="form-control" ng-blur="FromDateValidation()" type="text" readonly ng-click="p2=true" is-open="p2" ng-model="EmpCalender.Session_EndDate1" placeholder="End Date" min-date="session.Session_StartDate" uib-datepicker-popup="dd/MM/yyyy" name="Session_EndDate" required />
+                                            <span ng-show="submitted &&  addform.Session_EndDate.$error.required" class="help-block">End Date Required</span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group row" ng-show="EmpCalender.Id > 0">
+                                        <label class="col-md-4 control-label" style="text-align:right">
+
+                                        </label>
+                                        <div class="col-md-8">
+                                            <input type="checkbox" class="" style="margin-top:9px" name="IsOverlap" ng-model="EmpCalender.IsUpdateExisting" ng-checked="EmpCalender.IsUpdateExisting==true" />  Update Existing Data
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <div class="col-md-6">
+
+                                    <div class="form-group row" ng-class="{ 'has-error' : submitted && addform.WeekendDay.$invalid}">
+                                        <label class="col-lg-6 control-label text-right">
+                                            Weekend Day : <span class="required">*</span>
+                                        </label>
+                                        <div class="col-lg-6">
+                                            <select multiple multi-select required ng-model="EmpCalender.WeekendDay1" id="weekDayCount" ng-options="D.value as D.text for D in Days"></select>
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted && addform.WeekendDay.$error.required" class="help-block">Weekend Day Required</span>
+                                        </div>
+                                    </div>
+
+
+                                    <div class="form-group row" ng-class="{ 'has-error' : submitted && addform.InTime.$invalid}">
+                                        <label class="col-md-6 control-label" style="text-align:right">
+                                            In Time :
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-6">
+                                            <input type="time" ng-model="EmpCalender.In" class="form-control" name="InTime" required>
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted && addform.InTime.$error.required" class="help-block">In Time Required</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group row" ng-class="{ 'has-error' : submitted && addform.OutTime.$invalid}">
+                                        <label class="col-md-6 control-label" style="text-align:right">
+                                            Out Time :
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-6">
+                                            <input type="time" ng-model="EmpCalender.Out" class="form-control" name="OutTime" required>
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted && addform.OutTime.$error.required" class="help-block">Out Time Required</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group row" ng-class="{ 'has-error' : submitted && addform.DefaultLITime.$invalid}">
+                                        <label class="col-md-6 control-label" style="text-align:right">
+                                            Default Late InTime :
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-6">
+                                            <select required ng-model="EmpCalender.DefaultLITime" ng-options="D.value as D.text for D in SpareTimes" name="DefaultLITime" class="form-control">
+                                                <option value="" selected="selected">Chooes Options</option>
+                                            </select>
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted && addform.DefaultLITime.$error.required" class="help-block">Default Late InTime Required</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group row" ng-class="{ 'has-error' : submitted && addform.DefaultEOTime.$invalid}">
+                                        <label class="col-md-6 control-label" style="text-align:right">
+                                            Default Early OutTime :
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-6">
+                                            <select required ng-model="EmpCalender.DefaultEOTime" ng-options="D.value as D.text for D in SpareTimes" name="DefaultEOTime" class="form-control">
+                                                <option value="" selected="selected">Chooes Options</option>
+                                            </select>
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted && addform.DefaultEOTime.$error.required" class="help-block">Default Early OutTime Required</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" data-dismiss="modal" class="btn  btn-secondary" ng-click="resetForm();submitted=false">Cancel</button>
+                        <button type="submit" ng-click="submitted=true" class="btn btn-success">Save</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!--Modal Area End-->
+</div>
+
+@section Scripts{
+    @*<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>*@
+    <script>
+        $(document).ready(function () {
+            $('#weekDayCount').multiselect();
+        });
+    </script>
+    <script type="text/javascript">
+        OEMSApp.controller("ctrlEmpCalendarSetup", ["$scope", "$http", "SweetAlert", "$filter", "blockUI",
+           function ($scope, $http, SweetAlert, $filter, blockUI) {
+               init();
+               function init() {
+                   initialize();
+                   getEmpClanderList();
+                   getAllCommons();
+                   //createArrayByString();
+               }
+               function initialize() {
+                   $scope.aemodalTitle = "Add Employee Calender";
+                   $scope.minDate = new Date();
+                   //$scope.currentPage = 1;
+                   //$scope.pageno = 1;
+                   //$scope.pagesize = 10;
+                   //$scope.total_count = 12;
+                   //$scope.search = '';
+                   $scope.EmpCalender = {};
+                   $scope.EmpCalender.IsUpdateExisting = false;
+                   $scope.IsEdit = 0;
+                   //$scope.EmpCalender = [];
+
+                   $scope.Id = '';
+                   $scope.getEmpClanderList = getEmpClanderList;
+                   $scope.res = {};
+                   $scope.data = {};
+                   $scope.resetForm = resetForm;
+                   $scope.CommonFeilds = [];
+                   $scope.Days = [{ value: "Saturday", text: 'Saturday' },
+                                    { value: "Sunday", text: 'Sunday' }
+                                    , { value: "Monday", text: 'Monday' }
+                                    , { value: 'Tuesday', text: 'Tuesday' }
+                                    , { value: 'Wednesday', text: 'Wednesday' }
+                                    , { value: 'Thursday', text: 'Thursday' }
+                                    , { value: 'Friday', text: 'Friday' }
+                   ];
+                   $scope.pageSizeArray = [];
+                   $scope.pageSizeArray.push({ value: 5, text: 5 });
+                   $scope.pageSizeArray.push({ value: 10, text: 10 });
+                   $scope.pageSizeArray.push({ value: 20, text: 20 });
+                   $scope.pageSizeArray.push({ value: 50, text: 50 });
+                   $scope.currentPage = 1;
+                   $scope.pageSize = 10;
+                   $scope.EmpCalender.WeekendDay1 = [];
+
+                   //  datatimes();
+                   $scope.SpareTimes = [{ value: 15, text: '15 Minutes' },
+                                    { value: 30, text: '30 Minutes' }];
+               }
+               $scope.FromDateValidation = function FromDateValidation() {
+                   var condition = $scope.EmpCalender.session_StartDate1 < $scope.EmpCalender.session_EndDate1 ? true : false;
+                   //if (!condition)
+                   //    $scope.session.session_EndDate1 = null;
+               }
+               $scope.options = {
+                   minDate: new Date(),
+                   showWeeks: true
+               };
+               function resetForm() {
+                   $scope.aemodalTitle = "Add Employee Calender";
+                   $scope.EmpCalender = {};
+                   $scope.IsEdit = 0;
+                   $scope.addform.$setUntouched();
+                   $scope.addform.$setPristine();
+                   $scope.submitted = false;
+                   $scope.Id = '';
+                   $scope.EmpCalender.WeekendDay1 = [];
+                   $scope.EmpCalender.IsUpdateExisting = false;
+               }
+
+               function getEmpClanderList() {
+                   $scope.EmpCalenderList = [];
+                   blockUI.start();
+                   $http({
+                       method: 'GET',
+                       url: baseUrl + 'Attendance/GetEmpCalendarList/'
+                   }).then(function successCallback(response) {
+                       $scope.EmpCalenderList = response.data.results;
+                       blockUI.stop();
+                   }, function errorCallback(response) {
+
+                   });
+
+               }
+               $scope.searchData = function () {
+                   //     getsession();
+                   // $scope.total_count = 88;
+               };
+               $scope.edit = function (n) {
+
+                   console.log(n);
+                   $scope.aemodalTitle = "Update Employee Calender";
+                   $scope.EmpCalender = n;
+                   $scope.IsEdit = 1;
+                   $scope.EmpCalender.Session_StartDate1 = new Date(n.StartDate);
+                   $scope.EmpCalender.Session_EndDate1 = new Date(n.EndDate);
+                   $scope.EmpCalender.In = new Date(n.InTime);
+                   $scope.EmpCalender.Out = new Date(n.OutTime);
+                   $scope.EmpCalender.WeekendDay1 = $scope.EmpCalender.WeekendDay.split(',');
+
+               };
+               $scope.save = function save() {
+
+                   if ($scope.addform.$invalid)
+                       return;
+
+                   $scope.EmpCalender.StartDate = $filter('date')($scope.EmpCalender.Session_StartDate1, "yyyy-MM-dd");
+                   $scope.EmpCalender.EndDate = $filter('date')($scope.EmpCalender.Session_EndDate1, "yyyy-MM-dd");
+                   $scope.EmpCalender.WeekendDay = createStringByArray($scope.EmpCalender.WeekendDay1);
+
+                   if ($scope.EmpCalender.StartDate > $scope.EmpCalender.EndDate) {
+                       toastr["warning"]("From Date should be greater then To Date");
+                       return;
+                   }
+
+                   $scope.EmpCalender.In = $scope.EmpCalender.In.getHours() + '-' + $scope.EmpCalender.In.getMinutes();
+                   $scope.EmpCalender.Out = $scope.EmpCalender.Out.getHours() + '-' + $scope.EmpCalender.Out.getMinutes();
+
+                   if ($scope.IsEdit != 0) /// For Update
+                   {
+
+                       if ($scope.EmpCalender != '') {
+                           blockUI.start();
+
+                           $http({
+                               method: 'POST',
+                               url: baseUrl + 'Attendance/AddEmpAcademicCalendar/',
+                               data: $scope.EmpCalender
+                           }).then(function successCallback(response) {
+
+                               $('#addmodal').modal('toggle');
+                               //  getsession();
+                               getEmpClanderList();
+                               toastr["info"](response.data.message);
+                               resetForm();
+                               blockUI.stop();
+                           }, function errorCallback(response) {
+                               toastr["warning"](response.data.Message);
+                           });
+                       }
+                   } else {  //  For Add
+
+                       if ($scope.session != {}) {
+                           blockUI.start();
+                           $http({
+                               method: 'POST',
+                               url: baseUrl + 'Attendance/AddEmpAcademicCalendar/',
+                               data: $scope.EmpCalender
+                           }).then(function successCallback(response) {
+                               $('#addmodal').modal('hide');
+                               getEmpClanderList();
+                               toastr["success"](response.data.message);
+                               resetForm();
+                               blockUI.stop();
+                           }, function errorCallback(response) {
+                               toastr["warning"](response.data.Message);
+                           });
+                       }
+                   }
+
+               };
+
+
+               function createStringByArray(array) {
+                   var output = '';
+                   angular.forEach(array, function (value, key) {
+                       if (!isNaN(parseInt(value))) {
+                           output += value + ',';
+                       }
+                       else {
+                           output += "'" + value.toString() + '\',';
+                       }
+
+                   });
+                   return output;
+               }
+
+               function getAllCommons() {
+                   $scope.CommonFeilds = [];
+
+                   $http({
+                       method: 'GET',
+                       url: baseUrl + 'Common/GetCommonItemEmp/'
+                   }).then(function successCallback(response) {
+                       $scope.CommonFeilds = response.data.results;
+                       //console.log($scope.CommonFeilds);
+                   }, function errorCallback(response) {
+                   });
+               }
+               $scope.deletesession = function deletesession(n) {
+                   $scope.EmpCalender = n;
+                   // SweetAlert.swal("Good job!", "You clicked the button!", "success");
+                   SweetAlert.swal({
+                       title: "Are you sure to delete it ?", type: "warning", showCancelButton: true, confirmButtonColor: "#DD6B55",
+                       confirmButtonText: "Yes, delete it!",
+                       closeOnConfirm: false
+                   },
+                   function (isConfirm) {
+
+
+                       if (isConfirm) {
+                           $http({
+                               method: 'POST',
+                               url: baseUrl + 'Attendance/DeleteEmpCalendar/',
+                               data: $scope.EmpCalender
+                           }).then(function successCallback(response) {
+                               SweetAlert.swal("Deleted!", "Your data has been deleted.", "success");
+                               // getsession();
+                               getEmpClanderList();
+                           }, function errorCallback(response) {
+
+                               toastr["warning"](response.data.Message);
+                           });
+
+                       }
+                   });
+
+
+               };
+               //function datatimes() {
+               //    $scope.$watch('session.session_StartDate', function (niu) {
+               //        if (niu) {
+               //            $scope.dateOptions.minDate = niu
+               //        }
+               //    });
+               //}
+
+           }]);
+    </script>
+
+
+
+}
+

@@ -1,0 +1,321 @@
+﻿@{
+    ViewBag.Title = "Shift";
+}
+<div ng-controller="shift">
+    <!-- Begin: life time stats -->
+    <div class="portlet light bordered">
+        <div class="portlet-title">
+            <div class="caption">
+                <i class="icon-settings font-green"></i>
+                <span class="caption-subject font-green sbold uppercase">@ViewBag.Title</span>
+            </div>
+            <div class="actions">
+                <div class="btn-group btn-group-solid">
+                    <button ng-click="resetForm()" class="btn green" data-target="#addmodal" data-toggle="modal"> <i class="fa fa-plus"></i> Add Shift</button>
+                </div>
+            </div>
+        </div>
+        <div class="portlet-body">
+            <div class="table-container">
+                <div id="sample_3_wrapper" class="dataTables_wrapper no-footer">
+                    <div class="row">
+                        <div class="col-md-4 col-sm-5 col-xs-6">
+                            <div class="form-group">
+                                <div class="col-lg-3 col-md-5 col-sm-4 col-xs-8" style="padding-left:0px">
+                                    <select class="form-control" ng-model="pageSize" ng-options="P.value as P.text for P in pageSizeArray"></select>
+                                </div>
+                                <div class="col-md-7  col-sm-8  col-xs-4">
+                                    @*<label for="search" class="control-label" style="padding-top:5px">Items</label>*@
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 col-sm-3 col-xs-1">
+                        </div>
+                        <div class="col-md-4 col-sm-4 col-xs-5">
+                            <div id="sample_3_filter" class="pull-right">
+                                <input ng-model="q" id="search" class="form-control" placeholder="Filter text">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="table-scrollable"> </div>
+                    <table class="table table-bordered table-hover">
+                        <thead>
+                                <tr class="btn-primary">
+                                    <th>Branch Name</th>
+                                    <th>Shift Name</th>
+                                    <th>Shift Code</th>
+                                    <th>Start Time</th>
+                                    <th>End Time</th>
+                                    <th style="text-align:center">Action</th>
+                                </tr>
+                         </thead>
+                        <tbody>
+                            <tr ng-show="Shifts.results.length <= 0"><td colspan="5" style="text-align:center;"><i class="fa fa-refresh"></i> Loading new data!!</td></tr>
+                            <tr dir-paginate="item in Shifts.results| filter:q  | itemsPerPage: pageSize " current-page="currentPage">
+                                <td>{{item.Branch.BranchName}}</td>         
+                                <td>{{item.ShiftName}}</td>
+                                <td>{{item.ShiftCode}}</td>
+                                <td>{{item.ShiftStartTime | date: "h:mma"}}</td>
+                                <td>{{item.ShiftEndTime | date: "h:mma"}}</td> 
+                                                      
+                                <td align="center">
+                                    <a href="javascript:;" class="btn btn-icon-only green" ng-click="edit(item)" data-target="#addmodal" data-toggle="modal">
+                                        <i class="fa fa-edit"></i>
+                                    </a>
+                                    <a ng-click="deleteshift(item)" href="javascript:;" class="btn btn-icon-only red">
+                                        <i class="fa fa-trash"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="row">
+                            <dir-pagination-controls boundary-links="true" template-url="~/assets/angular/lib/dirPagination.tpl.html"></dir-pagination-controls>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- End: life time stats -->
+    <!--Modal Area Start-->
+    <div id="addmodal" class="modal fade" tabindex="-1" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form name="addform" ng-submit="save()" class="form-horizontal" id="form_sample_1" novalidate>
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                        <h4 class="modal-title">{{modalTitle}}</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-body">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group" ng-class="{ 'has-error' : submitted && addform.Branch.$invalid}">
+                                        <label class="col-md-4 control-label">
+                                            Branch:
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-8">
+                                            <select class="form-control" ng-model="shift.BranchId" name="Branch" required ng-options="Branch.BranchId as Branch.BranchName for Branch in CommonFeilds.Branch">
+                                                <option value="" selected>Choose Branch</option>
+                                            </select>
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted && addform.Branch.$error.required" class="help-block">Branch Name Required</span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group" ng-class="{ 'has-error' : submitted && addform.name.$invalid}">
+                                        <label class="col-md-4 control-label">
+                                            Shift Name:
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-8">
+                                            <input type="text" ng-model="shift.ShiftName" class="form-control" placeholder="Shift Name" name="name" required>
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted &&  addform.name.$error.required" class="help-block">Name Required</span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group" ng-class="{ 'has-error' : submitted && addform.code.$invalid}">
+                                        <label class="col-md-4 control-label">
+                                            Shift Code:
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-8">
+                                            <input type="text" ng-model="shift.ShiftCode"  ng-pattern="/^\S{0,50}$/"
+                                                    class="form-control" placeholder="Code" name="code" required>
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted &&  addform.code.$error.required" class="help-block">Code Required</span>
+                                            <span style="color:red" class="help-block" ng-if="submitted && addform.code.$invalid">No Space Allow</span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group" ng-class="{ 'has-error' : submitted && addform.FromDate.$invalid}">
+                                        <label class="col-md-4 control-label" style="margin-top: 35px;">
+                                            Duration From:
+                                        </label>
+                                        <div class="col-md-8">
+                                            <div uib-timepicker ng-model="shift.ShiftStartTime" ng-required="shift.ShiftStartTime==null" name="FromDate" 
+                                                 onkeypress='return event.charCode >= 48 && event.charCode <= 57' ng-change="changed()" readonly-time="false"
+                                                  readonly-date="false" disabled-date="false" hour-step="hstep" minute-step="mstep" show-meridian="true" ></div>
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted &&  addform.FromDate.$error.required" class="help-block">Invalid Time </span> </div>
+                                    </div>
+                                    <div class="form-group" ng-class="{ 'has-error' : submitted && addform.ToDate.$invalid}">
+                                        <label class="col-md-4 control-label" style="margin-top: 35px;">
+                                            To:
+                                        </label>
+                                        <div class="col-md-8">
+                                            <div uib-timepicker ng-model="shift.ShiftEndTime"  name="ToDate" ng-required="shift.ShiftEndTime==null" ng-change="changed()" 
+                                                 hour-step="hstep" minute-step="mstep" show-meridian="true"  readonly-time="true" readonly-date="true" 
+                                                 disabled-date="true"> </div>
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted &&  addform.ToDate.$error.required" class="help-block">Invalid Time </span>
+                                        </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" data-dismiss="modal" class="btn dark btn-outline" ng-click="resetForm();submitted=false">Cancel</button>
+                        <button type="submit" ng-click="submitted=true" class="btn green-haze">Save</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!--Modal Area End-->
+</div>
+@section Scripts{
+ <script type="text/javascript">
+        OEMSApp.controller("shift", ["$scope", "$http", "SweetAlert",
+              function ($scope, $http, SweetAlert) {
+                  init();
+                  function init() {
+                      initialize();
+                      getShifts();
+                      getAllBranchs(1);
+                      getAllCommons();
+                  }
+                  function initialize() {
+                      $scope.modalTitle = "Add Shift";
+                      $scope.shift = {};
+                      $scope.shift.ShiftId = 0;
+                      $scope.Shifts = [];
+                      $scope.branchs = [];
+                      $scope.currentPage = 1;
+                      $scope.pageno = 1;
+                      $scope.pagesize = 10;
+                      $scope.total_count = 12;
+                      $scope.search = '';                      
+                      $scope.Id = '';
+                      $scope.getShifts = getShifts;
+                      $scope.res = {};
+                      $scope.data = {};
+                      $scope.resetForm = resetForm;
+                      $scope.hstep = 1;
+                      $scope.mstep = 15;
+                      $scope.pageSizeArray = [];
+                      $scope.pageSizeArray.push({ value: 5, text: 5 });
+                      $scope.pageSizeArray.push({ value: 10, text: 10 });
+                      $scope.pageSizeArray.push({ value: 20, text: 20 });
+                      $scope.pageSizeArray.push({ value: 50, text: 50 });
+                      $scope.currentPage = 1;
+                      $scope.pageSize = 10;
+                      $scope.getAllBranchs = getAllBranchs;
+                  }
+                  function resetForm() {
+                      $scope.modalTitle = "Add Shift";
+                      $scope.shift = {};
+                      $scope.shift.ShiftId = 0;
+                      $scope.addform.$setUntouched();
+                      $scope.addform.$setPristine();
+                      $scope.submitted = false;
+                      $scope.Id = '';
+                      getShifts();
+                  }
+                  function getShifts() {
+                      $scope.Shifts = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'SetupInstitution/GetAllShift/'
+                      }).then(function successCallback(response) {
+                          $scope.Shifts = response.data;
+                      }, function errorCallback(response) {
+                          toastr["warning"](response.data.Message);
+                      });
+                  }
+                  $scope.searchData = function () {
+                      getShifts(1);
+                  };
+                  $scope.edit = function (n) {
+                      $scope.modalTitle = "Update Shift";
+                      $scope.shift = n;
+                      $scope.Id = n.Id;
+                  };
+                  $scope.save = function save() {
+                      if ($scope.addform.$invalid)
+                          return;
+                      var fromDate = new Date($scope.shift.ShiftStartTime);
+                      var ToDate = new Date($scope.shift.ShiftEndTime);
+                      if (fromDate > ToDate) {
+                          toastr["warning"]("Invalid Time Duration");
+                          return;
+                      }
+                      if ($scope.shift.ShiftId != 0) /// For Update
+                      {
+                          if ($scope.shift != '') {
+                              $http({
+                                  method: 'PUT',
+                                  url: baseUrl + 'SetupInstitution/UpdateShift/',
+                                  data: $scope.shift
+                              }).then(function successCallback(response) {
+
+                                  $('#addmodal').modal('toggle');
+                                  getShifts(1);
+                                  resetForm();
+                              }, function errorCallback(response) {
+                                  toastr["warning"](response.data.Message);
+                              });
+                          }
+                      }else {  //  For Add
+                          if ($scope.shift != {}) {
+                              $http({
+                                  method: 'POST',
+                                  url: baseUrl + 'SetupInstitution/AddShift/',
+                                  data: $scope.shift
+                              }).then(function successCallback(response) {
+                                  $('#addmodal').modal('toggle');
+                                  getShifts(1);
+                                  resetForm();
+                              }, function errorCallback(response) {
+                                  toastr["warning"](response.data.Message);
+                              });
+                          }
+                      }
+                  };
+                  $scope.deleteshift = function deleteshift(n) {
+                      // SweetAlert.swal("Good job!", "You clicked the button!", "success");
+                      SweetAlert.swal({
+                          title: "Are you sure to delete it ?", type: "warning", showCancelButton: true, confirmButtonColor: "#DD6B55",
+                          confirmButtonText: "Yes, delete it!",
+                          closeOnConfirm: false
+                      },
+                      function (isConfirm) {
+                          if (isConfirm) {
+                              $http({
+                                  method: 'DELETE',
+                                  url: baseUrl + 'SetupInstitution/DeleteShift/' + n.ShiftId
+                              }).then(function successCallback(response) {
+                                  SweetAlert.swal("Deleted!", "Your data has been deleted.", "success");
+                                  getShifts(1);
+                              }, function errorCallback(response) {
+                                  toastr["warning"](response.data.Message);
+                              });
+                          }
+                      });
+                  };
+                  function getAllCommons() {
+                      $scope.CommonFeilds = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Common/GetCommonItem/'
+                      }).then(function successCallback(response) {
+                          $scope.CommonFeilds = response.data.results;
+                      }, function errorCallback(response) {
+                          toastr["warning"](response.data.message);
+                      });
+                  }
+                  function getAllBranchs() {
+                      $scope.branchs = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'SetupInstitution/GetAllBranchs/' 
+                      }).then(function successCallback(response) {
+                          $scope.branchs = response.data.results;
+                      }, function errorCallback(response) {
+                          toastr["warning"](response.data.Message);
+                      });
+                  }
+              }]);
+    </script>
+
+}

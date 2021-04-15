@@ -1,0 +1,391 @@
+﻿
+@{
+    ViewBag.Title = "Meeting";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@*<link href="http://cdn.addiesoft.com/admin/assets/global/plugins/bootstrap-daterangepicker/daterangepicker.min.css" rel="stylesheet" type="text/css" />
+    <link href="http://cdn.addiesoft.com/admin/assets/global/plugins/bootstrap-datepicker/css/bootstrap-datepicker3.min.css" rel="stylesheet" type="text/css" />
+    <link href="http://cdn.addiesoft.com/admin/assets/global/plugins/bootstrap-timepicker/css/bootstrap-timepicker.min.css" rel="stylesheet" type="text/css" />
+    <link href="http://cdn.addiesoft.com/admin/assets/global/plugins/bootstrap-datetimepicker/css/bootstrap-datetimepicker.min.css" rel="stylesheet" type="text/css" />
+    <script src="http://cdn.addiesoft.com/admin/assets/global/plugins/bootstrap-daterangepicker/daterangepicker.min.js" type="text/javascript"></script>
+    <script src="http://cdn.addiesoft.com/admin/assets/global/plugins/bootstrap-datepicker/js/bootstrap-datepicker.min.js" type="text/javascript"></script>
+    <script src="http://cdn.addiesoft.com/admin/assets/global/plugins/bootstrap-timepicker/js/bootstrap-timepicker.min.js" type="text/javascript"></script>
+    <script src="http://cdn.addiesoft.com/admin/assets/global/plugins/bootstrap-datetimepicker/js/bootstrap-datetimepicker.min.js" type="text/javascript"></script>
+    <script src="http://cdn.addiesoft.com/admin/assets/pages/scripts/components-date-time-pickers.min.js" type="text/javascript"></script>*@
+
+<h2 class="SetUpHead">Meeting List</h2>
+<div ng-controller="meetingClt">
+    <div class="text-right">
+        <a data-toggle="modal" ng-click="ResetFrm()" title="Add Meeting" href="#draggable" class="btn btn-primary fa-item" style="margin-right: 1.5%;margin-top: -75px;">
+            @*<i class="fa fa-plus"></i>*@ <i class="fa fa-plus-square"></i> Add Meeting
+        </a>
+    </div>
+
+    <div class="panel-body">
+        <div class="row" style="margin-bottom:10px;margin-top: -3%;">
+            <div class="col-md-4 col-sm-5 col-xs-6">
+                <div class="form-group">
+                    <div class="col-lg-3 col-md-5 col-sm-4 col-xs-8" style="padding-left:0px;width:35%">
+                        <select class="form-control" ng-model="pageSize" ng-options="P.value as P.text for P in pageSizeArray"></select>
+                    </div>
+                    <div class="col-md-7  col-sm-8  col-xs-4">
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 col-sm-3 col-xs-1">
+            </div>
+            <div class="col-md-4 col-sm-4 col-xs-5">
+                <div id="sample_3_filter" class="pull-right">
+                    <input ng-model="q" id="search" class="form-control" placeholder="Filter text">
+                </div>
+            </div>
+        </div>
+        <table class="table table-bordered table-inverse table-hover
+               ">
+            <thead class="btn-primary">
+                <tr>
+                    @*<th><input type="checkbox" ng-model="selectedAll" ng-click="selectAll()" />  All</th>*@
+                    <th class="text-center">Title </th>
+                    <th class="text-center">Topics</th>
+                    <th class="text-center">Meeting Date</th>
+                    <th class="text-center">Start Time</th>
+                    <th class="text-center">End Time</th>
+                    <th class="text-center">Location</th>
+                    <th class="text-center">Meeting Person Name</th>
+                    <th class="text-center">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-show="MeetingList.length <= 0"><td colspan="7" style="text-align:center;"><i class="fa fa-refresh"></i> Loading new data!!</td></tr>
+                <tr dir-paginate="item in MeetingList| filter:q | itemsPerPage: pageSize" current-page="currentPage">
+                    @*<tr ng-repeat="item in ApplicantList track by $index">*@
+                    @*<td> <input type="checkbox" ng-model="item.Selected" value="false" ng-click="checkIfAllSelected()" /> </td>*@
+                    <td class="text-center"> {{item.Title}} </td>
+                    <td class="text-center"> {{item.Topics}} </td>
+                    <td class="text-center">{{item.MeetingDate.replace('/Date(','').replace(')/','') |  date:"MM/dd/yyyy"}}</td>
+                    <td class="text-center">{{item.StartDateTime.replace('/Date(','').replace(')/','') |  date:"HH:mm a"}}</td>
+                    <td class="text-center">{{item.EndDateTime.replace('/Date(','').replace(')/','') |  date:"HH:mm a"}}</td>
+                    <td class="text-center">{{item.Location}}</td>
+                    <td class="text-center"> {{item.MeetingPersonName}} </td>
+                    <td class="text-center">
+                        <button type="button" data-toggle="modal" class="btn btn-success" ng-click="EditMeeting(item)" title="Edit" data-target="#draggable"><i class="fa fa-edit"></i>Edit</button>
+                        <button type="button" class="btn btn-danger fa-item" title="Delete" ng-click="Delete(item)"><i class="fa fa-trash-o"></i></button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <div class="row" ng-show="MeetingList.length>1">
+            <dir-pagination-controls boundary-links="true" template-url="~/assets/dirPagination.tpl.html"></dir-pagination-controls>
+        </div>
+    </div>
+    <!-- Table -->
+    <div class="modal fade draggable-modal modal-full" id="draggable" tabindex="-1" role="basic" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                    <h4 class="modal-title">Add Meeting</h4>
+                </div>
+                <form name="frm" class="form-horizontal" ng-submit="Submit()" role="form" novalidate>
+                    <div class="portlet-body form" style="display: block;">
+                        <div class="form-body TopLeftMargin3">
+                            <div class="form-group" ng-class="{ 'has-error' : submitted && frm.Title.$invalid}">
+                                <label class="col-md-3 control-label">Meeting Title</label>
+                                <div class="col-md-9">
+                                    <input type="text" ng-model="Meeting.Id" hidden />
+                                    <input type="text" name="Title" ng-model="Meeting.Title" class="form-control input-lg" placeholder="Meeting Title" required>
+                                    <span ng-show="submitted &&  frm.Title.$error.required" class="text-danger">Meeting Title is Required</span>
+                                </div>
+                            </div>
+                            <div class="form-group" ng-class="{ 'has-error' : submitted && frm.Title.$invalid}">
+                                <label class="col-md-3 control-label">Topics</label>
+                                <div class="col-md-9">
+                                    <input type="text" name="Topics" ng-model="Meeting.Topics" class="form-control input-lg" placeholder="Topics" required>
+                                    <span ng-show="submitted &&  frm.Topics.$error.required" class="text-danger">Topics is Required</span>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-3 control-label">Client</label>
+                                <div class="col-md-9">
+                                    <select class="form-control input-lg" name="ClientId" ng-model="Meeting.ClientId">
+                                        <option value="">Select Please</option>
+                                        <option ng-repeat="item in LoadClientList" ng-if='item.Status=="A"' value="{{item.Id}}">
+                                            {{item.ShortName}}
+                                        </option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-3 control-label">Meeting Date</label>
+                                <div class="col-md-9">
+
+                                    <input type="text" class="form-control" uib-datepicker-popup="{{format}}" placeholder="Date Time" readonly ng-click="q1=true" ng-model="Meeting.MeetingDate" is-open="q1" min-date="minDate" max-date="maxDate" datepicker-options="dateOptions" date-disabled="disabled(date, mode)" ng-required="true" close-text="Close" name="MeetingDate" />
+
+                                    @*<input type="text" id="StartDate" autocomplete="off" required name="MeetingDate" class="form-control input-lg" ng-model="Meeting.MeetingDate" min="@DateTime.Now.ToString("yyyy-MM-dd")" placeholder="mm-dd-yyyy">*@
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-3 control-label" style="padding-top: 40px;">Start Time</label>
+                                <div class="col-md-9">
+                                    <div uib-timepicker ng-model="Meeting.StartTime" hour-step="hstep" minute-step="mstep" name="StartTime" show-meridian="ismeridian"></div>
+                                    @*<input type="time" id="StartDate" autocomplete="off" required name="StartDateTime" class="form-control input-lg" ng-model="Meeting.StartDateTime">*@
+
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-3 control-label" style="padding-top: 40px;">End Time</label>
+                                <div class="col-md-9">
+                                    <div uib-timepicker ng-model="Meeting.EndTime" name="EndTime" hour-step="hstep" minute-step="mstep" show-meridian="ismeridian"></div>
+                                    @*<input type="time" autocomplete="off" required name="EndDateTime" class="form-control input-lg" ng-model="Meeting.EndDateTime">*@
+
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-3 control-label">Notes</label>
+                                <div class="col-md-9">
+                                    <input type="text" name="Notes" ng-model="Meeting.Notes" class="form-control input-lg" placeholder="Notes" required>
+
+                                </div>
+                            </div>
+                            <div class="form-group" ng-class="{ 'has-error' : submitted && frm.Title.$invalid}">
+                                <label class="col-md-3 control-label">Location</label>
+                                <div class="col-md-9">
+                                    <input type="text" name="Location" ng-model="Meeting.Location" class="form-control input-lg" placeholder="Location" required>
+                                    <span ng-show="submitted &&  frm.Location.$error.required" class="text-danger">Location is Required</span>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-3 control-label">Meeting Person Name</label>
+                                <div class="col-md-9">
+                                    <input type="text" name="MeetingPersonName" ng-model="Meeting.MeetingPersonName" class="form-control input-lg" placeholder="Meeting Person Name" required>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-3 control-label">Meeting Person Mobile No</label>
+                                <div class="col-md-9">
+                                    <input type="text" name="MeetingPersonMobileNo" ng-model="Meeting.MeetingPersonMobileNo" class="form-control input-lg" placeholder="Meeting PersonMobile No" required>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="reset" class="btn btn-danger" data-dismiss="modal">Close</button>
+                        <input type="submit" class="btn btn-success" ng-click="submitted=true" value="{{btnTitle}}" />
+                    </div>
+                </form>
+            </div> 
+        </div>
+    </div>
+
+</div>
+
+
+
+
+
+<script type="text/javascript">
+
+    //$(document).ready(function () {
+    //    $("#StartDate").datepicker({
+    //        format: 'mm/dd/yyyy',
+    //        autoclose: true,
+    //        startDate: '0d'
+    //    });
+
+    //});
+    //$(document).ready(function () {
+    //    $("#ExpireDate").datepicker({
+    //        format: 'mm/dd/yyyy',
+    //        autoclose: true,
+    //        startDate: '0d'
+    //    });
+
+    //});
+
+    AddieApp.controller("meetingClt", ["$scope", "$http", "SweetAlert",
+      function ($scope, $http, SweetAlert) {
+          init();
+          function init() {
+              initialize();
+          }
+          function initialize() {
+              $scope.hstep = 1;
+              $scope.mstep = 15;
+              $scope.pageSizeArray = [];
+              $scope.pageSizeArray.push({ value: 5, text: 5 });
+              $scope.pageSizeArray.push({ value: 10, text: 10 });
+              $scope.pageSizeArray.push({ value: 20, text: 20 });
+              $scope.pageSizeArray.push({ value: 50, text: 50 });
+              $scope.currentPage = 1;
+              $scope.pageSize = 10;
+              LoadMeetingList()
+              $scope.IsEdit = 0;
+              $scope.btnTitle = 'Save';
+              LoadClientList();
+              $scope.Meeting = {};
+              $scope.Meeting.ID = 0;
+              $scope.ismeridian = true;
+          };
+
+          $scope.Submit = function () {
+
+              debugger;
+              //if ($scope.frm.$invalid)
+              //    return;
+              if ($scope.IsEdit == 0) {
+                  $scope.AddMeeting();
+                  $('#draggable').modal('hide');
+                  $scope.Meeting = {};
+              }
+              else {
+                  $scope.UpdateMeeting();
+                  //debugger;
+                  $('#draggable').modal('hide');
+              }
+          }
+          $scope.AddMeeting = function () {
+              console.log($scope.Meeting);
+              debugger;
+              $http({
+                  method: 'POST',
+                  url: baseUrl + 'Meeting/AddMeeting/',
+                  data: $scope.Meeting
+
+              }).then(function successCallback(response) {
+                  LoadMeetingList();
+                  toastr["info"](response.data.message);
+                  resetModel();
+
+                  // $scope.Search();
+              }, function errorCallback(response) {
+                  toastr["info"](response.data.message);
+              });
+
+          }
+
+
+
+          $scope.Delete = function (meeting) {
+              swal({
+                  title: "Are you sure?",
+                  text: "Once deleted, you will not be able to recover this data!",
+                  icon: "warning",
+                  buttons: true,
+                  dangerMode: true,
+              })
+                .then((willDelete) => {
+                    if (willDelete) {
+                        $http.post(baseUrl + 'Meeting/DeleteMeeting', meeting).
+                          then(function (response) {
+                              if (response.data == '0') {
+                                  toastr.warning('Not found');
+
+                                  return;
+                              }
+                              toastr.success('Deleted Successfully');
+                              LoadMeetingList();
+                          });
+
+                    } else {
+
+                    }
+                });
+
+          }
+          $scope.ResetFrm = function () {
+              //$scope.MeetingList = [];
+              $scope.btnTitle = 'Save';
+              $scope.IsEdit = 0;
+              $scope.submitted = false;
+              $scope.Meeting = {};
+          }
+
+          //$scope.changed = function () {
+          //    $log.log('Time changed to: ' + $scope.mytime);
+          //};
+          //$scope.UpdateMeeting = function () {
+          //   debugger;
+          //    $http.post(baseurl + 'Meeting/UpdateMeeting/')
+          //      .then(function (response) {
+          //          if (response.data != '0') {
+          //              toastr.success('update successfully');
+
+
+          //              return;
+          //          }
+          //          toastr.error('update error');
+          //      });
+          //}
+
+          $scope.UpdateMeeting = function () {
+              console.log($scope.Meeting);
+              //debugger;
+              $http({
+                  method: 'POST',
+                  url: baseUrl + 'Meeting/UpdateMeeting/',
+                  data: $scope.Meeting
+
+              }).then(function successCallback(response) {
+                  LoadMeetingList();
+                  //$('#draggable').modal('toggle');
+
+                  toastr.success('Updated Successfully');
+
+                  //resetModel();
+                  // $scope.Search();
+              }, function errorCallback(response) {
+                  toastr["info"](response.data.message);
+              });
+          }
+
+
+          $scope.EditMeeting = function (n) {
+              $scope.Meeting = n;
+
+
+              $scope.IsEdit = 1;
+
+              $scope.btnTitle = 'Update';
+              $scope.Meeting.MeetingDate = Dateconvert(n.MeetingDate);
+
+          }
+          function Dateconvert(str) {
+              var re = /\/Date\(([0-9]*)\)\//;
+              var m = str.match(re);
+              var datestring = new Date(parseInt(m[1]));
+              var date = new Date(datestring),
+                  mnth = ("0" + (date.getMonth() + 1)).slice(-2),
+                  day = ("0" + date.getDate()).slice(-2);
+              return new Date([date.getFullYear(), mnth, day].join("-"));
+          }
+
+          $scope.selectAll = function () {
+              angular.forEach($scope.MeetingList, function (item) {
+                  item.Selected = $scope.selectedAll;
+              });
+          };
+          function LoadClientList() {
+              $http.post(baseUrl + 'Setup/LoadClientList').
+                then(function (response) {
+                    $scope.LoadClientList = response.data;
+
+                });
+          }
+          function LoadMeetingList() {
+
+              $http.post(baseUrl + 'Meeting/LoadMeetingList').
+                then(function (response) {
+                    $scope.MeetingList = response.data;
+                    console.log($scope.MeetingList)
+                    toastr.success($scope.MeetingList.length + ' Meeting found');
+                });
+          }
+
+
+      }]);
+</script>
+
+
+

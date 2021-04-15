@@ -1,0 +1,716 @@
+﻿@{
+    ViewBag.Title = "Student Late In Early Out";
+}
+@*<link href="~/assets/global/plugins/bootstrap-timepicker/css/bootstrap-timepicker.css" rel="stylesheet" />*@
+
+<style type="text/css">
+    .table thead tr th {
+        font-size: 12px !important;
+        color: white !important;
+        font-weight: 600 !important;
+    }
+</style>
+<div ng-controller="ctrlLIEO">
+    <!-- Begin: life time stats -->
+    <div class="portlet light bordered">
+        <div class="portlet-title">
+            <div class="caption">
+                <i class="icon-settings font-green"></i>
+                <span class="caption-subject font-green sbold uppercase">@ViewBag.Title</span>
+            </div>
+            <div class="actions">
+                <div class="btn-group btn-group-solid">
+                    <button class="btn green" data-target="#addmodal" ng-click="Reset()" data-toggle="modal"> <i class="fa fa-plus"></i>Add LIEO Setup</button>
+                </div>
+            </div>
+        </div>
+        <div class="portlet-body">
+            <form class="form-horizontal" ng-submit="" id="frmCommon" name="formCommonFeilds" novalidate>
+                <div class="form-body">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="form-group" ng-class="{ 'has-error' : submitted && formCommonFeilds.Branch.$invalid}">
+                                <label class="col-md-5 control-label">
+                                    Branch :
+                                    <span class="required">*</span>
+                                </label>
+                                <div class="col-md-7">
+                                    <select class="form-control" ng-model="LIEOSetup.BranchId" required name="Branch" ng-options="LIEOSetup.BranchId as LIEOSetup.BranchName for LIEOSetup in CommonFeilds.Branch ">
+                                        <option value="" selected="selected">Choose Option</option>
+                                    </select>
+                                    <div class="form-control-focus"> </div>
+                                    <span ng-show="submitted && formCommonFeilds.Branch.$error.required" class="help-block">Branch Required</span>
+                                </div>
+                            </div>
+                            <div class="form-group" ng-class="{ 'has-error' : submitted && formCommonFeilds.Session.$invalid}">
+                                <label class="col-md-5 control-label">
+                                    Session :
+                                    <span class="required">*</span>
+                                </label>
+                                <div class="col-md-7">
+                                    <select class="form-control" ng-model="LIEOSetup.SessionId" required name="Session" ng-options="LIEOSetup.SessionId as LIEOSetup.SessionName for LIEOSetup in CommonFeilds.Session">
+                                        <option value="" selected="selected">Choose Option</option>
+                                    </select>
+
+                                    <div class="form-control-focus"> </div>
+                                    <span ng-show="submitted && formCommonFeilds.Session.$error.required" class="help-block">Session Required</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+
+                            <div class="form-group" ng-class="{ 'has-error' : submitted && formCommonFeilds.Shift.$invalid}">
+                                <label class="col-md-5 control-label">
+                                    Shift :
+                                    @*<span class="required">*</span>*@
+                                </label>
+                                <div class="col-md-7">
+                                    <select class="form-control" ng-model="LIEOSetup.ShiftId" name="Shift" ng-options="LIEOSetup.ShiftId as LIEOSetup.ShiftName for LIEOSetup in CommonFeilds.Shift | filter:{BranchId:LIEOSetup.BranchId}:true">
+                                        <option value="" selected="selected">Choose Option</option>
+                                    </select>
+                                    <div class="form-control-focus"> </div>
+                                    <span ng-show="submitted && formCommonFeilds.Shift.$error.required" class="help-block">Shift Required</span>
+                                </div>
+                            </div>
+                            <div class="form-group" ng-class="{ 'has-error' : submitted && formCommonFeilds.Class.$invalid}">
+                                <label class="col-md-5 control-label">
+                                    Class :
+                                    @*<span class="required">*</span>*@
+                                </label>
+                                <div class="col-md-7">
+                                    <select class="form-control" ng-model="LIEOSetup.ClassId" name="Class" ng-change="GetSection(LIEOSetup.SessionId,LIEOSetup.ShiftId,LIEOSetup.ClassId);" ng-options="LIEOSetup.ClassId as LIEOSetup.ClassName for LIEOSetup in CommonFeilds.ClassInfo | filter:{VersionId:LIEOSetup.VersionId}:true">
+                                        <option value="" selected="selected">Choose Option</option>
+                                    </select>
+                                    <div class="form-control-focus"> </div>
+                                    <span ng-show="submitted && formCommonFeilds.Class.$error.required" class="help-block">Class Required</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="form-group" ng-class="{ 'has-error' : submitted && formCommonFeilds.Section.$invalid}">
+                                <label class="col-md-5 control-label">
+                                    Section :
+                                    @*<span class="required">*</span>*@
+                                </label>
+                                <div class="col-md-7">
+                                    <select class="form-control" ng-model="LIEOSetup.SectionId" name="Section" ng-options="S.SectionId as S.SectionName for S in Sections">
+                                        <option value="" selected="selected">Choose Option</option>
+                                    </select>
+                                    <div class="form-control-focus"> </div>
+                                    <span ng-show="submitted && formCommonFeilds.Section.$error.required" class="help-block">Section Required</span>
+                                </div>
+                            </div>
+                            @*<div class="form-group" ng-class="{ 'has-error' : submitted && formCommonFeilds.mainExam.$invalid}">
+                                    <div class="form-group">
+                                        <label class="col-md-5 control-label">
+                                            Stu. Type:
+                                        </label>
+                                        <div class="col-md-7">
+                                            <select class="form-control" ng-model="LIEOSetup.StuType" ng-options="StuType.StudentTypeId as StuType.StudentTypeName for StuType in CommonFeilds.StuType">
+                                                <option value="" selected="selected">Choose Option</option>
+                                            </select>
+                                            <div class="form-control-focus"> </div>
+                                        </div>
+                                    </div>
+                                </div>*@
+                            <div class="pull-right">
+                                <button ng-click="submitted=true;SearchLIEO()" type="submit" class="btn green">Show</button>
+                                <button type="button" ng-click="submitted=true;Report();" class="btn btn-info">Report</button>
+                                <button type="button" ng-click="submitted=false;resetForm();" class="btn info">Reset</button>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+            <div class="table-scrollable"> </div>
+            <div class="table-container">
+                <div class="row">
+                    <div class="col-md-4 pull-left">
+                        <div class="form-group">
+                            <div class="col-md-4" style="padding-left:0px">
+                                <select class="form-control" ng-model="pagesize" ng-options="P.value as P.text for P in pageSizeArray"></select>
+                            </div>
+                            <div class="col-md-6" style="text-align:left;padding-left: 0px;margin-top: 5px;">
+                                <label for="search" class="control-label">Items per page</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 pull-right">
+                        <div class="form-group">
+                            <div class="col-md-4">
+
+                            </div>
+                            <div class="col-md-8 form-group" style="padding-right:0px">
+                                <input ng-model="search" id="search" class="form-control" placeholder="Filter text">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="sample_3_wrapper" class="dataTables_wrapper no-footer">
+
+                    <table class="table table-bordered table-hover">
+                        <thead>
+                            <tr class="bg-primary">
+                                <th width="10%">Branch Name</th>
+                                <th width="10%">Shift Name</th>
+                                <th width="10%">Class Name</th>
+                            
+                                <th width="10%">Sectin Name</th>
+                                <th width="10%">Class Start</th>
+                                <th width="10%">Late In</th>
+                                <th width="10%">Class End</th>
+                                <th width="10%">Early Out </th>
+                                <th width="10%">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-show="LIEOSetupss.length <= 0"><td colspan="10" style="text-align:center;"><i class="fa fa-refresh"></i> Data not found!</td></tr>
+                            <tr dir-paginate="item in LIEOSetupss| filter:search | itemsPerPage:pagesize" current-page="currentPage">
+                                <td>{{item.BranchName}}</td>
+                                <td>{{item.ShiftName}}</td>
+                                <td>{{item.ClassName}}</td>
+                              
+                                <td>{{item.SectionName}}</td>
+                                <td>{{item.StartTime | date: "shortTime"}}</td>
+                                <td>{{item.LateInTime | date: "shortTime"}}</td>
+                                <td>{{item.EndTime | date: "shortTime"}}</td>
+                                <td>{{item.EarlyOutTime | date: "shortTime"}}</td>
+                                <td>
+                                    <a class="btn btn-icon-only green" ng-click="edit(item)" data-target="#addmodal" data-toggle="modal">
+                                        <i class="fa fa-edit"></i>
+                                    </a>
+                                    <a ng-click="deleteLIEOSetups(item)" href="javascript:;" class="btn btn-icon-only red">
+                                        <i class="fa fa-trash"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="row ">
+                        <dir-pagination-controls boundary-links="true" template-url="~/assets/angular/lib/dirPagination.tpl.html"></dir-pagination-controls>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--Modal Area Start-->
+        <div id="addmodal" class="modal fade" tabindex="-1" data-backdrop="static" data-keyboard="false">
+            <div class="modal-dialog">
+                <div class="modal-content modal-lg">
+                    <form name="frmLIEOSetup" ng-submit="SaveLIEO()" class="form-horizontal" novalidate>
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" ng-click="Reset()" aria-hidden="true">X</button>
+                            <h4 class="modal-title">{{modalTitle}}</h4>
+                        </div>
+                        <div class="modal-body">
+                            <div class="form-body">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="form-group" ng-class="{ 'has-error' : submitted1 && frmLIEOSetup.Session.$invalid}">
+                                            <label class="col-md-5 control-label">
+                                                Branch :
+                                                <span class="required">*</span>
+                                            </label>
+                                            <div class="col-md-7">
+                                                <select class="form-control" ng-model="LIEOSetupAdd.BranchId" required name="Session" ng-options="LIEOSetup.BranchId as LIEOSetup.BranchName for LIEOSetup in CommonFeilds.Branch">
+                                                    <option value="" selected="selected">Choose Option</option>
+                                                </select>
+                                                <div class="form-control-focus"> </div>
+                                                <span ng-show="submitted1 && frmLIEOSetup.Session.$error.required" class="help-block">Branch Required</span>
+                                            </div>
+                                        </div>
+                                        <div class="form-group" ng-class="{ 'has-error' : submitted1 && frmLIEOSetup.Session.$invalid}">
+                                            <label class="col-md-5 control-label">
+                                                Session :
+                                                <span class="required">*</span>
+                                            </label>
+                                            <div class="col-md-7">
+                                                <select class="form-control" ng-model="LIEOSetupAdd.SessionId" required name="Session" ng-options="LIEOSetup.SessionId as LIEOSetup.SessionName for LIEOSetup in CommonFeilds.Session">
+                                                    <option value="" selected="selected">Choose Option</option>
+                                                </select>
+                                                <div class="form-control-focus"> </div>
+                                                <span ng-show="submitted1 && frmLIEOSetup.Session.$error.required" class="help-block">Session Required</span>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group" ng-class="{ 'has-error' : submitted1 && frmLIEOSetup.Shift.$invalid}">
+                                            <label class="col-md-5 control-label">
+                                                Shift :
+                                                <span class="required">*</span>
+                                            </label>
+                                            <div class="col-md-7">
+                                                <select class="form-control" ng-model="LIEOSetupAdd.ShiftId" required name="Shift" ng-options="LIEOSetup.ShiftId as LIEOSetup.ShiftName for LIEOSetup in CommonFeilds.Shift | filter:{BranchId:LIEOSetupAdd.BranchId}:true">
+                                                    <option value="" selected="selected">Choose Option</option>
+                                                </select>
+                                                <div class="form-control-focus"> </div>
+                                                <span ng-show="submitted1 && frmLIEOSetup.Shift.$error.required" class="help-block">Shift Required</span>
+                                            </div>
+                                        </div>
+                                        <div class="form-group" ng-class="{ 'has-error' : submitted1 && frmLIEOSetup.Class.$invalid}">
+                                            <label class="col-md-5 control-label">
+                                                Class :
+                                                @*<span class="required">*</span>*@
+                                            </label>
+                                            <div class="col-md-7">
+                                                <select class="form-control" ng-model="LIEOSetupAdd.ClassId" required name="Class" ng-change="GetSection(LIEOSetupAdd.SessionId,LIEOSetupAdd.ShiftId,LIEOSetupAdd.ClassId)"  ng-options="LIEOSetup.ClassId as LIEOSetup.ClassName for LIEOSetup in CommonFeilds.ClassInfo | filter:{VersionId:LIEOSetupAdd.VersionId}:true">
+                                                    <option value="" selected="selected">Choose Option</option>
+                                                </select>
+                                                <div class="form-control-focus"> </div>
+                                                <span ng-show="submitted1 && frmLIEOSetup.Class.$error.required" class="help-block">Class Required</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group" ng-class="{ 'has-error' : submitted1 && frmLIEOSetup.Section.$invalid}">
+                                            <label class="col-md-5 control-label">
+                                                Section :
+                                                @*<span class="required">*</span>*@
+                                            </label>
+                                            <div class="col-md-7">
+                                                <select class="form-control" ng-model="LIEOSetupAdd.SectionId" required name="Section" ng-options="S.SectionId as S.SectionName for S in Sections">
+                                                    <option value="" selected="selected">Choose Option</option>
+                                                </select>
+                                                <div class="form-control-focus"> </div>
+                                                <span ng-show="submitted1 && frmLIEOSetup.Section.$error.required" class="help-block">Section Required</span>
+                                            </div>
+                                        </div>
+                                        @*<div class="form-group">
+                                                    <label class="col-md-5 control-label">
+                                                        Stu. Type:
+                                                    </label>
+                                                    <div class="col-md-7">
+                                                        <select class="form-control" ng-model="LIEOSetupAdd.TypeId" ng-options="StuType.StudentTypeId as StuType.StudentTypeName for StuType in CommonFeilds.StuType">
+                                                            <option value="" selected="selected">Choose Option</option>
+                                                        </select>
+                                                        <div class="form-control-focus"> </div>
+                                                    </div>
+                                            </div>*@
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group" ng-class="{ 'has-error' : submitted1 && (frmLIEOSetup.StartTime.$invalid)}">
+                                            <label class="col-md-5 control-label">
+                                                Start Time :
+                                                <span class="required">*</span>
+                                            </label>
+                                            <div class="col-md-7">
+                                                @*<div class="row">
+                                                        <select style="width:65px" name="EndHour" ng-model="LIEOSetupAdd.EndHour" ng-options="P.value as P.text for P in hours" class="form-control col-md-6" required>
+                                                            <option value="">--</option>
+                                                        </select>
+                                                        <select style="width:65px" name="EndMinutes" ng-model="LIEOSetupAdd.EndMinutes" ng-options="P.value as P.text for P in minutes" class="form-control col-md-6" required>
+                                                            <option value="">--</option>
+                                                        </select>
+                                                    </div>*@
+                                                <div class="input-icon">
+                                                    <i class="fa fa-clock-o"></i>
+                                                    <input type="time" class="form-control" ng-change="ChangeST()" ng-model="LIEOSetupAdd.Start" required name="StartTime">
+                                                </div>
+                                                <div class="form-control-focus"> </div>
+                                                <span class="error" ng-show="frmLIEOSetup.StartTime.$error.time">Not a valid Time! </span>
+                                                <span ng-show="submitted1 && (frmLIEOSetup.StartTime.$error.required)" class="help-block">Start Time Required</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group" ng-class="{ 'has-error' : submitted1 && frmLIEOSetup.EndTime.$invalid}">
+                                            <label class="col-md-5 control-label">
+                                                End Time:
+                                                <span class="required">*</span>
+                                            </label>
+                                            <div class="col-md-7">
+                                                <div class="input-icon">
+                                                    <i class="fa fa-clock-o"></i>
+                                                    <input type="time" class="form-control" ng-change="ChangeET()" ng-model="LIEOSetupAdd.End" required name="EndTime">
+                                                </div>
+                                                <div class="form-control-focus"> </div>
+                                                <span class="error" ng-show="frmLIEOSetup.EndTime.$error.time">Not a valid Time! </span>
+                                                <span ng-show="submitted1 && frmLIEOSetup.EndTime.$error.required" class="help-block">End Time Required</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group" ng-class="{ 'has-error' : submitted1 && frmLIEOSetup.LateInTime.$invalid}">
+                                            <label class="col-md-5 control-label">
+                                                Late In:
+                                                <span class="required">*</span>
+                                            </label>
+                                            <div class="col-md-7">
+                                                <div class="input-icon">
+                                                    <i class="fa fa-clock-o"></i>
+                                                    <input type="time" class="form-control" ng-change="ChangeLST()" ng-model="LIEOSetupAdd.LateIn" required name="LateInTime">
+                                                </div>
+                                                <div class="form-control-focus"> </div>
+                                                <span class="error" ng-show="frmLIEOSetup.LateInTime.$error.time">Not a valid Time! </span>
+                                                <span ng-show="submitted1 && frmLIEOSetup.LateInTime.$error.required" class="help-block">Late In Time Required</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group" ng-class="{ 'has-error' : submitted1 && frmLIEOSetup.EarlyOutTime.$invalid}">
+                                            <label class="col-md-5 control-label">
+                                                Early Out :
+                                                <span class="required">*</span>
+                                            </label>
+                                            <div class="col-md-7">
+                                                <div class="input-icon">
+                                                    <i class="fa fa-clock-o"></i>
+                                                    <input type="time" class="form-control" ng-change="ChangeLET()" ng-model="LIEOSetupAdd.EarlyOut" required name="EarlyOutTime">
+                                                </div>
+                                                <div class="form-control-focus"> </div>
+                                                <span class="error" ng-show="frmLIEOSetup.EarlyOutTime.$error.time">Not a valid Time! </span>
+                                                <span ng-show="submitted1 && frmLIEOSetup.EarlyOutTime.$error.required" class="help-block">Early Out Time Required</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="submit" ng-click="submitted1=true" class="btn green-haze" ng-disabled="btnDis">{{BTNValue}} <i ng-show="spin" class="fa fa-spinner fa-spin" style="font-size:20px"></i></button>
+                            <button type="button" data-dismiss="modal" class="btn dark btn-outline" ng-click="Reset();submitted1=false">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <!--Modal Area End-->
+    </div>
+</div>
+@section Scripts{
+    @*<script src="~/assets/global/plugins/bootstrap-timepicker/js/bootstrap-timepicker.js"></script>*@
+    <script type="text/javascript">
+        //$(".timepicker").timepicker();
+        OEMSApp.controller("ctrlLIEO", ["$scope", "$http", "SweetAlert", "$window", "$filter",
+                function ($scope, $http, SweetAlert, $window, $filter) {
+                    init();
+                    function init() {
+                        initialize();
+                        getAllCommons();
+                        GetAllLIEOSetups();  //for subExam
+                    }
+                    function initialize() {
+                        $scope.LIEOSetups = {};
+                        $scope.LIEOSetupAdd = {};
+                        $scope.LIEOSetups.LIEOSetupsId = 0;
+                        $scope.LIEOSetupss = [];
+                        $scope.CommonFeilds = [];
+                        $scope.res = {};
+                        $scope.data = {};
+                        $scope.getAllCommons = getAllCommons;
+                        $scope.GetAllLIEOSetups = GetAllLIEOSetups;
+                        $scope.SaveLIEO = SaveLIEO;
+                        $scope.SearchLIEO = SearchLIEO;
+                        $scope.modalTitle = "Save LIEO Setup";
+                        $scope.BTNValue = "Save";
+                        $scope.currentPage = 1;
+                        $scope.pagesize = 10;
+                        $scope.pageSizeArray = [];
+                        $scope.pageSizeArray.push({ value: 5, text: 5 });
+                        $scope.pageSizeArray.push({ value: 10, text: 10 });
+                        $scope.pageSizeArray.push({ value: 20, text: 20 });
+                        $scope.pageSizeArray.push({ value: 50, text: 50 });
+                        $scope.hours = [];
+                        $scope.hours.push({ value: 00, text: '00' });
+                        $scope.hours.push({ value: 01, text: '01' });
+                        $scope.hours.push({ value: 02, text: '02' });
+                        $scope.hours.push({ value: 03, text: '03' });
+                        $scope.hours.push({ value: 04, text: '04' });
+                        $scope.hours.push({ value: 05, text: '05' });
+                        $scope.hours.push({ value: 06, text: '06' });
+                        $scope.hours.push({ value: 07, text: '07' });
+                        $scope.hours.push({ value: 08, text: '08' });
+                        $scope.hours.push({ value: 09, text: '09' });
+                        $scope.hours.push({ value: 10, text: '10' });
+                        $scope.hours.push({ value: 11, text: '11' });
+                        $scope.hours.push({ value: 12, text: '12' });
+                        $scope.hours.push({ value: 13, text: '13' });
+                        $scope.hours.push({ value: 14, text: '14' });
+                        $scope.hours.push({ value: 15, text: '15' });
+                        $scope.hours.push({ value: 16, text: '16' });
+                        $scope.hours.push({ value: 17, text: '17' });
+                        $scope.hours.push({ value: 18, text: '18' });
+                        $scope.hours.push({ value: 19, text: '19' });
+                        $scope.hours.push({ value: 20, text: '20' });
+                        $scope.hours.push({ value: 21, text: '21' });
+                        $scope.hours.push({ value: 22, text: '22' });
+                        $scope.hours.push({ value: 23, text: '23' });
+                        $scope.hours.push({ value: 24, text: '24' });
+                        $scope.minutes = [];
+                        $scope.minutes.push({ value: 00, text: '00' });
+                        $scope.minutes.push({ value: 05, text: '05' });
+                        $scope.minutes.push({ value: 10, text: '10' });
+                        $scope.minutes.push({ value: 15, text: '15' });
+                        $scope.minutes.push({ value: 20, text: '20' });
+                        $scope.minutes.push({ value: 25, text: '25' });
+                        $scope.minutes.push({ value: 30, text: '30' });
+                        $scope.minutes.push({ value: 35, text: '35' });
+                        $scope.minutes.push({ value: 40, text: '40' });
+                        $scope.minutes.push({ value: 45, text: '45' });
+                        $scope.minutes.push({ value: 50, text: '50' });
+                        $scope.minutes.push({ value: 55, text: '55' });
+                    }
+
+                    $scope.resetForm = function resetForm() {
+                        //$scope.LIEOSetups = [];
+                        $scope.LIEOSetup = {};
+                        $scope.submitted = false;
+                        $scope.submitted1 = false;
+                        GetAllLIEOSetups();
+                    }
+                    $scope.Reset = function Reset() {
+                        $scope.LIEOSetupAdd = {};
+                        $scope.submitted = false;
+                        $scope.submitted1 = false;
+                        GetAllLIEOSetups();
+                        $scope.modalTitle = "Save LIEO Setup";
+                        $scope.BTNValue = "Save";
+                    }
+                    $scope.ChangeST = function ChangeST() {
+                        if ($scope.LIEOSetupAdd.LateIn != null) {
+                            if ($scope.LIEOSetupAdd.Start > $scope.LIEOSetupAdd.LateIn) {
+                                alert("Start time is greater than late in time.");
+                            }
+                        }
+                        if ($scope.LIEOSetupAdd.End != null) {
+                            if ($scope.LIEOSetupAdd.Start > $scope.LIEOSetupAdd.End) {
+                                alert("Start time is greater than end time.");
+                            }
+                        }
+                        if ($scope.LIEOSetupAdd.EarlyOut != null) {
+                            if ($scope.LIEOSetupAdd.Start > $scope.LIEOSetupAdd.EarlyOut) {
+                                alert("Start time is greater than early out time.");
+                            }
+                        }
+                    }
+                    $scope.ChangeET = function ChangeET() {
+                        if ($scope.LIEOSetupAdd.Start != null) {
+                            if ($scope.LIEOSetupAdd.End < $scope.LIEOSetupAdd.Start) {
+                                alert("End time is less than start time.");
+                            }
+                        }
+                        if ($scope.LIEOSetupAdd.LateIn != null) {
+                            if ($scope.LIEOSetupAdd.End < $scope.LIEOSetupAdd.LateIn) {
+                                alert("End time is less than late in time.");
+                            }
+                        }
+                        if ($scope.LIEOSetupAdd.EarlyOut != null) {
+                            if ($scope.LIEOSetupAdd.End < $scope.LIEOSetupAdd.EarlyOut) {
+                                alert("End time is less than early out time.");
+                            }
+                        }
+                    }
+                    $scope.ChangeLST = function ChangeLST() {
+                        if ($scope.LIEOSetupAdd.Start != null) {
+                            if ($scope.LIEOSetupAdd.LateIn < $scope.LIEOSetupAdd.Start) {
+                                alert("Late in time is less than start time.");
+                            }
+                        }
+                        if ($scope.LIEOSetupAdd.End != null) {
+                            if ($scope.LIEOSetupAdd.LateIn > $scope.LIEOSetupAdd.End) {
+                                alert("Late in time is greater than End time.");
+                            }
+                        }
+                        if ($scope.LIEOSetupAdd.EarlyOut != null) {
+                            if ($scope.LIEOSetupAdd.LateIn > $scope.LIEOSetupAdd.EarlyOut) {
+                                alert("Late in time is greater than early out time.");
+                            }
+                        }
+                    }
+                    $scope.ChangeLET = function ChangeLET() {
+                        if ($scope.LIEOSetupAdd.Start != null) {
+                            if ($scope.LIEOSetupAdd.EarlyOut < $scope.LIEOSetupAdd.Start) {
+                                alert("Early out time is less than start time.");
+                            }
+                        }
+                        if ($scope.LIEOSetupAdd.End != null) {
+                            if ($scope.LIEOSetupAdd.EarlyOut > $scope.LIEOSetupAdd.End) {
+                                alert("Early out time is greater than End time.");
+                            }
+                        }
+                        if ($scope.LIEOSetupAdd.LateIn != null) {
+                            if ($scope.LIEOSetupAdd.EarlyOut < $scope.LIEOSetupAdd.LateIn) {
+                                alert("Early out time is less than late in time.");
+                            }
+                        }
+                    }
+                    function getAllCommons() {
+                        $scope.CommonFeilds = [];
+                        $http({
+                            method: 'GET',
+                            url: baseUrl + 'Common/GetCommonItem/'
+                        }).then(function successCallback(response) {
+                            $scope.CommonFeilds = response.data.results;
+                            //console.log(window.location);
+                        }, function errorCallback(response) {
+                            toastr["info"](response.data.message);
+                        });
+                    }
+            
+                    $scope.GetSection = function GetSection(SessionId, ShiftId, ClassId) {
+                        $scope.Sections = [];
+                        $http({
+                            method: 'GET',
+                            url: baseUrl + 'Common/GetSection/' + SessionId + "/" + ShiftId + "/" + ClassId
+                        }).then(function successCallback(response) {
+                            $scope.Sections = response.data.results;
+                        }, function errorCallback(response) {
+                            //toastr["info"](response.data.message);
+                        });
+                    }
+
+                    function SaveLIEO() {
+                        if ($scope.frmLIEOSetup.$invalid)
+                            return;
+                
+                        $scope.LIEOSetupss = [];
+                        //.toUTCString()
+                        if ($scope.LIEOSetupAdd.LIEOId > 0) {
+                            $http({
+                                method: 'POST',
+                                url: baseUrl + 'Attendance/UpdateStudentLIEO/',
+                                data: $scope.LIEOSetupAdd
+                            }).then(function successCallback(response) {
+                                $scope.LIEOSetupss = response.data.results;
+                                $('#addmodal').modal('toggle')
+                                toastr[response.data.ttype](response.data.message);
+                                GetAllLIEOSetups();
+                            }, function errorCallback(response) {
+                                console.log(response);
+                                toastr[response.data.ttype](response.data.message);
+                            });
+                        } else {
+
+                            $http({
+                                method: 'POST',
+                                url: baseUrl + 'Attendance/AddStudentLIEO/',
+                                data: $scope.LIEOSetupAdd
+                            }).then(function successCallback(response) {
+                                //$scope.LIEOSetupss = response.data.results;
+                                toastr[response.data.ttype](response.data.message);
+                                $('#addmodal').modal('hide')
+                                GetAllLIEOSetups();
+                            }, function errorCallback(response) {
+                                toastr[response.data.ttype](response.data.message);
+                            });
+                        }
+                    };
+                    function SearchLIEO() {
+                        if ($scope.formCommonFeilds.$invalid)
+                            return;
+                        $scope.LIEOSetupss = [];
+                        if ($scope.LIEOSetup.ShiftId == null) {
+                            $scope.LIEOSetup.ShiftId = 0;
+                        }
+                        if ($scope.LIEOSetup.ClassId == null) {
+                            $scope.LIEOSetup.ClassId = 0;
+                        }
+                       
+                        if ($scope.LIEOSetup.SectionId == null) {
+                            $scope.LIEOSetup.SectionId = 0;
+                        }
+                        $http({
+                            method: 'POST',
+                            url: baseUrl + 'Attendance/GetStudentLIEOByShiftClass/',
+                            data: $scope.LIEOSetup
+                        }).then(function successCallback(response) {
+                            $scope.LIEOSetupss = response.data.results;
+                        }, function errorCallback(response) {
+                            toastr["info"](response.data.message);
+                        });
+                    };
+                    function GetAllLIEOSetups() {
+                        $scope.LIEOSetupss = [];
+                        $http({
+                            method: 'GET',
+                            url: baseUrl + 'Attendance/GetAllStudentLIEO/'
+                        }).then(function successCallback(response) {
+                            $scope.LIEOSetupss = response.data.results;
+                        }, function errorCallback(response) {
+                            toastr["info"](response.data.message);
+                        });
+                    };
+                    $scope.edit = function edit(n) {
+                        //console.log(n);
+                        GetAllLIEOSetups();
+                        $scope.LIEOSetupAdd = {};
+                        $scope.LIEOSetupAdd = n;
+
+                        var sessionid = n.SessionId;
+                        var shiftid = n.ShiftId
+                        var classid = n.ClassId
+                   
+
+              
+                        $scope.GetSection(sessionid, shiftid, classid)
+                        var a = new Date(n.EarlyOutTime);
+                        var b = new Date(n.LateInTime);
+                        var c = new Date(n.EndTime);
+                        var d = new Date(n.StartTime);
+                        $scope.LIEOSetupAdd.EarlyOut = a;
+                        $scope.LIEOSetupAdd.LateIn = b;
+                        $scope.LIEOSetupAdd.End = c;
+                        $scope.LIEOSetupAdd.Start = d;
+                        $scope.LIEOSetupAdd.SectionId = n.SectionId;
+                        $scope.modalTitle = "Update Student LIEO";
+                        $scope.BTNValue = "Update";
+
+                      console.log($scope.LIEOSetupAdd);
+                    }
+
+                    $scope.deleteLIEOSetups = function (LIEOSetups) {
+                        $scope.LIEOSetups = LIEOSetups;
+                        SweetAlert.swal({
+                            title: "Are you sure to delete it ?", type: "warning", showCancelButton: true, confirmButtonColor: "#DD6B55",
+                            confirmButtonText: "Yes, delete it!",
+                            closeOnConfirm: false
+                        },
+                        function (isConfirm) {
+                            if (isConfirm) {
+                                $http({
+                                    method: 'POST',
+                                    url: baseUrl + '/Attendance/DeleteStudentLIEO/', // + dividedExam
+                                    data: LIEOSetups
+                                }).then(function successCallback(response) {
+                                    SweetAlert.swal("Deleted!", "Your data has been deleted.", "success");
+                                    $scope.LIEOSetupss = response.data.results;
+                                }, function errorCallback(response) {
+                                    toastr["info"](response.data.message);
+                                });
+                            }
+                        });
+                    };
+
+                    $scope.Report = function Report() {
+                        if ($scope.formCommonFeilds.$invalid)
+                            return;
+                        if ($scope.LIEOSetup.ShiftId == 0) {
+                            $scope.LIEOSetup.ShiftId = null
+                        }
+                        if ($scope.LIEOSetup.ClassId == 0) {
+                            $scope.LIEOSetup.ClassId = null
+                        }
+                        if ($scope.LIEOSetup.GroupId == 0) {
+                            $scope.LIEOSetup.GroupId = null
+                        }
+                        if ($scope.LIEOSetup.SectionId == 0) {
+                            $scope.LIEOSetup.SectionId = null
+                        }
+                        $scope.uri = "@Url.Action("LIEOSetupReport", "Report")?SessionID=" + $scope.LIEOSetup.SessionId + "&BranchId=" + $scope.LIEOSetup.BranchId + "&ShiftId=" + $scope.LIEOSetup.ShiftId + "&ClassId=" + $scope.LIEOSetup.ClassId + "&SectionId=" + $scope.LIEOSetup.SectionId;
+                        $window.open($scope.uri, '_blank');
+                        //}
+                    }
+                }]);
+    </script>
+}
+
+
+
+
+
+

@@ -1,0 +1,593 @@
+﻿
+@{
+    ViewBag.Title = "Main Exam Assessment";
+}
+<style type="text/css">
+    input[type=number]::-webkit-inner-spin-button,
+    input[type=number]::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+
+    .table > tbody > tr > td, .table > tbody > tr > th, .table > tfoot > tr > td, .table > tfoot > tr > th, .table > thead > tr > td, .table > thead > tr > th {
+        padding: 0 0 0 5px !important;
+        line-height: 1.42857;
+        vertical-align: middle;
+        border-top: 1px solid #e7ecf1;
+    }
+
+    .shadow {
+        -webkit-box-shadow: 1px 1px 5px 1px rgba(106,111,168,1);
+        -moz-box-shadow: 1px 1px 5px 1px rgba(106,111,168,1);
+        box-shadow: 1px 1px 5px 1px rgba(106,111,168,1);
+    }
+</style>
+
+
+<div class="portlet light bordered" ng-controller="ctrlGrandAssessment">
+    <div class="portlet-title">
+        <div class="caption">
+            <i class="icon-settings font-green"></i>
+            <span class="caption-subject font-green sbold uppercase">@ViewBag.Title</span>
+        </div>
+    </div>
+    <div class="portlet-body">
+        <!-- BEGIN FORM-->
+        <form class="form-horizontal" ng-submit="Search()" name="frmFilter" method="post" enctype="multipart/form-data" novalidate>
+            <div class="form-body">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label class="col-md-5 control-label">
+                                Version :
+                            </label>
+                            <div class="col-md-7" ng-class="{ 'has-error' :isSubmitted  && frmFilter.Version.$invalid}">
+                                <select class="form-control" ng-model="StudentExamFilter.VersionID" required name="Version" ng-options="studentInfo.VersionId as studentInfo.VersionName for studentInfo in CommonFeilds.Version">
+                                    <option value="" selected>Please Select</option>
+                                </select>
+                                <div class="form-control-focus"> </div>
+                                <span ng-show="isSubmitted && frmFilter.Version.$error.required " class="help-block">Version Required</span>
+
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-5 control-label">
+                                Session :
+                            </label>
+                            <div class="col-md-7" ng-class="{ 'has-error' :isSubmitted && frmFilter.SessionId.$invalid}">
+                                <select class="form-control" name="SessionId" ng-model="StudentExamFilter.SessionId" required ng-options="studentInfo.SessionId as studentInfo.SessionName for studentInfo in CommonFeilds.Session | filter:{VersionId:StudentExamFilter.VersionId}:true">
+                                    <option value="" selected="selected">Please Select</option>
+                                </select>
+                                <span ng-show="isSubmitted && frmFilter.SessionId.$error.required" class="help-block">Session Required</span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-5 control-label">
+                                Branch :
+                            </label>
+                            <div class="col-md-7" ng-class="{ 'has-error' :isSubmitted && frmFilter.BranchID.$invalid }">
+                                <select class="form-control" name="BranchID" ng-model="StudentExamFilter.BranchID" ng-options="studentInfo.BranchId as studentInfo.BranchName for studentInfo in CommonFeilds.Branch" required>
+                                    <option value="" selected="selected">Please Select</option>
+                                </select>
+                                <span ng-show="isSubmitted && frmFilter.BranchID.$error.required" class="help-block">Branch Required</span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-5 control-label">
+                                Shift :
+                            </label>
+                            <div class="col-md-7" ng-class="{'has-error' : isSubmitted && frmFilter.Shift.$invalid}">
+                                <select class="form-control" ng-model="StudentExamFilter.ShiftId" name="Shift" ng-options="studentInfo.ShiftId as studentInfo.ShiftName for studentInfo in CommonFeilds.Shift | filter:{BranchId:StudentExamFilter.BranchID}:true" required>
+                                    <option value="" selected="selected">Please Select</option>
+                                </select>
+                                <span ng-show="isSubmitted && frmFilter.Shift.$error.required" class="help-block">Shift Required</span>
+
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label class="col-md-5 control-label">
+                                Class :
+                            </label>
+                            <div class="col-md-7" ng-class="{ 'has-error' :isSubmitted && frmFilter.ClassId.$invalid}">
+                                <select class="form-control" name="ClassId" ng-disabled="StudentExamFilter.VersionID == null" ng-model="StudentExamFilter.ClassId" ng-change="GetGroup(StudentExamFilter.ClassId);" ng-options="studentInfo.ClassId as studentInfo.ClassName for studentInfo in CommonFeilds.ClassInfo | filter:{VersionId:StudentExamFilter.VersionID}:true" required>
+                                    <option value="" selected="selected">Please Select</option>
+                                </select>
+                                <span ng-show="isSubmitted && frmFilter.ClassId.$error.required " class="help-block">Class Required</span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-5 control-label">
+                                Group :
+                            </label>
+                            <div class="col-md-7" ng-class="{ 'has-error' : isSubmitted && frmFilter.GroupId.$invalid}">
+                                <select class="form-control" name="GroupId" ng-change="GetSection(); getMainExam();" ng-model="StudentExamFilter.GroupId" ng-disabled="StudentExamFilter.ClassId==null" ng-options="G.GroupId as G.GroupName for G in Groups" required>
+                                    <option value="" selected="selected">Select</option>
+                                </select>
+                                <div class="form-control-focus"> </div>
+                                <span ng-show="isSubmitted && frmFilter.GroupId.$error.required" class="help-block">Session Required</span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-5 control-label">
+                                Section :
+                            </label>
+                            <div class="col-md-7" ng-class="{ 'has-error' :isSubmitted && frmFilter.SectionId.$invalid }">
+                                <select class="form-control" name="SectionId" ng-model="StudentExamFilter.SectionId" ng-disabled="StudentExamFilter.ClassId==null" ng-options="S.SectionId as S.SectionName for S in Sections" required>
+                                    @*FilterSer by Shahin 17July2017*@
+                                    <option value="" selected="selected">Please Select</option>
+                                </select>
+                                <span ng-show="isSubmitted && frmFilter.SectionId.$error.required" class="help-block">Section Required</span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-5 control-label">
+                                Main Exam :
+                            </label>
+                            <div class="col-md-7" ng-class="{'has-error' : isSubmitted && frmFilter.mainExam.$invalid}">
+                                <select class="form-control" ng-model="StudentExamFilter.MainExamId" name="mainExam" ng-options="mainexam.MainExamId as mainexam.MainExamName for mainexam in MainExams" required>
+                                    <option value="" selected="selected">Please Select</option>
+                                </select>
+                                <span ng-show="isSubmitted && frmFilter.mainExam.$error.required" class="help-block">Main Exam Required</span>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label class="col-md-5 control-label">
+                                Subject :
+                            </label>
+                            <div class="col-md-7" ng-class="{ 'has-error' :isSubmitted && frmFilter.SubID.$invalid}">
+                                <select class="form-control" name="SubID" ng-disabled="StudentAssessments.length > 0" ng-model="StudentExamFilter.SubjectID" ng-options="item.SubjectId as item.SubjectName for item in Subjects" required>
+                                    <option value="" selected="selected">Please Select</option>
+                                </select>
+                                <span ng-show="isSubmitted && frmFilter.SubID.$error.required " class="help-block">Subject Required</span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-md-5" style="text-align:right">
+                                @*<a style="margin-left:3px;" href="@Url.Action("StudentMarks","Report")?VersionID={{StudentExamFilter.VersionID}}&SessionId={{StudentExamFilter.SessionId}}&BranchID={{StudentExamFilter.BranchID}}&ShiftID={{StudentExamFilter.ShiftId}}&ClassId={{StudentExamFilter.ClassId}}&GroupId={{StudentExamFilter.GroupId}}&SectionId={{StudentExamFilter.SectionId}}&SubjectID={{StudentExamFilter.EmployeeID}}&MainExamId={{StudentExamFilter.MainExamId}}&SubExamId={{StudentExamFilter.SubExamId}}&DividedExamId={{StudentExamFilter.DividedExamId}}" class="btn btn-primary" target="_blank">Report</a>*@
+                                <button ng-click="isSubmitted=true" class="btn green">Search</button>
+                            </div>
+                            <div class="col-md-7" style="text-align:right">
+                                @*<a ng-click="_generateReport()" class="btn btn-info">Report</a>*@
+                                <a ng-click="ResetSource()" class="btn red">Reset</a>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        </form>
+        <clearfix></clearfix>
+        <form name="frm" ng-submit="Save()" method="post" enctype="multipart/form-data" novalidate>
+            <div ng-show="StudentAssessments.length > 0" class="table-container shadow">
+                <table class="table table-bordered table-inverse fixed-table-toolbar">
+                    <thead class="btn-primary">
+                        <tr>
+                            <th> ID </th>
+                            <th> Name </th>
+                            <th> Roll </th>
+                            <th ng-show="StudentExamFilter.SubjectID==1 || StudentExamFilter.SubjectID==2"> HandWriting </th>
+                            <th ng-show="StudentExamFilter.SubjectID==1 || StudentExamFilter.SubjectID==2"> PicReading </th>
+                            <th ng-show="StudentExamFilter.SubjectID==1 || StudentExamFilter.SubjectID==2"> Recitation </th>
+                            <th ng-show="StudentExamFilter.SubjectID==1 || StudentExamFilter.SubjectID==2"> Conversation </th>
+                            <th ng-show="StudentExamFilter.SubjectID==1 || StudentExamFilter.SubjectID==2"> ColourSense </th>
+                            <th ng-show="StudentExamFilter.SubjectID==3"> Art </th>
+                            <th ng-show="StudentExamFilter.SubjectID==3"> Music </th>
+                            <th ng-show="StudentExamFilter.SubjectID==3"> ParticipationInGames </th>
+                            <th ng-show="StudentExamFilter.SubjectID==4"> Obedience </th>
+                            <th ng-show="StudentExamFilter.SubjectID==4"> Tolerance </th>
+                            <th ng-show="StudentExamFilter.SubjectID==4"> SelfReliance </th>
+                            <th ng-show="StudentExamFilter.SubjectID==4"> Leadership </th>
+                            <th ng-show="StudentExamFilter.SubjectID==4"> Interaction_with_Teachers_and_Peers </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="item in StudentAssessments">
+                            <td> {{item.StudentInsID}} </td>
+                            <td width="25%"> {{item.FullName}} </td>
+                            <td> {{item.RollNo}} </td>
+                            <td width="15%" ng-show="StudentExamFilter.SubjectID==1 || StudentExamFilter.SubjectID==2">
+                                <input type="number" ng-model="item.HandWriting" class="inputs" placeholder="HandWriting" style="width:100px;" onfocus="if (parseFloat(this.value) == 0) { this.value = ''; }" onchange="if (this.value>100 || this.value<0) { this.value = '0';}">
+                            </td>
+                            <td width="15%" ng-show="StudentExamFilter.SubjectID==1 || StudentExamFilter.SubjectID==2">
+                                <input type="number" ng-model="item.PicReading" class="inputs" placeholder="PicReading" style="width:100px;" onfocus="if (parseFloat(this.value) == 0) { this.value = ''; }" onchange="if (this.value>100 || this.value<0) { this.value = '0';}">
+                            </td>
+                            <td width="15%" ng-show="StudentExamFilter.SubjectID==1 || StudentExamFilter.SubjectID==2">
+                                <input type="number" ng-model="item.Recitation" class="inputs" placeholder="Recitation" style="width:100px;" onfocus="if (parseFloat(this.value) == 0) { this.value = ''; }" onchange="if (this.value>100 || this.value<0) { this.value = '0';}">
+                            </td>
+                            <td width="15%" ng-show="StudentExamFilter.SubjectID==1 || StudentExamFilter.SubjectID==2">
+                                <input type="number" ng-model="item.Conversation" class="inputs" placeholder="Conversation" style="width:100px;" onfocus="if (parseFloat(this.value) == 0) { this.value = ''; }" onchange="if (this.value>100 || this.value<0) { this.value = '0';}">
+                            </td>
+                            <td width="15%" ng-show="StudentExamFilter.SubjectID==1 || StudentExamFilter.SubjectID==2">
+                                <input type="number" ng-model="item.ColourSense" class="inputs" placeholder="ColourSense" style="width:100px;" onfocus="if (parseFloat(this.value) == 0) { this.value = ''; }" onchange="if (this.value>100 || this.value<0) { this.value = '0';}">
+                            </td>
+                            <td width="15%" ng-show="StudentExamFilter.SubjectID==3">
+                                <input type="number" ng-model="item.Art" class="inputs" placeholder="Art" style="width:100px;" onfocus="if (parseFloat(this.value) == 0) { this.value = ''; }" onchange="if (this.value>100 || this.value<0) { this.value = '0';}">
+                            </td>
+                            <td width="15%" ng-show="StudentExamFilter.SubjectID==3">
+                                <input type="number" ng-model="item.Music" class="inputs" placeholder="Music" style="width:100px;" onfocus="if (parseFloat(this.value) == 0) { this.value = ''; }" onchange="if (this.value>100 || this.value<0) { this.value = '0';}">
+                            </td>
+                            <td width="15%" ng-show="StudentExamFilter.SubjectID==3">
+                                <input type="number" ng-model="item.ParticipationInGames" class="inputs" placeholder="ParticipationInGames" style="width:100px;" onfocus="if (parseFloat(this.value) == 0) { this.value = ''; }" onchange="if (this.value>100 || this.value<0) { this.value = '0';}">
+                            </td>
+                            <td width="15%" ng-show="StudentExamFilter.SubjectID==4">
+                                <input type="number" ng-model="item.Obedience" class="inputs" placeholder="Obedience" style="width:100px;" onfocus="if (parseFloat(this.value) == 0) { this.value = ''; }" onchange="if (this.value>100 || this.value<0) { this.value = '0';}">
+                            </td>
+                            <td width="15%" ng-show="StudentExamFilter.SubjectID==4">
+                                <input type="number" ng-model="item.Tolerance" class="inputs" placeholder="Tolerance" style="width:100px;" onfocus="if (parseFloat(this.value) == 0) { this.value = ''; }" onchange="if (this.value>100 || this.value<0) { this.value = '0';}">
+                            </td>
+                            <td width="15%" ng-show="StudentExamFilter.SubjectID==4">
+                                <input type="number" ng-model="item.SelfReliance" class="inputs" placeholder="SelfReliance" style="width:100px;" onfocus="if (parseFloat(this.value) == 0) { this.value = ''; }" onchange="if (this.value>100 || this.value<0) { this.value = '0';}">
+                            </td>
+                            <td width="15%" ng-show="StudentExamFilter.SubjectID==4">
+                                <input type="number" ng-model="item.Leadership" class="inputs" placeholder="Leadership" style="width:100px;" onfocus="if (parseFloat(this.value) == 0) { this.value = ''; }" onchange="if (this.value>100 || this.value<0) { this.value = '0';}">
+                            </td>
+                            <td width="15%" ng-show="StudentExamFilter.SubjectID==4">
+                                <input type="number" ng-model="item.Interaction_with_Teachers_and_Peers" class="inputs" placeholder="Interaction with Teachers and Peers" style="width:100px;" onfocus="if (parseFloat(this.value) == 0) { this.value = ''; }" onchange="if (this.value>100 || this.value<0) { this.value = '0';}">
+                            </td>
+                        </tr>
+                        <tr ng-show="StudentAssessments.length > 0">
+                            <td colspan="10">
+                                <button ng-click="isSubmitted=true" class="btn btn-primary pull-right">&nbsp; Save &nbsp;</button>
+                            </td>
+                        </tr>
+
+                    </tbody>
+                </table>
+            </div>
+        </form>
+
+    </div>
+    <!-- END FORM-->
+</div>
+
+@section Scripts{
+
+    <script type="text/javascript">
+
+        OEMSApp.controller("ctrlGrandAssessment", ["$scope", "$http", "SweetAlert", "blockUI", "$window",
+                  function ($scope, $http, SweetAlert, blockUI, $window) {
+
+                      init();
+                      function init() {
+                          initialize();
+                          getAllDropdowns();
+                          getAllCommons();
+                          getSubjects();
+
+                      }
+                      function initialize() {
+                          $scope.StudentAssessments = [];
+                          $scope.StudentExamFilter = {};
+                          $scope.studentInfo = {};
+                          $scope.StudentInfos = [];
+                          $scope.Dropdowns = [];
+                          $scope.CommonFeilds = [];
+                          $scope.Versions = [];
+                          $scope.MainExams = [];
+
+                          $scope.Subjects = [];
+
+                          $scope.currentPage = 1;
+                          $scope.pageno = 1;
+                          $scope.pagesize = 1000;
+                          $scope.total_count = 1200;
+                          $scope.txtsearch = '';
+                          $scope.getAllDropdowns = getAllDropdowns;
+                          $scope.Search = Search;
+                          $scope.getAllCommons = getAllCommons;
+                          $scope.getSubjects = getSubjects;
+
+
+                          $scope.btnDis = false;
+                          $scope.spin = false;
+
+                      };
+
+                      function setProgress(s) {
+                          $scope.btnDis = s;
+                          $scope.spin = s;
+                      }
+                      //for class ways report ........
+                      $scope.generateReport = function generateReport() {
+                          if ($scope.StudentExamFilter.VersionID == null) {
+                              toastr["info"]("Select a Version.");
+                          }
+                          else if ($scope.StudentExamFilter.SessionId == null) {
+                              toastr["info"]("Select a Session.");
+                          }//StudentExamFilter. SessionId BranchID ShiftId ClassId GroupId SectionId
+                          else if ($scope.StudentExamFilter.BranchID == null) {
+                              toastr["info"]("Select a Branch.");
+                          } else if ($scope.StudentExamFilter.ShiftId == null) {
+                              toastr["info"]("Select a Shift.");
+                          } else if ($scope.StudentExamFilter.ClassId == null) {
+                              toastr["info"]("Select a Class.");
+                          } else if ($scope.StudentExamFilter.GroupId == null) {
+                              toastr["info"]("Select a Group.");
+                          } else if ($scope.StudentExamFilter.SectionId == null) {
+                              toastr["info"]("Select a Section.");
+                          } else if ($scope.StudentExamFilter.GrandExamId == null) {
+                              toastr["info"]("Select a Main Exam.");
+                          } else if ($scope.StudentExamFilter.SubjectID == null) {
+                              toastr["info"]("Select a Subject.");
+                          }
+                          else {//,,,
+                          }
+
+                      }
+
+                      $scope.GetGroup = function GetGroup(classid) {
+                          $scope.Groups = [];
+
+                          $http({
+                              method: 'GET',
+                              url: baseUrl + 'Common/GetGroup/' + classid
+                          }).then(function successCallback(response) {
+                              $scope.Groups = response.data.results;
+
+
+                          }, function errorCallback(response) {
+                              toastr["error"](response.data.Message);
+                          });
+
+                      }
+                      $scope.GetSection = function GetSection() {
+                          $scope.Sections = [];
+                          $http({
+                              method: 'GET',
+                              url: baseUrl + 'Common/GetSection/' + $scope.StudentExamFilter.SessionId + "/" + $scope.StudentExamFilter.ShiftId + "/" + $scope.StudentExamFilter.ClassId + "/" + $scope.StudentExamFilter.GroupId
+                          }).then(function successCallback(response) {
+                              $scope.Sections = response.data.results;
+                          }, function errorCallback(response) {
+                              toastr["error"](response.data.Message);
+                          });
+
+                      }
+
+                      function Report() {
+                          $scope.StudentInfos = [];
+                          if ($scope.frmFilter.$invalid == true)
+                              return;
+                          $http({
+                              method: 'POST',
+                              url: baseUrl + 'Report/StudentMarks/',
+                              data: $scope.StudentExamFilter
+                          }).then(function successCallback(response) {
+                              $scope.StudentInfos = response.data.results;
+                              toastr["success"](response.data.message);
+                              blockUI.stop();
+                          }, function errorCallback(response) {
+                              toastr["error"]("opps! Something went wrong. Data not found.");
+                              blockUI.stop();
+                          });
+
+                      };
+                      function Search() {
+                          setProgress(true);
+                          $http({
+                              method: 'GET',
+                              url: baseUrl + 'Result/GetAssessment/' + $scope.StudentExamFilter.MainExamId + '/' + $scope.StudentExamFilter.SubjectID + '/' + $scope.StudentExamFilter.VersionID + '/' + $scope.StudentExamFilter.SessionId + '/' + $scope.StudentExamFilter.BranchID + '/' + $scope.StudentExamFilter.ShiftId + '/' + $scope.StudentExamFilter.ClassId + '/' + $scope.StudentExamFilter.GroupId + '/' + $scope.StudentExamFilter.SectionId
+                          }).then(function successCallback(response) {
+                              $scope.StudentAssessments = response.data.results;
+                              toastr["info"](response.data.message);
+                          }, function errorCallback(response) {
+                              toastr["error"](response.data.Message);
+                          });
+
+                      };
+
+
+                      $scope.Save = function Save() {
+                          if ($scope.StudentAssessments.length == 0)
+                              return;
+                          setProgress(true);
+                          $http({
+                              method: 'POST',
+                              url: baseUrl + 'Result/AddAssessment/',// + $scope.StudentExamFilter.VersionID + '/' + $scope.StudentExamFilter.SessionId + '/' + $scope.StudentExamFilter.BranchID + '/' + $scope.StudentExamFilter.ShiftId + '/' + $scope.StudentExamFilter.ClassId + '/' + $scope.StudentExamFilter.GroupId + '/' + $scope.StudentExamFilter.SectionId,
+                              data: $scope.StudentAssessments
+                          }).then(function successCallback(response) {
+                              $scope.spin = false;
+                              setProgress(false);
+                              toastr["success"](response.data.message);
+                              Search();
+                          }, function errorCallback(response) {
+                              toastr["error"](response.data.Message);
+                          });
+
+                      };
+
+                      $scope.MainExamDeleteAllMark = function MainExamDeleteAllMark() {
+                          if ($scope.StudentInfos.length == 0)
+                              return;
+                          $http({
+                              method: 'POST',
+                              url: baseUrl + 'Result/BulkDeleteStudentMark/',
+                              data: $scope.StudentExamFilter
+                          }).then(function successCallback(response) {
+                              toastr["info"](response.data.message);
+                              Search();
+                          }, function errorCallback(response) {
+                              toastr["error"](response.data.Message);
+                          });
+                      }
+                      $scope.Reset = function Reset() {
+
+                          initialize();
+                          $scope.frmFilter.$setPristine();
+                          $scope.frmFilter.$setUntouched();
+                          getAllDropdowns();
+                          getAllCommons();
+                          $scope.isSubmitted = false;
+                      };
+                      $scope.ResetSource = function ResetSource() {
+                          $scope.StudentAssessments = [];
+                          $scope.allCheck = false;
+                      };
+
+
+                      function getAllDropdowns() {
+                          $scope.Dropdowns = [];
+
+                          $http({
+                              method: 'GET',
+                              url: baseUrl + 'Common/GetAllDropDown/'
+                          }).then(function successCallback(response) {
+                              $scope.Dropdowns = response.data.results;
+
+
+                          }, function errorCallback(response) {
+                              toastr["error"](response.data.Message);
+                          });
+                      }
+
+                      function getAllCommons() {
+                          $scope.CommonFeilds = [];
+
+                          $http({
+                              method: 'GET',
+                              url: baseUrl + 'Common/GetCommonItem/'
+                          }).then(function successCallback(response) {
+                              $scope.CommonFeilds = response.data.results;
+
+                          }, function errorCallback(response) {
+                              toastr["error"](response.data.Message);
+                          });
+                      }
+                      function getAllVersions() {
+                          $scope.Versions = [];
+
+                          $http({
+                              method: 'GET',
+                              url: baseUrl + 'Common/GetCommonItem/'
+                          }).then(function successCallback(response) {
+                              $scope.Versions = response.data.results;
+                          }, function errorCallback(response) {
+                              toastr["error"](response.data.Message);
+                          });
+                      }
+                      function getAllSeesion() {
+                          $scope.Sessions = [];
+
+                          $http({
+                              method: 'GET',
+                              url: baseUrl + 'Common/GetCommonItem/'
+                          }).then(function successCallback(response) {
+                              $scope.Sessions = response.data.results;
+                          }, function errorCallback(response) {
+                              toastr["error"](response.data.Message);
+                          });
+                      }
+
+                      function getAllShift() {
+                          $scope.Shifts = [];
+
+                          $http({
+                              method: 'GET',
+                              url: baseUrl + 'Common/GetCommonItem/'
+                          }).then(function successCallback(response) {
+                              $scope.Shifts = response.data.results;
+                          }, function errorCallback(response) {
+                              toastr["error"](response.data.Message);
+                          });
+                      }
+                      function getAllClass() {
+                          $scope.CommonFeilds = [];
+
+                          $http({
+                              method: 'GET',
+                              url: baseUrl + 'Common/GetCommonItem/'
+                          }).then(function successCallback(response) {
+                              $scope.CommonFeilds = response.data.results;
+                          }, function errorCallback(response) {
+                              toastr["error"](response.data.Message);
+                          });
+                      }
+                      function getAllSection() {
+                          $scope.CommonFeilds = [];
+
+                          $http({
+                              method: 'GET',
+                              url: baseUrl + 'Common/GetCommonItem/'
+                          }).then(function successCallback(response) {
+                              $scope.CommonFeilds = response.data.results;
+                              //$scope.CommonFeilds = [];
+                          }, function errorCallback(response) {
+                              toastr["error"](response.data.Message);
+                          });
+                      }
+                      $scope.getMainExam = function getMainExam() {
+                          $scope.MainExams = [];
+                          $http({
+                              method: 'GET',
+                              url: baseUrl + 'ExamSetup/GetMainExamBySession/' + $scope.StudentExamFilter.VersionID + "/" + $scope.StudentExamFilter.SessionId + "/" + $scope.StudentExamFilter.ClassId + "/" + $scope.StudentExamFilter.GroupId
+                          }).then(function successCallback(response) {
+                              $scope.MainExams = response.data.results;
+                          }, function errorCallback(response) {
+                              toastr["error"](response.data.Message);
+                          });
+                      }
+
+
+                      function getSubjects() {
+                          $scope.Subjects = [];
+                          $http({
+                              method: 'GET',
+                              url: baseUrl + 'GrandResult/GetAssessmentSubject/'
+                          }).then(function successCallback(response) {
+                              $scope.Subjects = response.data.results;
+                          }, function errorCallback(response) {
+                              toastr["error"](response.data.Message);
+                          });
+                      }
+
+
+
+                  }]);
+    </script>
+    <script type="text/javascript">
+
+
+        $(document).ready(function ($) {
+
+            // Disable scroll when focused on a number input.
+            $(document).on('focus', 'input[type=number]', function (e) {
+                $(this).on('wheel', function (e) {
+                    e.preventDefault();
+                });
+            });
+
+            // Restore scroll on number inputs.
+            $(document).on('blur', 'input[type=number]', function (e) {
+                $(this).off('wheel');
+            });
+
+            // Disable up and down keys.
+            $(document).on('keydown', 'input[type=number]', function (e) {
+                if (e.which == 38 || e.which == 40)
+                    e.preventDefault();
+                //if (e.keyCode == 13) {
+                //    $(this).next('input[type=number]').focus();
+                //}
+                if (e.which === 13 || e.which == 40) {
+                    var index = $('.inputs').index(this) + 1;
+                    $('.inputs').eq(index).focus();
+                }
+                if (e.which == 38) {
+                    var index = $('.inputs').index(this) - 1;
+                    $('.inputs').eq(index).focus();
+                }
+            });
+
+
+        });
+    </script>
+
+}

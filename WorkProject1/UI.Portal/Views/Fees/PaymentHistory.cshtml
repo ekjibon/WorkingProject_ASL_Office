@@ -1,0 +1,134 @@
+﻿
+@{
+    ViewBag.Title = "PaymentHistory";
+}
+
+<div ng-controller="PaymentHistoryCtrl">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="fessPayment">
+                <h3>Payment History</h3>
+
+
+                <div class="table-responsive">
+                    <table class="table   table-striped">
+                        <thead class="tableHead">
+                            <tr>
+                                @*<th scope="col">Version</th>*@
+                                @*<th scope="col">Session</th>
+                                    <th scope="col">Branch</th>
+                                    <th scope="col">Shift</th>
+                                    <th scope="col">Class</th>
+                                    <th scope="col">Group</th>
+                                    <th scope="col">Section</th>
+                                    <th scope="col">Name</th>*@
+                                <th scope="col">Sl</th>
+                                <th scope="col">Student ID</th>
+
+                                @*<th scope="col">Roll</th>*@
+                                <th scope="col">TrxnNo</th>
+                                <th scope="col">Payment Mode</th>
+                                <th scope="col">Amount</th>
+                                <th scope="col">Month</th>
+                                <th scope="col">Collection Date</th>
+                                @*<th scope="col">Collection Time</th>*@
+                                <th scope="col">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-show="PaymentHistories.length <= 0"><td colspan="14" style="text-align:center;"><i class="fa fa-refresh"></i> Loading new data!!</td></tr>
+                            <tr dir-paginate="item in PaymentHistories| filter:q  | itemsPerPage: pageSize" current-page="currentPage">
+                                <td>{{$index + 1 }}</td>
+
+                                @*<td>{{item.VersionName}}</td>*@
+
+                                @*<td>{{item.SessionName}}</td>
+                                    <td>{{item.BranchName}}</td>
+                                    <td>{{item.ShiftName}}</td>
+                                    <td>{{item.ClassName}}</td>
+                                    <td>{{item.GroupName}}</td>
+                                    <td>{{item.SectionName}}</td>
+                                    <td>{{item.FullName}}</td>*@
+                                <td>{{item.StudentInsID}}</td>
+                                @*<td>{{item.RollNo}}</td>*@
+                                <td>{{item.TrxID}}</td>
+                                <td>{{item.PType}}</td>
+                                <td>{{item.TotalAmount}}</td>
+                                <td>{{item.MonthName}}</td>
+                                <td>{{item.BankCollectionDate | date:'dd/MM/yyyy'}} ({{item.BankCollectionDate | date:'h:mm a'}})</td>
+                                @*<td>{{item.BankCollectionDate | date:'h:mm a'}}</td>*@
+
+                                <td width="15%">
+                                    <a href="@Url.Action("PaymentHistory","PortalReport")?Id={{item.Id}}" class="btn btn-primary" target="_blank">Print</a>
+
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+
+
+</div>
+@section Scripts{
+
+
+
+
+    <script type="text/javascript">
+
+    OEMSApp.controller("PaymentHistoryCtrl", ["$scope", "$http", "SweetAlert", "blockUI", "$window", "$filter",
+   function ($scope, $http, SweetAlert, blockUI, $window, $filter) {
+               init();
+
+               function init() {
+
+
+
+                   getPaymentHistory();
+
+                   $scope.PaymentHistory = {};
+                   $scope.PaymentHistories = [];
+
+                   $scope.pageSizeArray = [];
+                   $scope.pageSizeArray.push({ value: 5, text: 5 });
+                   $scope.pageSizeArray.push({ value: 10, text: 10 });
+                   $scope.pageSizeArray.push({ value: 20, text: 20 });
+                   $scope.pageSizeArray.push({ value: 50, text: 50 });
+                   $scope.currentPage = 1;
+                   $scope.pageSize = 10;
+
+               }
+
+
+               function getPaymentHistory() {
+                   $scope.PaymentHistories = [];
+                   $http({
+                       method: 'GET',
+                       url: baseUrl + 'PortalFees/PaymentHistory/'
+                   }).then(function successCallback(response) {
+                       console.log(response);
+                       $scope.PaymentHistories = response.data.results;
+                       console.log($scope.PaymentHistory);
+                   }, function errorCallback(response) {
+                       toastr["warning"](response.data.Message);
+                   });
+               }
+
+
+
+
+
+
+
+
+           }]);
+    </script>
+}
+

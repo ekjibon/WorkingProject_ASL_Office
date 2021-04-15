@@ -1,0 +1,1 @@
+for %%X in (*.SQL) do SQLCMD -S 192.168.20.2 -d cgsd_new_2019 -U cdbuser -P {CdbU$er}p@SS! -I -i "%%X" >> _ResultScript.txt

@@ -1,0 +1,576 @@
+﻿
+@{
+    ViewBag.Title = "Subject Wise Assessment";
+}
+<div ng-controller="subWiseAssesstmentClt">
+    <!-- Begin: life time stats -->
+    <div class="portlet light bordered">
+        <div class="portlet-title">
+            <div class="caption">
+                <i class="icon-settings font-green"></i>
+                <span class="caption-subject font-green sbold uppercase">@ViewBag.Title</span>
+            </div>
+            <div class="actions">
+                    <div class="btn-group btn-group-solid">
+                        <button ng-click="Reset()" class="btn green" data-target="#addmodal" data-toggle="modal"> <i class="fa fa-plus"></i> Add Assessment</button>
+                    </div>
+                </div>
+        </div>
+        <form novalidate name="mform" class="form-horizontal" id="form_sample_1">
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="form-group" ng-class="{ 'has-error' : submitted1 && mform.Session.$invalid}">
+                        <label class="col-md-5 control-label">
+                            Session:
+                            <span class="required">*</span>
+                        </label>
+                        <div class="col-md-7">
+                            <select class="form-control" ng-model="filterAssestment.SessionId" name="Session" ng-options="studentInfo.SessionId as studentInfo.SessionName for studentInfo in CommonFeilds.Session" required>
+                                <option value="" selected="selected">Choose Option</option>
+                            </select>
+                            <div class="form-control-focus"> </div>
+                            <span ng-show="submitted1 && mform.Session.$error.required" class="help-block">Session Required</span>
+
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group" ng-class="{ 'has-error' : submitted1 && mform.Term.$invalid}">
+                        <label class="col-md-5 control-label">
+                            Term :
+                            <span class="required">*</span>
+                        </label>
+                        <div class="col-md-7">
+                            <select class="form-control" ng-model="filterAssestment.TermId" ng-disabled="filterAssestment.ClassId==null" name="Term" ng-options="T.TermId as T.Name for T in Terms |filter:{ClassId:filterAssestment.ClassId}:true" required>
+                                <option value="" selected="selected">Choose Option</option>
+                            </select>
+                            <div class="form-control-focus"> </div>
+                            <span ng-show="submitted1 && mform.Term.$error.required" class="help-block">Term Required</span>
+                        </div>
+                    </div>
+               </div>
+                <div class="col-md-4">
+                    <div class="form-group" ng-class="{ 'has-error' : submitted1 && mform.Subject.$invalid}">
+                        <label class="col-md-5 control-label">
+                            Subject :
+                            <span class="required">*</span>
+                        </label>
+                        <div class="col-md-7">
+                            <select class="form-control" ng-disabled="filterAssestment.ClassId==null" ng-model="filterAssestment.SubjectId" name="Subject" ng-options="S.SubID as S.SubjectName for S in SubjectSetups.results |filter:{ClassId:filterAssestment.ClassId}:true" required>
+                                <option value="" selected="selected">Choose Option</option>
+                            </select>
+                            <div class="form-control-focus"> </div>
+                            <span ng-show="submitted1 && mform.Subject.$error.required" class="help-block">Subject Required</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <div class="row" style="margin-top: 1%;">
+                <div class="col-md-4">
+                    <div class="form-group" ng-class="{ 'has-error' : submitted1 && mform.class.$invalid}">
+                        <label class="col-md-5 control-label">
+                            Class
+                            <span class="required">*</span>
+                        </label>
+                        <div class="col-md-7">
+                            <select class="form-control" ng-model="filterAssestment.ClassId" name="class" required ng-options="class.ClassId as class.ClassName for class in CommonFeilds.ClassInfo">
+                                <option value="" selected="selected">Choose Option</option>
+                            </select>
+                            <div class="form-control-focus"> </div>
+                            <span ng-show="submitted1 && mform.class.$error.required" class="help-block">Class Name Required</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group" ng-class="{ 'has-error' : submitted1 && mform.MainExam.$invalid}">
+                        <label class="col-md-5 control-label">
+                            Main Exam :
+                            <span class="required">*</span>
+                        </label>
+                        <div class="col-md-7">
+                            <select class="form-control" ng-disabled="filterAssestment.TermId==null" ng-change="getSubject()" ng-model="filterAssestment.MainExamId" name="MainExam" ng-options="T.MainExamId as T.MainExamName for T in mainExams |filter:{TermId:filterAssestment.TermId}:true" required>
+                                <option value="" selected="selected">Choose Option</option>
+                            </select>
+                            <div class="form-control-focus"> </div>
+                            <span ng-show="submitted1 && mform.MainExam.$error.required" class="help-block">Main Exam Required</span>
+                        </div>
+                    </div>
+                  
+                </div>
+                <div class="col-md-4">
+                    <div class="pull-right">
+                        <button type="reset" ng-click="resetForm()" class="btn red">Clear</button>
+                        <button ng-click="AssessmentListByFilter();submitted1=true" class="btn green">Show</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+        <!--Modal Area Start-->
+        <div id="addmodal" class="modal fade" tabindex="-1" data-backdrop="static" data-keyboard="false">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <form name="addform" ng-submit="save()" class="form-horizontal" id="form_sample_1" novalidate>
+                        <div class="modal-header">
+                            <button type="button" class="close" ng-click="Reset()" data-dismiss="modal" aria-hidden="true">X</button>
+                            <h4 class="modal-title">{{aemodalTitle}}</h4>
+                        </div>
+                        <div class="modal-body">
+                            <div class="form-body">
+                                <div class="col-md-12">
+                                    <div class="form-group" ng-class="{ 'has-error' : submitted && addform.Session.$invalid}">
+                                        <label class="col-md-3 control-label">
+                                            Session:
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-9">
+                                            <select class="form-control" ng-model="SubAssestment.SessionId" name="Session" ng-options="studentInfo.SessionId as studentInfo.SessionName for studentInfo in CommonFeilds.Session" required>
+                                                <option value="" selected="selected">Choose Option</option>
+                                            </select>
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted && addform.Session.$error.required" class="help-block">Session Required</span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group" ng-class="{ 'has-error' : submitted && addform.class.$invalid}">
+                                        <label class="col-md-3 control-label">
+                                            Class
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-9">
+                                            <select class="form-control" ng-model="SubAssestment.ClassId" name="class" required ng-options="class.ClassId as class.ClassName for class in CommonFeilds.ClassInfo">
+                                                <option value="" selected="selected">Choose Option</option>
+                                            </select>
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted && addform.class.$error.required" class="help-block">Class Name Required</span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group" ng-class="{ 'has-error' : submitted && addform.Term.$invalid}">
+                                        <label class="col-md-3 control-label">
+                                            Term :
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-9">
+                                            <select class="form-control" ng-model="SubAssestment.TermId" ng-disabled="SubAssestment.ClassId==null" name="Term" ng-change="SubjectListById(SubAssestment)" ng-options="T.TermId as T.Name for T in Terms|filter:{ClassId:SubAssestment.ClassId}:true" required>
+                                                <option value="" selected="selected">Choose Option</option>
+                                            </select>
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted && addform.Term.$error.required" class="help-block">Term Required</span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group" ng-class="{ 'has-error' : submitted && addform.MainExam.$invalid}">
+                                        <label class="col-md-3 control-label">
+                                            Main Exam :
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-9">
+                                            <select class="form-control" ng-disabled="SubAssestment.TermId==null" ng-model="SubAssestment.MainExamId" name="MainExam" ng-options="T.MainExamId as T.MainExamName for T in mainExams |filter:{TermId:SubAssestment.TermId}:true" required>
+                                                <option value="" selected="selected">Choose Option</option>
+                                            </select>
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted && addform.MainExam.$error.required" class="help-block">Main Exam Required</span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group" ng-class="{ 'has-error' : submitted && addform.Subject.$invalid}">
+                                        <label class="col-md-3 control-label">
+                                            Subject :
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-9">
+                                            <select class="form-control" ng-model="SubAssestment.SubjectId" name="Subject" ng-options="S.SubID as S.SubjectName for S in SubjectList" required>
+                                                <option value="" selected="selected">Choose Option</option>
+                                            </select>
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted && addform.Subject.$error.required" class="help-block">Subject Required</span>
+                                        </div>
+                                    </div>
+                                   <div class="form-group" ng-class="{ 'has-error' : submitted && addform.Assestment.$invalid}">
+                                        <label class="col-md-3 control-label" for="form_control_1">
+                                           Assestment
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-9">
+                                            <input type="text"  ng-model="SubAssestment.Name" class="form-control" placeholder="Assestment" name="Assestment" required>
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted && addform.Assestment.$error.required" class="help-block">Sub Assestment Required</span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group" ng-class="{ 'has-error' : submitted && addform.Code.$invalid}">
+                                        <label class="col-md-3 control-label" for="form_control_1">
+                                            Code
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-9">
+                                            <input type="text" ng-model="SubAssestment.Code" class="form-control" placeholder="Code" name="Code" required>
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted && addform.Code.$error.required" class="help-block"> Assestment Code Required</span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group" ng-class="{ 'has-error' : submitted && addform.Order.$invalid}">
+                                        <label class="col-md-3 control-label" for="form_control_1">
+                                            Order
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-9">
+                                            <input type="text" ng-model="SubAssestment.Order" class="form-control" placeholder="Order" name="Order" required>
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted && addform.Order.$error.required" class="help-block">Sub Order Required</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" data-dismiss="modal" class="btn dark btn-outline" ng-click="resetForm();submitted=false">Cancel</button>
+                            <button type="submit" ng-click="submitted=true" class="btn green">Save</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="portlet-body">
+                <div class="table-container">
+                    <div id="sample_3_wrapper" class="dataTables_wrapper no-footer">
+                        <div class="row">
+                            <div class="col-md-4 col-sm-5 col-xs-6">
+                                <div class="form-group">
+                                    <div class="col-lg-3 col-md-5 col-sm-4 col-xs-8" style="padding-left:0px">
+                                        <select class="form-control" ng-model="pageSize" ng-options="P.value as P.text for P in pageSizeArray"></select>
+                                    </div>
+                                    <div class="col-md-7  col-sm-8  col-xs-4">
+                                        @*<label for="search" class="control-label" style="padding-top:5px">Items</label>*@
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4 col-sm-3 col-xs-1">
+                            </div>
+                            <div class="col-md-4 col-sm-4 col-xs-5">
+                                <div id="sample_3_filter" class="pull-right">
+                                    <input ng-model="q" id="search" class="form-control" placeholder="Filter text">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="table-scrollable"> </div>
+                        <table class="table table-bordered table-hover">
+                            <thead>
+                                <tr class="btn-primary">
+                                   <th>Term Name</th>
+                                    <th>MainExam Name</th>
+                                    <th>Assessment Name</th>
+                                    <th>Assessment Code</th>
+                                    <th>Subject Name</th>
+                                    <th>Order</th>
+                                    <th style="text-align:center">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-show="AssessmentList.length <= 0"><td colspan="5" style="text-align:center;"><i class="fa fa-refresh"></i> Loading new data!!</td></tr>
+                                <tr dir-paginate="item in AssessmentList | filter:q |itemsPerPage:pageSize" current-page="currentPage">
+                                    <td>{{item.TermName}}</td>
+                                    <td>{{item.MainExamName}}</td>
+                                    <td>{{item.Name}}</td>
+                                    <td>{{item.Code}}</td>
+                                    <td>{{item.SubjectName}}</td>
+                                    <td>{{item.Order}}</td>
+                                    <td align="center">
+                                        <a class="btn btn-icon-only green" ng-click="edit(item)" data-target="#addmodal" data-toggle="modal">
+                                            <i class="fa fa-edit"></i>
+                                        </a>
+                                        <a ng-click="deleteassessment(item)" class="btn btn-icon-only red">
+                                            <i class="fa fa-trash"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <div class="row ">
+                            <dir-pagination-controls boundary-links="true" template-url="~/assets/angular/lib/dirPagination.tpl.html"></dir-pagination-controls>
+                        </div>
+                    </div>
+                </div>
+            </div>
+    </div>
+    <!-- End: life time stats -->
+    
+    <!--Modal Area End-->
+</div>
+@section Scripts{
+    <script type="text/javascript">
+        OEMSApp.controller("subWiseAssesstmentClt", ["$scope", "$http", "SweetAlert",
+           function ($scope, $http, SweetAlert) {
+               init();
+               function init() {
+                   initialize();
+                   getAllCommons();
+                   getmainExams(1);
+                   getTerms(1);
+                   SubjectListWithoutId();
+                   getAllAssessmentList(1);
+               }
+               function initialize() {
+                   $scope.aemodalTitle =  "Add Subject Wise Assessment";
+                   $scope.currentPage = 1;
+                   $scope.pageno = 1;
+                   $scope.pagesize = 10;
+                   $scope.total_count = 12;
+                   $scope.search = '';
+
+                   $scope.filterAssestment = {};
+                   $scope.SubAssestment = {};
+                   $scope.SubAssestment.Id = '';
+                   $scope.Id = 0;
+                   $scope.mainExams = [];
+                   $scope.SubjectSetups = [];
+                  
+                   $scope.res = {};
+                   $scope.data = {};
+                   $scope.resetForm = resetForm;
+
+
+                   $scope.Classes = [];
+                   $scope.CommonFeilds = [];
+
+                   $scope.pageSizeArray = [];
+                   $scope.pageSizeArray.push({ value: 5, text: 5 });
+                   $scope.pageSizeArray.push({ value: 10, text: 10 });
+                   $scope.pageSizeArray.push({ value: 20, text: 20 });
+                   $scope.pageSizeArray.push({ value: 50, text: 50 });
+                   $scope.currentPage = 1;
+                   $scope.pageSize = 10;
+
+               }
+               function resetForm() {
+                   $scope.aemodalTitle =  "Add Subject Wise Assessment";
+                   $scope.SubAssestment = {};
+                   $scope.SubAssestment.Id = '';
+                   $scope.Id = 0;
+                   $scope.addform.$setUntouched();
+                   $scope.addform.$setPristine();
+                   $scope.submitted = false;
+                   getAllAssessmentList(1);
+               }
+               $scope.Reset = function Reset() {
+                   $scope.aemodalTitle = "Add Subject Wise Assessment";
+                   $scope.SubAssestment = {};
+                   $scope.SubAssestment.Id = '';
+                   $scope.Id = 0;
+                   $scope.filterAssestment = {};
+                   $scope.submitted1 = false;
+               
+               }
+               $scope.deleteassessment = function deleteassessment(n) {
+                   // SweetAlert.swal("Good job!", "You clicked the button!", "success");
+                   SweetAlert.swal({
+                       title: "Are you sure to delete it ?", type: "warning", showCancelButton: true, confirmButtonColor: "#DD6B55",
+                       confirmButtonText: "Yes, delete it!",
+                       closeOnConfirm: false
+                   },
+                   function (isConfirm) {
+                       if (isConfirm) {
+                           $http({
+                               method: 'PUT',
+                               url: baseUrl + 'SubjectSetUp/DeleteAssessment/',
+                               data: n
+                           }).then(function successCallback(response) {
+                               SweetAlert.swal("Deleted!", "Your data has been deleted.", "success");
+                               getAllAssessmentList(1);
+                               toastr["info"](response.data.message);
+                           }, function errorCallback(response) {
+                               toastr["info"](response.data.message);
+                           });
+                       }
+                   });
+               };
+               $scope.save = function save() {
+                   if ($scope.addform.$invalid)
+                       return;
+                   if ($scope.SubAssestment.Id != 0) /// For Update
+                   {
+                       if ($scope.SubAssestment != '') {
+                           $http({
+                               method: 'POST',
+                               url: baseUrl + 'SubjectSetUp/UpdateAssessmentSub/',
+                               data: $scope.SubAssestment
+                           }).then(function successCallback(response) {
+                               //$('#addmodal').modal('toggle');
+                               
+                               toastr["info"](response.data.message);
+                               $scope.SubAssestment.Name = '';
+                               $scope.SubAssestment.Code = '';
+                               $scope.SubAssestment.Order = '';
+                           }, function errorCallback(response) {
+                               toastr["warning"](response.data.Message);
+                           });
+                       }
+                   } else {  //  For Add
+                       if ($scope.SubAssestment != {}) {
+                           $http({
+                               method: 'POST',
+                               url: baseUrl + 'SubjectSetUp/AddAssessmentSub/',
+                               data: $scope.SubAssestment
+                           }).then(function successCallback(response) {
+
+                               //$('#addmodal').modal('toggle');
+                               //getAllAssessmentList(1);
+                               toastr["info"](response.data.message);
+                               $scope.SubAssestment.Name = '';
+                               $scope.SubAssestment.Code = '';
+                               $scope.SubAssestment.Order = '';
+                           }, function errorCallback(response) {
+                               toastr["warning"](response.data.Message);
+                           });
+                       }
+                   }
+               };
+               $scope.edit = function (n) {
+                   $scope.mainExam = {};
+                   $scope.SubAssestment.Id = n.Id;
+                   $scope.aemodalTitle = "Update Subject Wise Assessment";
+                   $scope.SubAssestment = n;
+                   $scope.Id = n.Id;
+
+               };
+        function getmainExams() {
+                   $scope.mainExams = [];
+                   $http({
+                       method: 'GET',
+                       url: baseUrl + 'ExamSetup/GetAllMainExam/'
+                   }).then(function successCallback(response) {
+                      $scope.mainExams = response.data.results;
+                       //console.log($scope.mainExams);
+                       // $scope.AspNetRoles = response.data;
+                       $scope.total_count = response.data.totalcount;
+                       //console.log(response.data);
+                   }, function errorCallback(response) {
+                       toastr["warning"](response.data.Message);
+                   });
+                   //$scope.AspNetRoles = $scope.data;
+                   //console.log($scope.data.totalcount);
+                   // $scope.totalcount = 3; //$scope.data.totalcount;
+        }
+        $scope.getSubject =  function getSubject() { // Get Subject List By VSCG
+            //if ($scope.mform.$invalid)
+            //    return;
+            //blockUI.start(); // spinning Start
+            $scope.SubjectSetups = [];
+            var searchtxt = $scope.search;
+            if ($scope.search == 'undefined' || $scope.search == '') {
+                searchtxt = 'null';
+            }
+            $http({
+                method: 'GET',
+                url: baseUrl + 'SubjectSetup/GetAllSubject/' + $scope.filterAssestment.ClassId + '/' + $scope.filterAssestment.SessionId 
+            }).then(function successCallback(response) {
+                $scope.SubjectSetups = response.data;
+                $scope.total_count = response.data.totalcount;
+                if ($scope.pagesize == -1)
+                    $scope.pagesize = 500;
+                //blockUI.stop();  // spinning Finished
+            }, function errorCallback(response) {
+                toastr["info"](response.data.message);
+                blockUI.stop();
+            });
+        }
+
+
+
+        $scope.SubjectListById = function SubjectListById(n) {
+            $scope.SubjectList = [];
+            $http({
+                method: 'GET',
+                url: baseUrl + 'SubjectSetup/GetAllSubject/'+n.ClassId +'/'+n.SessionId
+
+            }).then(function successCallback(response) {
+                $scope.SubjectList = response.data.results;
+            }, function errorCallback(response) {
+                toastr["info"](response.data.message);
+            });
+        }
+      function SubjectListWithoutId() {
+            $scope.SubjectList = [];
+            $http({
+                method: 'GET',
+                url: baseUrl + 'SubjectSetup/GetAllSubjectList/'
+
+            }).then(function successCallback(response) {
+                $scope.SubjectList = response.data.results;
+            }, function errorCallback(response) {
+                toastr["info"](response.data.message);
+            });
+        }
+        $scope.AssessmentListByFilter = function AssessmentListByFilter() {
+            if ($scope.mform.Term.$invalid == true ||
+                $scope.mform.MainExam.$invalid == true ||
+                $scope.mform.Subject.$invalid == true
+                ) {
+                return;
+            }
+            $scope.AssessmentList = [];
+            $http({
+                method: 'GET',
+                url: baseUrl + 'SubjectSetUp/AssessmentSubjectListById/' + $scope.filterAssestment.TermId + '/' + $scope.filterAssestment.MainExamId + '/' + $scope.filterAssestment.SubjectId
+               
+            }).then(function successCallback(response) {
+                $scope.AssessmentList = response.data.results;
+                toastr["info"](response.data.message);
+            }, function errorCallback(response) {
+                toastr["error"](response.data.message);
+            });
+        }
+        function getAllAssessmentList() {
+            $scope.AssessmentList = [];
+            $http({
+                method: 'GET',
+                url: baseUrl + 'SubjectSetUp/GetALlAssessmentList/'
+            }).then(function successCallback(response) {
+                $scope.AssessmentList = response.data.results;
+                toastr["info"](response.data.message);
+            }, function errorCallback(response) {
+                toastr["error"](response.data.message);
+            });
+        }
+
+               function getAllClasses() {
+                   $http({
+                       method: 'GET',
+                       url: baseUrl + 'SetupInstitution/GetClass/'
+                   }).then(function successCallback(response) {
+                       $scope.Classes = response.data.results;
+                   }, function errorCallback(response) {
+                       toastr["info"](response.data.message);
+                   });
+               }
+
+               function getAllCommons() {
+                   $scope.CommonFeilds = [];
+                   $http({
+                       method: 'GET',
+                       url: baseUrl + 'Common/GetCommonItem/'
+                   }).then(function successCallback(response) {
+                       $scope.CommonFeilds = response.data.results;
+                   }, function errorCallback(response) {
+                       toastr["info"](response.data.message);
+                   });
+               }
+               function getTerms() {
+                   $scope.Terms = [];
+                   $http({
+                       method: 'GET',
+                       url: baseUrl + 'SetupInstitution/GetAllTerm/'
+                   }).then(function successCallback(response) {
+                       // this callback will be called asynchronously
+                       // when the response is available
+                       $scope.Terms = response.data.results;
+                       $scope.total_count = response.data.totalcount;
+                       //console.log(response.data);
+                   }, function errorCallback(response) {
+                       toastr["warning"](response.data.Message);
+                   });
+
+               }
+
+           }]);
+    </script>
+
+}
+

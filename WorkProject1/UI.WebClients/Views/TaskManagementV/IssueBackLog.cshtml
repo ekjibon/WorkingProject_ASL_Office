@@ -1,0 +1,1340 @@
+﻿
+@{
+    ViewBag.Title = "Backlog";
+}
+<style>
+    .backlogActive {
+        background: #e8cdcd !important;
+    }
+    
+
+</style>
+
+<div class="kt-container  kt-container--fluid  kt-grid__item kt-grid__item--fluid" ng-controller="IssueDetails">
+    <div class="row">
+        <div class="kt-portlet kt-portlet--mobile">
+            <div class="kt-portlet__head kt-portlet__head--lg headerProgressBar">
+                <div class="kt-portlet__head-label ">
+
+                    <span class="kt-portlet__head-icon">
+                       
+                    </span>
+                    <h3 class="kt-portlet__head-title">
+                        <!----Title Text-->
+                        <span class="caption-subject font-green sbold uppercase">@ViewBag.Title</span>
+                        <!----Title Text -->
+                    </h3>
+                    <span class="progressBarTodo">Todo</span> <span class="progressbarInProgress">In Progress</span><span class="progressBarReview">QA/Review</span><span class="progressBarDone">Done</span>
+                </div>
+                <div class="kt-portlet__head-toolbar">
+
+                    <div class="kt-portlet__head-wrapper">
+                        <div class="dropdown dropdown-inline">
+                            <button ng-click="Reset()" class="btn btn-brand btn-icon-sm" data-target="#addmodal" data-toggle="modal">
+                                <i class="fa fa-plus"></i> Add New Sprint
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="kt-portlet__body">
+
+
+                <div class="row ">
+                    <div ng-class="IsShowIssueDetails? 'col-md-8' : 'col-md-12'">
+
+                        <div class="row">
+                            <div class="col-lg-12 col-sm-6">
+                                <div class="row accordion" id="accordion">
+                                    <div class="col-lg-12">
+                                        <div class="cardBacklog" ng-repeat="item in IssueList.ProjectWiseList">
+                                            <div class="carBacklogbutton">
+
+                                                <div class="cardBacklog-header">
+                                                    <button class="btn btn-link cardBacklogButton" data-toggle="collapse" data-target="#collapse{{$index}}"><i class="fas fa-chevron-right"></i></button>
+                                                    <span><b>{{item.ProjectName}} </b></span>
+                                                
+                                                </div><!-- /card-header -->
+
+                                            </div>
+                                            <div class="collapse" id="collapse{{$index}}">
+                                                <div class="card-body" data-parent="#accordion">
+                                                    <div class="listDetails" ng-repeat="item1 in item.ProjectWiseSprintList" style="padding:10px 0">
+                                                        <div class="accordion">
+
+                                                            <div class="">
+                                                                <div class="cardBacklog-header">
+                                                                    <div class="card-header" id="headingTwo">
+
+                                                                        <h2 class="mb-0 bprogreeBarColour">
+                                                                            <button class="btn btn-link btn-block text-left collapsed" type="button" data-toggle="collapse" data-target="#collapseTwo{{item1.Id}}" aria-expanded="false" aria-controls="collapseTwo">
+                                                                                <i class="fas fa-chevron-right"></i> {{item1.SprintTitle}} @*<span class="progressBarTodo">Todo</span> <span class="progressbarInProgress">In Progress</span><span class="progressBarReview">QA/Review</span><span class="progressBarDone">Done</span>*@
+                                                                            </button>
+
+                                                                            <div class="kt-section__content">
+                                                                                <div class="progress">
+                                                                                    <div class="progress-bar-striped progress-bar-animated " role="progressbar" style="width: {{item1.TodoPersent}}%; background: #73B6E1;" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100"><p class="progressCount">{{item1.TodoPersent}}%</p></div>
+                                                                                    <div class="progress-bar-striped progress-bar-animated bg-warning" role="progressbar" style="width: {{item1.InProPersent}}%;" aria-valuenow="30" aria-valuemin="0" aria-valuemax="100"><p class="progressCount">{{item1.InProPersent}}%</p></div>
+                                                                                    <div class="progress-bar-striped progress-bar-animated " role="progressbar" style="width: {{item1.QAPersent}}%; background: #BF609F;" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100"><p class="progressCount">{{item1.QAPersent}}%</p></div>
+                                                                                    <div class="progress-bar-striped progress-bar-animated bg-success" role="progressbar" style="width: {{item1.DonePersent}}%; background-color: #0abb87;" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100"><p class="progressCount">{{item1.DonePersent}}%</p></div>
+                                                                                </div>
+
+                                                                            </div>
+                                                                        </h2>
+
+                                                                    </div>
+                                                                    <div id="collapseTwo{{item1.Id}}" class="collapse" aria-labelledby="headingTwo">
+
+                                                                        <div class="card-body progressBarBody" ng-repeat="item2 in item1.SprintList">
+                                                                            <table class="table table-striped table-sm backlogTable">
+                                                                                <tbody>
+                                                                                    <tr ng-click="getIssueDetails(item2.Id,0)">
+                                                                                        <td style="padding:7px"><i class="fas fa-bookmark {{item2.IssueTypeName}}" style="color:green; margin-right:5px"></i> &nbsp;                                    {{item2.Title}} &nbsp;&nbsp;<strong> <span>{{item2.IssueTypeName}} &nbsp;&nbsp; ({{item2.Id}})</span></strong></td>
+                                                                                        <td class="text-right" style="padding:7px">
+                                                                                            <span>{{item2.ProjectName}}</span> &nbsp;
+                                                                                            <span href=""><i class="fas fa-arrow-up {{item2.Priority}}"></i></span>
+                                                                                        </td>
+                                                                                    </tr>
+                                                                                </tbody>
+                                                                            </table>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="cardBacklog-sprint text-right">
+                                                                    <a><span class="Todo" ng-hide="item1.IsStart" ng-click="UpdateSprintStart(item1.Id)"><i class="fas fa-play"></i> Start</span></a>
+                                                                    <a><span class="InProcess" ng-show="item1.IsStart && item1.Completed==0" ng-click="UpdateSprintComplete(item1.Id)"><i class="fas fa-pause"></i>&nbsp;In Progress</span> </a>
+                                                                    <a><span class="Done" ng-show="item1.Completed"><i class="fas fa-check"></i>&nbsp; Completed</span></a>
+                                                                </div>
+                                                            
+                                                            </div>
+                                                        </div>
+
+                                                    </div>
+                                                </div><!-- /card-body -->
+                                            </div><!-- /collapse -->
+                                        </div>
+                                    </div>
+                                    <!-- /card -->
+                                    <div class="col-lg-12">
+                                        <div class="cardBacklog2">
+                                            <div class="cardBacklog-header">
+                                                <button class="btn btn-link cardBacklogButton" data-toggle="collapse" data-target="#collapseBacklog"><i class="fas fa-chevron-right"></i></button>
+                                                <span>Backlog List</span>
+                                            </div><!-- /card-header -->
+                                            <div class="collapse show" id="collapseBacklog">
+                                                <div class="card-body" data-parent="#accordion">
+                                                    <div class="listDetails" style="padding:10px 0">
+                                                        <a href="#" ng-click="getIssueDetails(item.Id,$index)" ng-repeat="item in IssueList.BacklogList">
+                                                            <table class="table table-striped table-sm backlogTable">
+                                                                <tbody>
+                                                                    <tr>
+                                                                        <td style="padding:7px" ng-class="checkIssueActive($index)"><i class="fas fa-bookmark {{item.IssueTypeName}}" style="color:green; margin-right:5px"></i> &nbsp; {{item.Title}} &nbsp;&nbsp;<strong> <span>{{item.IssueTypeName}} &nbsp;&nbsp; ({{item.Id}})</span></strong></td>
+                                                                        <td class="text-right" style="padding:7px" ng-class="checkIssueActive($index)">
+                                                                            <span>{{item.ProjectName}}</span> &nbsp;
+                                                                            <span href=""><i class="fas fa-arrow-up {{item.Priority}}"></i></span>
+                                                                        </td>
+                                                                    </tr>
+                                                                </tbody>
+                                                            </table>
+                                                        </a>
+                                                    </div>
+                                                </div><!-- /card-body -->
+
+                                            </div><!-- /collapse -->
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-12">
+                                        <div class="descriptionMain_2">
+                                            <button type="button" id="descriptionshowButton_2" style="border: none; background: transparent;">+ Create Issue</button>
+                                        </div>
+                                        <form id="descriptionShow_2" style="display: none;">
+                                            <div class="form-group">
+                                                <label for="exampleFormControlTextarea1">Issue</label>
+                                                <textarea class="form-control" ng-model="IssueTitle" required id="exampleFormControlTextarea1" rows="1" placeholder="Enter Issue Title.." maxlength = "50"></textarea>
+                                                <div class="form-control-focus"> </div>
+                                                <span ng-show="submitted &&  IssueTitle.$error.required" class="help-block">Sprint Title Required</span>
+                                            </div>
+                                            <button type="submit" ng-click="AddIssue()" id="descriptionSave_2" class="btn btn-primary">Save</button>
+                                            <button type="button" class="btn btn-light" id="descriptionCancel_2">Cancel</button>
+                                        </form>
+                                    </div>
+                                    <!-- /card -->
+                                </div><!-- /#accordion -->
+                            </div><!-- /col -->
+                        </div><!-- /row -->
+
+                    </div>
+
+                    <div class="col-md-4 backlogIssue" ng-show="IsShowIssueDetails">
+                        <button type="button" class="close" ng-click="hideDetals()" style="margin-top:10px">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                        <div class="issueDetails">
+                            <h6>
+                                <i class="fas fa-bookmark {{IssueDetails.IssueTypeName}}"></i> <a href="#"> {{IssueDetails.Title}} - {{IssueDetails.ProjectName}}</a>
+                            </h6>
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <div class="issueDetailsIcon">
+
+                                        <div class="attach attachBacklog" data-toggle="modal" data-target="#attachmentModal"> <a href=""><i class="fas fa-paperclip"></i> Attach</a></div>
+                                        <div class="subtask attachSubtask" id="showAddUp" ng-show="IssueDetails.ParentId==0"><button type="submit" style="border:none;background:transparent"><i class="far fa-copy"></i> + Subtask</button></div>
+                                        <div class="link linkSubtask" id="weblinkButtonTop">
+                                            <div class="linlIcon">
+                                                <button type="submit" class="weblink"><i class="fas fa-link"></i> + Web link</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <div class="description">
+                                        <div class="descriptionMain">
+                                            <h6> <label for="exampleFormControlTextarea1"><b>Issue Description :</b></label></h6> <br>
+                                            <button type="button" id="descriptionshowButton"> {{IssueDetails.Description? IssueDetails.Description : 'Add Description...'}}</button>
+                                        </div>
+                                        <form id="descriptionShow" style="display: none;">
+                                            <div class="form-group">
+                                                <label for="exampleFormControlTextarea1">Description</label>
+                                                <textarea class="form-control" ng-model="IssueDetails.Description" id="exampleFormControlTextarea1" rows="3" placeholder="Add a description..."></textarea>
+                                            </div>
+
+                                            <button type="submit" ng-click="UpdateIssueDescription()" id="descriptionCancel2" class="btn btn-primary">Save</button>
+                                            <button type="button" class="btn btn-light" id="descriptionCancel">Cancel</button>
+                                        </form>
+                                    </div>
+                                </div>
+                                <div class="col-lg-12" ng-show="IssueDetails.ProjectId==0">
+                                    <div class="backlogIteam">
+                                        <div class="backlogIteamInnerLeft">
+                                            <p>Project</p>
+                                        </div>
+                                        <div class="backlogIteamInnerRight">
+                                            <div class="containerMain">
+
+                                                <select class="form-control" ng-model="Project.Id" ng-change="getSprintList(Project.Id)" name="Sprint" ng-options="Project.Id as Project.ProjectName for Project in ProjectList">
+                                                    <option value="" selected="selected">Choose an Option</option>
+                                                </select>
+                                                <div class="form-control-focus"> </div>
+                                                <span ng-show="submited && mainForm.Version.$error.required" class="help-block">Sprint Required</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-12">
+                                    <div class="backlogIteam">
+                                        <div class="backlogIteamInnerLeft">
+                                            <p>Sprint</p>
+                                        </div>
+                                        <div class="backlogIteamInnerLeft" id="sprintText">
+                                            <p>{{IssueDetails.SprintTitle? IssueDetails.SprintTitle : 'Add Sprint'}}</p>
+                                        </div>
+                                        <div class="backlogIteamInnerRight" id="sprintDropdown">
+                                            <div class="containerMain">
+
+                                                <select class="form-control" ng-model="Sprint.Id" required name="Sprint" ng-change="UpdateSprint()" ng-options="Sprint.Id as Sprint.SprintTitle for Sprint in SprintList">
+                                                    <option value="" selected="selected">Choose an Option</option>
+                                                </select>
+                                                <div class="form-control-focus"> </div>
+                                                <span ng-show="submited && mainForm.Version.$error.required" class="help-block">Sprint Required</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-12">
+                                    <div class="backlogIteam">
+                                        <div class="backlogIteamInnerLeft">
+                                            <p>Status</p>
+                                        </div>
+                                        <div class="backlogIteamInnerRight">
+                                            <div class="containerMain">
+
+                                                <select ng-model="Status.Id" name="Status" ng-change="UpdateStatus()" ng-options="Status.Id as Status.StatusName for Status in StatusList" class="form-control kt-select2">
+                                                    <option value='' selected="selected">Choose an Status</option>
+                                                </select>
+                                                <div class="form-control-focus"> </div>
+                                                <span ng-show="submited && mainForm.Version.$error.required" class="help-block">Sprint Required</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-12">
+                                    <div class="backlogIteam">
+                                        <div class="backlogIteamInnerLeft">
+                                            <p>Assignee</p>
+                                        </div>
+                                        <div class="backlogIteamInnerRight">
+                                            <div class="containerMain">
+                                                <select class="form-control" ng-model="Employee.EmpBasicInfoID" required name="Employee" ng-change="UpdateAssignee(Employee.EmpBasicInfoID)" ng-options="Employee.EmpBasicInfoID as Employee.FullName group by Employee.DepartmentName for Employee in EmployeeList">
+                                                    <option value="" selected="selected">Choose an Option</option>
+                                                </select>
+
+                                                @*<select ng-model="model" ng-options="Employee.EmpBasicInfoID as Employee.FullName group by Employee.DepartmentName for Employee in EmployeeList"></select>*@
+
+                                                <div class="form-control-focus"> </div>
+                                                <span ng-show="submited && mainForm.Version.$error.required" class="help-block">Assignee Required</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-12">
+                                    <div class="backlogIteam">
+                                        <div class="backlogIteamInnerLeft">
+                                            <p>Priority</p>
+                                        </div>
+                                        <div class="backlogIteamInnerRight">
+                                            <div class="containerMain">
+                                                <div class="form-control-focus"> </div>
+                                                <span ng-show="submited && mainForm.Version.$error.required" class="help-block">Priority Required</span>
+                                                <select class="form-control" name="Priority" ng-change="UpdatePriority()" ng-model="IssueDetails.Priority" data-size="7" data-live-search="true" data-title="Location" id="state_list" data-width="100%">
+                                                    @*form-control-xs selectpicker*@
+                                                    <option value="">Choose one ..</option>
+                                                    <option value="Highest"> Highest </option>
+                                                    <option value="High">  High</option>
+                                                    <option value="Medium"> Medium</option>
+                                                    <option value="Low"> Low</option>
+                                                    <option value="Lowest"> @*<span> <i class="fas fa-arrow-up Highest"></i></span>&nbsp;*@Lowest</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-12">
+                                    <div class="backlogIteam">
+                                        <div class="backlogIteamInnerLeft">
+                                            Due Date
+                                        </div>
+                                        <div class="backlogIteamInnerRight">
+                                            <div class="containerMain">
+                                                <input type="text" class="form-control" uib-datepicker-popup="dd/MM/yyyy" ng-change="UpdateDueDate()" placeholder="Due Date" name="DueDate" ng-model="issue.DueDate" is-open="end1.opened" ng-click="end1.opened=true" ng-required="false" close-text="Close" readonly="readonly" />
+                                                <div class="form-control-focus"> </div>
+                                                <span ng-show="submitted &&  addBasic.DueDate.$error.required" class="help-block">End Date Required</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-12 mt-3">
+                                    <div class="listHeader">
+                                        <div class="listHeaderIteam">
+                                            <h6> <label for="exampleFormControlTextarea1"><b>Attachments :</b></label></h6>
+                                        </div>
+                                        <div class="listHeaderIteam text-right">
+                                            @*<a href=""><i class="fas fa-ellipsis-h"></i></a>*@
+                                            <a data-toggle="modal" data-target="#attachmentModal"><i class="fas fa-plus"></i></a>
+                                        </div>
+                                    </div>
+                                    <div class="listDetails">
+                                        <table class="table table-striped">
+                                            <thead>
+                                                <tr>
+                                                    <th scope="col">File Name</th>
+                                                    <th scope="col">Action</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr ng-repeat="item in IssueDetails.IssueAttachmentList">
+                                                    <td><i class="fas fa-list-alt"></i> &nbsp;<a href="{{item.ImageUrl}}" target="_blank">{{item.FileName}}</a></td>
+                                                    <td class="detailsAction">
+                                                        <a href="{{item.ImageUrl}}" target="_blank"><i class="fas fa-cloud-download-alt"></i></a>
+                                                        <a href="" class="hidenDelet" ng-click="DelectAttachment(item.AttachmentId)"><i class="fas fa-trash"></i></a>
+
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                <div class="col-lg-12 mt-3">
+                                    <div class="listHeader SubtasksHeader" ng-show="IssueDetails.ParentId==0">
+                                        <div class="listHeaderIteam">
+                                            <h6> <label for="exampleFormControlTextarea1"><b>Sub Issue :</b></label></h6>
+                                        </div>
+                                        <div class="listHeaderIteam text-right">
+                                            @*<a href=""><i class="fas fa-ellipsis-h"></i></a>*@
+                                            <button type="submit" id="showAdd"><i class="fas fa-plus"></i></button>
+                                        </div>
+                                    </div>
+                                    <div class="SubtasksAdd text-right" id="SubtasksAdd" style="display: none;" ng-show="IssueDetails.ParentId==0">
+                                        <form>
+                                            <div class="form-group">
+                                                <input type="text" class="form-control" ng-model="SubIssueTitle" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Type Sub Isuue Title..">
+                                            </div>
+                                            <button type="submit" ng-click="AddSubIssue(SubIssueTitle)" class="btn btn-primary">Create</button>
+                                            <button type="button" class="btn btn-light" id="subCancel">Cancel</button>
+                                        </form>
+                                    </div><br />
+                                    <div class="listDetails" ng-show="IssueDetails.ParentId==0">
+                                        <table class="table table-sm backlogTable">
+                                            <tbody>
+                                                <tr ng-click="getIssueDetails(item.Id,0)" style="cursor:pointer" ng-repeat="item in IssueDetails.SubIssueList">
+                                                    <td style="padding:10px">
+                                                        <i class="fas fa-list-alt"></i>
+                                                        <span>{{item.Title}} </span> </br>
+                                                        @*<span>{{item.Description}}</span>*@
+                                                    </td>
+                                                    <td class="text-right" style="padding:7px">
+                                                        <a href=""><i class="fas fa-arrow-up {{item.Priority}}"></i></a>
+                                                    </td>
+                                            </tbody>
+                                        </table>
+                                    </div>
+
+
+
+
+
+                                    <div class="listHeader SubtasksHeader mt-4">
+                                        <div class="listHeaderIteam">
+                                            <h6> <label for="exampleFormControlTextarea1"><b>Web Links :</b></label></h6>
+                                        </div>
+                                        <div class="listHeaderIteam text-right">
+                                            <button type="submit" id="showWeblinkClick"><i class="fas fa-plus"></i></button>
+                                        </div>
+                                    </div>
+                                    <div class="listDetails">
+                                        <table class="table table-striped table-sm">
+                                            <tbody>
+                                                <tr ng-repeat="item in IssueDetails.IssueWebLinksList">
+                                                    <td>
+                                                        <a href="{{item.Url}}" target="_blank"><i class="fas fa-globe-asia"></i> {{item.Description}}</a>
+                                                        <button type="button" class="close" ng-click="DeleteIssueWebLink(item.Id)" style="margin-top:0px">
+                                                            <span aria-hidden="true">&times;</span>
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <div class="" text-right" id="showWeblink" style="display: none;">
+
+                                        <div class="row">
+                                            <div class="col text-left">
+                                                <label for="inputEmail4">Url<span style="color:red">*</span></label>
+                                                <input type="url" ng-model="issueWebLink.Url" id="weblinkinput" required class="form-control" placeholder="https://www.example.com">
+                                            </div>
+                                            <div class="col text-left mb-2">
+                                                <label for="inputEmail4">Link text<span style="color:red">*</span></label>
+                                                <input type="text" ng-model="issueWebLink.Description" class="form-control" required placeholder="Add a description...">
+                                            </div>
+                                        </div>
+                                        <button type="submit" ng-click="AddIssueWebLink()" class="btn btn-primary">save</button>
+                                        <button type="button" class="btn btn-light" id="weblinkCancel">Cancel</button>
+
+                                        <br /><br />
+                                    </div>
+                                </div>
+                                <div class="col-lg-12">
+                                    <ul class="nav nav-pills mb-3 activityTab" id="pills-tab" role="tablist">
+                                        <li class="nav-item">
+                                            <p></p>
+                                        </li>
+                                        <li class="nav-item" role="presentation">
+                                            <a class="nav-link active" id="pills-home-tab" data-toggle="pill" href="#pills-home" role="tab" aria-controls="pills-home" aria-selected="true">Comments</a>
+                                        </li>
+                                        <li class="nav-item" role="presentation">
+                                            <a class="nav-link" id="pills-profile-tab" data-toggle="pill" href="#pills-profile" role="tab" aria-controls="pills-profile" aria-selected="false">History</a>
+                                        </li>
+                                        @*<li class="nav-item" role="presentation">
+                                                <a class="nav-link" id="pills-contact-tab" data-toggle="pill" href="#pills-contact" role="tab" aria-controls="pills-contact" aria-selected="false">Work log</a>
+                                            </li>*@
+                                    </ul>
+                                    <div class="tab-content backlogTabContent" id="pills-tabContent">
+                                        <div class="tab-pane fade show active" id="pills-home" role="tabpanel" aria-labelledby="pills-home-tab">
+                                            <div class="comments">
+                                                <div class="commentEditsection backlogComment" ng-repeat="item in IssueDetails.CommentsList">
+                                                    <div class="commentUser">
+                                                        <div class="CommentUserImage">
+                                                            <img src="/TaskManagementV/GetImage?userId={{item.UserId}}" />
+                                                        </div>
+                                                    </div>
+                                                    <div class="commentUserName">
+                                                        <p> <span><b>{{ item.FullName  }} :</b></span> {{item.AddDate | date:"MM/dd/yyyy ' ' h:mma"}}</p>
+                                                        <p class="ml-3">{{item.Description}}</p>
+                                                        <!---Hide Comments Edite---->
+                                                        @*<form id="editeComment" style="display: none;">
+                                                                <div class="form-group">
+                                                                    <textarea class="form-control" id="exampleFormControlTextarea1" rows="3" placeholder="Add a description..."></textarea>
+                                                                </div>
+                                                                <button type="submit" class="btn btn-primary">Save</button>
+                                                                <button type="button" class="btn btn-light" id="commentsCancel">Cancel</button>
+                                                            </form>*@
+                                                        <!---Hide Comments Edite---->
+
+                                                        <div class="actionButton ml-2">
+                                                            <button type="submit" ng-click="EditComments( item )" id="showEdit">Edit</button>
+                                                            <button type="submit" ng-click="DelectComments(item.Id)" id="deletEdit">Delete</button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="addComments">
+                                                    <form>
+                                                        <div class="form-group">
+                                                            <textarea class="form-control" ng-model="Comments.Description" id="exampleFormControlTextarea1" rows="1" placeholder="Add Comments..."></textarea>
+                                                        </div>
+                                                        <button type="submit" ng-show="!isCommentsEdit" ng-click="AddComments()" class="btn btn-primary">Save</button>
+                                                        <button type="submit" ng-show="isCommentsEdit" ng-click="UpdateComments()" class="btn btn-primary">Update</button>
+                                                        <button type="button" ng-click="ClearComments()" class="btn btn-light">Cancel</button>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="tab-pane fade" id="pills-profile" role="tabpanel" aria-labelledby="pills-profile-tab">
+                                            <div class="commentEditsection" ng-repeat="item in IssueDetails.IssueHistoryList">
+                                                <div class="commentUser">
+                                                    <div class="CommentUserImage">
+                                                        <img src="/TaskManagementV/GetImage?userId={{item.UserId}}" />
+                                                    </div>
+                                                </div>
+                                                <div class="commentUserName">
+                                                    <p> <strong>{{item.Type }}  </strong> <span>{{item.Description}}</span></p>
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+
+
+                <!--Modal Area Start-->
+                <div id="addmodal" class="modal fade" tabindex="-1" data-backdrop="static" data-keyboard="false">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <form name="addBasic" ng-submit="save()" class="form-horizontal" id="form_sample_1" novalidate autocomplete="off">
+                                <div class="modal-header">
+                                    <h4 class="modal-title">Add Sprint  </h4>
+                                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true" ng-click="Reset();submitted=false"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="form-body">
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <div class="form-group row" ng-class="{ 'has-error' : submitted && addBasic.Project.$invalid}">
+                                                    <label class="col-md-4 control-label text-right">
+                                                        Project :
+                                                        <span class="required">*</span>
+                                                    </label>
+                                                    <div class="col-md-8">
+                                                        <select class="form-control" ng-model="SprintInfo.ProjectId" required name="Project" ng-options="aProject.Id as aProject.ProjectName for aProject in ProjectList">
+                                                            <option value="" selected="selected">Choose an Option</option>
+                                                        </select>
+                                                        <div class="form-control-focus"> </div>
+                                                        <span ng-show="submitted && addBasic.Project.$error.required" class="help-block">Project Required</span>
+                                                    </div>
+                                                </div>
+
+                                                <div class="form-group row" ng-class="{ 'has-error' : submitted && addBasic.SprintTitle.$invalid}">
+                                                    <label class="col-md-4 control-label text-right">
+                                                        Sprint Title :
+                                                        <span class="required">*</span>
+                                                    </label>
+                                                    <div class="col-md-8">
+                                                        <input type="text" ng-model="SprintInfo.SprintTitle" class="form-control" placeholder="Sprint Name" name="SprintTitle" required>
+                                                        <div class="form-control-focus"> </div>
+                                                        <span ng-show="submitted &&  addBasic.SprintTitle.$error.required" class="help-block">Sprint Title Required</span>
+                                                    </div>
+                                                </div>
+
+                                                <div class="form-group row" ng-class="{ 'has-error' : submitted && addBasic.StartDate.$invalid}">
+                                                    <label class="col-md-4 control-label text-right">
+                                                        Start Date :
+                                                        <span class="required">*</span>
+                                                    </label>
+                                                    <div class="col-md-8">
+                                                        <input type="text" class="form-control" ng-change="check()" uib-datepicker-popup="dd/MM/yyyy" datepicker-options="dateOptions" placeholder="Start Date" name="StartDate" ng-model="SprintInfo.SprintStartDate" is-open="strat.opened" ng-click="strat.opened=true" ng-required="true" close-text="Close" readonly="readonly" />
+                                                        <div class="form-control-focus"> </div>
+                                                        <span ng-show="submitted &&  addBasic.StartDate.$error.required" class="help-block">Start Date Required</span>
+                                                    </div>
+                                                </div>
+
+                                                <div class="form-group row" ng-class="{ 'has-error' : submitted && addBasic.EndDate.$invalid}">
+                                                    <label class="col-md-4 control-label text-right">
+                                                        End Date :
+                                                        <span class="required">*</span>
+                                                    </label>
+                                                    <div class="col-md-8">
+                                                        <input type="text" class="form-control" uib-datepicker-popup="dd/MM/yyyy" datepicker-options="dateOptionsEnd" placeholder="End Date" name="EndDate" ng-model="SprintInfo.SprintEndDate" is-open="end.opened" ng-click="end.opened=true" ng-required="true" close-text="Close" readonly="readonly" />
+                                                        <div class="form-control-focus"> </div>
+                                                        <span ng-show="submitted &&  addBasic.EndDate.$error.required" class="help-block">End Date Required</span>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group row" ng-class="{ 'has-error' : submitted && addBasic.EndDate.$invalid}">
+                                                    <label class="col-md-4 control-label text-right">
+                                                        Goal :
+                                                    </label>
+                                                    <div class="col-md-8">
+                                                        <textarea class="form-control" ng-model="SprintInfo.Goal" id="exampleFormControlTextarea1" rows="1" placeholder="Goal Info.."></textarea>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" data-dismiss="modal" class="btn btn-secondary" ng-click="Reset();submitted=false">Cancel</button>
+                                    <button type="submit" ng-click="submitted=true" class="btn btn-success">Save</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <!--Modal Area End-->
+                <!-------Modal------->
+                <div class="modal fade" id="attachmentModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-lg" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="exampleModalLabel">Attach</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <form>
+                                    <div class="row">
+                                        <div class="col-lg-12">
+                                            <div class="form-group form-group-last">
+                                                <label>Upload Files:</label>
+
+                                                <div class="form-control dropzone dropzone-multi mb-3" id="kt_dropzone_4">
+                                                    <div class="dropzone-panel">
+                                                        <input type="file" name="ImageUrl" id="pdf" accept="application/pdf,image/*" />
+
+                                                        @*<a class="dropzone-select btn btn-label-brand btn-bold btn-sm">Attach files</a>
+                                                            <a class="dropzone-remove-all btn btn-label-brand btn-bold btn-sm">Remove All</a>*@
+                                                    </div>
+                                                    @*<div class="dropzone-items">
+                                                            <div class="dropzone-item" style="display:none">
+                                                                <div class="dropzone-file">
+                                                                    <div class="dropzone-filename" title="some_image_file_name.jpg"><span data-dz-name>some_image_file_name.jpg</span> <strong>(<span data-dz-size>340kb</span>)</strong></div>
+                                                                    <div class="dropzone-error" data-dz-errormessage></div>
+                                                                </div>
+                                                                <div class="dropzone-progress">
+                                                                    <div class="progress">
+                                                                        <div class="progress-bar kt-bg-brand" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" data-dz-uploadprogress></div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="dropzone-toolbar">
+                                                                    <span class="dropzone-start"><i class="flaticon2-arrow"></i></span>
+                                                                    <span class="dropzone-cancel" data-dz-remove style="display: none;"><i class="flaticon2-cross"></i></span>
+                                                                    <span class="dropzone-delete" data-dz-remove><i class="flaticon2-cross"></i></span>
+                                                                </div>
+                                                            </div>
+                                                        </div>*@
+                                                    <span class="form-text text-muted">Max file size is 1MB and max number of files is 1.</span>
+                                                </div>
+
+
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                        <button type="button" class="btn btn-primary" ng-click="UploadAttachment()">Upload</button>
+                                    </div>
+                                </form>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+@section Scripts{
+
+    <script type="text/javascript">
+
+        OEMSApp.controller("IssueDetails", ["$scope", "$http", "SweetAlert",
+              function ($scope, $http, SweetAlert) {
+
+                  init();
+                  function init() {
+                      initialize();
+                      getIssueList();
+                      getProjectList();
+                      //getEmployeeList();
+                      getAllStatus();
+                      GetDepertmentWiseEmpList();
+                      resetFilter();
+                  }
+                  function initialize() {
+                      $scope.GetDepertmentWiseEmpList = GetDepertmentWiseEmpList;
+                      //$scope.pageno = 1;
+                      //$scope.total_count = 12;
+                      //$scope.search = '';
+                      //$scope.Requisition = {};
+                      //$scope.PurchaseOrderList = [];
+
+                      $scope.modalbutton = 'Save';
+                      $scope.modalTitle = 'Add New Sprint';
+                      $scope.SprintInfo = {};
+                      $scope.SprintInfo.Id = 0;
+
+                      $scope.IssueList = getIssueList;
+                      $scope.IssueDetails = {};
+                      $scope.IsShowIssueDetails = 0;
+                      $scope.SprintList = [];
+                      $scope.ProjectList = getProjectList;
+                      $scope.issueWebLink = {};
+                      $scope.SubIssueTitle = '';
+                      $scope.Comments = {};
+                      $scope.isCommentsEdit = 0;
+                      $scope.EmployeeList = [];
+                      $scope.ProjectList = [];
+                      //$scope.ProjectList2 = [];
+                      $scope.Employee = {};
+                      $scope.Sprint = {};
+                      $scope.Sprint.Id = 0;
+                      $scope.StatusList = getAllStatus;
+                      $scope.Status = {};
+                      $scope.Status.Id = 0;
+                      $scope.Project = {};
+                      //$scope.Project.Id = 0;
+                      $scope.Employee.EmpBasicInfoID = 0;
+                      $scope.IssueTitle = '';
+                      $scope.resetFilter = resetFilter;
+                      $scope.issue = {};
+                      $scope.IssueDetails.Description = '';
+
+                      $scope.dateOptions = { minDate: new Date() };
+
+                      //$scope.isIssueEmpty = 1;
+                      //$scope.IssueDetails.Priority = '';
+                      //$scope.btnDis = false;
+                      //$scope.spin = false;
+                      //$scope.pageSizeArray = [];
+                      //$scope.pageSizeArray.push({ value: 5, text: 5 });
+                      //$scope.pageSizeArray.push({ value: 10, text: 10 });
+                      //$scope.pageSizeArray.push({ value: 20, text: 20 });
+                      //$scope.pageSizeArray.push({ value: 50, text: 50 });
+                      //$scope.currentPage = 1;
+                      //$scope.pageSize = 10;
+
+                  }
+                  $scope.Reset = function Reset() {
+                      $scope.issueWebLink = {};
+                      $scope.SubIssueTitle = '';
+                      $scope.modalTitle = "Add New Sprint";
+                      $scope.SprintInfo = {};
+                      $scope.SprintInfo.Id = 0;
+                      $scope.Comments = {};
+                      $scope.isCommentsEdit = 0;
+                      $scope.IssueTitle = '';
+                  };
+
+                  $scope.check = function () {
+                      $scope.dateOptionsEnd = { minDate: $scope.SprintInfo.SprintStartDate };
+                  }
+
+
+                  function getIssueList() {
+                      $scope.IssueList = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'TaskManagement/GetIssueList/'
+                      }).then(function successCallback(response) {
+                          $scope.IssueList = response.data.results;
+                          console.log('SprintList', $scope.IssueList.SprintList);
+                          console.log('BacklogList', $scope.IssueList.BacklogList);
+                      }, function errorCallback(response) {
+                          toastr["warning"](response.data.Message);
+                      });
+                  }
+
+                  $scope.getIssueDetails = function (id, index) {
+                      $scope.IssueDetails = {};
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'TaskManagement/getIssueDetails/' + id
+                      }).then(function successCallback(response) {
+                          $scope.IssueDetails = response.data.results;
+                          console.log('Details', $scope.IssueDetails, index);
+                          localStorage.setItem("Index", index);
+                          $scope.IsShowIssueDetails = 1;
+                          $scope.getSprintList($scope.IssueDetails.ProjectId);
+                          $scope.Employee.EmpBasicInfoID = $scope.IssueDetails.AssigneeId;
+                          $scope.Status.Id = $scope.IssueDetails.StatusId;
+                          //$scope.Sprint.Id = $scope.IssueDetails.SprintId;
+                          if ($scope.IssueDetails.DueDate == null) {
+                              $scope.issue.DueDate = new Date();
+                          }
+                          else {
+                              $scope.issue.DueDate = new Date($scope.IssueDetails.DueDate);
+                          }
+
+
+                          $('#sprintDropdown').hide();
+                          $('#sprintText').show();
+                      }, function errorCallback(response) {
+                          toastr["warning"](response.data.Message);
+                      });
+                  }
+
+                  $scope.hideDetals = function () {
+                      $scope.IsShowIssueDetails = 0;
+                  }
+
+
+                  //$scope.getAllSprint = function getAllSprint() {
+                  //    console.log($scope.Project.Id)
+                  //    $scope.SprintList = [];
+                  //    $http({
+                  //        method: 'GET',
+                  //        url: baseUrl + 'TaskManagement/GetAllSprint'
+                  //    }).then(function successCallback(response) {
+                  //        $scope.SprintList = response.data.results;
+                  //        //$scope.Reset();
+                  //        console.log($scope.SprintList)
+                  //    }, function errorCallback(response) {
+                  //        toastr["warning"](response.data.Message);
+                  //    });
+                  //}
+
+
+                  $scope.getSprintList = function getSprintList(n) {
+                      console.log(n)
+                      $scope.SprintList = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'TaskManagement/GetSprintByProjectId/' + n
+                      }).then(function successCallback(response) {
+                          $scope.SprintList = response.data.results;
+                          //$scope.Reset();
+                          console.log($scope.SprintList)
+                      }, function errorCallback(response) {
+                          toastr["warning"](response.data.Message);
+                      });
+                  }
+
+                  function getProjectList() {
+                      $scope.ProjectList = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'TaskManagement/GetAllProject/'
+                      }).then(function successCallback(response) {
+                          $scope.ProjectList = response.data.results;
+                          console.log($scope.ProjectList);
+                      }, function errorCallback(response) {
+                          toastr["warning"](response.data.Message);
+                      });
+                  }
+
+                  function GetDepertmentWiseEmpList() {
+                      $scope.EmployeeList = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'TaskManagement/GetDepertmentWiseEmpList/'
+                      }).then(function successCallback(response) {
+                          $scope.EmployeeList = response.data.results;
+                          console.log('Emp', $scope.EmployeeList);
+                      }, function errorCallback(response) {
+                          toastr["warning"](response.data.Message);
+                      });
+                  }
+
+                  function getAllStatus() {
+                      $scope.StatusList = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'TaskManagement/GetAllStatus/'
+                      }).then(function successCallback(response) {
+                          $scope.StatusList = response.data.results;
+                          //console.log($scope.StatusList);
+                      }, function errorCallback(response) {
+                          toastr["warning"](response.data.Message);
+                      });
+                  }
+
+                  $scope.UpdateStatus = function () {
+                      if ($scope.Status == {} || $scope.Status.Id == 0 || $scope.Status.Id == null || $scope.Status.Id == 'undefined') {
+                          return;
+                      }
+                      
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'TaskManagement/UpdateIssueStatus/' + $scope.IssueDetails.Id + '/' + $scope.Status.Id,
+                      }).then(function successCallback(response) {
+                          
+                          $scope.getIssueDetails($scope.IssueDetails.Id)
+                          toastr["info"]("Status Updated.");
+                      }, function errorCallback(response) {
+                          toastr["warning"](response.data.Message);
+                      });
+                  }
+
+                  $scope.UpdateSprint = function () {
+                      if ($scope.Sprint == {} || $scope.Sprint.Id == 0 || $scope.Sprint.Id == null || $scope.Sprint.Id == 'undefined') {
+                          return;
+                      }
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'TaskManagement/UpdateIssueSprint/' + $scope.IssueDetails.Id + '/' + $scope.Sprint.Id,
+                      }).then(function successCallback(response) {
+                          
+                          getIssueList()
+                          $scope.getIssueDetails($scope.IssueDetails.Id)
+                          $('#sprintDropdown').hide();
+                          $('#sprintText').show();
+                          toastr["info"]("Sprint Updated.");
+                      }, function errorCallback(response) {
+                          toastr["warning"](response.data.Message);
+                      });
+                  }
+
+                  $scope.UpdateSprintStart = function (n) {
+                      console.log(n)
+                      if (n < 1) {
+                          return;
+                      }
+                      SweetAlert.swal("Good job!", "You clicked the button!", "success");
+                      SweetAlert.swal({
+                          title: "Are you sure to complete it ?", type: "warning", showCancelButton: true, confirmButtonColor: "#DD6B55",
+                          confirmButtonText: "Yes, Update it!",
+                          closeOnConfirm: false
+                      },
+                      function (isConfirm) {
+                          if (isConfirm) {
+                              $http({
+                                  method: 'DELETE',
+                                  url: baseUrl + 'TaskManagement/StartSprint/' + n,
+                              }).then(function successCallback(response) {
+                                  SweetAlert.swal("Updated!", "Your data has been updated.", "success");
+                                  getIssueList()
+                              }, function errorCallback(response) {
+                                  toastr["warning"](response.data.Message);
+                              });
+                          }
+                      });
+                  }
+
+                  $scope.UpdateSprintComplete = function (n) {
+                      console.log(n)
+                      if (n < 1) {
+                          return;
+                      }
+                      SweetAlert.swal("Good job!", "You clicked the button!", "success");
+                      SweetAlert.swal({
+                          title: "Are you sure to complete it ?", type: "warning", showCancelButton: true, confirmButtonColor: "#DD6B55",
+                          confirmButtonText: "Yes, complete it!",
+                          closeOnConfirm: false
+                      },
+                      function (isConfirm) {
+                          if (isConfirm) {
+                              $http({
+                                  method: 'DELETE',
+                                  url: baseUrl + 'TaskManagement/CompleteSprint/' + n,
+                              }).then(function successCallback(response) {
+                                  SweetAlert.swal("Updated!", "Your data has been updated.", "success");
+                                  getIssueList()
+                              }, function errorCallback(response) {
+                                  toastr["warning"](response.data.Message);
+                              });
+                          }
+                      });
+                  }
+
+                  $scope.UpdateAssignee = function (assigneeId) {
+                      console.log('sprint Id - ' + assigneeId);
+                      console.log('Issue Id - ' + $scope.IssueDetails.Id);
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'TaskManagement/IssueAssign/' + $scope.IssueDetails.Id + '/' + assigneeId
+                      }).then(function successCallback(response) {
+                          $scope.Reset();
+                          $scope.getIssueDetails($scope.IssueDetails.Id)
+                          toastr["info"]("Assignee Updated.");
+                      }, function errorCallback(response) {
+                          toastr["warning"](response.data.Message);
+                      });
+                  }
+
+                  $scope.UpdateIssueDescription = function () {
+                      $scope.issue.IssueId = $scope.IssueDetails.Id;
+                      $scope.issue.Description = $scope.IssueDetails.Description;
+                      console.log($scope.issue)
+                      $http({
+                          method: 'PUT',
+                          url: baseUrl + 'TaskManagement/UpdateIssueDescription',
+                          data: $scope.issue
+                      }).then(function successCallback(response) {
+                          $scope.Reset();
+                          $scope.getIssueDetails($scope.IssueDetails.Id)
+                          toastr["info"]("Description Updated.");
+                      }, function errorCallback(response) {
+                          toastr["warning"](response.data.Message);
+                      });
+                  }
+
+                  $scope.UpdatePriority = function () {
+                      console.log($scope.IssueDetails.Id);
+                      console.log($scope.IssueDetails.Priority);
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'TaskManagement/UpdateIssuePriority/' + $scope.IssueDetails.Id + '/' + $scope.IssueDetails.Priority,
+                      }).then(function successCallback(response) {
+                          //$scope.Reset();
+                          getIssueList();
+                          $scope.getIssueDetails($scope.IssueDetails.Id)
+                          toastr["info"]("Priority Updated.");
+                      }, function errorCallback(response) {
+                          toastr["warning"](response.data.Message);
+                      });
+                  }
+                  $scope.UpdateDueDate = function () {
+                      $scope.issue.IssueId = $scope.IssueDetails.Id;
+                      console.log($scope.issue)
+                      $http({
+                          method: 'PUT',
+                          url: baseUrl + 'TaskManagement/UpdateIssueDueDate',
+                          data: $scope.issue
+                      }).then(function successCallback(response) {
+                          toastr["info"]("DueDate Updated.");
+                      }, function errorCallback(response) {
+                          toastr["warning"](response.data.Message);
+                      });
+                  }
+
+                  $scope.UpdateComments = function () {
+                      if ($scope.Comments.Description == null || $scope.Comments.Description == '' || $scope.Comments.Description == 'undefined') {
+                          $scope.Comments.IssueId = $scope.IssueDetails.Id;
+                          console.log($scope.Comments);
+                          toastr["info"]("Please Enter Comments..!");
+                          return;
+                      }
+                      $scope.Comments.IssueId = $scope.IssueDetails.Id;
+                      console.log($scope.Comments);
+                      $http({
+                          method: 'PUT',
+                          url: baseUrl + 'TaskManagement/UpdateComments',
+                          data: $scope.Comments
+                      }).then(function successCallback(response) {
+                          toastr["info"]("Your Comments Updated Successfully");
+                          $scope.Reset();
+                          $scope.getIssueDetails($scope.IssueDetails.Id)
+                      }, function errorCallback(response) {
+                          toastr["warning"](response.data.Message);
+                      });
+                  }
+
+                  $scope.EditComments = function (n) {
+                      $scope.isCommentsEdit = 1;
+                      $scope.Comments = n;
+                  }
+
+                  $scope.ClearComments = function () {
+                      $scope.Comments = {};
+                      $scope.isCommentsEdit = 0;
+                  }
+
+                  $scope.AddIssue = function () {
+                      var issue = {};
+                      issue.Title = $scope.IssueTitle;
+                      console.log($scope.IssueTitle)
+                      if ($scope.IssueTitle == '' || $scope.IssueTitle == null || $scope.IssueTitle == 'undefined') {
+                          toastr["warning"]('Invalid Title');
+                          return;
+                      }
+                      $http({
+                          method: 'POST',
+                          url: baseUrl + 'TaskManagement/AddIssue',
+                          data: issue,
+                      }).then(function successCallback(response) {
+                          $scope.Reset();
+                          getIssueList();
+                          toastr["info"]("Issue Successfully Added.");
+                      }, function errorCallback(response) {
+                          toastr["warning"](response.data.Message);
+                      });
+                  }
+
+                  $scope.AddComments = function () {
+                      if ($scope.Comments.Description == null || $scope.Comments.Description == '' || $scope.Comments.Description == 'undefined') {
+                          console.log($scope.IssueDetails.Id);
+                          $scope.Comments.IssueId = $scope.IssueDetails.Id;
+                          console.log($scope.Comments);
+                          toastr["warning"]("Comments Required");
+                          return;
+                      }
+                      $scope.Comments.IssueId = $scope.IssueDetails.Id;
+                      console.log($scope.Comments);
+                      $http({
+                          method: 'POST',
+                          url: baseUrl + 'TaskManagement/AddComments',
+                          data: $scope.Comments
+                      }).then(function successCallback(response) {
+                          toastr["info"]("Comments Added");
+                          $scope.Reset();
+                          $scope.getIssueDetails($scope.IssueDetails.Id)
+                      }, function errorCallback(response) {
+                          toastr["warning"](response.data.Message);
+                      });
+                  }
+
+                  $scope.AddSubIssue = function (n) {
+                      if (n == null || n == '' || n == 'undefined') {
+                          console.log($scope.IssueDetails.Id);
+                          console.log(n);
+                          toastr["warning"]("Enter Valid Sub Issue Title");
+                          return;
+                      }
+                      console.log($scope.IssueDetails.Id);
+                      console.log(n);
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'TaskManagement/CreateSubIssue/' + $scope.IssueDetails.Id + '/' + n,
+                      }).then(function successCallback(response) {
+                          $scope.Reset();
+                          $scope.getIssueDetails($scope.IssueDetails.Id)
+                          toastr["info"]("Sub Issue Added");
+                      }, function errorCallback(response) {
+                          toastr["warning"](response.data.Message);
+                      });
+                  }
+
+                  $scope.AddIssueWebLink = function () {
+                      $scope.issueWebLink.IssueId = $scope.IssueDetails.Id;
+                      console.log($scope.issueWebLink);
+                      if ($scope.issueWebLink.Url == null || $scope.issueWebLink.Url == '') {
+                          toastr["warning"]("Url Required");
+                          return;
+                      } else if ($scope.issueWebLink.Description == null || $scope.issueWebLink.Description == '') {
+                          toastr["warning"]("Web Link Description Required");
+                          return;
+                      }
+                      $http({
+                          method: 'POST',
+                          url: baseUrl + 'TaskManagement/AddIssueWebLink',
+                          data: $scope.issueWebLink
+                      }).then(function successCallback(response) {
+                          $scope.Reset();
+                          $scope.getIssueDetails($scope.IssueDetails.Id)
+                          toastr["info"]("Issue Web Link Added");
+                      }, function errorCallback(response) {
+                          toastr["warning"](response.data.Message);
+                      });
+                  }
+
+                  $scope.save = function save() {
+                      if ($scope.addBasic.$invalid)
+                          return;
+                      else {
+                          
+                          var result = validation();
+                          if (result) {
+                              if ($scope.SprintInfo.Id == 0) {
+                                  $http({
+                                      method: 'POST',
+                                      url: baseUrl + 'TaskManagement/AddSprint',
+                                      data: $scope.SprintInfo
+                                  }).then(function successCallback(response) {
+                                      $('#addmodal').modal('toggle');
+                                      toastr["info"](response.data.message);
+                                      getIssueList();
+                                      if ($scope.IssueDetails.ProjectId > 0) {
+                                          $scope.getSprintList($scope.IssueDetails.ProjectId);
+                                      }
+                                      $scope.Reset();
+                                  }, function errorCallback(response) {
+                                      toastr["warning"](response.data.Message);
+                                  });
+                              }
+                              else {
+                                  $http({
+                                      method: 'PUT',
+                                      url: baseUrl + 'TaskManagement/UpdateSprint',
+                                      data: $scope.SprintInfo
+                                  }).then(function successCallback(response) {
+                                      toastr["info"](response.data.message);
+                                      if (response.data.httpStatusCode != 305) {
+                                          $('#addmodal').modal('toggle');
+                                          getAllSprint();
+                                          $scope.Reset();
+                                      }
+
+                                  }, function errorCallback(response) {
+                                      toastr["warning"](response.data.Message);
+                                  });
+                              }
+                          }
+                      }
+                  }
+
+                  function validation() {
+                      var sdate = new Date();
+                      sdate.setDate(sdate.getDate() - 1);
+                      if ($scope.SprintInfo.SprintStartDate < sdate) {
+                          toastr["warning"]("Please Select Valid Start date..!");
+                          return false;
+                      } else if ($scope.SprintInfo.SprintEndDate < $scope.SprintInfo.SprintStartDate) {
+                          toastr["warning"]("Please Select Valid End date..!");
+                          return false;
+                      } else {
+                          return true;
+                      }
+                  }
+
+                  $scope.DeleteIssueWebLink = function (issueWebLinkId) {
+                     
+                      SweetAlert.swal("Good job!", "You clicked the button!", "success");
+                      SweetAlert.swal({
+                          title: "Are you sure to delete it ?", type: "warning", showCancelButton: true, confirmButtonColor: "#DD6B55",
+                          confirmButtonText: "Yes, delete it!",
+                          closeOnConfirm: false
+                      },
+                      function (isConfirm) {
+                          if (isConfirm) {
+                              $http({
+                                  method: 'DELETE',
+                                  url: baseUrl + 'TaskManagement/DeleteIssueWebLink/' + issueWebLinkId,
+                              }).then(function successCallback(response) {
+                                  SweetAlert.swal("Deleted!", "Your data has been deleted.", "success");
+                                  $scope.Reset();
+                                  $scope.getIssueDetails($scope.IssueDetails.Id)
+                              }, function errorCallback(response) {
+
+                                  toastr["warning"](response.data.Message);
+                              });
+                          }
+                      });
+                  }
+
+                  $scope.DelectComments = function (commentsId) {
+                      
+                      SweetAlert.swal("Good job!", "You clicked the button!", "success");
+                      SweetAlert.swal({
+                          title: "Are you sure to delete it ?", type: "warning", showCancelButton: true, confirmButtonColor: "#DD6B55",
+                          confirmButtonText: "Yes, delete it!",
+                          closeOnConfirm: false
+                      },
+                      function (isConfirm) {
+                          if (isConfirm) {
+                              $http({
+                                  method: 'DELETE',
+                                  url: baseUrl + 'TaskManagement/DeleteComments/' + commentsId,
+                              }).then(function successCallback(response) {
+                                  SweetAlert.swal("Deleted!", "Your data has been deleted.", "success");
+                                  $scope.Reset();
+                                  $scope.getIssueDetails($scope.IssueDetails.Id)
+                              }, function errorCallback(response) {
+                                  toastr["warning"](response.data.Message);
+                              });
+                          }
+                      });
+                  }
+
+                  $scope.DelectAttachment = function (attachmentId) {
+                      
+                      SweetAlert.swal("Good job!", "You clicked the button!", "success");
+                      SweetAlert.swal({
+                          title: "Are you sure to delete it ?", type: "warning", showCancelButton: true, confirmButtonColor: "#DD6B55",
+                          confirmButtonText: "Yes, delete it!",
+                          closeOnConfirm: false
+                      },
+                      function (isConfirm) {
+                          if (isConfirm) {
+                              $http({
+                                  method: 'DELETE',
+                                  url: baseUrl + 'TaskManagement/DeleteIssueAttachment/' + $scope.IssueDetails.Id + '/' + attachmentId,
+                              }).then(function successCallback(response) {
+                                  SweetAlert.swal("Deleted!", "Your data has been deleted.", "success");
+                                  $scope.Reset();
+                                  $scope.getIssueDetails($scope.IssueDetails.Id)
+                              }, function errorCallback(response) {
+                                  toastr["warning"](response.data.Message);
+                              });
+                          }
+                      });
+                  }
+
+                  $scope.UploadAttachment = function () {
+                      $scope.issueAttachmentInfo = {};
+                      $scope.issueAttachmentInfo.IssueId = $scope.IssueDetails.Id;
+                      var files = $("#pdf").get(0).files;
+                      if (files == null || files.length < 1) {
+                          toastr["warning"]('File is required');
+                          return;
+                      }
+                      
+                      $http({
+                          method: 'POST',
+                          url: baseUrl + 'TaskManagement/AddIssueAttachment/',
+                          headers: { 'Content-Type': undefined },
+                          transformRequest: function (data) {
+                              var formData = new FormData();
+                              formData.append('issueAttachment', JSON.stringify($scope.issueAttachmentInfo.IssueId));
+                              if (files.length > 0)
+                                  formData.append("attachment", files[0]);
+                              return formData;
+                          },
+                          data: { issueAttachment: $scope.issueAttachmentInfo.IssueId }
+                      }).then(function successCallback(response) {
+                          $scope.Reset();
+                          $scope.getIssueDetails($scope.IssueDetails.Id)
+                          toastr["success"]("Attachment Uploaded");
+                          $('#attachmentModal').modal('hide');
+                      }, function errorCallback(response) {
+                          resetForm();
+                          toastr["warning"](response.data.Message);
+
+                      });
+
+                  }
+
+
+                  $("#weblinkButtonTop").click(function () {
+                      $('#weblinkinput').focus();
+                  });
+
+                  $("#showAddUp").click(function () {
+                      $('#exampleInputEmail1').focus();
+                  });
+
+                  $("#showWeblinkClick").click(function () {
+                      $('#weblinkinput').focus();
+                  });
+
+                  $("#showAdd").click(function () {
+                      $('#exampleInputEmail1').focus();
+                  });
+
+                  $("#sprintText").click(function () {
+                      $('#sprintText').hide();
+                      $('#sprintDropdown').show();
+                  });
+                  $('#sprintDropdown').hide();
+                 
+                  $scope.checkIssueActive = function (index) {
+                      var gIndex = parseInt(localStorage.getItem("Index"));
+                      if (gIndex == index) {
+                          return ' backlogActive';
+                      }
+
+                  }
+                  function resetFilter() {
+                      localStorage.setItem("Index", 0);
+                  }
+
+              }]);
+    </script>
+
+}
+

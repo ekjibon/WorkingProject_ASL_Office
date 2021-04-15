@@ -1,0 +1,558 @@
+﻿<div class="portlet box blue-hoki" ng-controller="AttendanceCrt">
+    <div class="portlet-title">
+        <div class="caption">
+            <i class="fa fa-user-plus"></i>Student Attendance  Search
+        </div>
+
+    </div>
+    <div class="portlet-body form">
+        <!-- BEGIN FORM-->
+        <form class="form-horizontal">
+            <div class="form-body">
+                
+
+                <div class="row">
+                    <div class="col-md-4">
+
+                        <div class="form-group" ng-class="{ 'has-error' : submitted1 && formCommonFeilds.AdmissionDate.$invalid}">
+                            <label class="col-md-5 control-label" style="padding-left:2px">
+                                From Date:
+                                <span class="required">*</span>
+                            </label>
+                            <div class="col-md-7">
+                                <input class="form-control" name="JoiningDate" required type="datetime" placeholder="From Date"  readonly  ng-click="p1=true" is-open="p1" uib-datepicker-popup="dd-MM-yyyy" ng-model="AttendanceSearch.FromDate" />
+                                <div class="form-control-focus"> </div>
+                                <span ng-show="submitted1 && formCommonFeilds.FromDate.$error.required" class="help-block">From Date Required</span>
+                            </div>
+                        </div>
+
+                        <div class="form-group" ng-class="{ 'has-error' : submitted && formCommonFeilds.Version.$invalid}">
+                            <label class="col-md-5 control-label">
+                                Version :
+                                <span class="required">*</span>  
+                            </label>
+                            <div class="col-md-7">
+                                <select class="form-control" ng-disabled="sid" ng-model="AttendanceSearch.VersionID" required name="Version" ng-options="AttendanceSearch.VersionId as AttendanceSearch.VersionName for AttendanceSearch in CommonFeilds.Version">
+                                    <option value="" selected="selected">Choose Option</option>
+                                </select>
+                                <div class="form-control-focus"> </div>
+                                <span ng-show="submitted && formCommonFeilds.Version.$error.required" class="help-block">Version Required</span>
+                            </div>
+                        </div>
+                        <div class="form-group" ng-class="{ 'has-error' : submitted && formCommonFeilds.Session.$invalid}">
+                            <label class="col-md-5 control-label">
+                                Session :
+                                <span class="required">*</span>  
+                            </label>
+                            <div class="col-md-7">
+                                <select class="form-control" ng-disabled="sid" ng-model="AttendanceSearch.SessionId" required name="Session" ng-options="AttendanceSearch.SessionId as AttendanceSearch.SessionName for AttendanceSearch in CommonFeilds.Session">
+                                    <option value="" selected="selected">Choose Option</option>
+                                </select>
+
+                                <div class="form-control-focus"> </div>
+                                <span ng-show="submitted && formCommonFeilds.Session.$error.required" class="help-block">Session Required</span>
+                            </div>
+                        </div>
+
+                        <div class="form-group" ng-class="{ 'has-error' : submitted && formCommonFeilds.Branch.$invalid}">
+                            <label class="col-md-5 control-label">
+                                Branch : 
+                                <span class="required">*</span> 
+                            </label>
+                            <div class="col-md-7">
+                                <select class="form-control" ng-disabled="sid" ng-model="AttendanceSearch.BranchID" required name="Branch" ng-options="AttendanceSearch.BranchId as AttendanceSearch.BranchName for AttendanceSearch in CommonFeilds.Branch">
+                                    <option value="" selected="selected">Choose Option</option>
+                                </select>
+                                <div class="form-control-focus"> </div>
+                                <span ng-show="submitted && formCommonFeilds.Branch.$error.required" class="help-block">Branch Name Required</span>
+                            </div>
+                        </div>
+                        <div class="form-group" ng-class="{ 'has-error' : sid && submitted1 && formCommonFeilds.studentID.$invalid}">
+                            <label class="col-md-5 control-label">
+                                Student ID &nbsp;
+                                <span><input type="checkbox" ng-change="AttendanceSearch.SID = sid ? '' : undefined" ng-model="sid" ng-true-value="true" ng-false-value="false" /></span>
+                            </label>
+                            <div class="col-md-7" ng-show="sid">
+                                <input type="text" ng-model="AttendanceSearch.SID" class="form-control" placeholder="Student ID" name="studentID" required />
+                                <div class="form-control-focus"> </div>
+                                <span ng-show="sid && submitted1 && formCommonFeilds.studentID.$error.required" class="help-block">Student ID Required</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+
+                        <div class="form-group" ng-class="{ 'has-error' : submitted1 && formCommonFeilds.AdmissionDate.$invalid}">
+                            <label class="col-md-5 control-label" style="padding-left:2px">
+                                To Date:
+                                <span class="required">*</span> 
+                            </label>
+                            <div class="col-md-7">
+                                <input class="form-control" name="ToDate" type="datetime" placeholder="To Date" readonly ng-change="getOrderbydate()" ng-click="p2=true" is-open="p2" uib-datepicker-popup="dd-MM-yyyy" ng-model="AttendanceSearch.ToDate" />
+                                <div class="form-control-focus"> </div>
+                                <span ng-show="submitted1 && formCommonFeilds.ToDate.$error.required" class="help-block">From Date Required</span>
+                            </div>
+                        </div>
+                        <div class="form-group" ng-class="{ 'has-error' : submitted && formCommonFeilds.Shift.$invalid}">
+                            <label class="col-md-5 control-label">
+                                Shift :
+                                <span class="required">*</span>
+                            </label> 
+                            <div class="col-md-7">
+                                <select class="form-control" ng-disabled="sid" ng-model="AttendanceSearch.ShiftId" required name="Shift" ng-options="AttendanceSearch.ShiftId as AttendanceSearch.ShiftName for AttendanceSearch in CommonFeilds.Shift | filter:{BranchId:AttendanceSearch.BranchID}:true">
+                                    <option value="" selected="selected">Choose Option</option>
+                                </select>
+                                <div class="form-control-focus"> </div>
+                                <span ng-show="submitted && formCommonFeilds.Shift.$error.required" class="help-block">Shift Name Required</span>
+                            </div>
+                        </div>
+
+                        <div class="form-group" ng-class="{ 'has-error' : submitted && formCommonFeilds.Class.$invalid}">
+                            <label class="col-md-5 control-label">
+                                Class :
+                                <span class="required">*</span>
+                            </label>
+                            <div class="col-md-7">
+                                <select class="form-control" ng-disabled="sid" ng-model="AttendanceSearch.ClassId" name="Class" ng-change="GetGroup(AttendanceSearch.ClassId)" required ng-options="AttendanceSearch.ClassId as AttendanceSearch.ClassName for AttendanceSearch in CommonFeilds.ClassInfo | filter:{VersionId:AttendanceSearch.VersionID}:true">
+                                    <option value="" selected="selected">Choose Option</option>
+                                </select>
+                                <div class="form-control-focus"> </div>
+                                <span ng-show="submitted && formCommonFeilds.Class.$error.required" class="help-block">Class Required</span>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-md-5 control-label">
+                                Group :
+                            </label>
+                            <div class="col-md-7">
+                                <select class="form-control"  ng-disabled="Groups.length <= 0 || sid" ng-change="GetSection();" ng-model="AttendanceSearch.GroupId" name="Group" ng-options="G.GroupId as G.GroupName for G in Groups">
+                                    <option value="" selected>Choose Option</option>
+                                </select>
+                                <div class="form-control-focus"> </div>
+
+                            </div>
+                        </div>
+                    </div>
+                  
+                    <div class="col-md-4">
+                        <div class="form-group" ng-class="{ 'has-error' : submitted && formCommonFeilds.IsGrand.$invalid}">
+                            <label class="col-md-5 control-label">
+                                Is Grand :
+                            </label>
+                            <div class="col-md-7">
+                                <input type="checkbox" width="150" height="150" ng-true-value="true" ng-false-value="false" ng-model="AttendanceSearch.IsGrand"  style="width:20px;height:20px;"  />
+
+                                <div class="form-control-focus"> </div>
+                                <span ng-show="submitted && formCommonFeilds.IsGrand.$error.required" class="help-block">Main Exam Name Required</span>
+
+                            </div>
+                        </div>
+
+                        <div class="form-group" ng-class="{ 'has-error' : submitted && formCommonFeilds.Section.$invalid}">
+                            <label class="col-md-5 control-label">
+                                Section :
+                                <span class="required">*</span>
+                            </label>
+                            <div class="col-md-7">
+                                <select class="form-control" ng-model="AttendanceSearch.SectionId" ng-disabled="sid" required name="Section" ng-options="S.SectionId as S.SectionName for S in Sections" ng-change="getMainExam();">
+                                    <option value="" selected="selected">Choose Option</option>
+                                </select>
+                                <div class="form-control-focus"> </div>
+                                <span ng-show="submitted && formCommonFeilds.Section.$error.required" class="help-block">Section Name Required</span>
+                            </div>
+                        </div>   
+                        <div class="form-group" ng-class="{ 'has-error' : submitted && formCommonFeilds.mainExam.$invalid}">
+                            <label class="col-md-5 control-label">
+                                Main Exam :
+                            </label>
+                            <div class="col-md-7">
+                                <select class="form-control" ng-model="AttendanceSearch.MainExamId" required  name="mainExam" ng-options="mainexam.MainExamId as mainexam.MainExamName for mainexam in Exams ">
+                                    <option value="" selected="selected">Choose Option</option>
+                                </select>
+                                <div class="form-control-focus"> </div>
+                                <span ng-show="submitted && formCommonFeilds.mainExam.$error.required" class="help-block">Main Exam Name Required</span> 
+                            </div>
+                        </div>  
+                        <div class="pull-right">
+                            <button ng-click="Search()" class="btn green">Show</button>
+                            @*<button ng-click="Report()" class="btn info">Report</button>*@                                                                                                                                                                                        
+                            <a href="@Url.Action("MainExamResultAttendanceReport","Report")?FromDate={{AttendanceSearch.FromDate | date:'dd/MM/yyyy'}}&ToDate={{AttendanceSearch.ToDate| date:'dd/MM/yyyy'}}&VersionID={{AttendanceSearch.VersionID}}&BranchID={{AttendanceSearch.BranchID}}&SessionID={{AttendanceSearch.SessionId}}&ShiftId={{AttendanceSearch.ShiftId}}&ClassId={{AttendanceSearch.ClassId}}&GroupId={{AttendanceSearch.GroupId}}&SectionId={{AttendanceSearch.SectionId}}&MainExamId={{AttendanceSearch.MainExamId}}&IsGrand={{AttendanceSearch.IsGrand}}" class="btn btn-primary" target="_blank" >Report</a>
+                            <button ng-click="Reset()" class="btn info">Reset</button>
+                        </div>
+                    </div>
+
+                </div>
+     
+
+                </div>
+
+        </form>
+        
+    </div>
+
+    <div class="panel" ng-show="studentAttendanceInfos.length>0">
+        <!-- Default panel contents -->
+        <div class="panel-heading bg-green-haze-opacity">
+            <h3 class="panel-title" style="color:#ffffff; font-size:large">Student Attendance List</h3>
+        </div>
+        <div class="panel-body" >
+            
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="form-group" ng-class="{ 'has-error' : submitted &&studentAttendanceInfos.TStudent.$invalid}">
+                        <label class="col-md-5 control-label">
+                            Total Student
+                        </label>
+                        <div class="col-md-7">
+                          
+                            <input type="text" class="form-control" ng-model="studentAttendanceInfos.TotalStudent"/>
+
+                            <div class="form-control-focus"> </div>
+
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group" ng-class="{ 'has-error' : submitted && studentAttendanceInfos.TExaminee.$invalid}">
+                        <label class="col-md-5 control-label">
+                            Total Examinee
+                        </label>
+                        <div class="col-md-7">
+
+                            <input type="text" class="form-control" ng-model="studentAttendanceInfos.TExaminee"/>
+
+                            <div class="form-control-focus"> </div>
+
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group" >
+                        <label class="col-md-6 control-label">
+                            Total Working Day
+                        </label>
+                        <div class="col-md-6"  ng-class="{ 'has-error' : studentAttendanceInfos[0].TotalWorkingDays >300}">
+
+                            <input type="text" class="form-control" ng-model="studentAttendanceInfos[0].TotalWorkingDays"/>
+                            <span class="help-block" ng-show="(studentAttendanceInfos[0].TotalWorkingDays >300)">Invalid!</span>
+                            <div class="form-control-focus"> </div>
+
+                        </div>
+                    </div>
+                </div>
+                @*<div class="col-md-8">
+                    <div class="form-group pull-right">
+
+                        <button ng-click="SaveAtt()" class="btn green">Save</button>
+
+                    </div>
+                </div>*@
+
+            </div>
+            <hr/>
+           
+             <table class="table table-bordered table-inverse">
+                <thead class="btn-primary">
+                    <tr>
+                        <th> Student ID </th>
+                        <th> Student Roll </th>
+                        <th> Student Name</th>
+                        <th> Attendance </th>
+                        <th> Present </th>
+                        <th> Percentage </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="item in studentAttendanceInfos">
+                        <td width="15%"> {{item.StudentInsID}} </td>
+                        <td width="15%"> {{item.RollNo}} </td>
+                        <td width="30%"> {{item.FullName}} </td>
+                        <td width="20%"> {{item.Attendance}} </td>
+                        <td width="20%" ng-class="{ 'has-error' : studentAttendanceInfos[0].TotalWorkingDays < item.PresentDay}">
+                            <input type="number" ng-model="item.PresentDay" class="form-control" ng-disabled="item==null" />
+                            <span class="help-block" ng-show="(studentAttendanceInfos[0].TotalWorkingDays < item.PresentDay)">Invalid!</span>
+                         </td>
+                        <td width="20%"> {{(item.PresentDay*100)/item.TotalWorkingDays}} </td>
+
+                    </tr>
+                  
+                </tbody>
+
+            </table>
+
+            <div class="col-md-2 pull-right">
+                <button ng-click="SaveAtt()" class="btn green">Save</button>
+
+           </div>
+        </div>
+        <!-- Table -->
+
+
+    </div>
+
+
+</div>
+
+@section Scripts{
+    <script type="text/javascript">
+        OEMSApp.controller("AttendanceCrt", ["$scope", "$http", "SweetAlert","$window",
+          function ($scope, $http, SweetAlert, $window) {
+
+                  init();
+                  function init() {
+                      initialize();
+                      getAllCommons();
+                  }
+                  function initialize() {
+                      $scope.AttendanceSearch = {};
+                      $scope.AttendanceSearch.VersionID = 0;
+                      $scope.AttendanceSearch.SessionId = 0;
+                      $scope.AttendanceSearch.BranchID = 0;
+                      $scope.AttendanceSearch.ShiftId = 0;
+                      $scope.AttendanceSearch.ClassId = 0;
+                      $scope.AttendanceSearch.GroupId = 0;
+                      $scope.AttendanceSearch.SectionId = 0;
+                      $scope.AttendanceSearch.HouseId = 0;
+                      $scope.AttendanceSearch.StudentType = 0;
+                     
+                      $scope.AttendanceSearch = {};
+                      $scope.studentAttendanceInfos = [];
+                      $scope.SaveAtt = SaveAtt;
+
+                      $scope.StudentInfos = [];
+                      $scope.Dropdowns = [];
+                      $scope.CommonFeilds = [];
+                      $scope.currentPage = 1;
+                      $scope.pageno = 1;
+                      $scope.pagesize = 10;
+                      $scope.total_count = 12;
+                      $scope.txtsearch = '';
+
+                  
+                      $scope.getMainExam = getMainExam;
+
+                  };
+                  function resetForm() {
+                      $scope.submitted = false;
+
+                  };
+
+                  $scope.Reset = function Reset() {
+
+                      //initialize();
+                      //getAllDropdowns();
+                      //getAllCommons();
+                      $scope.submitted = false;
+                      $scope.selectedAll = false;
+                      $scope.StudentInfos = [];
+                  };
+
+                 
+                  $scope.Search = function Search() {
+
+                      if ($scope.AttendanceSearch.MainExamId!=null) {
+                          ($scope.AttendanceSearch.
+                          $scope.studentAttendanceInfos = [];
+
+                          $http({
+                              method: 'POST',
+                              url: baseUrl + 'Attendance/AttendanceSearch/',
+                              data: $scope.AttendanceSearch
+                          }).then(function successCallback(response) {
+                              $scope.studentAttendanceInfos = response.data.results;
+                              toastr["success"](response.data.message);
+                          }, function errorCallback(response) {
+                              toastr["error"](response.data.message);
+                          });
+
+                         }
+                   
+
+                  };
+                 
+                  $scope.Report = function Report() {
+                  if ($scope.AttendanceSearch.MainExamId != null) { 
+                      
+                      $scope.uri = "@Url.Action("MainExamResultAttendanceReport", "Report")?FromDate=" + $scope.AttendanceSearch.FromDate+ "&ToDate=" + $scope.AttendanceSearch.ToDate + "&VersionID=" + $scope.AttendanceSearch.VersionID + "&BranchID=" + $scope.AttendanceSearch.BranchID + "&SessionID=" + $scope.AttendanceSearch.SessionId + "&ShiftId=" + $scope.AttendanceSearch.ShiftId + "&ClassId=" + $scope.AttendanceSearch.ClassId + "&GroupId=" + $scope.AttendanceSearch.GroupId + "&SectionId=" + $scope.AttendanceSearch.SectionId + "&MainExamId=" + $scope.AttendanceSearch.MainExamId + "&IsGrand=" + $scope.AttendanceSearch.IsGrand;
+                      $window.open($scope.uri, '_blank');
+                      }
+
+
+                  };
+                  function SaveAtt() {
+                      $http({
+                          method: 'POST',
+                          url: baseUrl + 'Attendance/SaveExamAtte/',
+                         
+                          
+
+                          data: $scope.studentAttendanceInfos
+                      }).then(function successCallback(response) {
+                          toastr["success"](response.data.message);
+                      }, function errorCallback(response) {
+                          toastr["info"](response.data.message);
+                      });
+
+                  };
+
+                  $scope.GetGroup = function GetGroup(classid) {
+                      $scope.Groups = [];
+
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Common/GetGroup/' + classid
+                      }).then(function successCallback(response) {
+                          $scope.Groups = response.data.results;
+
+
+                      }, function errorCallback(response) {
+                          toastr["error"](response.data.message);
+                      });
+
+                  }
+
+                  $scope.GetSection = function GetSection() {
+                      $scope.Sections = [];
+
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Common/GetSection/' + $scope.AttendanceSearch.SessionId + "/" + $scope.AttendanceSearch.ShiftId + "/" + $scope.AttendanceSearch.ClassId + "/" + $scope.AttendanceSearch.GroupId
+                      }).then(function successCallback(response) {
+                          $scope.Sections = response.data.results;
+
+
+                      }, function errorCallback(response) {
+                          toastr["error"](response.data.message);
+                      });
+
+                  }
+
+                  function getMainExam() {
+
+                      $scope.MainExams = [];
+
+                      if ($scope.AttendanceSearch.IsGrand==true) {
+                          $http({
+                              method: 'GET',
+                              url: baseUrl + 'ExamSetup/GetGrandExam/' + $scope.AttendanceSearch.VersionID + '/' + $scope.AttendanceSearch.SessionId + '/' + $scope.AttendanceSearch.ClassId + '/' + $scope.AttendanceSearch.GroupId
+                          }).then(function successCallback(response) {
+                              debugger;
+
+                              $scope.MainExams = response.data.results;
+                              
+                              $scope.Exams = [];
+                              $scope.Exam={};
+
+                              for (var i = 0 ; i < $scope.MainExams.length; i++) {
+                                  $scope.Exam.MainExamName = $scope.MainExams[i].GrandExamName;
+                                  $scope.Exam.MainExamId = $scope.MainExams[i].GrandExamId;
+
+                                  $scope.Exams.push({
+                                      MainExamName: $scope.Exam.MainExamName, MainExamId: $scope.Exam.MainExamId
+                                  });
+                              }                          
+
+                          }, function errorCallback(response) {
+                          });
+                      }
+                      else {
+                          $http({
+                              method: 'GET',
+                              url: baseUrl + 'ExamSetup/GetMainExamBySession/' + $scope.AttendanceSearch.VersionID + '/' + $scope.AttendanceSearch.SessionId + '/' + $scope.AttendanceSearch.ClassId + '/' + $scope.AttendanceSearch.GroupId
+                          }).then(function successCallback(response) {
+                              $scope.MainExams = response.data.results;
+
+                              $scope.Exams = [];
+                              $scope.Exams = $scope.MainExams;
+
+                          }, function errorCallback(response) {
+                              toastr["error"](response.data.message);
+                          });
+                      }
+                     
+                  }
+
+                  $scope.selectAll = function () {
+                      angular.forEach($scope.StudentInfos, function (item) {
+                          item.Selected = $scope.selectedAll;
+                      });
+
+                  };
+
+                  $scope.GetSelects = function GetSelects() {
+                      var res = '';
+                      angular.forEach($scope.StudentInfos, function (item) {
+                          if(item.Selected)
+                          {
+                              res = res + ',' + item.StudentIID
+                          }
+                      });
+
+                    return  res.trim()
+
+                  };
+
+
+                  $scope.checkIfAllSelected = function () {
+                      $scope.selectedAll = $scope.StudentInfos.every(function (item) {
+                          return item.Selected == true
+                      })
+                  };
+
+                 
+
+
+
+                  function getAllCommons() {
+                      $scope.CommonFeilds = [];
+
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Common/GetCommonItem/'
+                      }).then(function successCallback(response) {
+                          $scope.CommonFeilds = response.data.results;
+                      }, function errorCallback(response) {
+                          toastr["error"](response.data.message);
+                      });
+                  }
+
+
+
+              }]);
+    </script>
+<script type="text/javascript">
+
+        $(document).ready(function ($) {
+
+            // Disable scroll when focused on a number input.
+            $(document).on('focus', 'input[type=number]', function (e) {
+                $(this).on('wheel', function (e) {
+                    e.preventDefault();
+                });
+            });
+
+            // Restore scroll on number inputs.
+            $(document).on('blur', 'input[type=number]', function (e) {
+                $(this).off('wheel');
+            });
+
+            // Disable up and down keys.
+            $(document).on('keydown', 'input[type=number]', function (e) {
+                if (e.which == 38 || e.which == 40)
+                    e.preventDefault();
+                //if (e.keyCode == 13) {
+                //    $(this).next('input[type=number]').focus();
+                //}
+                if (e.which === 13 ||  e.which == 40) {
+                    var index = $('.inputs').index(this) + 1;
+                    $('.inputs').eq(index).focus();
+                }
+                if ( e.which == 38 ) {
+                    var index = $('.inputs').index(this) - 1;
+                    $('.inputs').eq(index).focus();
+                }
+            });
+        });
+</script>
+} 

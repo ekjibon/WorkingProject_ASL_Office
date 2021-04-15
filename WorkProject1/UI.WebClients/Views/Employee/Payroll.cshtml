@@ -1,0 +1,137 @@
+﻿@{
+    ViewBag.Title = "Employee Profile";
+    Layout = "~/Views/Shared/_EmpLayout.cshtml";
+}
+@{
+    ViewBag.Title = "Payroll";
+}
+<style>
+    .Approved {
+        background: rgba(0, 156, 184, 0.521);
+        color: #009DB8;
+        padding: 8px 16px;
+        border-radius: 27px;
+    }
+
+    .pending {
+        background: rgba(252, 122, 82, 0.5);
+        color: #FC7B52;
+        padding: 8px 16px;
+        border-radius: 27px;
+    }
+
+    .Rejected {
+        background: #dc3545;
+        color: white;
+        padding: 8px 16px;
+        border-radius: 27px;
+    }
+</style>
+
+<div class="kt-container  kt-container--fluid  kt-grid__item kt-grid__item--fluid" ng-controller="PayrollCltr">
+    <div class="row">
+        <div class="kt-portlet kt-portlet--mobile">
+            <div class="kt-portlet__head kt-portlet__head--lg">
+                <div class="kt-portlet__head-label">
+                    <h3 class="kt-portlet__head-title">
+                        <b>
+                            Payroll
+                        </b>
+                    </h3>
+                </div>
+            </div>
+            <div class="kt-portlet__body">
+
+                <div class="row">
+                    <div class="col-md-4 col-sm-5 col-xs-6">
+                        <div class="form-group">
+                            <div class="col-lg-3 col-md-5 col-sm-4 col-xs-8" style="padding-left:0px">
+
+                                <select class="form-control kt-font-brand" ng-model="pageSize" ng-options="P.value as P.text for P in pageSizeArray"></select>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="col-md-4 col-sm-3 col-xs-1">
+                    </div>
+                    <div class="col-md-4 col-sm-4 col-xs-5">
+                        <div id="sample_3_filter" class="pull-right">
+                            <input ng-model="q" id="search" class="form-control" placeholder="Filter text">
+                        </div>
+                    </div>
+                </div>
+                <table class="table table-bordered table-hover rounded">
+                    <thead>
+                        <tr class="btn-primary">
+                            <th> Salary Month & Year </th>
+                            <th>Attendance Range </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="item in EmployeeInfos">
+                            <td> {{item.MonthName}},{{item.Year}}</td>
+                            <td> {{item.StartDate | date}} to {{item.EndDate | date}} </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="row" style="padding-left:10px; padding-right:10px;">
+                    <dir-pagination-controls boundary-links="true" template-url="~/assets/angular/lib/dirPagination.tpl.html"></dir-pagination-controls>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts{
+
+    <script type="text/javascript">
+        OEMSApp.controller("PayrollCltr", ["$scope", "$http", "SweetAlert", "blockUI", "$window", "$filter",
+                     function ($scope, $http, SweetAlert, blockUI, $window, $filter) {
+                         init();
+
+                         function init() {
+                             initialize();
+
+                         }
+                         function initialize() {
+                             $scope.pageSizeArray = [];
+                             $scope.pageSizeArray.push({ value: 5, text: 5 });
+                             $scope.pageSizeArray.push({ value: 10, text: 10 });
+                             $scope.pageSizeArray.push({ value: 20, text: 20 });
+                             $scope.pageSizeArray.push({ value: 50, text: 50 });
+                             $scope.currentPage = 1;
+                             $scope.pageSize = 10;
+                             $scope.oddColor = '#E4F4F7';
+                             //GetMeetingList();
+                             GetPayslipList();
+
+                         };
+                         function GetPayslipList() {
+                             //debugger;
+                             //if ($scope.formCommonFeilds.$invalid)
+                             //    return;
+                             $scope.EmployeeInfos = [];
+                             $http({
+                                 method: 'POST',
+                                 url: baseUrl + 'Employee/PayslipListByEmpId/'
+                             }).then(function successCallback(response) {
+                                 $scope.EmployeeInfos = response.data.results;
+                                 //console.log($scope.EmployeeInfos);
+                                 //$scope.selectedAll = true;
+                                 //angular.forEach($scope.EmployeeInfos, function (item) {
+                                 //    item.Selected = $scope.selectedAll;
+                                 //});
+
+                                 toastr["success"](response.data.message);
+                             }, function errorCallback(response) {
+                                 toastr["error"](response.data.Message);
+                             });
+                         };
+
+                     }]);
+    </script>
+}
+
+
+

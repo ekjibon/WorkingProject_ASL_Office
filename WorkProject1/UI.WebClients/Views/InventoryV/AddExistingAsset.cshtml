@@ -1,0 +1,322 @@
+﻿
+@{
+    ViewBag.Title = "Add Existing Asset";
+}
+
+
+<div class="kt-container  kt-container--fluid  kt-grid__item kt-grid__item--fluid" ng-controller="AddExistingAsset">  
+
+    <div class="row">
+        <div class="kt-portlet kt-portlet--mobile">
+            <div class="kt-portlet__head kt-portlet__head--lg">
+                <div class="kt-portlet__head-label">
+                    <h3 class="kt-portlet__head-title">
+                        Existing Asset
+                    </h3>
+                </div>
+                <div class="kt-portlet__head-toolbar">
+                    <div class="kt-portlet__head-wrapper">
+                        <div class="dropdown dropdown-inline">
+                            <button type="button" ng-click="resetForm()" class="btn btn-brand btn-icon-sm" data-toggle="modal" data-target="#addmodal" aria-haspopup="true" aria-expanded="false">
+                                <i class="flaticon2-plus"></i> Add Existing Asset
+                            </button>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="kt-portlet__body">
+
+                <div class="row">
+                    
+                        <div class="col-md-6">
+                            <div class="form-group row">
+                               
+                                    <div class="col-md-4">
+                                        <div class="pull-right">
+                                            <button class="btn btn-success" @*ng-click="getAllRosterRegular()"*@ type="submit">Asset Register</button>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="pull-left">
+                                            <button class="btn btn-success" @*ng-click="getAllRosterRegular()"*@ type="submit">Asset Modify</button>
+                                        </div>
+                                        <br />
+                                    </div> 
+
+                                    <div class="col-md-4">
+                                    </div>
+                                </div>
+                        </div>
+                    </div>
+                
+               
+            </div>
+        </div>
+    </div>
+   <!--Modal Area Start-->
+    <div id="addmodal" class="modal fade bd-example-modal-lg" tabindex="-1" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <form name="addform" ng-submit="save()" class="form-horizontal" id="form_sample_1" novalidate>
+                    <div class="modal-header">
+                        <h4 class="modal-title">{{modalTitle}}</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                        
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-body">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="row">
+                                        <div class="col-md-6">
+
+                                            <div class="form-group row" @*ng-class="{ 'has-error' : submitted && addform.AssetName.$invalid}"*@>
+                                                <label class="col-md-5 control-label" style="text-align:right">
+                                                    Asset Name :
+                                                    <span class="required">*</span>
+                                                </label>
+                                                <div class="col-md-7">
+                                                    <input type="text" ng-model="AssetName"
+                                                           typeahead-on-select='onSelect($item, $model, $label)'
+                                                           placeholder="Search Cadet by Id or Name"
+                                                           uib-typeahead="i  as i.Name  for i in Search($viewValue)"
+                                                           typeahead-loading="loadingLocations"
+                                                           typeahead-no-results="noResults"
+                                                           class="form-control">
+                                                    <i ng-show="loadingLocations" class="glyphicon glyphicon-refresh"></i>
+                                                    <div ng-show="noResults"><i class="glyphicon glyphicon-remove"></i> No Results Found</div>
+                                                    <input type="hidden" name="ExistAssetName" ng-model="ExistAssetName" ng-value="AssetName.Value" />
+                                                </div>
+
+                                            </div>
+                                            <div class="form-group row" ng-class="{ 'has-error' : submitted && addform.AssetId.$invalid}">
+                                                <label class="col-md-5 control-label" style="text-align:right">
+                                                    Asset ID:
+                                                    <span class="required">*</span>
+                                                </label>
+                                                <div class="col-md-7">
+                                                    <input type="text" ng-model="ExAsset.AssetID" class="form-control" placeholder="Asset Id" name="AssetId" required>
+                                                    <div class="form-control-focus"> </div>
+                                                    <span ng-show="submitted && addform.AssetId.$error.required" class="help-block">Asset ID Required</span>
+                                                </div>
+                                            </div>
+                                            <div class="form-group row" ng-class="{ 'has-error' : submitted && addform.PurchseValue.$invalid}">
+                                                <label class="col-md-5 control-label" style="text-align:right">
+                                                    Purchse Value:
+                                                    <span class="required">*</span>
+                                                </label>
+                                                <div class="col-md-7">
+                                                    <input type="text" ng-model="ExAsset.PurchseValue" class="form-control" placeholder="Purchse Value" name="PurchseValue" required>
+                                                    <div class="form-control-focus"> </div>
+                                                    <span ng-show="submitted && addform.PurchseValue.$error.required" class="help-block">Asset ID Required</span>
+                                                </div>
+                                            </div>
+                                            <div class="form-group row" ng-class="{ 'has-error' : submitted && addform.CurrentValue.$invalid}">
+                                                <label class="col-md-5 control-label" style="text-align:right">
+                                                    Current Value:
+                                                    <span class="required">*</span>
+                                                </label>
+                                                <div class="col-md-7">
+                                                    <input type="text" ng-model="ExAsset.CurrentValue" class="form-control" placeholder="Current Value" name="CurrentValue" required>
+                                                    <div class="form-control-focus"> </div>
+                                                    <span ng-show="submitted && addform.CurrentValue.$error.required" class="help-block">Current Value Required</span>
+                                                </div>
+                                            </div>
+                                            <div class="form-group row" ng-class="{ 'has-error' : submitted && addform.Brand.$invalid}">
+                                                <label class="col-md-5 control-label" style="text-align:right">
+                                                    Brand:
+                                                    <span class="required">*</span>
+                                                </label>
+                                                <div class="col-md-7">
+                                                    <input type="text" ng-model="ExAsset.Brand" class="form-control" placeholder="Brand" name="Brand" required>
+                                                    <div class="form-control-focus"> </div>
+                                                    <span ng-show="submitted && addform.Brand.$error.required" class="help-block">Brand Required</span>
+                                                </div>
+                                            </div>
+                                            <div class="form-group row" ng-class="{ 'has-error' : submitted && addform.Branch.$invalid}">
+                                                <label class="col-md-5 control-label" style="text-align:right">
+                                                    Branch:
+                                                    <span class="required">*</span>
+                                                </label>
+                                                <div class="col-md-7">                                                
+                                                        <select class="form-control" ng-model="ExAsset.BranchID" name="Branch" ng-options="ExAsset.BranchId as ExAsset.BranchName for ExAsset in CommonFeilds.Branch">
+                                                            <option value="" selected="selected">Select</option>
+                                                        </select>
+                                                        <div class="form-control-focus"> </div>
+                                                        <span ng-show="submitted1 && formCommonFeilds.Branch.$error.required" class="help-block">Branch Name Required</span>
+                                                    </div>                                               
+                                            </div>
+                                        </div>
+                                            <div class="col-md-6">
+                                                <div class="form-group row" @*ng-class="{ 'has-error' : submitted && addform.Branch.$invalid}"*@>
+                                                    <label class="col-md-5 control-label" style="text-align:right">
+                                                        Location:
+                                                        @*<span class="required">*</span>*@
+                                                    </label>
+                                                    <div class="col-md-7">
+                                                        <input type="text" ng-model="ExAsset.Location" class="form-control" placeholder="Location" name="Location" @*required*@>
+                                                        <div class="form-control-focus"> </div>
+                                                        @*<span ng-show="submitted && addform.Branch.$error.required" class="help-block">Branch Required</span>*@
+                                                    </div>
+                                                </div>
+                                                <div class="form-group row" @*ng-class="{ 'has-error' : submitted && addform.Branch.$invalid}"*@>
+                                                    <label class="col-md-5 control-label" style="text-align:right">
+                                                        Room No:
+                                                        @*<span class="required">*</span>*@
+                                                    </label>
+                                                    <div class="col-md-7">
+                                                        <input type="text" ng-model="ExAsset.Room" class="form-control" placeholder="RoomNo" name="Room No" @*required*@>
+                                                        <div class="form-control-focus"> </div>
+                                                        @*<span ng-show="submitted && addform.Branch.$error.required" class="help-block">Branch Required</span>*@
+                                                    </div>
+                                                </div>
+                                                <div class="form-group row" @*ng-class="{ 'has-error' : submitted && addform.Branch.$invalid}"*@>
+                                                    <label class="col-md-5 control-label" style="text-align:right">
+                                                        Buliding No:
+                                                        @*<span class="required">*</span>*@
+                                                    </label>
+                                                    <div class="col-md-7">
+                                                        <input type="text" ng-model="ExAsset.Building" class="form-control" placeholder="Buliding No" name="Buliding No" @*required*@>
+                                                        <div class="form-control-focus"> </div>
+                                                        @*<span ng-show="submitted && addform.BulidingNo.$error.required" class="help-block">Branch Required</span>*@
+                                                    </div>
+                                                </div>
+                                                <div class="form-group row" ng-class="{ 'has-error' : submitted && addform.ExpectedLife.$invalid}">
+                                                    <label class="col-md-5 control-label" style="text-align:right">
+                                                        Expected Life:
+                                                        <span class="required">*</span>
+                                                    </label>
+                                                    <div class="col-md-7">
+                                                        <input type="text" ng-model="ExAsset.AssetLifeTime" class="form-control" placeholder="Expected Life" name="ExpectedLife" required>
+                                                        <div class="form-control-focus"> </div>
+                                                        <span ng-show="submitted && addform.ExpectedLife.$error.required" class="help-block">Branch Required</span>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group row" ng-class="{ 'has-error' : submitted && addform.SalvageValue.$invalid}">
+                                                    <label class="col-md-5 control-label" style="text-align:right">
+                                                        Salvage Value:
+                                                        <span class="required">*</span>
+                                                    </label>
+                                                    <div class="col-md-7">
+                                                        <input type="text" ng-model="ExAsset.SalvageValue" class="form-control" placeholder="Salvage Value" name="SalvageValue" required>
+                                                        <div class="form-control-focus"> </div>
+                                                        <span ng-show="submitted && addform.SalvageValue.$error.required" class="help-block">Branch Required</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" data-dismiss="modal" class="btn  btn-secondary" ng-click="resetForm();">Cancel</button>
+                        <button type="submit" ng-click="submitted=true;" class="btn btn-success">Save </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!--Modal Area End-->
+</div>
+
+@section Scripts{
+
+    <script type="text/javascript">
+        OEMSApp.controller("AddExistingAsset", ["$scope", "$http", "SweetAlert", "$filter",
+              function ($scope, $http, SweetAlert, $filter) {
+
+                  init();
+                  function init() {
+                      initialize();
+                      getAllCommons();
+                  }
+                  function initialize() {
+                      $scope.modalTitle = "Add Exsiting Asset";
+                      $scope.CommonFeilds = [];
+                      $scope.ExAsset = {};
+                      //  $scope.ExAsset.ExAssetId = 0;
+                  }
+
+           
+                  function getAllCommons() {
+                      $scope.CommonFeilds = [];
+
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Common/GetCommonItemEmp/'
+                      }).then(function successCallback(response) {
+                          $scope.CommonFeilds = response.data.results;
+                      }, function errorCallback(response) {
+                      });
+                  }
+
+                  $scope.Search = function (val) {
+
+                      if (val.length >= 3)
+                          return $http.get(baseUrl + 'Inventory/SearchAsset/' + val, {
+                              // params: {}
+                          }).then(function (response) {
+                              return response.data.results.map(function (item) {
+                                  return item;
+                              });
+                          });
+                  };
+                  $scope.onSelect = function onSelect($item, $model, $label) {
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Inventory/GetAssetInfo/' + $item.Id
+
+                      }).then(function successCallback(response) {
+                          $scope.ExistAssetName = response.data.results[0];
+                          $scope.ExAsset.AssetIId = $scope.ExistAssetName.AssetId;
+                          toastr["info"](response.data.message);
+                      }, function errorCallback(response) {
+                          toastr["error"](response.data.Message);
+                      });
+
+                  };
+                  
+                  function resetForm() {
+                      $scope.modalTitle = "Add Exsiting Asset";
+                      $scope.ExAsset = {};
+                      $scope.drRow = {};
+                    //  $scope.ExAsset.ExAssetId = 0;
+                      $scope.show = false;
+
+               
+                 
+
+                      $scope.FiledHide = false;
+                      $scope.addform.$setUntouched();
+                      $scope.addform.$setPristine();
+                      $scope.submitted = false;
+                 
+        
+
+                  }
+
+                  $scope.save = function save() {
+   //  For Add
+                       if ($scope.ExAsset != {}) {
+                                  $http({
+                                      method: 'POST',
+                                      url: baseUrl + '/Inventory/AddExAsset/',
+                                      data: $scope.ExAsset
+                                  }).then(function successCallback(response) {
+                                      $('#addmodal').modal('toggle');
+                                      toastr["info"](response.data.message);
+                                      resetForm();
+                                  }, function errorCallback(response) {
+                                      toastr["warning"](response.data.Message);
+                                  });
+                              }
+              
+                  };
+              }]);
+    </script>
+}
+

@@ -1,0 +1,124 @@
+﻿@{
+    ViewBag.Title = "Attendence";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<div ng-controller="AttendenceCtrl">
+    <!--Tab start-->
+    <div class="portlet light bordered">
+        <div class="portlet-title">
+            <div class="caption">
+                <i class="icon-settings font-green"></i>
+                <span class="caption-subject font-green sbold uppercase">@ViewBag.Title</span>
+            </div>
+        </div>
+        <div class="portlet-body">
+            <div class="table-container">
+                <div id="sample_3_wrapper" class="dataTables_wrapper no-footer">
+                    <div class="row">
+                        <div class="col-md-4 col-sm-5 col-xs-6">
+                            <div id="sample_3_filter">
+                                <div class="col-md-3"><label>Month:</label></div>
+                                <div class="col-md-9">
+                                    <select class="form-control" ng-model="Attendence.month" ng-change="getAtt(@ViewBag.IID,Attendence.month)" name="month" required>
+                                        <option value="" selected="selected">Select</option>
+                                        <option value="1">January</option>
+                                        <option value="2">February</option>
+                                        <option value="3">March</option>
+                                        <option value="4">April</option>
+                                        <option value="5">May</option>
+                                        <option value="6">June</option>
+                                        <option value="7">July</option>
+                                        <option value="8">August</option>
+                                        <option value="9">September</option>
+                                        <option value="10">October</option>
+                                        <option value="11">November</option>
+                                        <option value="12">December</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 col-sm-3 col-xs-1">
+                            
+                        </div>
+                        <div class="col-md-4 col-sm-4 col-xs-5">
+                            
+                        </div>
+                    </div>
+                    <div class="table-scrollable"> </div>
+                    <table class="table table-bordered table-hover">
+                        <thead>
+                            <tr class="btn-primary">
+                                <th>Date</th>
+                                <th>In Time</th>
+                                <th>Status</th>
+                                <th>Is Late</th>
+                                <th>Late Time</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-show="Attendences.length <= 0"><td colspan="5" style="text-align:center;"><i class="fa fa-refresh"></i> Loading new data!!</td></tr>
+                            @*<tr dir-paginate="item in Attendences|itemsPerPage:pageSize" current-page="currentPage">*@
+                                <tr ng-repeat="item in Attendences">
+                                    <td>{{item.InTime | date: 'dd/MM/yyyy'}}</td>
+                                    <td>{{item.InTime | date: 'HH:mm'}}</td>
+                                    <td>{{item.Status}}</td>
+                                    <td ng-if="isLate">Yes</td>
+                                    <td ng-if="!isLate">No</td>
+                                    <td ng-if="isLate">{{item.LateTime}}</td>
+                                    <td ng-if="!isLate">N/A</td>
+                                @*<td><a href="~/InstitutionSetup/Class?R={{item.ClassId}}" class="label label-sm label-info"> View </a></td>*@
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="row">
+                        <dir-pagination-controls boundary-links="true" template-url="~/assets/angular/lib/dirPagination.tpl.html"></dir-pagination-controls>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--Tab End-->
+</div>
+@section Scripts{
+    <script type="text/javascript">
+        OEMSApp.controller("AttendenceCtrl", ["$scope", "$http",
+           function ($scope, $http) {
+               init();
+               function init() {
+                   $scope.Attendences = [];
+                   getStdentAttendence(@ViewBag.IID);
+                   $scope.pageSizeArray = [];
+                   $scope.pageSizeArray.push({ value: 5, text: 5 });
+                   $scope.pageSizeArray.push({ value: 10, text: 10 });
+                   $scope.pageSizeArray.push({ value: 20, text: 20 });
+                   $scope.pageSizeArray.push({ value: 50, text: 50 });
+                   $scope.currentPage = 1;
+                   $scope.pageSize = 10;
+               }
+
+               function getStdentAttendence(StdId, month) {
+                   $http({
+                       method: 'GET',
+                       url: baseUrl + 'PortalAttendance/GetAttendence/?StdId=' + StdId+'&Month='+month,
+                   }).then(function successCallback(res) {
+                       $scope.Attendences = res.data.results;
+                   }, function errorCallback() {
+                       toastr["warning"](response.data.Message);
+                   });
+               }
+
+               $scope.getAtt = function (StdId, month) {
+                   $http({
+                       method: 'GET',
+                       url: baseUrl + 'PortalAttendance/GetAttendence/?StdId=' + StdId + '&Month=' + month,
+                   }).then(function successCallback(res) {
+                       $scope.Attendences = res.data.results;
+                   }, function errorCallback() {
+                       toastr["warning"](response.data.Message);
+                   });
+               }
+
+           }]);
+    </script>
+}
+

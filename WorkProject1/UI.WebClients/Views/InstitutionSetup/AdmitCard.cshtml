@@ -1,0 +1,152 @@
+﻿
+@{
+    ViewBag.Title = "Session";
+}
+<div ng-controller="session">
+    <!-- Begin: life time stats -->
+    <div class="portlet light bordered">
+        <div class="portlet-title">
+            <div class="caption">
+                <i class="icon-settings font-green"></i>
+                <span class="caption-subject font-green sbold uppercase">@ViewBag.Title</span>
+            </div>
+            <div class="actions">
+                <div class="btn-group btn-group-solid">
+                    <button ng-click="resetForm()" class="btn green" data-target="#addmodal" data-toggle="modal"> <i class="fa fa-plus"></i> Add New</button>
+                </div>
+
+            </div>
+        </div>
+        @*<div class="portlet-body">
+            <div class="table-container">
+                <div id="sample_3_wrapper" class="dataTables_wrapper no-footer">
+                    <div class="row">
+                        <div class="col-md-6 col-sm-6">
+                            <div class="dataTables_length" id="sample_3_length">
+                                <label>
+                                    <select ng-model="pagesize" ng-change="searchData()" aria-controls="sample_3" class="form-control input-sm input-xsmall input-inline">
+
+                                        <option value="10" selected="selected">10</option>
+                                        <option value="15">15</option>
+                                        <option value="20">20</option>
+                                        <option value="-1">All</option>
+                                    </select> entries
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-sm-6">
+                            <div id="sample_3_filter" class="pull-right">
+                                <label>Search:<input ng-change="searchData()" type="text" ng-model="search" class="form-control input-sm input-small input-inline" placeholder="" aria-controls="sample_3"></label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="table-scrollable"> </div>
+                    <table class="table table-bordered table-hover">
+                        <thead>
+                            <tr>
+                                <th>Session</th>
+                                <th>Code</th>
+                                <th>Start Date</th>
+                                <th>End Date</th>
+
+                                <th>Action</th>
+
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-show="Sessions.results.length <= 0"><td colspan="5" style="text-align:center;"><i class="fa fa-refresh"></i> Loading new data!!</td></tr>
+                            <tr dir-paginate="item in Sessions.results|itemsPerPage:pagesize" total-items="total_count">
+
+                                <td>{{item.SessionName}}</td>
+                                <td>{{item.SessionCode}}</td>
+                                <td>{{item.Session_StartDate | date:'dd/MM/yyyy'}}</td>
+                                <td>{{item.Session_EndDate | date:'dd/MM/yyyy'}}</td>
+
+                                <td>
+                                    <a href="javascript:;" class="btn btn-icon-only green" ng-click="edit(item)" data-target="#addmodal" data-toggle="modal">
+                                        <i class="fa fa-edit"></i>
+                                    </a>
+                                    <a ng-click="deletesession(item)" href="javascript:;" class="btn btn-icon-only red">
+                                        <i class="fa fa-trash"></i>
+                                    </a>
+
+
+                                </td>
+
+                            </tr>
+                        </tbody>
+
+                    </table>
+
+
+                    <div class="row">
+                        <div class="col-sm-6 pull-right">
+                            <dir-pagination-controls max-size="8"
+                                                     direction-links="true"
+                                                     boundary-links="true"
+                                                     on-page-change="getSession(newPageNumber)">
+                            </dir-pagination-controls>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>*@
+    </div>
+    <!-- End: life time stats -->
+    <!--Modal Area Start-->
+    <div id="addmodal" class="modal fade" tabindex="-1" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form name="addform" ng-submit="save()" class="form-horizontal" id="form_sample_1" novalidate>
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                        <h4 class="modal-title"></h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-body">
+
+                            <div class="row">
+                                <div class="col-md-12">
+
+                                    <div class="form-group last">
+                                        <label class="control-label col-md-2">Default Editor</label>
+                                        <div class="col-md-10">
+                                            <div name="summernote" id="summernote_1"> </div>
+                                        </div>
+                                    </div>
+
+
+                                    <div class="form-group last" ng-class="{ 'has-error' : submitted && addform.SessionName.$invalid}">
+                                        <label class="col-md-2 control-label">
+                                            Templete
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-10">
+                                            <div name="summernote" id="summernote_1"> </div>
+                                        </div>
+
+                                    </div>
+                                    
+                                 
+
+                                    
+                                </div>
+
+                            </div>
+
+
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" data-dismiss="modal" class="btn dark btn-outline" ng-click="resetForm();submitted=false">Cancel</button>
+                        <button type="submit" ng-click="submitted=true" class="btn green">Save</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!--Modal Area End-->
+
+</div>
+

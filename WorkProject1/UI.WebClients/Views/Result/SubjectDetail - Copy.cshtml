@@ -1,0 +1,156 @@
+﻿
+@{
+    ViewBag.Title = "Subject Detail Report";
+}
+<style type="text/css">
+    .portlet.light.bordered {
+        border: 1px solid #e7ecf1 !important;
+        background-color: wheat !important;
+    }
+</style>
+<div class="portlet box" style="background-color:#678069" ng-controller="SubListReportCntrl">
+    <div class="portlet-title">
+        <div class="caption">
+            <i class="fa fa-user-plus" style="color:#ffffff"></i>Subject List
+        </div>
+    </div>
+    <div class="portlet-body form">
+        <!-- BEGIN FORM-->
+        <form class="form-horizontal" name="frmSubjectlist" novalidate>
+            <div class="form-body">
+
+                <div class="row">
+                    <div class="col-md-10">
+                        <div class="form-group">
+                            <label class="col-md-5 control-label">
+                                Sudent ID or Name :
+                            </label>
+                            <div class="col-md-7" ng-class="{ 'has-error' :isSubmitted  && frmSubjectlist.Version.$invalid}">
+                                <input type="text" ng-model="Subjectlist.StudentInsID"  uib-typeahead="Subjectlist.StudentInsID as Subjectlist.StudentName for Subjectlist in SubjectlistList | filter:$viewValue | limitTo:8" class="form-control">
+                                <div class="form-control-focus"> </div>
+                                <span ng-show="isSubmitted && frmSubjectlist.Version.$error.required " class="help-block">Version Required</span>
+                            </div>
+                        </div>
+                    </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-10">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label class="col-md-5 control-label">
+                                    </label>
+                                    <div class="col-md-7" >
+                                        <a class="btn btn-info" ng-disabled="Subjectlist.StudentInsID==null" ng-click="ShowReport()" >Show Report</a>
+                                        <a ng-click="ResetSource()" class="btn btn-danger ">Reset</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+               
+            </div>
+        </form>
+    </div>
+    <!-- END FORM-->
+</div>
+
+@section Scripts{
+
+    <script type="text/javascript">
+
+        OEMSApp.controller("SubListReportCntrl", ["$scope", "$http", "SweetAlert",
+          function ($scope, $http, SweetAlert) {
+              init();
+              function init() {
+                  initialize();
+                  getAllDropdowns();
+                  getAllCommons();
+                  //getSubjects();
+              }
+              function initialize() {
+                  $scope.Dropdowns = [];
+                  $scope.CommonFeilds = [];
+                  $scope.currentPage = 1;
+                  $scope.pageno = 1;
+                  $scope.pagesize = 10;
+                  $scope.total_count = 12;
+                  $scope.txtsearch = '';
+                  $scope.getAllDropdowns = getAllDropdowns;
+                  //$scope.Search = Search;
+                  $scope.getAllCommons = getAllCommons;
+                  $scope.getSubjectlist = getSubjectlist;
+                  $scope.btnDis = false;
+                  $scope.spin = false;
+              };
+              function setProgress(s) {
+                  $scope.btnDis = s;
+                  $scope.spin = s;
+              }
+              $scope.GetGroup = function GetGroup(classid) {
+                  $scope.Groups = [];
+
+                  $http({
+                      method: 'GET',
+                      url: baseUrl + 'Common/GetGroup/' + classid
+                  }).then(function successCallback(response) {
+                      $scope.Groups = response.data.results;
+                  }, function errorCallback(response) {
+
+                  });
+
+              }
+              function getAllCommons() {
+                  $scope.CommonFeilds = [];
+
+                  $http({
+                      method: 'GET',
+                      url: baseUrl + 'Common/GetCommonItem/'
+                  }).then(function successCallback(response) {
+                      $scope.CommonFeilds = response.data.results;
+                  }, function errorCallback(response) {
+                  });
+              }
+              function getAllDropdowns() {
+                  $scope.Dropdowns = [];
+                  $http({
+                      method: 'GET',
+                      url: baseUrl + 'Common/GetAllDropDown/'
+                  }).then(function successCallback(response) {
+                      $scope.Dropdowns = response.data.results;
+                  }, function errorCallback(response) {
+                  });
+              }
+              function getAllSubjects() {
+                  $scope.Subjects = [];
+                  $http({
+                      method: 'GET',
+                      url: baseUrl + 'SubjectSetup/GetAllSubject/' + $scope.Subjectlist.VersionId + '/' + $scope.Subjectlist.SessionId + '/' + $scope.Subjectlist.ClassId + '/' + $scope.Subjectlist.GroupId
+                  }).then(function successCallback(response) {
+                      $scope.Subjects = response.data.results;
+                  }, function errorCallback(response) {
+                  });
+              }
+              $scope.ResetSource = function ResetSource() {
+                
+              }
+              getSubjectlist();
+            function getSubjectlist() {
+                  $scope.SubjectlistList = [];
+                  $http({
+                      method: 'GET',
+                      url: baseUrl + 'Student/GetAllStudentBasicInfo/' 
+                  }).then(function successCallback(response) {
+                      debugger;
+                      $scope.SubjectlistList= response.data.results;
+                  }, function errorCallback(response) {
+                      toastr["info"](response.data.message);
+                  });
+              }
+              $scope.ShowReport = function ShowReport() {
+                       var w = window.open("","_blank");
+                       w.location = baseUrl + 'Report/GetAllSubListByStutId?StudentInsID=' + $scope.Subjectlist.StudentInsID
+              }
+              }]);
+    </script>
+}
+

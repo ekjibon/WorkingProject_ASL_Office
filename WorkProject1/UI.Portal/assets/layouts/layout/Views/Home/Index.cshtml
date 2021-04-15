@@ -1,0 +1,334 @@
+﻿@{
+    ViewBag.Title = "Index";
+}
+<style>
+    .portalChart {
+        padding: 10px;
+        box-shadow: 0px 0px 5px 2px rgba(0,0,0,.15);
+        border-radius: 3px !important;
+        background: white;
+    }
+
+    .dashboard-stat2.first-w,
+    .dashboard-stat2.second-w,
+    .dashboard-stat2.third-w,
+    .dashboard-stat2.fourth-w {
+        -moz-border-radius: 5px !important;
+        -webkit-border-radius: 5px !important;
+        border-radius: 5px !important;
+    }
+
+    .dashboard-stat2.first-w {
+        color: white !important;
+        background: #F15A29;
+    }
+
+    .dashboard-stat2.second-w {
+        color: white !important;
+        background: #79BB43;
+    }
+
+    .dashboard-stat2.third-w {
+        color: white !important;
+        background: #7D7BFB;
+    }
+
+    .dashboard-stat2.fourth-w {
+        color: white !important;
+        background: #009DB8;
+    }
+
+        .dashboard-stat2.first-w div.display div.number small,
+        .dashboard-stat2.second-w div.display div.number small,
+        .dashboard-stat2.third-w div.display div.number small,
+        .dashboard-stat2.fourth-w div.display div.number small,
+        .dashboard-stat2 .display .icon > i,
+        div.status-title,
+        div.status-number {
+            color: white;
+        }
+
+    .progress-bar.progress-first {
+        background: #79BB43;
+    }
+
+    .progress-bar.progress-second {
+        background: #F15A29;
+    }
+
+    .progress-bar.progress-third {
+        background: #79BB43;
+    }
+
+    .progress-bar.progress-third {
+        background: #F15A29;
+    }
+</style>
+<div ng-controller="DashboardCtrl">
+    <div class="page-wrapper-row full-height">
+        <div class="page-wrapper-middle">
+            <!-- BEGIN CONTAINER -->
+            <div class="page-container">
+                <!-- BEGIN PAGE CONTENT BODY -->
+                <!-- BEGIN PAGE CONTENT INNER -->
+                <div class="page-content-inner">
+                    <div class="row">
+                        <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
+                            <div class="dashboard-stat2 first-w">
+                                <div class="display">
+                                    <div class="number">
+                                        <h3 class="">
+                                            <span>{{GetDashboarInfo.TotalDue}}</span>
+                                            <small>TK</small>
+                                        </h3>
+                                        <small>TOTAL DUE</small>
+                                    </div>
+                                    <div class="icon">
+                                        @*<i class="icon-pie-chart"></i>*@
+                                        <img src="~/assets/global/img/dashboard/first-w.png" alt="Alternate Text" />
+                                    </div>
+                                </div>
+                                <div class="progress-info">
+                                    <div class="progress">
+                                        <span style="width: {{GetDashboarInfo.DuePercent}}%;" class="progress-bar progress-bar-success progress-first">
+                                            <span class="sr-only">{{GetDashboarInfo.DuePercent}}% progress</span>
+                                        </span>
+                                    </div>
+                                    <div class="status">
+                                        <div class="status-title"> due percentage </div>
+                                        <div class="status-number"> {{GetDashboarInfo.DuePercent}}% </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
+                            <div class="dashboard-stat2 second-w">
+                                <div class="display">
+                                    <div class="number">
+                                        <h3 class="">
+                                            <span>{{GetDashboarInfo.TotalPaid}}</span>
+                                            <small class="">TK</small>
+                                        </h3>
+                                        <small>TOTAL PAID</small>
+                                    </div>
+                                    <div class="icon">
+                                        <img src="~/assets/global/img/dashboard/second-w.png" alt="Alternate Text" />
+                                    </div>
+                                </div>
+                                <div class="progress-info">
+                                    <div class="progress">
+                                        <span style="width: {{GetDashboarInfo.PaidPercent}}%;" class="progress-bar progress-bar-success progress-second">
+                                            <span class="sr-only">{{GetDashboarInfo.PaidPercent}}% change</span>
+                                        </span>
+                                    </div>
+                                    <div class="status">
+                                        <div class="status-title"> paid percentage </div>
+                                        <div class="status-number"> {{GetDashboarInfo.PaidPercent}}% </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
+                            <div class="dashboard-stat2 third-w">
+                                <div class="display">
+                                    <div class="number">
+                                        <h3 class="">
+                                            <span>{{GetDashboarInfo.TotalPresent}}</span>
+                                        </h3>
+                                        <small>TOTAL PRESENT</small>
+                                    </div>
+                                    <div class="icon">
+                                        <img src="~/assets/global/img/dashboard/third-w.png" alt="Alternate Text" />
+                                    </div>
+                                </div>
+                                <div class="progress-info">
+                                    <div class="progress">
+                                        <span style="width: {{GetDashboarInfo.PeresentPercent}}%;" class="progress-bar progress-bar-success progress-third">
+                                            <span class="sr-only">{{GetDashboarInfo.PeresentPercent}}% grow</span>
+                                        </span>
+                                    </div>
+                                    <div class="status">
+                                        <div class="status-title"> present percentage </div>
+                                        <div class="status-number"> {{GetDashboarInfo.PeresentPercent}}% </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
+                            <div class="dashboard-stat2 fourth-w">
+                                <div class="display">
+                                    <div class="number">
+                                        <h3 class="">
+                                            <span>{{GetDashboarInfo.TotalAbsent}}</span>
+                                        </h3>
+                                        <small>TOTAL ABSENT</small>
+                                    </div>
+                                    <div class="icon">
+                                        <img src="~/assets/global/img/dashboard/fourth-w.png" alt="Alternate Text" />
+                                    </div>
+                                </div>
+                                <div class="progress-info">
+                                    <div class="progress">
+                                        <span style="width: {{GetDashboarInfo.AbsentPercent}}%;" class="progress-bar progress-bar-success purple-soft">
+                                            <span class="sr-only">{{GetDashboarInfo.AbsentPercent}}% change</span>
+                                        </span>
+                                    </div>
+                                    <div class="status">
+                                        <div class="status-title"> absent percentage </div>
+                                        <div class="status-number"> {{GetDashboarInfo.AbsentPercent}}% </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-6 col-md-6">
+                            <div class="portalChart">
+                                <div style="width:100%">
+                                    <div>
+                                        <canvas id="monthBar" height="350" width="600"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6 col-md-6">
+                            <div class="portalChart">
+                                <div style="width:100%">
+                                    <div>
+                                        <canvas id="monthPie" height="350" width="600"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- END PAGE CONTENT INNER -->
+                <!-- END PAGE CONTENT BODY -->
+                <!-- END CONTENT BODY -->
+            </div>
+            <!-- END CONTENT -->
+
+        </div>
+        <!-- END CONTAINER -->
+    </div>
+</div>
+
+@section Scripts{
+
+    <script type="text/javascript">
+        OEMSApp.controller("DashboardCtrl", ["$scope", "$http", "$window",
+        function ($scope, $http, $window) {
+            init();
+            function init() {
+                $scope.GetDashboarInfo = [];
+                GetDashboarInfo();
+            }
+
+            var monthlyPresentDate = [];
+            var monthlyPresentCount = [];
+
+            function GetDashboarInfo() {
+                $http({
+                    method: 'GET',
+                    url: baseUrl + 'Home/GetPortalDashBoardData/'
+                }).then(function successCallback(response) {
+                    var dashData = response.data.CurrMonthAttendance;
+                    console.log(dashData);
+                    $scope.GetDashboarInfo = response.data;
+                    console.log($scope.GetDashboarInfo);
+
+                    //getting currentmonth charts data
+                    $.each(dashData, function (i, res) {
+                        monthlyPresentDate.push(res.PresentMonth);
+                        monthlyPresentCount.push(res.Present);
+                    });
+
+
+                    //for chart js
+                    var ctx = document.getElementById("monthBar").getContext("2d");
+                    window.myLine = new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: ["Jan", "Feb", "Mar", "Apr", "May", "June", "Jul", "Aug", "Sep", "Nov", "Dec"],
+                            datasets: [{
+                                label: 'This Year Present Status',
+                                data: monthlyPresentCount, //[1200, 2000, 800, 200, 2500, 4000],
+                                backgroundColor: "rgba(163, 161, 251, 1)",
+                                fill: false,
+                                borderColor: "rgba(163, 161, 251, 1)",
+                                pointBorderColor: "rgba(163, 161, 251, 1)",
+                                pointBackgroundColor: "rgba(255, 255, 255, 1)",
+                                pointBorderWidth: "2"
+                            }]
+                        },
+                        options: {
+                            legend: {
+                                display: true,
+                                labels: {
+                                    fontColor: 'rgb(255, 99, 132)'
+                                }
+                            },
+                            scales: {
+                                yAxes: [
+                                    {
+                                        type: 'linear',
+                                        display: true,
+                                        position: 'left',
+                                        ticks: {
+                                            beginAtZero: true,
+                                            stepSize: 5,
+                                            max: 30
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    });
+
+                    //Doughnut Chart
+                    var oilCanvas = document.getElementById("monthPie");
+
+                    Chart.defaults.global.defaultFontFamily = "Lato";
+
+                    var oilData = {
+                        labels: ["Jan", "Feb", "Mar", "Apr", "May", "June", "Jul", "Aug", "Sep", "Nov", "Dec"],
+                        datasets: [
+                            {
+                                data: monthlyPresentCount,
+                                label: 'This Year Present Status',
+                                backgroundColor: [
+                                    "#FF3D67",
+                                    "#FFC233",
+                                    "#059BFF",
+                                    "#22CECE",
+                                    "#79BB43",
+                                    "#009DB8",
+                                    "#F15A29",
+                                    "#7875FF",
+                                    "#8E210B",
+                                    "#00498A",
+                                    "#692369"
+                                ]
+                            }]
+                    };
+
+                    var pieChart = new Chart(oilCanvas, {
+                        type: 'doughnut',
+                        data: oilData,
+                        options: {
+                            legend: {
+                                display: true,
+                                position: 'right'
+                            }
+                        }
+                    });
+
+
+                }, function errorCallback(response) {
+                });
+            }
+
+        }]);
+    </script>
+}
+

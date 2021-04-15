@@ -1,0 +1,722 @@
+﻿@{
+    ViewBag.Title = "Dynamic Attendance Report";
+}
+
+<style>
+    .panel-title > a:before {
+        float: right !important;
+        font-family: FontAwesome;
+        content: "\f056";
+        padding-right: 5px;
+    }
+
+    .panel-title > a.collapsed:before {
+        float: right !important;
+        content: "\f055";
+    }
+
+    .panel-title > a:hover,
+    .panel-title > a:active,
+    .panel-title > a:focus {
+        text-decoration: none;
+    }
+
+    .slider {
+        position: relative;
+        text-align: left;
+        border: 1px solid gray;
+        height: 0.6em;
+    }
+
+        .slider .handle {
+            position: absolute;
+            z-index: 2;
+            width: 1.2em;
+            height: 1.2em;
+            background-color: gray;
+        }
+
+    .handle {
+        top: -0.3em;
+        margin-left: -0.6em;
+    }
+
+    .slider .range {
+        position: absolute;
+        z-index: 1;
+        display: block;
+        font-size: .7em;
+        background-color: #e6975f;
+        top: 0;
+        height: 100%;
+    }
+
+    .switch {
+        position: relative;
+        display: inline-block;
+        width: 60px;
+        height: 34px;
+    }
+
+    .radio-group label {
+        overflow: hidden;
+    }
+
+    .radio-group input {
+        /* This is on purpose for accessibility. Using display: hidden is evil.
+    This makes things keyboard friendly right out tha box! */
+        height: 1px;
+        width: 1px;
+        position: absolute;
+        top: -20px;
+    }
+
+    .radio-group .not-active {
+        color: #3276b1;
+        background-color: #fff;
+    }
+</style>
+
+<div class="portlet box blue-hoki" ng-controller="studentSearchrdCrlt">
+    <div class="portlet-title">
+        <div class="caption">
+            <i class="fa fa-user-plus"></i> Dynamic Attendance Report
+        </div>
+    </div>
+    <div class="portlet-body form">
+        <!-- BEGIN FORM-->
+        <form class="form-horizontal" ng-submit="SearchReport()" name="frmstudentSearchrd" novalidate>
+            <div class="form-body">
+                <div class="row">
+                    <div class="panel-group " id="accordion" role="tablist" aria-multiselectable="true">
+                        <div class="panel panel-default panel-info">
+                            <!--Academic Informatin--><div class="panel-heading" role="tab" id="headingOne">
+                                <h4 class="panel-title">
+                                    <a data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+                                        Academic Infomation
+                                    </a>
+                                </h4>
+                            </div>
+                            <div id="collapseOne" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingOne">
+                                <div class="panel-body">
+                                    <div class="row">
+                                        <div class="col-md-7">
+                                            <div class="form-group">
+                                                <div class="row">
+                                                    <label class="col-md-3 control-label">
+                                                        Search :
+                                                    </label>
+                                                    <div class="col-md-9">
+                                                        @*<input type="text" ng-model="studentSearch.Search" placeholder="ID, Roll, Name, Father's Name, Mother's Name, SMS No." class="form-control">*@
+                                                        <input type="text" ng-model="studentSearch.Search1"  placeholder="Search Student By ID or Name or SMS Notification No." uib-typeahead="i  as i.Text for i in Search($viewValue)" typeahead-loading="loadingLocations" typeahead-no-results="noResults" class="form-control">
+                                                        <i ng-show="loadingLocations" class="glyphicon glyphicon-refresh"></i>
+                                                        <div ng-show="noResults"><i class="glyphicon glyphicon-remove"></i> No Results Found</div>                                                        
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-5">
+                                            <div class="form-group" ng-class="{ 'has-error' : submitted1 && frmstudentSearchrd.date.$invalid}">
+                                                <div class="row">
+                                                    <label class="col-md-4 control-label">
+                                                        Date Range :<span class="required">*</span>
+                                                    </label>
+                                                    <div class="col-md-4">
+                                                        <input type="text" class="form-control" name="date" uib-datepicker-popup="{{Dateformat}}" placeholder="Start Date" datepicker-options="{showWeeks: false}" uib-datepicker-popup="{{format}}" ng-model="studentSearch.startDate" is-open="popup1.opened" ng-click="popup1.opened=true" ng-required="true" close-text="Close" alt-input-formats="altInputFormats" readonly="readonly" />
+                                                        <span class="form-control-focus"> </span>
+                                                        <span ng-show="submitted1 && frmstudentSearchrd.date.$error.required" class="help-block">Date Required</span>
+                                                    </div>
+                                                    <div class="col-md-4">
+                                                        <input type="text" class="form-control" name="date" uib-datepicker-popup="{{Dateformat}}" placeholder="End Date" datepicker-options="{showWeeks: false}" uib-datepicker-popup="{{format}}" ng-model="studentSearch.endDate" min-date="studentSearch.startDate" is-open="popup2.opened" ng-click="popup2.opened=true" datepicker-options="dateOptionsDOB" ng-required="true" close-text="Close" alt-input-formats="altInputFormats" readonly="readonly" />
+                                                        <span class="form-control-focus"> </span>
+                                                        <span ng-show="submitted1 && frmstudentSearchrd.date.$error.required" class="help-block">Date Required</span>
+                                                    </div>
+                                                    <div class="form-control-focus"> </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label class="col-md-5 control-label">
+                                                    Branch :
+                                                </label>
+                                                <div class="col-md-7">
+                                                    <select multiple multi-select ng-model="studentSearch.Branch1" ng-options="Branch.BranchId as Branch.BranchName for Branch in CommonFeilds.Branch"></select>
+                                                    <div class="form-control-focus"> </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                       
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label class="col-md-5 control-label">
+                                                    Section :
+                                                </label>
+                                                <div class="col-md-7">
+                                                    <select multiple multi-select ng-model="studentSearch.Section1" ng-disabled="Sections.length > 1" ng-options="Section.SectionId as Section.SectionName for Section in Sections"></select>
+                                                    @*<select multiple multi-select ng-model="studentSearch.Section">
+                                                            <optgroup ng-repeat="op in CommonFeilds.Group" label="{{op.GroupName}}">
+                                                                <option ng-repeat="Section in CommonFeilds.Section | filter:{GroupId:op.GroupId}:true" value="{{Section.SectionId}}">
+                                                                    {{Section.SectionName}}
+                                                                </option>
+                                                            </optgroup>
+                                                        </select>*@
+                                                    <div class="form-control-focus"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label class="col-md-5 control-label">
+                                                    Status:
+                                                </label>
+                                                <div class="col-md-7">
+                                                    <select multiple multi-select ng-model="studentSearch.Statuses1" ng-options="StudentType.Value as StudentType.Text for StudentType in StudentTypeArr"></select>
+                                                    <div class="form-control-focus"> </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label class="col-md-5 control-label">
+                                                    Session :
+                                                </label>
+                                                <div class="col-md-7">
+                                                    <select multiple multi-select ng-model="studentSearch.Session1" ng-options="Session.SessionId as Session.SessionName for Session in CommonFeilds.Session"></select>
+                                                    <div class="form-control-focus"> </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label class="col-md-5 control-label">
+                                                    Class :
+                                                </label>
+                                                <div class="col-md-7">
+                                                    <select multiple multi-select ng-model="studentSearch.Class1" ng-change="GetSection()" >
+                                                            <option ng-repeat="Class in CommonFeilds.ClassInfo " value="{{Class.ClassId}}">
+                                                                {{Class.ClassName}}
+                                                            </option>
+                                                    </select>
+                                                    <div class="form-control-focus"> </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label class="col-md-5 control-label">
+                                                    Stu. Type:
+                                                </label>
+                                                <div class="col-md-7">
+                                                    <select multiple multi-select ng-model="studentSearch.StuType1" ng-options="StuType.StudentTypeId  as StuType.StudentTypeName for StuType in CommonFeilds.StuType"></select>
+                                                    <div class="form-control-focus"> </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label class="col-md-5 control-label">
+                                                    Shift :
+                                                </label>
+                                                <div class="col-md-7">
+                                                    <select multiple multi-select ng-model="studentSearch.Shift1">
+                                                        <optgroup ng-show="!Shift.length" ng-repeat="op in CommonFeilds.Branch" label="{{op.BranchName}}">
+                                                            <option ng-repeat="Shift in CommonFeilds.Shift | filter:{BranchId:op.BranchId}:true" value="{{Shift.ShiftId}}">
+                                                                {{Shift.ShiftName}}
+                                                            </option>
+                                                        </optgroup>
+                                                    </select>
+                                                    <div class="form-control-focus"> </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label class="col-md-5 control-label">
+                                                    House :
+                                                </label>
+                                                <div class="col-md-7">
+                                                    <select multiple multi-select ng-model="studentSearch.House1" ng-options="House.HouseId as House.HouseName for House in CommonFeilds.House"></select>
+                                                    <div class="form-control-focus"> </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                            <div class="panel panel-default panel-info">
+                                <div class="panel-heading" role="tab" id="headingTwo">
+                                    <h4 class="panel-title">
+                                        <a class="collapsed" data-toggle="collapse" data-parent="#accordion" href="#collapseTwo" aria-expanded="true" aria-controls="collapseTwo">
+                                            Attendence Information
+                                        </a>
+                                    </h4>
+                                </div>
+                                <div id="collapseTwo" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingTwo">
+                                    <div class="panel-body">
+                                        <div class="row">
+                                            <div class="col-md-4">
+                                                <div class="form-group">
+                                                    <div class="row">
+                                                        <label class="col-md-4 control-label">
+                                                            Percentage Range :
+                                                        </label>
+                                                        <div class="col-md-4">
+                                                            <input type="number" class="form-control" min="0" placeholder="Min" ng-model="studentSearch.minPercentage" />
+                                                            <div class="form-control-focus"> </div>
+                                                        </div>
+                                                        <div class="col-md-4">
+                                                            <input type="number" class="form-control" min="0" ng-change="studentSearch.maxPercentage > 0" placeholder="Max" ng-model="studentSearch.maxPercentage" />
+                                                            <div class="form-control-focus"> </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="form-group">
+                                                    <div class="row">
+                                                        <label class="col-md-4 control-label">
+                                                            Period Range:
+                                                        </label>
+                                                        <div class="col-md-4">
+                                                            <input type="number" class="form-control" min="0" placeholder="Min" ng-model="studentSearch.minPeriod" />
+                                                            <div class="form-control-focus"> </div>
+                                                        </div>
+                                                        <div class="col-md-4">
+                                                            <input type="number" class="form-control" min="0" placeholder="Max" ng-model="studentSearch.maxPeriod" />
+                                                            <div class="form-control-focus"> </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="form-group">
+                                                    <div class="row">
+                                                        <label class="col-md-4 control-label">
+                                                            LIEO Duration Range:
+                                                        </label>
+
+                                                        <div class="col-md-4">
+                                                            <input type="number" class="form-control" min="0" placeholder="Min" ng-model="studentSearch.minLIEODuration" />
+                                                            <div class="form-control-focus"> </div>
+                                                        </div>
+                                                        <div class="col-md-4">
+                                                            <input type="number" class="form-control" min="0" placeholder="Max" ng-model="studentSearch.maxLIEODuration" />
+                                                            <div class="form-control-focus"> </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-4">
+                                                <div class="form-group">
+                                                    <div class="row">
+                                                        <label class="col-md-4 control-label">
+                                                            Present Day Range :
+                                                        </label>
+                                                        <div class="col-md-4">
+                                                            <input type="number" class="form-control" min="0" placeholder="Min" ng-model="studentSearch.minPresentDay" />
+                                                            <div class="form-control-focus"> </div>
+                                                        </div>
+                                                        <div class="col-md-4">
+                                                            <input type="number" class="form-control" min="0" placeholder="Max" ng-model="studentSearch.maxPresentDay" />
+                                                            <div class="form-control-focus"> </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="form-group">
+                                                    <div class="row">
+                                                        <label class="col-md-4 control-label">
+                                                            Absent Day Range :
+                                                        </label>
+                                                        <div class="col-md-4">
+                                                            <input type="number" class="form-control" min="0" placeholder="Min" ng-model="studentSearch.minAbsentDay" />
+                                                            <div class="form-control-focus"> </div>
+                                                        </div>
+                                                        <div class="col-md-4">
+                                                            <input type="number" class="form-control" min="0" placeholder="Max" ng-model="studentSearch.maxAbsentDay" />
+                                                            <div class="form-control-focus"> </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="form-group">
+                                                    <div class="row">
+                                                        <label class="col-md-4 control-label">
+                                                            Leave Day Range :
+                                                        </label>
+                                                        <div class="col-md-4">
+                                                            <input type="number" class="form-control" min="0" placeholder="Min" ng-model="studentSearch.minLeaveDay" />
+                                                            <div class="form-control-focus"> </div>
+                                                        </div>
+                                                        <div class="col-md-4">
+                                                            <input type="number" class="form-control" min="0" placeholder="Max" ng-model="studentSearch.maxLeaveDay" />
+                                                            <div class="form-control-focus"> </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-4">
+                                                <div class="form-group">
+                                                    <div class="row">
+                                                        <label class="col-md-4 control-label">
+                                                            Absconding Day Range :
+                                                        </label>
+                                                        <div class="col-md-4">
+                                                            <input type="number" class="form-control" min="0" placeholder="Min" ng-model="studentSearch.minAbscondingDay" />
+                                                            <div class="form-control-focus"> </div>
+                                                        </div>
+                                                        <div class="col-md-4">
+                                                            <input type="number" class="form-control" min="0" placeholder="Max" ng-model="studentSearch.maxAbscondingDay" />
+                                                            <div class="form-control-focus"> </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4">
+                        </div>
+                        <div class="col-md-8 pull-right">
+                            <button type="submit" ng-click="submitted1=true" class="btn green">Search</button>
+                            <a ng-click="Report()"  class="btn btn-success">Report</a>
+                            <button ng-click="Reset()" class="btn info">Reset</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="panel">
+        <!-- Default panel contents -->
+        <div class="panel-heading bg-green-haze-opacity">
+            <h3 class="panel-title" style="color:#ffffff; font-size:large">Attendence Dynamic Report</h3>
+        </div>
+        <div class="panel-body">
+            <table datatable="ng" dt-options="dtOptions">
+                <thead class="btn-primary">
+                    <tr>
+                        <th> Student ID </th>
+                        <th> Roll </th>
+                        <th> Name</th>
+                        <th> Present Day</th>
+                        <th> Absent Day</th>
+                        <th> Leave Day</th>
+                        <th> Absconding Day</th>
+                        <th> Percentage</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="item in studentSearchs">
+                        <td width="10%"> {{item.STUDENTINSID}} </td>
+                        <td width="7%"> {{item.RollNo}} </td>
+                        <td width="10%"> {{item.FullName}} </td>
+                        <td width="10%"> {{item.PresentDay}} </td>
+                        <td width="7%"> {{item.AbsentDay}} </td>
+                        <td width="7%"> {{item.LeaveDay}} </td>
+                        <td width="7%"> {{item.AbscondingDay}} </td>
+                        <td width="10%"> {{item.Percentage}}% </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Table -->
+        <!-- END FORM-->
+    </div>
+</div>
+
+
+@section Scripts{
+
+    <script type="text/javascript">
+
+        OEMSApp.controller("studentSearchrdCrlt", ["$scope", "$http", "SweetAlert", "filterFilter", "DTOptionsBuilder", "$filter",
+          function ($scope, $http, SweetAlert, filterFilter, DTOptionsBuilder, $filter) {
+              init();
+              function init() {
+                  initialize();
+                  getAllDropdowns();
+                  getAllCommons();
+                  $scope.format = 'dd/MM/yyyy';
+              }
+              function initialize() {
+                  $scope.studentSearch = {};
+                  $scope.studentSearch.VersionID = 0;
+                  $scope.studentSearch.SessionId = 0;
+                  $scope.studentSearch.BranchID = 0;
+                  $scope.studentSearch.ShiftID = 0;
+                  $scope.studentSearch.ClassId = 0;
+                  $scope.studentSearch.GroupId = 0;
+                  $scope.studentSearch.SectionId = 0;
+                  $scope.studentSearch.HouseId = 0;
+                  $scope.studentSearch.StudentType = 0;
+                  //$scope.studentSearch.Search = {};
+                  $scope.studentSearch.StudentId =0;
+                  $scope.studentSearch = {};
+                  $scope.studentSearchs = [];
+                  $scope.Dropdowns = [];
+                  $scope.DropdownGender = [];
+                  $scope.DropdownStuType = [];
+                  $scope.CommonFeilds = [];
+                  $scope.data = [];
+                  $scope.DataV = [];
+                  $scope.Districts = [];
+                  $scope.Groups = new Array();
+                  $scope.currentPage = 1;
+                  $scope.pageno = 1;
+                  $scope.pagesize = 10;
+                  $scope.total_count = 12;
+                  $scope.txtsearch = '';                
+                  $scope.getAllCommons = getAllCommons;
+                  $scope.getAllDropdowns = getAllDropdowns;
+                  $scope.SearchReport = SearchReport;
+                 // datatimes();
+              };
+              //for Student Search for auto complit text box ......
+              $scope.Search = function (val) {
+                  if (val.length >= 3)
+                      return $http.get(baseUrl + 'Student/SearchStudent/' + val, {
+                          params: {}
+                      }).then(function (response) {
+                          return response.data.results.map(function (item) {
+                              return item;
+                          });
+                      });
+              };
+              $scope.Reset = function Reset() {
+                  submitted1 = false;
+                  $scope.studentSearch = [];
+                  initialize();
+                  getAllDropdowns();
+                  getAllCommons();
+              };
+              function getAllDropdowns() {
+                  $scope.Dropdowns = [];
+                  $http({
+                      method: 'GET',
+                      url: baseUrl + 'Common/GetAllDropDown/'
+                  }).then(function successCallback(response) {
+                      $scope.Dropdowns = response.data.results;
+                  }, function errorCallback(response) {
+                      toastr["warning"](response.data.message);
+                  });
+              }
+              function getAllCommons() {
+                  $scope.CommonFeilds = [];
+                  $http({
+                      method: 'GET',
+                      url: baseUrl + 'Common/GetCommonItem/'
+                  }).then(function successCallback(response) {
+                      $scope.CommonFeilds = response.data.results;
+                  }, function errorCallback(response) {
+                      toastr["warning"](response.data.message);
+                  });
+              }
+              $scope.GetClass = function GetClass() {
+                  debugger;
+                  if ($scope.studentSearch.Version.length > 1)
+                      return;
+                  $http({
+                      method: 'GET',
+                      url: baseUrl + 'Common/GetCommonItem/'
+                  }).then(function successCallback(response) {
+                      //$scope.CommonFeilds.ClassInfo = filterFilter(response.data.results.ClassInfo, { VersionId: $scope.studentSearch.Version1.VersionId });
+                  }, function errorCallback(response) {
+                      toastr["warning"](response.data.message);
+                  });
+              }
+              $scope.GetGroup = function GetGroup(classid) {
+                  $scope.Groups = new Array();
+                  if (classid.length != 1)
+                      return;
+                  $http({
+                      method: 'GET',
+                      url: baseUrl + 'Common/GetGroup/' + classid[0]
+                  }).then(function successCallback(response) {
+                      $scope.Groups = response.data.results;
+                  }, function errorCallback(response) {
+                      toastr["warning"](response.data.message);
+                  });
+              }
+              $scope.GetSection = function GetSection() {
+                  $scope.Sections = [];
+                  if ($scope.studentSearch.Group1.length != 1)
+                      return;
+                  $http({
+                      method: 'GET',
+                      url: baseUrl + 'Common/GetSection/' + $scope.studentSearch.Session1[0] + "/" + $scope.studentSearch.Shift1[0] + "/" + $scope.studentSearch.Class1[0] + "/" + $scope.studentSearch.Group1[0]
+                  }).then(function successCallback(response) {
+                      $scope.Sections = response.data.results;
+                  }, function errorCallback(response) {
+                      toastr["warning"](response.data.message);
+                  });
+              }
+              var log = [];
+              $scope.StudentTypeArr = [{ 'Value': 'I', 'Text': 'Inactive' }, { 'Value': 'A', 'Text': 'Active' }, { 'Value': 'D', 'Text': 'Delete' }]
+              $scope.getSubjectlist = function (val) {
+                  return $http.get(baseUrl + 'Student/GetAllStudentBasicInfo/' + val).then(function (response) {
+                      return response.data.results.map(function (item) {
+                          return item;
+                      });
+                  });
+              };
+              $scope.dtOptions = DTOptionsBuilder.newOptions()
+                     .withDisplayLength(10)
+                     .withOption('bLengthChange', true);
+              function SearchReport() {
+                  if ($scope.studentSearch.minAbscondingDay == '' && $scope.studentSearch.maxAbscondingDay == '') {
+                      toastr["warning"]("Please Fill Date Range");
+                  }
+                  if ($scope.frmstudentSearchrd.$invalid)
+                      return;
+                  $scope.studentSearch.Statuses = createStringByArray($scope.studentSearch.Statuses1);
+                  $scope.studentSearch.Shift = createStringByArray($scope.studentSearch.Shift1);
+                  $scope.studentSearch.Session = createStringByArray($scope.studentSearch.Session1);
+                  $scope.studentSearch.Section = createStringByArray($scope.studentSearch.Section1);
+                  $scope.studentSearch.Class = createStringByArray($scope.studentSearch.Class1);
+                  $scope.studentSearch.StuType = createStringByArray($scope.studentSearch.StuType1);
+                  $scope.studentSearch.Branch = createStringByArray($scope.studentSearch.Branch1);
+                  $scope.studentSearch.House = createStringByArray($scope.studentSearch.House1);
+                  if (angular.isUndefined($scope.studentSearch.Search1))
+                      $scope.studentSearch.StudentId = 0;
+                  else
+                      $scope.studentSearch.StudentId = $scope.studentSearch.Search1.Value;                 
+                                   
+                  $scope.studentSearchs = [];
+                  $http({
+                      method: 'POST',
+                      url: baseUrl + 'Attendance/AttDynamicReport/',
+                      data: $scope.studentSearch
+                  }).then(function successCallback(response) {
+                      $scope.studentSearchs = response.data.results;
+                      toastr["success"](response.data.message);
+                  }, function errorCallback(response) {
+                      toastr["warning"](response.data.message);
+                  });
+              };
+              $scope.pageChanged = function () {
+                  Search()
+              };
+              $scope.Report = function Report() {
+                  if ($scope.studentSearch.minAbscondingDay == '' && $scope.studentSearch.maxAbscondingDay == '') {
+                      toastr["warning"]("Please Fill Date Range");
+                  }
+                  if ($scope.frmstudentSearchrd.$invalid)
+                      return;
+                  $scope.studentSearch.Statuses = createStringByArray($scope.studentSearch.Statuses1);
+                  $scope.studentSearch.Shift = createStringByArray($scope.studentSearch.Shift1);
+                  $scope.studentSearch.Session = createStringByArray($scope.studentSearch.Session1);
+                  $scope.studentSearch.Section = createStringByArray($scope.studentSearch.Section1);
+                  $scope.studentSearch.Class = createStringByArray($scope.studentSearch.Class1);
+                  $scope.studentSearch.StuType = createStringByArray($scope.studentSearch.StuType1);
+                  $scope.studentSearch.Branch = createStringByArray($scope.studentSearch.Branch1);
+                  $scope.studentSearch.House = createStringByArray($scope.studentSearch.House1);
+                  if (angular.isUndefined($scope.studentSearch.Search1))
+                      $scope.studentSearch.StudentId = 0;
+                  else
+                      $scope.studentSearch.StudentId = $scope.studentSearch.Search1.Value;
+                  $scope.studentSearch.startDate = $filter('date')($scope.studentSearch.startDate, 'MM/dd/yyyy');
+                  $scope.studentSearch.endDate = $filter('date')($scope.studentSearch.endDate, 'MM/dd/yyyy');
+                  if (new Date($scope.studentSearch.endDate) < new Date($scope.studentSearch.startDate)) {
+                      toastr["info"]("Date range is not valid !");
+                      return;
+                  }
+                  //new Date($scope.studentSearch.endDate); 
+                  var form = document.createElement("form");
+                  form.target = "_blank";
+                  form.method = "POST";
+                  form.action = window.location.origin + '/Report/AttDynamicReport/';
+                  form.style.display = "none";
+
+                  for (var key in $scope.studentSearch) {
+                      var input = document.createElement("input");
+                      input.type = "hidden";
+                      input.name = key;
+                      if ($scope.studentSearch[key] != "") {
+                          input.value = $scope.studentSearch[key].toString();
+                      }
+                      else {
+                          input.value = " "
+                      }
+                      form.appendChild(input);
+                  }
+
+                  document.body.appendChild(form);
+                  form.submit();
+                  document.body.removeChild(form);
+                  //$http({
+                  //    method: 'POST',
+                  //    url: baseUrl + 'Report/AttDynamicReport/',
+                  //    data: $scope.studentSearch
+                  //}).then(function successCallback(response) {
+                  //    $scope.studentSearchs = response.data.results;
+                  //    toastr["success"](response.data.message);
+                  //}, function errorCallback(response) {
+                  //    toastr["warning"](response.data.message);
+                  //});
+              };
+              //This method is calling from dropDown
+              $scope.changePageSize = function () {
+                  $scope.studentSearch.pageIndex = 1;
+                  Search();
+              };
+              function DropDownValue(a, b) {
+                  var data = "";
+                  $scope.array = b;
+                  angular.forEach($scope.array, function (value, key) {
+                      if (!isNaN(parseInt(value))) {
+                          data = data.concat(value[a]).concat(',')
+                      }
+                      else {
+                          data = data.concat("'" + value[a].toString() + "'").concat(',')
+                      }
+                  });
+                  return data;
+              }
+              function createStringByArray(array) {
+                  var output = '';
+                  angular.forEach(array, function (value, key) {
+                      output += value + ',';
+                  });
+                  return output = output.slice(0, output.length - 1);
+              }
+              //function datatimes() {
+              //    $scope.Dateformat = 'dd/MM/yyyy';
+              //    $scope.$watch('studentSearch.startDate', function (niu) {
+              //        if (niu) {
+              //            $scope.dateOptionsDOB.minDate = niu
+              //        }
+              //    });
+              //    $scope.$watch('studentSearch.AdstartDate', function (niu) {
+              //        if (niu) {
+              //            $scope.dateOptionsAd.minDate = niu
+              //        }
+              //    });
+              //}
+          }]);
+    </script>
+}
+
+
+
+

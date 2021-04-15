@@ -1,0 +1,344 @@
+﻿
+@{
+    ViewBag.Title = "Auto SMS Config";
+}
+<style>
+    .form-border {
+        padding: 5px;
+        border-radius: 5px;
+    }
+
+    .form-div {
+        background-color: #e3eff9;
+        padding-left: 10px !important;
+        padding-right: 10px !important;
+    }
+
+    .form-body {
+        padding-bottom: 0px !important;
+        padding-top: 0px !important;
+    }
+</style>
+<div class="portlet box blue-hoki" ng-controller="MEGR">
+    <div class="portlet-title">
+        <div class="caption">
+            <span class="caption-subject sbold uppercase">Auot SMS</span>
+        </div>
+    </div>
+    <div class="portlet-body form">
+        <form class="form-horizontal form-border" name="addformDOB" novalidate>
+            <div class="form-body form-div">
+                <div class="row ">
+                    <label class="col-md-3 control-label sbold" style="text-align:left!important;padding-bottom:20px">
+                        <span style="border-bottom:#0094ff 2px solid;"> BirthDay</span>
+                    </label>
+                </div>
+                <div class="row">
+                    <div class="col-md-3 form-group" ng-class="{ 'has-error' : submitted && addformDOB.Hours.$invalid && addformDOB.Min.$invalid}">
+                        <label class="col-md-5 control-label" style="padding:0px!important">
+                            Run Time :
+                            <span class="required">*</span>
+                        </label>
+                        <div class="col-md-7">
+                            <div class="col-md-6" style="padding:0px!important">
+                                <select class="form-control" ng-model="smsDOB.Hours" name="Hours" style="padding:0px!important">
+                                    <option ng-selected="{{1==item}}" ng-repeat="item in hours" value="{{item}}">{{item}}</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6" style="padding:0px!important">
+                                <select class="form-control" ng-model="smsDOB.Min" name="Min" style="padding:0px!important">
+                                    <option ng-repeat="item in Min" value="{{item}}">{{item}}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-control-focus"> </div>
+                        <span ng-show="submitted && addformDOB.Hours.$error.required && addformDOB.Min.$error.required" class="help-block">Run Time Required</span>
+                    </div>
+                    <div class="col-md-6 form-group" ng-class="{ 'has-error' : submitted && addformDOB.Body.$invalid}">
+                        <label class="col-md-3 control-label">
+                            Body:
+                            <span class="required">*</span>
+                        </label>
+                        <div class="col-md-9">
+                            <textarea rows="4" ng-model="smsDOB.Body" placeholder="Write Your Message..." id="txtBody1" required name="Body" class="form-control"></textarea>
+                            <div class="form-control-focus"> </div>
+                            <span ng-show="submitted && addformDOB.Body.$error.required" class="help-block">Body Required</span>
+                        </div>
+                    </div>
+                    <div class="row col-md-4">
+                        <span class="btn btn-xs" ng-click="Tags($event,1)" style="margin-right:5px;margin-bottom:5px;" data-name="{{item.TagName}}" ng-repeat="item in TempTag | filter:TagType='Student'">{{item.TagName}}</span>
+                        <span class="btn btn-xs" ng-click="Tags($event,1)" style="margin-right:5px;margin-bottom:5px;" data-name="[Birthday]">[Birthday]</span>
+                        <div class="pull-right">
+                            <button ng-click="submitted=true;DOBSave()" class="btn green">Save</button>
+                            <a ng-click="ResetDOB()" class="btn info">Reset</a>
+                        </div>
+                     </div>
+                </div>
+            </div>
+        </form>
+        <form class="form-horizontal form-border" name="addformFees" novalidate>
+            <div class="form-body form-div">
+                <div class="row ">
+                    <label class="col-md-3 control-label sbold" style="text-align:left!important;padding-bottom:20px">
+                        <span style="border-bottom:#0094ff 2px solid;"> Fees Collection SMS</span>
+                    </label>
+                </div>
+                <div class="row">
+                    <div class="col-md-3 form-group" ng-class="{ 'has-error' : submitted1 && addformFees.Hours.$invalid && addformFees.Min.$invalid}">
+                        <label class="col-md-5 control-label" style="padding:0px!important">
+                            Run Time :
+                            <span class="required">*</span>
+                        </label>
+                        <div class="col-md-7">
+                            <div class="col-md-6" style="padding:0px!important">
+                                <select class="form-control" ng-model="smsFees.Hours" name="Hours" style="padding:0px!important">
+                                    <option ng-selected="{{1==item}}" ng-repeat="item in hours" value="{{item}}">{{item}}</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6" style="padding:0px!important">
+                                <select class="form-control" ng-model="smsFees.Min" name="Min" style="padding:0px!important">
+                                    <option ng-repeat="item in Min" value="{{item}}">{{item}}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-control-focus"> </div>
+                        <span ng-show="submitted1 && addformFees.Hours.$error.required && addformFees.Min.$error.required" class="help-block">Run Time Required</span>
+                    </div>
+                    <div class="col-md-6 form-group" ng-class="{ 'has-error' : submitted1 && addformFees.Body.$invalid}">
+                        <label class="col-md-3 control-label">
+                            Body:
+                            <span class="required">*</span>
+                        </label>
+                        <div class="col-md-9">
+                            <textarea rows="4" ng-model="smsFees.Body" required name="Body" id="txtBody2" class="form-control"></textarea>
+                            <div class="form-control-focus"> </div>
+                            <span ng-show="submitted1 && addformFees.Body.$error.required" class="help-block">Body Required</span>
+
+                        </div>
+                        <span class="btn btn-xs" ng-click="Tags($event,2)" style="margin-right:5px;margin-bottom:5px;" data-name="[CollectionDate]">[CollectionDate]</span>
+                        <span class="btn btn-xs" ng-click="Tags($event,2)" style="margin-right:5px;margin-bottom:5px;" data-name="[BankName]">[BankName]</span>
+                        <span class="btn btn-xs" ng-click="Tags($event,2)" style="margin-right:5px;margin-bottom:5px;" data-name="[Amount]">[Amount]</span>
+                    </div>
+                    <div class="row col-md-4">
+                        <div class="pull-right">
+                            <button ng-click="submitted1=true;FeesSave()" class="btn green">Save</button>
+                            <a ng-click="ResetFees()" class="btn info">Reset</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts{
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            function Tags(e) {
+                var tag = $(this).text();
+                console.log(tag);
+                var el = $("#txtBody"+e).get(0);
+                console.log(el.selectionStart);
+                if (el.setSelectionRange) {
+                    el.value = el.value.substring(0, el.selectionStart) + tag + el.value.substring(el.selectionStart, el.selectionEnd) + el.value.substring(el.selectionEnd, el.value.length);
+                }
+                console.log(el.selectionStart);
+            }
+            $(document).on("click", ".tag", function () {
+                var tag = $(this).text();
+                console.log(tag);
+                var el = $("#txtBody").get(0);
+                console.log(el.selectionStart);
+                if (el.setSelectionRange) {
+                    el.value = el.value.substring(0, el.selectionStart) + tag + el.value.substring(el.selectionStart, el.selectionEnd) + el.value.substring(el.selectionEnd, el.value.length);
+                }
+                console.log(el.selectionStart);
+            });
+        });
+    </script>
+
+    <script type="text/javascript">
+        OEMSApp.controller("MEGR", ["$scope", "$http", "SweetAlert", "$window", "filterFilter", "$filter",
+        function ($scope, $http, SweetAlert, $window, filterFilter, $filter) {
+              init();
+              function init() {
+                  initialize();
+                  getAllDropdowns();
+                  GetAutoSMSConfig();
+                  getAllTempTag();
+              }
+              function initialize() {
+                  $scope.smsFees = {};
+                  $scope.smsDOB = {};
+                  $scope.sms = {};
+                  $scope.Settings = {};
+                  $scope.sms.SMSPart = 0;
+                  $scope.sms.SMSLen = 0;
+                  $scope.Dropdowns = [];
+                  $scope.Settings = [];
+                  $scope.TempTag = [];
+                  $scope.CommonFeilds = [];
+                  $scope.getAllDropdowns = getAllDropdowns;
+
+                  $scope.getAllTempTag = getAllTempTag;
+
+                  $scope.submitted = false;
+                  $scope.submitted1 = false;
+                  $scope.submitted2 = false;
+                  $scope.submitted3 = false;
+                  $scope.submitted4 = false;
+                  // $scope.total = total;
+                  $scope.Min = [ ]
+                  for (var i = 1; i < 60; i++) {
+                      $scope.Min.push(i);
+                  }
+                  $scope.hours = []
+                  for (var i = 1; i < 24; i++) {
+                      $scope.hours.push(i);
+                  }
+                  $scope.smsFees.RunTime = 1;
+              };
+              $scope.Tags = function Tags(e,num) {
+                  var tag = e.target.attributes["data-name"].value;
+                  console.log(tag);
+                  var el = $("#txtBody" + num).get(0);
+                  console.log(el.selectionStart);
+                  if (el.setSelectionRange) {
+                      el.value = el.value.substring(0, el.selectionStart) + tag + el.value.substring(el.selectionStart, el.selectionEnd) + el.value.substring(el.selectionEnd, el.value.length);
+                  }
+                  console.log(el.selectionStart);
+              };
+              $scope.ResetDOB = function ResetDOB() {
+                  $scope.smsDOB = {};
+                  $scope.submitted = false;
+              };
+              $scope.ResetFees = function ResetFees() {
+                  $scope.smsFees = {};
+                  $scope.submitted1 = false;
+              };
+              $scope.total = function total() {
+                  if ($scope.sms.isUnicode)
+                  {
+
+                      if ($scope.sms.SMSBody.length > 70) {
+                          $scope.sms.SMSPart = Math.ceil($scope.sms.SMSBody.length / 67);
+                          $scope.maximumLength = 67;
+                      }
+                      else {
+                          $scope.sms.SMSPart = 1;
+                          $scope.maximumLength = 70;
+                      }
+                  }
+                  else
+                  {
+                      if ($scope.sms.SMSBody.length > 160) {
+                          $scope.sms.SMSPart = Math.ceil($scope.sms.SMSBody.length / 153);
+                          $scope.maximumLength = 153;
+                      }
+                      else {
+                          $scope.sms.SMSPart = 1;
+                          $scope.maximumLength = 160;
+                      }
+                  }
+
+                  return $scope.sms.SMSPart;
+              }
+              $scope.containsNonLatinCodepoints = function containsNonLatinCodepoints(s) {
+                  $scope.sms.isUnicode = /[^\u0000-\u00ff]/.test(s);
+              }
+              $scope.DOBSave = function DOBSave() {
+                  if ($scope.addformDOB.$invalid == true)
+                      return;
+                  $scope.smsDOB.CategoryId = 7;
+                  $scope.smsDOB.Type = 'A';
+                  if ($scope.smsDOB != {}) {
+                      $http({
+                          method: 'POST',
+                          url: baseUrl + 'SMS/AddUpdateScheduleSMSConfig/',
+                          data: $scope.smsDOB
+                      }).then(function successCallback(response) {
+                          toastr["info"](response.data.message);
+                      }, function errorCallback(response) {
+                          toastr["warning"](response.data.Message);
+                      });
+                  }
+              };
+              $scope.FeesSave = function FeesSave() {
+                  if ($scope.addformFees.$invalid == true)
+                      return;
+                  $scope.smsFees.CategoryId = 6;
+                  $scope.smsFees.Type = 'A';
+                  if ($scope.smsFees != {}) {
+                      $http({
+                          method: 'POST',
+                          url: baseUrl + 'SMS/AddUpdateScheduleSMSConfig/',
+                          data: $scope.smsFees
+                      }).then(function successCallback(response) {
+                          toastr["info"](response.data.message);
+                      }, function errorCallback(response) {
+                          toastr["warning"](response.data.message);
+                      });
+                  }
+              };
+              function GetAutoSMSConfig() {
+                  $scope.Settings = [];
+                  $http({
+                      method: 'GET',
+                      url: baseUrl + 'SMS/GetAutoSMSConfig/'
+                  }).then(function successCallback(response) {
+                      $scope.Settings = response.data.results;
+                      $scope.smsFees = filterFilter(response.data.results, { CategoryId: 6 })[0];
+                      $scope.smsFees.Hours = $scope.smsFees.RunTime.substring(0, 2);
+                      $scope.smsFees.Min = $scope.smsFees.RunTime.substring(3, 5);
+                      $scope.smsDOB = filterFilter(response.data.results, { CategoryId: 7 })[0];
+                      $scope.smsDOB.Hours = $scope.smsDOB.RunTime.substring(0, 2);
+                      $scope.smsDOB.Min = $scope.smsDOB.RunTime.substring(3, 5);
+                  }, function errorCallback(response) {
+                      toastr["info"](response.data.Message);
+                  });
+              }
+              function getAllTempTag() {
+                  $scope.TempTag = [];
+                  $http({
+                      method: 'GET',
+                      url: baseUrl + 'SMS/GetAllTempTag/'
+                  }).then(function successCallback(response) {
+                      $scope.TempTag = response.data.results;
+                  }, function errorCallback(response) {
+                      toastr["info"](response.data.message);
+                  });
+              }
+              function getAllDropdowns() {
+                  $scope.Dropdowns = [];
+                  $http({
+                      method: 'GET',
+                      url: baseUrl + 'Common/GetAllDropDown/'
+                  }).then(function successCallback(response) {
+                      $scope.Dropdowns = response.data.results;
+                  }, function errorCallback(response) {
+                      toastr["info"](response.data.message);
+                  });
+              }
+
+              function getAllCommons() {
+                  $scope.CommonFeilds = [];
+                  $http({
+                      method: 'GET',
+                      url: baseUrl + 'Common/GetCommonItem/'
+                  }).then(function successCallback(response) {
+                      $scope.CommonFeilds = response.data.results;
+                  }, function errorCallback(response) {
+                      toastr["info"](response.data.message);
+                  });
+              }
+          }]);
+    </script>
+}
+
+
+
+
+
+
+

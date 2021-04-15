@@ -1,0 +1,100 @@
+﻿@model IEnumerable<OEMS.Models.Model.AspNetPage>
+@{
+    Layout = null;
+    var g = string.Empty;
+    var DashClass = string.Empty;
+    var RouteAction = this.Request.RequestContext.RouteData.Values["Action"].ToString();
+    var Controller = this.Request.RequestContext.RouteData.Values["Controller"].ToString();
+    #region Chack Parent  
+    var parentId = 0;
+    var Cls = string.Empty;
+    var data = Model.Where(e => e.ParentID == 1);
+    #endregion
+}
+
+@if (Model.Any()) { 
+    <ul class="kt-menu__nav ">
+        <li  class="kt-menu__item Dashboard" >
+            <a href="@Url.Action(Model.First().Action, Model.First().Controller)" class="kt-menu__link ">
+                <span class="kt-menu__link-text">Dashboard</span>
+                
+            </a>
+        </li>
+     @foreach (var item in Model.Where(e => e.ParentID == 0 && e.IsModule == false).OrderBy(e => e.Displayorder))
+     {
+         var UrlAction = "#";
+         var clas = string.Empty;
+         var clas1 = string.Empty;
+         if (Model.Any(e => e.ParentID == item.PageID && (e.PageID == parentId)))
+         {
+             clas = "open-active nvv";
+             clas1 = "start active nvv";
+         }
+            <li class="kt-menu__item  kt-menu__item--submenu  @clas1 @item.IconClass"  >
+              
+                  @if(item.Controller != null)
+                  {
+                     UrlAction = Url.Action(item.Action, item.Controller);
+                  }
+                  <a href="@UrlAction" class="kt-menu__link kt-menu__toggle" >
+                      <span class="kt-menu__link-text ">@item.NameOption_En</span>
+                  @*<span class="selected"></span>*@
+                  @if(Model.Any(e => e.ParentID == item.PageID))
+                  {
+                      <i class="fa fa-chevron-down"></i>
+                  }
+                  </a>
+               
+                @if (Model.Any(e => e.ParentID == item.PageID))
+                {
+                    <div class="kt-menu__submenu ">
+                        <span class="kt-menu__arrow"></span>
+                        <ul class="kt-menu__subnav">
+                            @foreach (var Submenu in Model.Where(e => e.ParentID == item.PageID))
+                        {
+                            var class1 = string.Empty;
+                            if (Submenu.ParentID == item.PageID && Submenu.Action == RouteAction)
+                            {
+                                class1 = "active";
+                            }
+                            
+
+                            <li class="kt-menu__item" >
+                                @if (Submenu.Controller != null)
+                                {
+                                    UrlAction = Url.Action(Submenu.Action, Submenu.Controller);
+                                }
+                                <a href="@UrlAction" class="kt-menu__link ">
+                                    <i class="kt-menu__link-bullet kt-menu__link-bullet--dot"><span></span></i>
+                                    <span class="kt-menu__link-text">@Submenu.NameOption_En</span>
+
+                                    
+                                   
+                                    @*@if (Model.Any(e => e.ParentID == Submenu.PageID))
+                                    {
+                                        <i class="fa fa-chevron-down"></i>
+                                    }*@
+                                </a>
+                                @*@if (Model.Any(e => e.ParentID == Submenu.PageID))
+                                {
+                                    <ul class="sub-menu submenu side-sub">
+                                        @foreach (var SubSubmenu in Model.Where(e => e.ParentID == Submenu.PageID))
+                                        {
+                                           
+                                            <li>
+                                                <a href="@Url.Action(SubSubmenu.Action,SubSubmenu.Controller)">
+                                                    <span class="title ">@SubSubmenu.NameOption_En</span>
+                                                </a>
+                                            </li>
+                                        }
+                                    </ul>
+                                }*@
+                            </li>
+                            }
+                        </ul>
+                    </div>
+                }
+            </li>
+        }
+    </ul>
+}

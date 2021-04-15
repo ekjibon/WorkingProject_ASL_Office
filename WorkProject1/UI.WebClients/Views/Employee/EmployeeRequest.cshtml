@@ -1,0 +1,984 @@
+﻿
+@{
+    ViewBag.Title = "Employee Request";
+    //Layout = "~/Views/Shared/_EmpLayout.cshtml";
+}
+<link href="~/assets/timeline.css" rel="stylesheet" />
+
+<style>
+    #custom-button {
+        padding: 5px;
+        color: #009db8;
+        background-color: rgb(228, 244, 247);
+        /*opacity:0.6;*/
+        border: 1px solid #009db8;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 18px;
+    }
+
+
+    #custom_text {
+        margin-left: 10px;
+        font-family: sans-serif;
+        color: #aaa;
+    }
+
+    .button-wrapper {
+        position: relative;
+        width: 150px;
+        text-align: center;
+        /*margin: 20% auto;*/
+    }
+
+        /*.pending {
+        background: rgba(252, 122, 82, 0.5);
+        color: #FC7B52;
+        padding: 8px 16px;
+        border-radius: 27px;
+    }*/
+
+        .button-wrapper span.label {
+            position: relative;
+            z-index: 0;
+            display: inline-block;
+            width: 100%;
+            background: #c4e9f5;
+            cursor: pointer;
+            color: #5ebcda;
+            padding: 10px 0;
+            text-transform: uppercase;
+            font-size: 12px;
+        }
+
+    #upload {
+        display: inline-block;
+        position: absolute;
+        z-index: 1;
+        width: 100%;
+        height: 50px;
+        top: 0;
+        left: 0;
+        opacity: 0;
+        cursor: pointer;
+    }
+
+    /*.Approved {
+        background: rgba(0, 156, 184, 0.521);
+        color: #009DB8;
+        padding: 8px 16px;
+        border-radius: 27px;
+    }*/
+
+    .Approved {
+        background: #009933;
+        color: #009DB8;
+        padding: 8px 16px;
+        border-radius: 27px !important;
+        color: white;
+    }
+
+    .pending {
+        background: #33bbff;
+        color: #FC7B52;
+        padding: 8px 16px;
+        border-radius: 27px !important;
+        color: white;
+    }
+
+    .Rejected {
+        background: #dc3545;
+        color: white;
+        padding: 8px 16px;
+        border-radius: 27px !important;
+        color: white;
+    }
+
+    .edit {
+        font-size: 25px;
+        color: #6b6565;
+        cursor: pointer;
+    }
+
+    .view {
+        font-size: 25px;
+        color: #58cf91;
+        cursor: pointer;
+    }
+</style>
+
+
+<div class="kt-container  kt-container--fluid  kt-grid__item kt-grid__item--fluid" ng-controller="EmpRequestApply">
+    <div class="row">
+        <div class="kt-portlet kt-portlet--mobile">
+            <div class="kt-portlet__head kt-portlet__head--lg">
+                <div class="kt-portlet__head-label">
+                    <h2 class="kt-portlet__head-title">
+                        <b>Request</b>
+                    </h2>
+                </div>
+                <div class="kt-portlet__head-toolbar">
+                    <div class="kt-portlet__head-wrapper">
+                        <div class="dropdown dropdown-inline">
+                            <button type="button" ng-show="IsShowAddBtn" @*ng-click="resetForm()"*@ class="btn btn-brand btn-icon-sm" data-toggle="modal" data-target="#exampleModal" aria-haspopup="true" aria-expanded="false">
+                                <i class="flaticon2-plus"></i> Add New Request
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="kt-portlet__body" ng-show="IsShowAddBtn">
+
+                <div class="row">
+                    <div class="col-md-4 col-sm-5 col-xs-6">
+                        <div class="form-group">
+                            <div class="col-lg-3 col-md-5 col-sm-4 col-xs-8" style="padding-left:0px">
+
+                                <select class="form-control kt-font-brand" ng-model="pageSize" ng-options="P.value as P.text for P in pageSizeArray"></select>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="col-md-4 col-sm-3 col-xs-1">
+                    </div>
+                    <div class="col-md-4 col-sm-4 col-xs-5">
+                        <div id="sample_3_filter" class="pull-right">
+                            <input ng-model="q" id="search" class="form-control" placeholder="Filter text">
+                        </div>
+                    </div>
+                </div>
+                <table class="table table-bordered table-hover rounded">
+                    <thead>
+                        <tr class="btn-primary">
+                            <th class="text-center">Request for</th>
+                            <th class="text-center">Category</th>
+                            <th class="text-center">Reason</th>
+                            <th class="text-center">Description</th>
+                            <th class="text-center">Date of Submission</th>
+                            <th class="text-center">Status</th>
+                            <th style="text-align:center">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-show="RequestList.length <= 0"><td colspan="7" style="text-align:center;"><i class="fa fa-refresh"></i> No Data Found..</td></tr>
+
+
+                        <tr dir-paginate="item in RequestList| filter:q  | itemsPerPage: pageSize" current-page="currentPage">
+
+                            <td class="text-center" width="10%">{{item.RequestTypeName}}</td>
+                            <td class="text-center" width="10%">{{item.CategoryName}}</td>
+                            <td class="text-center" ng-hide="item.Reason==null">{{item.Reason}}</td>
+                            <td class="text-center" ng-show="item.Reason==null">N/A</td>
+
+                            <td class="text-center" ng-hide="item.Description==null" style="width:15%">{{item.Description}}</td>
+                            <td class="text-center" ng-show="item.Description==null" style="width:15%">N/A</td>
+
+                            <td class="text-center">{{item.AddDate | date: "mediumDate"}}</td>
+                            <td ng-if="item.Status=='Pending'" class="text-center"><span class="pending">{{item.Status}}</span></td>
+                            <td ng-if="item.Status=='Approved'" class="text-center"><span class="Approved ">{{item.Status}}</span></td>
+                            <td ng-if="item.Status=='Rejected'" class="text-center"><span class="Rejected ">{{item.Status}}</span></td>
+                            <td class="text-center">
+                                <button class="btn dropdown-toggle" type="button" data-toggle="dropdown" aria-expanded="false">
+                                    Options
+                                </button>
+                                <ul class="dropdown-menu" role="menu" style="left: -111%; ">
+                                    <li>
+                                        <a ng-click="view(item);ViewLeaveDetails(item)" data-toggle="modal" data-target="#viewDetailsModal" data-whatever="fat" href="">
+                                            <i class="fa fa-eye"></i> View
+                                        </a>
+                                    </li>
+                                    @*<li>
+                                        <a ng-click="edit(item)" data-toggle="modal" data-target="#exampleModal" data-whatever="fat" ng-show="item.Status=='Pending'">
+                                            <i class="fa fa-edit"></i> Edit
+                                        </a>
+                                    </li>*@
+                                    <li>
+                                        <a ng-click="DeleteRequest(item.Id)" href="javascript:;" ng-show="item.Status=='Pending'||item.Status=='Rejected'">
+                                            <i class="fa fa-trash"></i> Delete
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="@Url.Action("LeaveApplicationForm", "Report")?LeaveId={{item.Id}}" target="_blank">
+                                            <i class="fas fa-download"></i> Download
+                                        </a>
+                                    </li>
+                                </ul>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="row" style="padding-left:10px; padding-right:10px;">
+                    <dir-pagination-controls boundary-links="true" template-url="~/assets/angular/lib/dirPagination.tpl.html"></dir-pagination-controls>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <!--Modal Area Start-->
+    <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">{{modalTitle}} Request</h5>
+                </div>
+                <div class="modal-body" style="margin-left: 5%;">
+                    <form name="formCommonFeilds" novalidate>
+                        <div class="form-group row" ng-class="{ 'has-error' : submitted && formCommonFeilds.RequestType.$invalid}">
+                            <label for="text" class="col-sm-3  control-label">Request</label>
+                            <div class="col-sm-9" style="margin-left: -8%;">
+                                <div class="col-lg-12 col-md-5 col-sm-4 col-xs-8 Item" style="padding-left:0px;padding-right: 1px;">
+                                    <select class="form-control" ng-model="Request.RequestType" ng-change="LoadCategory()" required name="RequestType" ng-options="m.Id as m.RequestName for m in RequestListType">
+                                        <option value="">Select</option>
+                                    </select>
+                                    <span ng-show="submitted && formCommonFeilds.RequestType.$error.required" class="required">Request Type Required</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div ng-show="Request.RequestType==5">
+                            <div class="form-group row" ng-class="{ 'has-error' : submitted && formCommonFeilds.LeaveCategoryId.$invalid}">
+                                <label for="text" class="col-sm-4  control-label">Leave Category</label>
+                                <div class="col-sm-8" style="margin-left: -8%;">
+                                    <div class="col-lg-12 col-md-5 col-sm-4 col-xs-8 Item" style="padding-left:0px;padding-right: 1px;">
+                                        <select class="form-control" required ng-model="Request.LeaveCategoryId" name="LeaveCategoryId" ng-options="m.Id as m.CategoryName for m in LeaveCategory" @*ng-change="GetEmpLeaveBalance()"*@>
+                                            <option value="" selected="selected">Select</option>
+                                        </select>
+                                        <span ng-show="submitted && formCommonFeilds.LeaveCategoryId.$error.required" class="required">Category Required</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group row" ng-class="{ 'has-error' : submitted && formCommonFeilds.LeaveTypeCategory.$invalid}">
+                                <label for="text" class="col-sm-4  control-label">Leave Type</label>
+                                <div class="col-sm-8" style="margin-left: -8%;">
+                                    <div class="col-lg-12 col-md-5 col-sm-4 col-xs-8 Item" style="padding-left:0px;padding-right: 1px;">
+                                        <select class="form-control" ng-model="Request.LeaveTypeCategory" name="LeaveTypeCategory" required ng-change="CalculateDuratoin()">
+                                            <option value="" selected="selected">Select</option>
+                                            <option value="HD" selected="selected">Half Day</option>
+                                            <option value="FD" selected="selected">Full Day</option>
+                                        </select>
+                                        <span ng-show="submitted && formCommonFeilds.LeaveTypeCategory.$error.required" class="required">Type Required</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group row" ng-class="{ 'has-error' : submitted && formCommonFeilds.FromDate.$invalid && Request.LeaveTypeCategory == 'FD'}" ng-hide="Request.LeaveTypeCategory == 'HD'">
+                                <label for="inputPassword" class="col-sm-4  control-label">From</label>
+                                <div class="col-sm-8" style="margin-left: -8%;">
+                                    <input class="form-control" ng-required="Request.LeaveTypeCategory == 'FD'" name="FromDate" type="text" placeholder="From Date" readonly ng-click="p1=true" is-open="p1" uib-datepicker-popup="dd-MM-yyyy" ng-model="Request.From" />
+
+                                    @*<input class="form-control" required name="FromDate" type="date" placeholder="From Date" ng-model="Leave.From" />*@
+                                    <span ng-show="submitted && formCommonFeilds.FromDate.$error.required && Request.LeaveTypeCategory == 'FD'" class="required">From Date Required</span>
+                                </div>
+                            </div>
+
+                            <div class="form-group row" ng-class="{ 'has-error' : submitted && formCommonFeilds.To.$invalid && Request.LeaveTypeCategory == 'FD'}" ng-hide="Request.LeaveTypeCategory == 'HD'">
+                                <label for="inputPassword" class="col-sm-4  control-label">To</label>
+                                <div class="col-sm-8" style="margin-left: -8%;">
+                                    <div class="col-lg-12 col-md-5 col-sm-4 col-xs-8 Item" style="padding-left:0px;padding-right: 1px;">
+                                        <input class="form-control" ng-required="Request.LeaveTypeCategory == 'FD'" ng-change="CalculateDuratoin();GetEmpLeaveBalance()" name="To" type="text" placeholder="To Date" readonly ng-click="p2=true" is-open="p2" uib-datepicker-popup="dd-MM-yyyy" ng-model="Request.To" />
+
+                                        @*<input class="form-control" type="date" required name="To" placeholder="Requested On" ng-change="CalculateDuratoin()" ng-model="Leave.To" />*@
+                                        <span ng-show="submitted && formCommonFeilds.To.$error.required && Request.LeaveTypeCategory == 'FD'" class="required">To Date Required</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group row" ng-class="{ 'has-error' : submitted && formCommonFeilds.HalfDayDate.$invalid && Request.LeaveTypeCategory == 'HD'}" ng-show="Request.LeaveTypeCategory == 'HD'">
+                                <label class="col-sm-4  control-label">Date</label>
+                                <div class="col-sm-8" style="margin-left: -8%;">
+                                    <div class="col-lg-12 col-md-5 col-sm-4 col-xs-8 Item" style="padding-left:0px;padding-right: 1px;">
+                                        <input class="form-control" ng-required="Request.LeaveTypeCategory == 'HD'" name="HalfDayDate" ng-change="CalculateDuratoin();GetEmpLeaveBalance()" type="text" placeholder="Leave Date" readonly ng-click="p3=true" is-open="p3" uib-datepicker-popup="dd-MM-yyyy" ng-model="Request.HalfDayDate" />
+                                        <span ng-show="submitted && formCommonFeilds.HalfDayDate.$error.required && Request.LeaveTypeCategory == 'HD'" class="required">Date Required</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group row" ng-show="Request.To != null || Request.HalfDayDate != null">
+                                <label class="col-sm-4  control-label">Available Leave</label>
+                                <div class="col-sm-8" style="margin-left: -8%;">
+                                    <div class="col-lg-12 col-md-5 col-sm-4 col-xs-8 Item" style="padding-left:0px;padding-right: 1px;">
+                                        @*<label><span ng-value="LeaveBalanceInfo.LeaveBalance"></span></label>*@
+                                        <input class="form-control" name="LeaveBalance" type="text" ng-value="LeaveBalanceInfo.LeaveBalance" readonly />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <div class="col-sm-4">
+                                    <label for="message-text" class="control-label">Attachment</label>
+                                </div>
+                                <div class="col-sm-8" style="margin-left: -7%;">
+                                    <input type="file" id="real_file" ng-hide="imgfile" accept="image/x-png,image/gif,image/jpeg" />
+                                    <button type="button" id="custom-button"><i class="fas fa-file-medical"> Choose File</i></button>
+                                    <span class="demoInputBox" id="custom_text">No file chosen, yet.</span>
+                                </div>
+                            </div>
+
+                            <div class="form-group row" ng-class="{ 'has-error' : submitted && formCommonFeilds.Reason.$invalid}">
+                                <label for="inputPassword" class="col-sm-3  control-label">Reason</label>
+                                <div class="col-sm-9" style="margin-left: -8%;">
+                                    <textarea class="form-control" rows="4" cols="50" maxlength="460" required name="Reason" ng-model="Request.Reason" id="message-text"></textarea>
+                                    <span class="form-help">{{460-Request.Reason.length}} Characters of 460</span>
+                                    <span ng-show="submitted && formCommonFeilds.Reason.$error.required" class="required">Reason Required</span>
+                                </div>
+                            </div>
+
+                            <div class="form-group row" ng-class="{ 'has-error' : submitted && formCommonFeilds.Description.$invalid}">
+                                <div class="col-sm-3">
+                                    <label for="message-text" class="control-label">Description</label>
+                                </div>
+                                <div class="col-sm-9" style="margin-left: -8%;">
+                                    <textarea class="form-control" rows="4" cols="50" required name="Description" ng-model="Request.Description" id="message-text" maxlength="460"></textarea>
+                                    <span class="form-help">{{460-Request.Description.length}} Characters of 460</span>
+                                    <span ng-show="submitted && formCommonFeilds.Description.$error.required" class="required">Description Required</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" ng-click="reset();submitted=false" data-dismiss="modal">Cancel</button>
+                            <button type="button" class="btn btn-success" ng-click="SaveRequest(Request);submitted=true">{{btnTitle}}</button>
+                        </div>
+
+                    </form>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!--Modal Area End-->
+    <!--viewDetailsModal For Leave-->
+    <div class="modal fade" id="viewDetailsModal" tabindex="-1" role="dialog" aria-labelledby="viewDetailsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel"><strong>View Leave Request Details</strong></h5>
+                </div>
+                <div class="modal-body" style="margin-left: 5%;">
+                    <form name="formCommonFeilds2" novalidate>
+
+                        <div ng-show="Request.RequestType==5" class="row">
+
+                            <div class="col-md-6">
+                                <div class="form-group row">
+                                    <label class="col-sm-4  control-label">Leave Type</label>
+                                    <div class="col-sm-8" style="margin-left: -8%;">
+                                        <div class="col-lg-12 col-md-5 col-sm-4 col-xs-8 Item" style="padding-left:0px;padding-right: 1px;">
+                                            <input class="form-control" ng-show="Request.LeaveTypeCategory == 'FD'" disabled value="Full Day" />
+                                            <input class="form-control" ng-show="Request.LeaveTypeCategory == 'HD'" disabled value="Half Day" />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group row" ng-show="Request.LeaveTypeCategory == 'FD'">
+                                    <label class="col-sm-4  control-label">From</label>
+                                    <div class="col-sm-8" style="margin-left: -8%;">
+                                        <input class="form-control" required name="FromDate" type="datetime" placeholder="From Date" readonly disabled uib-datepicker-popup="dd-MM-yyyy" ng-model="Request.From" />
+                                    </div>
+                                </div>
+                                <div class="form-group row" ng-show="Request.LeaveTypeCategory == 'HD'">
+                                    <label class="col-sm-4  control-label">Date</label>
+                                    <div class="col-sm-8" style="margin-left: -8%;">
+                                        <div class="col-lg-12 col-md-5 col-sm-4 col-xs-8 Item" style="padding-left:0px;padding-right: 1px;">
+                                            <input class="form-control" name="HalfDayDate" type="text" placeholder="Leave Date" readonly disabled uib-datepicker-popup="dd-MM-yyyy" ng-model="Request.HalfDayDate" />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-sm-4  control-label">Reason</label>
+                                    <div class="col-sm-8" style="margin-left: -8%;">
+                                        <div class="col-lg-12 col-md-5 col-sm-4 col-xs-8 Item" style="padding-left:0px;padding-right: 1px;">
+                                            <textarea class="form-control" readonly rows="4" cols="50" required name="Description" disabled ng-model="Request.Reason">{{Request.Remarks}}</textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group row">
+                                    <label class="col-sm-4  control-label">Category</label>
+                                    <div class="col-sm-8" style="margin-left: -8%;">
+                                        <div class="col-lg-12 col-md-5 col-sm-4 col-xs-8 Item" style="padding-left:0px;padding-right: 1px;">
+                                            <input class="form-control" ng-model="Request.CategoryName" disabled />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group row" ng-show="Request.LeaveTypeCategory == 'FD'">
+                                    <label class="col-sm-4  control-label">To</label>
+                                    <div class="col-sm-8" style="margin-left: -8%;">
+                                        <div class="col-lg-12 col-md-5 col-sm-4 col-xs-8 Item" style="padding-left:0px;padding-right: 1px;">
+                                            <input class="form-control" required name="To" type="datetime" placeholder="To Date" readonly disabled uib-datepicker-popup="dd-MM-yyyy" ng-model="Request.To" />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <div class="col-sm-4">
+                                        <label for="message-text" class="control-label">Description</label>
+                                    </div>
+                                    <div class="col-sm-8" style="margin-left: -8%;">
+                                        <textarea class="form-control" readonly disabled rows="4" cols="50" required name="Description" ng-model="Request.Description" id="message-text" maxlength="460"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-12">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h5 class="mb-5"><strong class="text-center">Leave Routing Timeline</strong></h5>
+                                        <div class="hori-timeline" dir="ltr">
+                                            <ul class="list-inline events">
+                                                <li class="list-inline-item event-list" ng-repeat="item in EmpLeaveSummary.LeaveRoutingHistoryList">
+                                                    <div class="px-4">
+                                                        <div class="event-date " ng-class="(item.ApprovedStatus=='Pending' )? 'bg-soft-primary text-primary' : (item.ApprovedStatus=='Approved') ? 'bg-soft-success  text-success' : (item.ApprovedStatus=='Rejected') ? 'bg-soft-danger text-danger' : 'bg-soft-warning text-warning'">{{item.ApprovedStatus}}</div>
+                                                        <h5 class="font-size-16">{{item.FullName}}</h5>
+                                                        <p class="text-muted">{{item.Comments}}</p>
+                                                    </div>
+                                                </li>
+
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal" ng-click="reset();submitted=false">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+    <!--viewDetailsModal-->
+
+</div>
+
+
+@section Scripts{
+    <script type="text/javascript">
+        const realFileBtn = document.getElementById("real_file");
+        const customBtn = document.getElementById("custom-button");
+        const customTxt = document.getElementById("custom_text");
+
+        customBtn.addEventListener("click", function () {
+            realFileBtn.click();
+        });
+
+        realFileBtn.addEventListener("change", function () {
+            $("#custom_text").html("No file chosen, yet.");
+            $(".demoInputBox").css("color", "#aaa");
+            if (realFileBtn.value) {
+                customTxt.innerHTML = realFileBtn.value.match(
+                  /[\/\\]([\w\d\s\.\-\(\)]+)$/
+                )[1];
+            } else {
+                customTxt.innerHTML = "No file chosen, yet.";
+            }
+        });
+
+
+
+    </script>
+    <script type="text/javascript">
+        OEMSApp.controller("EmpRequestApply", ["$scope", "$http", "SweetAlert", "blockUI", "$window", "$filter",
+                     function ($scope, $http, SweetAlert, blockUI, $window, $filter) {
+                         init();
+                         function init() {
+                             initialize();
+                         }
+                         function initialize() {
+                             $scope.pageSizeArray = [];
+                             $scope.pageSizeArray.push({ value: 5, text: 5 });
+                             $scope.pageSizeArray.push({ value: 10, text: 10 });
+                             $scope.pageSizeArray.push({ value: 20, text: 20 });
+                             $scope.pageSizeArray.push({ value: 50, text: 50 });
+                             $scope.currentPage = 1;
+                             $scope.pageSize = 10;
+                             $scope.Request = {};
+                             $scope.Request.Id = 0;
+                             //$scope.Request.To = {};
+                             $scope.LeaveBalanceInfo = {};
+                             $scope.Leave = {};
+                             $scope.RequestList = [];
+                             $scope.CategoryList = [];
+                             $scope.DesignationList = [];
+                             $scope.LeaveCategory = [];
+                             $scope.hstep = 1;
+                             $scope.mstep = 15;
+                             //$scope.Request.Time = "00";
+                             $scope.Request.CategoryId = null;
+                             $scope.oddColor = '#E4F4F7';
+                             var RequesType = [
+                                              // { Id: 1, RequestName: "For Meeting" },
+                                               //{ Id: 2, RequestName: "For Tailor/TuckShop" },
+
+                                                //{ Id: 3, RequestName: "For NOC" },
+                                                   //{ Id: 4, RequestName: "For Experience Letter" },
+                                                   { Id: 5, RequestName: "For Leave" },
+                                                   //{ Id: 6, RequestName: "For Release Letter" },
+                                                 //  { Id: 7, RequestName: "For 5+ Years Early Leave Privilege" }
+                             ];
+                             var NOCTypeList = [{ Id: 1, NOCName: "Travelling NOC" },
+                                              { Id: 2, NOCName: "Not Travelling NOC" }
+                             ]
+                             $scope.RequestListType = RequesType;
+                             $scope.NOCType = NOCTypeList;
+                             GetAllRequestList();
+                             getAllDropdowns();
+                             // GetAllLeaveType();
+                             GetAllLeaveCategory();
+                             //getEmpMeetingList();
+                             $scope.imgfile = true;
+                             $scope.modalTitle = 'Add';
+                             $scope.btnTitle = 'Save';
+                             //$scope.submitted = false;
+                             $scope.LeaveBalanceInfo.LeaveBalance = 0;
+                             $scope.IsShowAddBtn = true;
+                             $scope.EmpLeaveDetails = {};
+                             $scope.EmpLeaveSummary = {};
+                             $scope.detailsList = [];
+                         };
+
+                         $scope.ViewLeaveDetails = function ViewLeaveDetails(n) {
+
+                             $scope.EmpLeaveDetails.EmpRequestId = n.Id;
+                             $scope.EmpLeaveDetails.EmpId = n.EmpId;
+
+                             $http({
+                                 method: 'POST',
+                                 url: baseUrl + 'Employee/ViewLeaveDetailsEmpWise/',
+                                 data: $scope.EmpLeaveDetails //+ Id
+                             }).then(function successCallback(response) {
+                                 //LeaveSummary();
+                                 $scope.detailsList = response.data.results;
+                                 $scope.EmpLeaveSummary = response.data.results;
+                                 $scope.EmpLeaveSummary.EmpRequestId = n.Id;
+                                 $scope.EmpLeaveSummary.LeaveHistoryId = n.LeaveHistoryId;
+
+                                 if ($scope.EmpLeaveSummary.RemainingUnadjusted < 0 || $scope.EmpLeaveSummary.RemainingUnadjusted == null) {
+                                     $scope.EmpLeaveSummary.RemainingUnadjusted = 0;
+                                 }
+
+                                 if ($scope.EmpLeaveSummary.Adjustable < 0) {
+                                     $scope.EmpLeaveSummary.Adjustable = 0;
+                                 }
+                                 if ($scope.EmpLeaveSummary.Unadjusted < 0) {
+                                     $scope.EmpLeaveSummary.Unadjusted = 0;
+                                 }
+
+
+                             }, function errorCallback(response) {
+
+                                 // toastr["error"](response.data.message);
+                             });
+
+                         }
+
+
+                         $scope.reset = function reset() {
+                             $scope.Request = {};
+                             $scope.Request.Id = 0;
+                             $scope.modalTitle = 'Add';
+                             $scope.btnTitle = 'Save';
+
+                             $scope.formCommonFeilds.$setUntouched();
+                             $scope.formCommonFeilds.$setPristine();
+                             $scope.submitted = false;
+
+                             $scope.Leave = {};
+                             $scope.LeaveBalanceInfo = {};
+                             $("#custom_text").html("No file chosen, yet.");
+                             $(".demoInputBox").css("color", "#aaa");
+                         }
+
+                         function resetform() {
+                             $scope.Request = {};
+                             $scope.Request.Id = 0;
+                             $scope.modalTitle = 'Add';
+                             $scope.btnTitle = 'Save';
+
+                             $scope.formCommonFeilds.$setUntouched();
+                             $scope.formCommonFeilds.$setPristine();
+                             $scope.submitted = false;
+
+                             $scope.Leave = {};
+                             $scope.LeaveBalanceInfo = {};
+                             $("#custom_text").html("No file chosen, yet.");
+                             $(".demoInputBox").css("color", "#aaa");
+                         }
+
+                         $scope.SaveRequest = function SaveRequest(n) {
+                             if ($scope.formCommonFeilds.RequestType.$invalid == true)
+                                 return;
+
+                             if (n.RequestType == 5) {
+
+                                 //debugger;
+                                 var files = $("#real_file").get(0).files;
+                                 if ($scope.Request.LeaveTypeCategory == null || $scope.Request.LeaveTypeCategory == 0) {
+                                     return;
+                                 }
+
+                                 if (files.length == 0) {
+                                     if ($scope.Request.LeaveTypeCategory == 'HD') {
+                                         if ($scope.formCommonFeilds.LeaveCategoryId.$invalid == true
+                                               || $scope.formCommonFeilds.Description.$invalid == true
+                                               || $scope.formCommonFeilds.HalfDayDate.$invalid == true
+                                             )
+
+                                             return;
+                                     }
+                                     else {
+                                         if ($scope.formCommonFeilds.LeaveCategoryId.$invalid == true
+                                       || $scope.formCommonFeilds.To.$invalid == true
+                                       || $scope.formCommonFeilds.Description.$invalid == true
+                                       || $scope.formCommonFeilds.FromDate.$invalid == true
+                                       )
+                                             return;
+                                     }
+                                 }
+
+                                 else {
+
+                                     var files = $("#real_file").get(0).files;
+                                     //console.log(files);
+                                     var file_size = $('#real_file')[0].files[0].size;
+                                     if (file_size > 2097152) {
+                                         toastr["warning"]("File Size Only 2MB.");
+                                         return;
+
+                                         if ($scope.Request.LeaveTypeCategory == 'HD') {
+
+                                             if ($scope.formCommonFeilds.LeaveCategoryId.$invalid == true
+                                                || $scope.formCommonFeilds.HalfDayDate.$invalid == true
+                                                || $scope.formCommonFeilds.Request.$invalid == true
+                                                || $scope.formCommonFeilds.Description.$invalid == true
+                                                 )
+
+                                                 return;
+                                         }
+                                         else {
+                                             if ($scope.formCommonFeilds.LeaveCategoryId.$invalid == true
+                                               || $scope.formCommonFeilds.FromDate.$invalid == true
+                                               || $scope.formCommonFeilds.To.$invalid == true
+                                               || $scope.formCommonFeilds.Request.$invalid == true
+                                               || $scope.formCommonFeilds.Description.$invalid == true
+                                               )
+                                                 return;
+                                         }
+
+                                     }
+                                 }
+
+                             }
+                             if ($scope.Request.RequestType != 0) {
+                                 console.log($scope.Request)
+                                 var files = $("#real_file").get(0).files;
+                                 if ($scope.Request.Id == 0) {     ///Add Request
+                                     $http({
+                                         method: 'POST',
+                                         url: baseUrl + 'Employee/AddRequest/',
+                                         headers: { 'Content-Type': undefined },
+                                         transformRequest: function (data) {
+                                             var formData = new FormData();
+                                             formData.append('Request', JSON.stringify($scope.Request));
+                                             if (files.length > 0)
+                                                 formData.append("file", files[0]);
+                                             return formData;
+                                         },
+                                         data: { Request: $scope.Request }
+                                     }).then(function SuccessCallback(response) {
+                                         if (response.data == 0) {
+                                             toastr["success"]("You Select Holiday.");
+                                         } else if (response.data == 2) {
+                                             toastr["error"]("Academic Clander Doesn't SetUp.");
+                                         } else if (response.data.results == 3) {
+                                             toastr["success"](response.data.message);
+                                             $('#exampleModal').show();
+
+                                         } else {
+                                             toastr["success"](response.data.message);
+                                             $('#exampleModal').hide();
+                                             $('.modal-backdrop').remove();
+
+                                             resetform();
+                                             blockUI.start();
+                                             GetAllRequestList();
+                                             blockUI.stop();
+                                         }
+                                     }, function errorCallback(response) {
+
+                                         toastr["error"](response.data.Message);
+                                     });
+                                 } else {            //Updated Request
+                                     $http({
+                                         method: 'POST',
+                                         url: baseUrl + 'Employee/UpdateRequest/',
+                                         headers: { 'Content-Type': undefined },
+                                         transformRequest: function (data) {
+                                             var formData = new FormData();
+                                             formData.append('Request', JSON.stringify($scope.Request));
+                                             if (files.length > 0)
+                                                 formData.append("file", files[0]);
+                                             return formData;
+                                         },
+                                         data: { Request: $scope.Request }
+                                     }).then(function SuccessCallback(response) {
+                                         if (response.data == 0) {
+                                             toastr["success"]("You Select Holiday.");
+                                         } else if (response.data == 2) {
+                                             toastr["error"]("Academic Clander Doesn't SetUp.");
+                                         } else if (response.data.results == 3) {
+                                             toastr["success"](response.data.message);
+                                             $('#exampleModal').show();
+
+                                         } else {
+                                             toastr["success"](response.data.message);
+                                             $('#exampleModal').hide();
+                                             $('.modal-backdrop').remove();
+                                             blockUI.start();
+                                             GetAllRequestList();
+                                             resetform();
+                                             blockUI.stop();
+                                         }
+                                     }, function errorCallback(response) {
+
+                                         toastr["error"](response.data.Message);
+                                     });
+                                 }
+                             }
+
+
+                         }
+                         $scope.view = function (n) {
+                             //console.log(n);
+                             $scope.Request = n;
+                             $scope.Request.Id = n.Id;
+                             $scope.Request.RequestType = n.ReqID;
+                             $scope.Request.NOCType = n.NOCType;
+                             Request.Description = n.Description;
+                             $scope.Request.date = new Date(n.Date);
+
+                             if ($scope.Request.RequestType == 5) {
+                                 $scope.Request.LeaveCategoryId = n.LeaveCategoryId;
+                                 //$scope.Request.Request = new Date(n.RequestOn);
+                                 $scope.Request.From = new Date(n.FromDate);
+                                 $scope.Request.To = new Date(n.ToDate);
+                                 $scope.Request.HalfDayDate = new Date(n.FromDate);
+                             }
+
+                         }
+                         $scope.edit = function (n) {
+                             $scope.modalTitle = 'Update ';
+                             $scope.btnTitle = 'Update';
+                             //console.log(n);
+                             $scope.Request = n;
+                             $scope.Request.Id = n.Id;
+                             $scope.Request.RequestType = n.ReqID;
+                             $scope.Request.NOCType = n.NOCType;
+                             $scope.Request.date = new Date(n.Date);
+
+                             if ($scope.Request.RequestType == 5) {
+                                 $scope.Request.LeaveCategoryId = n.LeaveCategoryId;
+                                 $scope.Request.Request = new Date(n.AddDate);
+                                 $scope.Request.From = new Date(n.FromDate);
+                                 $scope.Request.To = new Date(n.ToDate);
+                                 $scope.Request.HalfDayDate = new Date(n.FromDate);
+                             }
+                         }
+
+                         function getEmpMeetingList() {
+                             $scope.EmpMeetingList = [];
+                             blockUI.start();
+                             $http({
+                                 method: 'GET',
+                                 url: baseUrl + 'PortalRequest/GetMeetingList/'
+                             }).then(function SuccessCallback(response) {
+                                 $scope.EmpMeetingList = response.data.results;
+                                 blockUI.stop();
+                             });
+                         }
+
+                         $scope.DeleteRequest = function DeleteRequest(Id) {
+
+                             SweetAlert.swal({
+                                 title: "Are you sure to delete it ?", type: "warning", showCancelButton: true, confirmButtonColor: "#DD6B55",
+                                 confirmButtonText: "Yes, delete it!",
+                                 closeOnConfirm: false
+                             },
+                         function (isConfirm) {
+                             if (isConfirm) {
+
+                                 $http({
+                                     method: 'POST',
+                                     url: baseUrl + 'Employee/DeleteRequest/' + Id
+                                 }).then(function successCallback(response) {
+                                     SweetAlert.swal("Deleted!", "Your data has been deleted.", "success");
+                                     GetAllRequestList();
+                                     toastr["success"](response.data.message);
+                                 }, function errorCallback(response) {
+                                     GetAllRequestList();
+                                     toastr["error"](response.data.message);
+                                 });
+
+                             }
+                         });
+                         }
+                         $scope.CalculateDuratoin = function CalculateDuratoin() {
+                             var From = new Date($scope.Request.From);
+                             var To = new Date($scope.Request.To);
+                             if (To < From) {
+                                 toastr["info"]("Please Select a Valid Date Range.");
+                                 $scope.Request.To = null;
+                                 $scope.Request.Duration = null;
+                             } else {
+                                 if ($scope.Request.LeaveTypeCategory == "FD") {
+                                     $scope.Request.Duration = (((((To - From) / 1000) / 60) / 60) / 24) + 1;
+                                 }
+                                 else {
+                                     $scope.Request.Duration = 0.50;
+                                 }
+                             }
+                             //var Durat = To-From
+                             //alert(From);
+                             //alert(To);
+                             //alert(duration)
+                         }
+                         function validate() {
+                             $("#file_error").html("");
+                             $(".demoInputBox").css("color", "#dc3545");
+                             var file_size = $('#real_file')[0].files[0].size;
+                             if (file_size > 2097152) {
+                                 $("#custom_text").html("(Maximum 2MB)");
+                                 //console.log("File size is greater than 2MB");
+                                 //$("#file_error").html("File size is greater than 2MB");
+                                 $(".demoInputBox").css("border-color", "#FF0000");
+                                 return false;
+                             }
+                             return true;
+                         }
+                         function GetAllRequestList() {
+                             blockUI.start();
+                             $http({
+                                 method: 'GET',
+                                 url: baseUrl + 'Employee/GetAllRequestList/'
+                             }).then(function SuccessCallback(response) {
+                                 $scope.RequestList = response.data.results;
+                                 //console.log($scope.RequestList);
+                                 $scope.IsShowAddBtn = true;
+                                 blockUI.stop();
+                             }, function errorCallback(response) {
+                                 toastr["warning"](response.data.Message);
+                                 $scope.IsShowAddBtn = false;
+                             });
+                         };
+
+                         $scope.LoadCategory = function LoadCategory() {
+
+                             $http({
+                                 method: 'GET',
+                                 url: baseUrl + 'Employee/GetAllCategory/'
+                             }).then(
+                             function SuccessCallback(response) {
+                                 $scope.CategoryList = response.data.results;
+                                 //console.log(DepartmentList);
+
+                             }
+                             )
+                         }
+                         $scope.LoadDesignation = function LoadDesignation(Id) {
+
+                             $http({
+                                 method: 'GET',
+                                 url: baseUrl + 'PortalRequest/GetAllDesignation/' + Id
+                             }).then(
+                             function SuccessCallback(response) {
+                                 $scope.DesignationList = response.data.results;
+                                 //console.log(DesignationList);
+                             }
+                             )
+                         }
+
+
+
+                         function getAllDropdowns() {
+                             $scope.Dropdowns = [];
+
+                             $http({
+                                 method: 'GET',
+                                 url: baseUrl + 'Common/GetAllDropDown/'
+                             }).then(function successCallback(response) {
+                                 //console.log(response.data.results);
+                                 $scope.Dropdowns = response.data.results;
+                             }, function errorCallback(response) {
+                             });
+
+                         }
+                         //function GetAllLeaveType() {
+                         //    $http({
+                         //        method: 'GET',
+                         //        url: baseUrl + 'Attendance/GetAllLeaveType'
+                         //    }).then(function successCallback(response) {
+                         //        $scope.LeaveType = response.data.results;
+
+                         //    }, function errorCallback(response) {
+                         //        toastr["warning"](response.data.message);
+                         //    });
+                         //};
+
+                         function GetAllLeaveCategory() {
+                             $http({
+                                 method: 'GET',
+                                 url: baseUrl + 'Employee/GetAllLeaveCategory/'
+                             }).then(function successCallback(response) {
+                                 $scope.LeaveCategory = response.data.results;
+
+                             }, function errorCallback(response) {
+                                 toastr["warning"](response.data.message);
+                             });
+                         };
+
+
+                         $scope.GetEmpLeaveBalance = function GetEmpLeaveBalance() {
+                             //$scope.Request.From = $filter('date')($scope.Request.From, "yyyy-MM-dd");
+                             //$scope.Request.To = $filter('date')($scope.Request.To, "yyyy-MM-dd");
+                             //$scope.Request.HalfDayDate = $filter('date')($scope.Request.HalfDayDate, "yyyy-MM-dd");
+
+                             if ($scope.Request.LeaveTypeCategory == 'HD') {
+                                 $scope.Request.From = $scope.Request.HalfDayDate
+                                 $scope.Request.To = $scope.Request.HalfDayDate
+                             }
+                             
+
+                             $http({
+                                 method: 'POST',
+                                 url: baseUrl + 'Employee/GetEmpLeaveBalance/', //+ $scope.Request.LeaveCategoryId + $scope.Request.From + $scope.Request.To 
+                                 data: $scope.Request
+                             }).then(function SuccessCallback(response) {
+                                 $scope.LeaveBalanceInfo = response.data.results[0];
+                             })
+                         }
+
+                         $("#exampleModal").modal({
+                             backdrop: 'static',
+                             keyboard: false,
+                             show: false
+                         });
+                         $("#viewModal").modal({
+                             backdrop: 'static',
+                             keyboard: false,
+                             show: false
+                         });
+
+
+                     }]);
+    </script>
+}
+
+

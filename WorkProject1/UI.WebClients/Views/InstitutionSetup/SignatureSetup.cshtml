@@ -1,0 +1,827 @@
+﻿@{
+    ViewBag.Title = "Auto Signature Setup";
+}
+<style type="text/css">
+     /*Maruf*/
+    input[type="number"]::-webkit-outer-spin-button,
+    input[type="number"]::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+    input[type="number"] {
+    -moz-appearance: textfield;
+}
+</style>
+@section Styles{
+    <link href="~/assets/global/plugins/bootstrap-fileinput/bootstrap-fileinput.css" rel="stylesheet" type="text/css" />
+}
+<div ng-controller="SignatureSetup">
+    <!-- Begin: life time stats -->
+    <div class="portlet light bordered">
+        <div class="portlet-title">
+            <div class="caption">
+                <i class="icon-settings font-green"></i>
+                <span class="caption-subject font-green sbold uppercase">@ViewBag.Title</span>
+            </div>
+            <div class="actions">
+                <div class="btn-group btn-group-solid">
+                    <button ng-click="resetForm()" class="btn green" data-target="#addmodal" data-toggle="modal"> <i class="fa fa-plus"></i>Add Signature</button>
+                </div>
+            </div>
+        </div>
+        <form class="form-horizontal" ng-submit="getSignatureSetup()" name="frmCommonFeilds" novalidate  >
+            <div class="form-body">
+                <div class="row" style="margin-right: 1%;">
+                  
+                    <div class="col-md-4">
+                        <div class="form-group" ng-class="{ 'has-error' : submitted1 && frmCommonFeilds.BranchId.$invalid}">
+                            <label class="col-md-4 control-label">
+                                Branch:<span class="required">*</span>
+                            </label>
+                            <div class="col-md-8">
+                                <select class="form-control" name="BranchId" ng-model="CommonFeild.BranchId"  ng-options="CommonFeild.BranchId as CommonFeild.BranchName for CommonFeild in CommonFeilds.Branch" required>
+                                    <option value="" selected="selected">Select</option>
+                                </select>
+                                <div class="form-control-focus"> </div>
+                                <span ng-show="submitted1 && frmCommonFeilds.BranchId.$error.required" class="help-block">Branch Required</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group" ng-class="{ 'has-error' :submitted1 && frmCommonFeilds.ShiftId.$invalid}">
+                            <label class="col-md-4 control-label">
+                                Shift:<span class="required">*</span>
+                            </label>
+                            <div class="col-md-8">
+                                <select class="form-control" name="ShiftId" ng-disabled="CommonFeild.BranchId == null" ng-model="CommonFeild.ShiftId" ng-options="CommonFeild.ShiftId as CommonFeild.ShiftName for CommonFeild  in CommonFeilds.Shift | filter:{BranchId:CommonFeild.BranchId}:true" required>
+                                    <option value="" selected="selected">Please Select</option>
+                                </select>
+                                <span ng-show="submitted1 && frmCommonFeilds.ShiftId.$error.required " class="help-block">Shift Required</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group" ng-class="{ 'has-error' :submitted1 && frmCommonFeilds.ClassId.$invalid}">
+                            <label class="col-md-4 control-label">
+                                Class:<span class="required">*</span>
+                            </label>
+                            <div class="col-md-8">
+                                <select class="form-control" name="ClassId" ng-disabled="CommonFeild.BranchId == null" ng-model="CommonFeild.ClassId"  ng-options="CommonFeild.ClassId as CommonFeild.ClassName for CommonFeild in CommonFeilds.ClassInfo" required>
+                                    <option value="" selected="selected">Please Select</option>
+                                </select>
+                                <span ng-show="submitted1 && frmCommonFeilds.ClassId.$error.required " class="help-block">Class Required</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="btn-group btn-group-solid pull-right" style="margin-bottom:5px;margin-right: 2%;">
+                    <button ng-click="submitted1=true" class="btn btn-info btn-large">&nbsp;&nbsp; <i class="fa fa-search"></i> Show &nbsp;&nbsp;&nbsp;&nbsp;</button>
+                </div>
+            </div>
+        </form>
+      
+        <div class="portlet-body">
+            <div class="table-container">
+                <div class="row" >
+                    <div class="col-md-4 col-sm-5 col-xs-6">
+                        <div class="form-group">
+                            <div class="col-lg-3 col-md-5 col-sm-4 col-xs-8" style="padding-left:0px">
+                                <select class="form-control" ng-model="pageSize" ng-options="P.value as P.text for P in pageSizeArray"></select>
+                            </div>
+                            <div class="col-md-7  col-sm-8  col-xs-4">
+                                @*<label for="search" class="control-label" style="padding-top:5px">Items</label>*@
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-sm-3 col-xs-1">
+                    </div>
+                    <div class="col-md-4 col-sm-4 col-xs-5">
+                        <div id="sample_3_filter" class="pull-right">
+                            <input ng-model="q" id="search" class="form-control" placeholder="Filter text">
+                        </div>
+                    </div>
+                </div>
+                <div id="sample_3_wrapper" class="dataTables_wrapper no-footer">
+                    <div class="table-scrollable">
+                        <table class="table table-bordered table-hover">
+                            <thead>
+                                <tr class="bg-primary">
+                                    <th> Branch</th>
+                                    <th> Shift</th>
+                                    <th> Class</th>
+                                    <th> Person Name 1</th>
+                                    <th>Designation 1</th>
+                                    <th>Signature 1</th>
+
+                                    <th> Person Name 2</th>
+                                    <th>Designation 2</th>
+                                    <th>Signature 2</th>
+
+                                    <th> Person Name 3</th>
+                                    <th>Designation 3</th>
+                                    <th>Signature 3</th>
+
+                                    <th> Person Name 4</th>
+                                    <th>Designation 4</th>
+                                    <th>Signature 4</th>
+                                    <th style="width:100px;">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr dir-paginate="item in SignatureSetups| filter:q  | itemsPerPage: pageSize " current-page="currentPage">
+                                    <td> {{item.Branch}} </td>
+                                    <td> {{item.Shift}} </td>
+                                    <td> {{item.Class}} </td>
+                                    <td> {{item.PersonName1}} </td>
+                                    <td> {{item.Designation1}} </td>
+                                    <td>
+                                        <img ng-hide="item.SignatureImg1==null" ng-src="data:image/png;base64,{{item.SignatureImg1}}" style="height:40px;width:90px">
+                                    </td>
+                                    <td> {{item.PersonName2}} </td>
+                                    <td> {{item.Designation2}} </td>
+                                    <td>    <img ng-hide="item.SignatureImg2==null" ng-src="data:image/png;base64,{{item.SignatureImg2}}" style="height:40px;width:90px"> </td>
+                                    <td> {{item.PersonName3}} </td>
+                                    <td> {{item.Designation3}} </td>
+                                    <td>    <img ng-hide="item.SignatureImg3==null" ng-src="data:image/png;base64,{{item.SignatureImg3}}" style="height:40px;width:90px"> </td>
+                                    <td> {{item.PersonName4}} </td>
+                                    <td> {{item.Designation4}} </td>
+                                    <td>    <img ng-hide="item.SignatureImg4==null" ng-src="data:image/png;base64,{{item.SignatureImg4}}" style="height:40px;width:90px"> </td>
+                                    <td  style="width:100px;" >
+                                        <a href="javascript:;" class="btn  green btn-xs" ng-click="edit(item)" data-target="#addmodal2" data-toggle="modal">
+                                            <i class="fa fa-edit "></i>
+                                        </a>
+                                        <a ng-click="deleteSignature(item)" href="javascript:;" class="btn  btn-xs red">
+                                            <i class="fa fa-trash"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="row ">
+                        <dir-pagination-controls boundary-links="true" template-url="~/assets/angular/lib/dirPagination.tpl.html"></dir-pagination-controls>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- End: life time stats -->
+    <!--Modal Area Start-->
+    <div id="addmodal" class="modal fade" tabindex="-1" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content ">
+                <form name="frmSignatureSetup" ng-submit="save()" class="form-horizontal" novalidate enctype="multipart/form-data">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">X</button>
+                        <h4 class="modal-title">{{modalTitle}}</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-body">
+                            <div class="row">
+                               
+                                <div class="col-md-6">
+                                    <div class="form-group" ng-class="{ 'has-error' :submitted && frmSignatureSetup.BranchId.$invalid}">
+                                        <label class="col-md-4 control-label">
+                                            Branch:
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-8">
+                                            <select multiple multi-select class="form-control"  name="BranchId" ng-model="Signature1.Branch1" required ng-options="SignatureSetup.BranchId as SignatureSetup.BranchName for SignatureSetup in CommonFeilds.Branch" ></select>
+                                            <span ng-show="submitted && frmSignatureSetup.BranchId.$error.required" class="help-block">Branch Required</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group" ng-class="{ 'has-error' :submitted && frmSignatureSetup.Shift.$invalid}">
+                                        <label class="col-md-4 control-label">
+                                            Shift:
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-8">
+                                            <select multiple multi-select ng-model="Signature1.Shift1" name="Shift" required>
+                                                <optgroup ng-show="!Shift.length" ng-repeat="op in CommonFeilds.Branch" label="{{op.BranchName}}">
+                                                    <option ng-repeat="Shift in CommonFeilds.Shift | filter:{BranchId:op.BranchId}:true" value="{{Shift.ShiftId}}">
+                                                        {{Shift.ShiftName}}
+                                                    </option>
+                                                </optgroup>
+                                            </select>
+                                            <span ng-show="submitted && frmSignatureSetup.Shift.$error.required " class="help-block">Shift Required</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group" ng-class="{ 'has-error' :submitted && frmSignatureSetup.ClassId.$invalid}">
+                                        <label class="col-md-4 control-label">
+                                            Class:
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-8">
+                                            <select multiple multi-select ng-model="Signature1.Class1" name="ClassId"  required>
+                                                    <option ng-repeat="Class in CommonFeilds.ClassInfo" value="{{Class.ClassId}}">
+                                                        {{Class.ClassName}}
+                                                    </option>
+
+                                            </select>
+                                            <span ng-show="submitted && frmSignatureSetup.ClassId.$error.required " class="help-block">Class Required</span>
+                                        </div>
+                                    </div>
+                                </div>
+                               </div>
+                            <hr />
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="text-center h5 sbold">Signature One</div>
+                                    <div class="form-group" ng-class="{ 'has-error' : submitted && frmSignatureSetup.PersonName1.$invalid}">
+                                        <label class="col-md-4 control-label">
+                                            Name:
+                                        </label>
+                                        <div class="col-md-8">
+                                            <input type="text" ng-model="Signature.PersonName1" class="form-control" placeholder="Name.." name="PersonName1"  />
+                                            <div class="form-control-focus"> </div>
+                                            @*<span ng-show="submitted &&  frmSignatureSetup.PersonName1.$error.required" class="help-block">PersonName Required</span>*@
+                                        </div>
+                                    </div>
+                                    <div class="form-group" ng-class="{ 'has-error' : submitted && frmSignatureSetup.Designation1.$invalid}">
+                                        <label class="col-md-4 control-label">
+                                            Designation:
+                                            @*<span class="required">*</span>*@
+                                        </label>
+                                        <div class="col-md-8">
+                                            <select class="form-control" name="Designation1" ng-model="Signature.Designation1" ng-options="designation.DesignationName as designation.DesignationName for designation in designations ">
+                                                <option value="" selected="selected">Please Select</option>
+                                            </select>
+                                            @*<span ng-show="submitted && frmSignatureSetup.Designation.$error.required " class="help-block">Designation Required</span>*@
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="control-label col-md-4"> Signature :</label>
+                                        <div class="col-md-6">
+                                            <input type="file" name="..." accept="image/x-png" class="form-control col-md-12" id="SignatureImg1">
+                                        </div>
+                                    </div>
+                                </div>
+                            
+                                <div class="col-md-6">
+                                    <div class="text-center h5 sbold">Signature Two</div>
+                                    <div class="form-group" ng-class="{ 'has-error' : submitted && frmSignatureSetup.PersonName2.$invalid}">
+                                        <label class="col-md-4 control-label">
+                                            Name:
+                                          
+                                        </label>
+                                        <div class="col-md-8">
+                                            <input type="text" ng-model="Signature.PersonName2" class="form-control" placeholder="Name.." name="PersonName2"  />
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted &&  frmSignatureSetup.PersonName2.$error.required" class="help-block">PersonName Required</span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group" ng-class="{ 'has-error' : submitted && frmSignatureSetup.Designation2.$invalid}">
+                                        <label class="col-md-4 control-label">
+                                            Designation:
+                                           
+                                        </label>
+                                        <div class="col-md-8">
+                                            <select class="form-control" name="Designation2" ng-model="Signature.Designation2" ng-options="designation.DesignationName as designation.DesignationName for designation in designations ">
+                                                <option value="" selected="selected">Please Select</option>
+                                            </select>
+                                            <span ng-show="submitted && frmSignatureSetup.Designation2.$error.required " class="help-block">Designation Required</span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="control-label col-md-4"> Signature :</label>
+                                        <div class="col-md-6">
+                                            <input type="file" name="..." accept="image/x-png" class="form-control col-md-12" id="SignatureImg2">
+
+                                        </div>
+                                    </div>
+                                </div>
+                               
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="text-center h5 sbold">Signature Three</div>
+                                    <div class="form-group" ng-class="{ 'has-error' : submitted && frmSignatureSetup.PersonName3.$invalid}">
+                                        <label class="col-md-4 control-label">
+                                            Name:
+                                            @*<span class="required">*</span>*@
+                                        </label>
+                                        <div class="col-md-8">
+                                            <input type="text" ng-model="Signature.PersonName3" class="form-control" placeholder="Name.." name="PersonName3"  />
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted &&  frmSignatureSetup.PersonName3.$error.required" class="help-block">PersonName Required</span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group" ng-class="{ 'has-error' : submitted && frmSignatureSetup.Designation3.$invalid}">
+                                        <label class="col-md-4 control-label">
+                                            Designation:
+                                            @*<span class="required">*</span>*@
+                                        </label>
+                                        <div class="col-md-8">
+                                            <select class="form-control" name="Designation3" ng-model="Signature.Designation3" ng-options="designation.DesignationName as designation.DesignationName for designation in designations ">
+                                                <option value="" selected="selected">Please Select</option>
+                                            </select>
+                                            <span ng-show="submitted && frmSignatureSetup.Designation3.$error.required " class="help-block">Designation Required</span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="control-label col-md-4"> Signature :</label>
+                                        <div class="col-md-6">
+                                            <input type="file" name="..." class="form-control col-md-12" accept="image/x-png" id="SignatureImg3">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="text-center h5 sbold">Signature Four</div>
+                                    <div class="form-group" ng-class="{ 'has-error' : submitted && frmSignatureSetup.PersonName4.$invalid}">
+                                        <label class="col-md-4 control-label">
+                                            Name:
+                                            @*<span class="required">*</span>*@
+                                        </label>
+                                        <div class="col-md-8">
+                                            <input type="text" ng-model="Signature.PersonName4" class="form-control" placeholder="Name.." name="PersonName4" />
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted &&  frmSignatureSetup.PersonName4.$error.required" class="help-block">PersonName Required</span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group" ng-class="{ 'has-error' : submitted && frmSignatureSetup.Designation4.$invalid}">
+                                        <label class="col-md-4 control-label">
+                                            Designation:
+                                            @*<span class="required">*</span>*@
+                                        </label>
+                                        <div class="col-md-8">
+                                            <select class="form-control" name="Designation4" ng-model="Signature.Designation4" ng-options="designation.DesignationName as designation.DesignationName for designation in designations ">
+                                                <option value="" selected="selected">Please Select</option>
+                                            </select>
+                                            <span ng-show="submitted && frmSignatureSetup.Designation4.$error.required " class="help-block">Designation Required</span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="control-label col-md-4"> Signature :</label>
+                                        <div class="col-md-6">
+                                            <input type="file" name="..." class="form-control col-md-12" accept="image/x-png" id="SignatureImg4">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">                        
+                        <button type="submit" ng-click="submitted=true" class="btn green-haze" ng-disabled="btnDis">Save <i ng-show="spin" class="fa fa-spinner fa-spin" style="font-size:20px"></i></button>
+                        <button type="button" data-dismiss="modal" class="btn dark btn-outline" ng-click="submitted=false; window.location.reload()">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div id="addmodal2" class="modal fade" tabindex="-1" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content ">
+                <form name="frmSignatureSetupUpdate" ng-submit="update()" class="form-horizontal" novalidate enctype="multipart/form-data">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                        <h4 class="modal-title">{{modalTitle}}</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-body">
+                            <div class="row">
+                               
+                                <div class="col-md-3">
+                                    <div class="form-group" >
+                                        <label class="col-md-12 control-label">
+                                            Branch: &nbsp;&nbsp; <span class="text-left sbold"> {{Signature.Branch}}</span>
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group" >
+                                        <label class="col-md-12 control-label">
+                                            Shift:&nbsp;&nbsp; <span class="text-left sbold"> {{Signature.Shift}}</span>
+                                        </label>
+                                        
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group" >
+                                        <label class="col-md-12 control-label">
+                                            Class:&nbsp;&nbsp; <span class="text-left sbold"> {{Signature.Class}}</span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <hr />
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="text-center h5 sbold">Signature One</div>
+                                    <div class="form-group" ng-class="{ 'has-error' : submitted && frmSignatureSetupUpdate.PersonName1.$invalid}">
+                                        <label class="col-md-4 control-label">
+                                            Name:
+                                        </label>
+                                        <div class="col-md-8">
+                                            <input type="text" ng-model="Signature.PersonName1" class="form-control" placeholder="Name.." name="PersonName1" />
+                                            <div class="form-control-focus"> </div>
+                                            @*<span ng-show="submitted &&  frmSignatureSetupUpdate.PersonName1.$error.required" class="help-block">PersonName Required</span>*@
+                                        </div>
+                                    </div>
+                                    <div class="form-group" ng-class="{ 'has-error' : submitted && frmSignatureSetupUpdate.Designation1.$invalid}">
+                                        <label class="col-md-4 control-label">
+                                            Designation:
+                                            @*<span class="required">*</span>*@
+                                        </label>
+                                        <div class="col-md-8">
+                                            <select class="form-control" name="Designation1" ng-model="Signature.Designation1" ng-options="designation.DesignationName as designation.DesignationName for designation in designations ">
+                                                <option value="" selected="selected">Please Select</option>
+                                            </select>
+                                            @*<span ng-show="submitted && frmSignatureSetupUpdate.Designation.$error.required " class="help-block">Designation Required</span>*@
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="control-label col-md-4"> Signature :</label>
+                                        <div class="col-md-6">
+                                            <input type="file" name="..." accept="image/x-png" class="form-control col-md-12" id="USignatureImg1">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="text-center h5 sbold">Signature Two</div>
+                                    <div class="form-group" ng-class="{ 'has-error' : submitted && frmSignatureSetupUpdate.PersonName2.$invalid}">
+                                        <label class="col-md-4 control-label">
+                                            Name:
+
+                                        </label>
+                                        <div class="col-md-8">
+                                            <input type="text" ng-model="Signature.PersonName2" class="form-control" placeholder="Name.." name="PersonName2" />
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted &&  frmSignatureSetupUpdate.PersonName2.$error.required" class="help-block">PersonName Required</span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group" ng-class="{ 'has-error' : submitted && frmSignatureSetupUpdate.Designation2.$invalid}">
+                                        <label class="col-md-4 control-label">
+                                            Designation:
+
+                                        </label>
+                                        <div class="col-md-8">
+                                            <select class="form-control" name="Designation2" ng-model="Signature.Designation2" ng-options="designation.DesignationName as designation.DesignationName for designation in designations ">
+                                                <option value="" selected="selected">Please Select</option>
+                                            </select>
+                                            <span ng-show="submitted && frmSignatureSetupUpdate.Designation2.$error.required " class="help-block">Designation Required</span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="control-label col-md-4"> Signature :</label>
+                                        <div class="col-md-6">
+                                            <input type="file" name="..." accept="image/x-png" class="form-control col-md-12" id="USignatureImg2">
+
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="text-center h5 sbold">Signature Three</div>
+                                    <div class="form-group" ng-class="{ 'has-error' : submitted && frmSignatureSetupUpdate.PersonName3.$invalid}">
+                                        <label class="col-md-4 control-label">
+                                            Name:
+                                            @*<span class="required">*</span>*@
+                                        </label>
+                                        <div class="col-md-8">
+                                            <input type="text" ng-model="Signature.PersonName3" class="form-control" placeholder="Name.." name="PersonName3" />
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted &&  frmSignatureSetupUpdate.PersonName3.$error.required" class="help-block">PersonName Required</span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group" ng-class="{ 'has-error' : submitted && frmSignatureSetupUpdate.Designation3.$invalid}">
+                                        <label class="col-md-4 control-label">
+                                            Designation:
+                                            @*<span class="required">*</span>*@
+                                        </label>
+                                        <div class="col-md-8">
+                                            <select class="form-control" name="Designation3" ng-model="Signature.Designation3" ng-options="designation.DesignationName as designation.DesignationName for designation in designations ">
+                                                <option value="" selected="selected">Please Select</option>
+                                            </select>
+                                            <span ng-show="submitted && frmSignatureSetupUpdate.Designation3.$error.required " class="help-block">Designation Required</span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="control-label col-md-4"> Signature :</label>
+                                        <div class="col-md-6">
+                                            <input type="file" name="..." class="form-control col-md-12" accept="image/x-png" id="USignatureImg3">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="text-center h5 sbold">Signature Four</div>
+                                    <div class="form-group" ng-class="{ 'has-error' : submitted && frmSignatureSetupUpdate.PersonName4.$invalid}">
+                                        <label class="col-md-4 control-label">
+                                            Name:
+                                            @*<span class="required">*</span>*@
+                                        </label>
+                                        <div class="col-md-8">
+                                            <input type="text" ng-model="Signature.PersonName4" class="form-control" placeholder="Name.." name="PersonName4" />
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted &&  frmSignatureSetupUpdate.PersonName4.$error.required" class="help-block">PersonName Required</span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group" ng-class="{ 'has-error' : submitted && frmSignatureSetupUpdate.Designation4.$invalid}">
+                                        <label class="col-md-4 control-label">
+                                            Designation:
+                                            @*<span class="required">*</span>*@
+                                        </label>
+                                        <div class="col-md-8">
+                                            <select class="form-control" name="Designation4" ng-model="Signature.Designation4" ng-options="designation.DesignationName as designation.DesignationName for designation in designations ">
+                                                <option value="" selected="selected">Please Select</option>
+                                            </select>
+                                            <span ng-show="submitted && frmSignatureSetupUpdate.Designation4.$error.required " class="help-block">Designation Required</span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="control-label col-md-4"> Signature :</label>
+                                        <div class="col-md-6">
+                                            <input type="file" name="..." class="form-control col-md-12" accept="image/x-png" id="USignatureImg4">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" ng-click="submitted=true" class="btn green-haze" ng-disabled="btnDis">Update <i ng-show="spin" class="fa fa-spinner fa-spin" style="font-size:20px"></i></button>
+                        <button type="button" data-dismiss="modal" class="btn dark btn-outline" ng-click="submitted=false; window.location.reload()">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!--Modal Area End-->
+</div>
+
+@section Scripts{
+<script src="~/assets/global/plugins/bootstrap-fileinput/bootstrap-fileinput.js" type="text/javascript"></script>
+
+    <script type="text/javascript">
+
+        OEMSApp.controller("SignatureSetup", ["$scope", "$http", "SweetAlert", "$window",
+              function ($scope, $http, SweetAlert, $window) {
+                  init();
+                  function init() {
+                      initialize();
+                      getAllDropdowns();
+                      getAllCommons();
+                      getAllSignatureSetup();
+                      getDesignation();
+                  }
+                  function initialize() {
+                      $scope.modalTitle = "Signature Setup";
+                      $scope.SignatureSetup = {};
+                      $scope.SignatureSetups = [];
+                      $scope.CommonFeild = {};
+                      $scope.Signature = {};
+                      $scope.res = {};
+                      $scope.data = {};
+                      $scope.resetForm = resetForm;
+
+                      $scope.btnDis = false;
+                      $scope.spin = false;
+                      $scope.getSignatureSetup = getSignatureSetup;
+                      $scope.SignatureSetup.ID = 0;
+
+                      $scope.pageSizeArray = [];
+                      $scope.pageSizeArray.push({ value: 5, text: 5 });
+                      $scope.pageSizeArray.push({ value: 10, text: 10 });
+                      $scope.pageSizeArray.push({ value: 20, text: 20 });
+                      $scope.pageSizeArray.push({ value: 50, text: 50 });
+                      $scope.currentPage = 1;
+                      $scope.pageSize = 10;
+                     
+                  }
+                  function setProgress(s) {
+                      $scope.btnDis = s;
+                      $scope.spin = s;
+                  }
+            
+                   function resetForm() {
+                      $scope.modalTitle = "Signature Setup";
+                      $scope.Signature = {};
+                      $scope.submitted = false;
+                      $scope.submitted1 = false;
+                      setProgress(false);
+                      getAllSignatureSetup();
+                      document.getElementById("SignatureImg1").value = '';
+                      document.getElementById("SignatureImg2").value = '';
+                      document.getElementById("SignatureImg3").value = '';
+                      document.getElementById("SignatureImg4").value = '';
+                      $scope.Signature1 = [];
+                     
+                  }
+                  $scope.GetGroup = function GetGroup(classid) {
+                      $scope.Groups = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Common/GetGroup/' + classid
+                      }).then(function successCallback(response) {
+                          $scope.Groups = response.data.results;
+                      }, function errorCallback(response) {
+                          toastr["info"](response.data.message);
+                      });
+                  }
+
+                  function getAllDropdowns() {
+                      $scope.Dropdowns = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Common/GetAllDropDown/'
+                      }).then(function successCallback(response) {
+                          $scope.Dropdowns = response.data.results;
+                      }, function errorCallback(response) {
+                          toastr["info"](response.data.message);
+                      });
+                  }
+                  function getAllCommons() {
+                      $scope.CommonFeilds = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Common/GetCommonItem/'
+                      }).then(function successCallback(response) {
+                          $scope.CommonFeilds = response.data.results;
+                      }, function errorCallback(response) {
+                          toastr["info"](response.data.message);
+                      });
+                  }
+                  function getSignatureSetup() {
+                      if ($scope.frmCommonFeilds.$invalid)
+                          return;
+                      $scope.SignatureSetups = [];
+                      $http({
+                          method: 'POST',
+                          url: baseUrl + 'SetupInstitution/GetSignatureSetupInfo/',
+                          data: $scope.CommonFeild
+                      }).then(function successCallback(response) {
+                          $scope.SignatureSetups = response.data.results;
+                          toastr["success"](response.data.message);
+                      }, function errorCallback(response) {
+                          toastr["warning"](response.data.Message);
+                      });
+                  };
+                  function getAllSignatureSetup() {
+                      $scope.SignatureSetups = [];
+                      $http({
+                          method: 'POST',
+                          url: baseUrl + 'SetupInstitution/GetAllSignatureSetup/',
+                      }).then(function successCallback(response) {
+                          $scope.SignatureSetups = response.data.results;
+                      }, function errorCallback(response) {
+                          toastr["warning"](response.data.Message);
+                      });
+                  };
+                  $scope.searchData = function () {
+                      getBranchs(1);
+                  };
+                  $scope.edit = function (n) {
+                      $scope.modalTitle = "Update Signature";
+                      $scope.Signature = n;
+                     // getDesignation();
+                      $scope.Id = n.Id;
+                  };
+                  $scope.save = function save() {
+                      if ($scope.frmSignatureSetup.$invalid)
+                          return;
+                      //setProgress(true);
+                      $scope.Signature.Branch = createStringByArray($scope.Signature1.Branch1);
+                      $scope.Signature.Shift = createStringByArray($scope.Signature1.Shift1);
+                      $scope.Signature.Class = createStringByArray($scope.Signature1.Class1);
+                      if ($scope.Signature != {}) {
+                          var files1 = $("#SignatureImg1").get(0).files;
+                          var files2 = $("#SignatureImg2").get(0).files;
+                          var files3 = $("#SignatureImg3").get(0).files;
+                          var files4 = $("#SignatureImg4").get(0).files;
+                          $http({
+                              method: 'POST',
+                              url: baseUrl + '/SetupInstitution/AddSignatureSetup/',
+                              headers: { 'Content-Type': undefined },
+                              transformRequest: function (data) {
+                                  var formData = new FormData();
+                                  formData.append('Signature', JSON.stringify($scope.Signature));
+                                  if (files1.length > 0)
+                                      formData.append("SignatureImg1", files1[0]);
+                                  if (files2.length > 0)
+                                      formData.append("SignatureImg2", files2[0]);
+                                  if (files3.length > 0)
+                                      formData.append("SignatureImg3", files3[0]);
+                                  if (files4.length > 0)
+                                      formData.append("SignatureImg4", files4[0]);
+                                  return formData;
+                              },
+                              data: { Signature: $scope.Signature }
+                          }).then(function successCallback(response) {
+                                  $scope.SignatureSetups = response.data.results;
+                                  toastr["success"](response.data.message);
+                                  $('#addmodal').modal('toggle');
+                                  resetForm();
+                                  getAllSignatureSetup();
+                              }, function errorCallback(response) {
+                                  toastr["warning"](response.data.Message);
+                          });
+                      }                         
+                  };
+                  $scope.update = function update() {
+                      if ($scope.frmSignatureSetupUpdate.$invalid)
+                          return;
+                      //setProgress(true);
+                      if ($scope.Signature != {}) {
+                          var files1 = $("#USignatureImg1").get(0).files;
+                          var files2 = $("#USignatureImg2").get(0).files;
+                          var files3 = $("#USignatureImg3").get(0).files;
+                          var files4 = $("#USignatureImg4").get(0).files;
+                          $http({
+                              method: 'POST',
+                              url: baseUrl + '/SetupInstitution/AddSignatureSetup/',
+                              headers: { 'Content-Type': undefined },
+                              transformRequest: function (data) {
+                                  var formData = new FormData();
+                                  formData.append('Signature', JSON.stringify($scope.Signature));
+                                  if (files1.length > 0)
+                                      formData.append("SignatureImg1", files1[0]);
+                                  if (files2.length > 0)
+                                      formData.append("SignatureImg2", files2[0]);
+                                  if (files3.length > 0)
+                                      formData.append("SignatureImg3", files3[0]);
+                                  if (files4.length > 0)
+                                      formData.append("SignatureImg4", files4[0]);
+                                  return formData;
+                              },
+                              data: { Signature: $scope.Signature }
+                          }).then(function successCallback(response) {
+                              $scope.SignatureSetups = response.data.results;
+                              toastr["success"](response.data.message);
+                              $('#addmodal2').modal('toggle');
+                              resetForm();
+                              getAllSignatureSetup();
+                              window.location.reload();
+                          }, function errorCallback(response) {
+                              toastr["warning"](response.data.Message);
+                          });
+                      }
+                  };
+                  function createStringByArray(array) {
+                  var output = '';
+                  angular.forEach(array, function (value, key) {
+                      if (!isNaN(parseInt(value))) {
+                          output += value + ',';
+                      }
+                      else {
+                          output += "'" + value.toString() + '\',';
+                      }
+                  });
+                  return output;
+              }
+                  $scope.deleteSignature = function deleteSignature(n) {
+                      // SweetAlert.swal("Good job!", "You clicked the button!", "success");
+                      SweetAlert.swal({
+                          title: "Are you sure to delete it ?", type: "warning", showCancelButton: true, confirmButtonColor: "#DD6B55",
+                          confirmButtonText: "Yes, delete it!",
+                          closeOnConfirm: false
+                      },
+                      function (isConfirm) {
+                          if (isConfirm) {
+                              $http({
+                                  method: 'POST',
+                                  url: baseUrl + 'SetupInstitution/deleteSignature/',
+                                  data:n
+                              }).then(function successCallback(response) {
+                                  SweetAlert.swal("Deleted!", "Your data has been deleted.", "success");
+                                  $scope.SignatureSetups = response.data.results;
+                                  getAllSignatureSetup();
+                              }, function errorCallback(response) {
+                                  toastr["info"](response.data.message);
+                              });
+                          }
+                      });
+                  };
+                   function getDesignation() {
+                      $scope.designations = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'SetupInstitution/getDesignation/',
+                      }).then(function successCallback(response) {
+                          $scope.designations = response.data.results;
+                      }, function errorCallback(response) {
+                          toastr["error"](response.data.message);
+                      });
+                  }
+                  function getSubjectsWhenEdit(vid, sid, seid, gid ) {
+                      $scope.Subjects = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'SubjectSetup/GetAllSubject/' +vid + '/' + sid + '/' + seid + '/' + gid
+                      }).then(function successCallback(response) {
+                          $scope.Subjects = response.data.results;
+                      }, function errorCallback(response) {
+                          toastr["error"](response.data.message);
+                      });
+                  }
+              }]);
+    </script>
+
+}

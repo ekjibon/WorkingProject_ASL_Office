@@ -1,0 +1,602 @@
+﻿@{
+    ViewBag.Title = "Ledger Setup";
+}
+<div class="kt-container  kt-container--fluid  kt-grid__item kt-grid__item--fluid"  ng-controller="AcLedgerCtrl">
+
+    <div class="row">
+        <div class="kt-portlet kt-portlet--mobile">
+            <div class="kt-portlet__head kt-portlet__head--lg">
+                <div class="kt-portlet__head-label">
+                    <h3 class="kt-portlet__head-title">
+                        Ledger Setup
+                    </h3>
+                </div>
+                <div class="kt-portlet__head-toolbar">
+                    <div class="kt-portlet__head-wrapper">
+                        <div class="dropdown dropdown-inline">
+                            <button type="button" ng-click="resetForm();getAcRootGroups()" class="btn btn-brand btn-icon-sm" data-toggle="modal" data-target="#addmodal" aria-haspopup="true" aria-expanded="false">
+                                <i class="flaticon2-plus"></i> Add New Ledger Setup
+                            </button>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="kt-portlet__body">
+
+
+                <div class="row">
+                    <div class="col-md-4 col-sm-5 col-xs-6">
+                        <div class="form-group">
+                            <div class="col-lg-3 col-md-5 col-sm-4 col-xs-8" style="padding-left:0px">
+
+                                <select class="form-control kt-font-brand" ng-model="pageSize" ng-options="P.value as P.text for P in pageSizeArray"></select>
+                            </div>
+
+                        </div>
+
+                    </div>
+                    <div class="col-md-4 col-sm-3 col-xs-1">
+                    </div>
+                    <div class="col-md-4 col-sm-4 col-xs-5">
+                        <div id="sample_3_filter" class="pull-right">
+                            <input ng-model="q" id="search" class="form-control" placeholder="Filter text">
+                        </div>
+                    </div>
+                </div>
+                <table class="table table-bordered table-hover rounded">
+                    <thead>
+                        <tr class="btn-primary">
+                            <th> Ledger Name</th>
+                            <th> Ledger Code</th>
+                            <th> Openning Balance</th>
+                            <th>Current Balance</th>
+                            <th>Display</th>
+                            <th>Status</th>
+                            <th style="text-align:center">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-show="AcLedgers.length <= 0"><td colspan="5" style="text-align:center;"><i class="fa fa-refresh"></i> Loading new data!!</td></tr>
+                        <tr dir-paginate="item in AcLedgers| filter:q  | itemsPerPage: pageSize" current-page="currentPage">
+                            <td>{{item.Name}}</td>
+                            <td>{{item.Code}}</td>
+
+                            <td>{{item.OpenningBalance}}</td>
+                            <td>{{item.CurrentBalance}}</td>
+                            <td style="width:10%" class="text-center">
+                                <input style="width:50%" type="checkbox" ng-model="item.IsDisplay" ng-checked="item.IsDisplay==true" ng-change="SetDisplay(item)" />
+                            </td>
+                            <td ng-show="item.Status=='A'">Active</td>
+                            <td ng-show="item.Status=='I'">Inactive</td>
+                            <td align="center">
+                                <div class="input-group-btn">
+                                    <button type="button" class="btn btn-label-success" data-toggle="dropdown">
+                                        Options
+                                        <span class="caret"></span>
+                                    </button>
+                                    <ul class="dropdown-menu pull-right">
+                                        <li>
+                                            <a ng-show="item.Status=='A'" ng-click="inactive(item)">@*<i class="fa fa-ban"></i>*@ Inactive</a>
+                                        </li>
+                                        <li>
+                                            <a ng-show="item.Status=='I'" ng-click="active(item)">@*<i class="fa fa-check"></i>*@ Active</a>
+                                        </li>
+                                        <li>
+                                            <a ng-show="item.IsEdit==true" ng-click="edit(item)" data-target="#addmodal" data-toggle="modal">@*<i class="fa fa-edit"></i>*@ Edit</a>
+                                        </li>
+                                        <li>
+                                            <a ng-click="deleteAcLedger(item)">@*<i class="fa fa-trash"></i>*@ Delete</a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="row">
+                    <dir-pagination-controls boundary-links="true" template-url="~/assets/angular/lib/dirPagination.tpl.html"></dir-pagination-controls>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- End: life time stats -->
+    <!--Modal Area Start-->
+    <div id="addmodal" class="modal fade" tabindex="-1" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form name="addform" ng-submit="save()" class="form-horizontal" id="form_sample_1" novalidate autocomplete="off">
+                    <div class="modal-header">
+                        <h4 class="modal-title">{{modalTitle}}</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-body">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div>
+                                        <div class="form-group row" ng-class="{ 'has-error' : submitted && addform.Category.$invalid}">
+                                            <label class="col-md-4 control-label"style="text-align:right">
+                                                Select Category:
+                                                <span class="required">*</span>
+                                            </label>
+                                            <div class="col-md-8">
+                                                <select class="form-control" ng-disabled="IsEnable" ng-model="GroupP.Parent0" ng-change="getGroupById(GroupP.Parent0)" name="Category" ng-options="RGroup.LedgerId as RGroup.Name for RGroup in RootGroups" required>
+                                                    <option value="">Select One</option>
+                                                </select>
+                                                <div class="form-control-focus"> </div>
+                                                <span ng-show="submitted &&  addform.Category.$error.required" class="help-block">Category Required</span>
+                                                <input type="hidden" ng-model="GroupValue" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                   
+                                    <div class="form-group row" ng-class="{ 'has-error' : submitted && addform.SubCat1.$invalid}">
+                                        <label class="col-md-4 control-label"style="text-align:right">
+                                            Group :
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-8">
+                                            <input type="text" name="SubCat2" ng-disabled="IsEnable" ng-model="GroupP.Parent1" typeahead-on-select='onSelect($item, $model, $label)'
+                                                   placeholder="Search Group"
+                                                   uib-typeahead="i  as i.Text for i in Search($viewValue)"
+                                                   typeahead-loading="loadingLocations" typeahead-no-results="noResults" class="form-control">
+                                            <i ng-show="loadingLocations" class="glyphicon glyphicon-refresh"></i>
+                                            <div ng-show="noResults"><i class="glyphicon glyphicon-remove"></i> No Results Found</div>
+
+                                            <span ng-show="submitted &&  addform.SubCat2.$error.required" class="help-block">Sub Category Required</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="form-group row" ng-class="{ 'has-error' : submitted && addform.name.$invalid}">
+                                        <label class="col-md-4 control-label"style="text-align:right">
+                                            Ledger Name:
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-8">
+                                            <input type="text" ng-model="AcLedger.Name" class="form-control" placeholder="Ledger Name" name="name" required>
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted &&  addform.name.$error.required" class="help-block">Name Required</span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group row" ng-class="{ 'has-error' : submitted && addform.OpBal.$invalid}">
+                                        <label class="col-md-4 control-label"style="text-align:right">
+                                            Opening Balance:
+                                        </label>
+                                        <div class="col-md-8">
+                                            <input type="number" ng-disabled="AcLedger.OpenningBalance >= 0" min="0" ng-model="AcLedger.OpenningBalance" class="form-control" placeholder="Balance" name="OpBal">
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted &&  addform.OpBal.$error.min" class="help-block">Negative values not allowed</span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group row" >
+                                        <label class="col-md-4 control-label"style="text-align:right">
+                                            Cash Flow Type:
+                                        </label>
+                                        <div class="col-md-8">
+                                            <select class="form-control" ng-model="AcLedger.CashFlowType"  name="CashFlowType" >
+                                                <option value="">Select One</option>
+                                                <option value="Operation">Operation</option>
+                                                <option value="Investing">Investing</option>
+                                                <option value="Financing">Financing</option>
+                                            </select>
+                                            <div class="form-control-focus"> </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" data-dismiss="modal" class="btn  btn-secondary" ng-click="getAcLedger();resetForm();submitted=false">Cancel</button>
+                        <button type="submit" ng-click="submitted=true" class="btn btn-success">Save</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!--Modal Area End-->
+
+</div>
+
+@section Scripts{
+
+    <script type="text/javascript">
+        OEMSApp.controller("AcLedgerCtrl", ["$scope", "$http", "SweetAlert", "$filter",
+              function ($scope, $http, SweetAlert, $filter) {
+
+                  init();
+                  function init() {
+                      initialize();
+                      getAcLedger();
+                      //getAcRootGroups();
+                  }
+                  function initialize() {
+                      $scope.modalTitle = "Add Account Ledger";
+                      $scope.AcLedger = {};
+                      $scope.RootGroups = [];
+                      $scope.arrNum = 0;
+                      $scope.Groups0 = [];
+                      $scope.GroupsbyG = [];
+                      $scope.AcLedger.LedgerId = 0;
+                      $scope.secGroups = [];
+                      $scope.thirdGroups = [];
+
+                      $scope.showChild1 = false;
+                      $scope.showChild2 = false;
+                      $scope.showChild3 = false;
+                   //   $scope.GroupP.Parent1 = null;
+                      $scope.AcLedgers = [];
+                      $scope.currentPage = 1;
+                      $scope.pageno = 1;
+                      $scope.pagesize = 10;
+                      $scope.total_count = 12;
+                      $scope.search = '';
+                      $scope.Id = '';
+                      $scope.getAcLedger = getAcLedger;
+                      //$scope.getAcRootGroups = getAcRootGroups;
+                      $scope.res = {};
+                      $scope.data = {};
+                      $scope.resetForm = resetForm;
+                      $scope.hstep = 1;
+                      $scope.mstep = 15;
+                      $scope.GroupP = {};
+                      $scope.isGroup = false;
+                      $scope.IsEnable = false;
+                      $scope.DCs = [
+                          { Id: 1, Name: 'Dr' },
+                          { Id: 2, Name: 'Cr' }
+                      ]
+
+                      $scope.GroupSets = {
+                          choices: []
+                      }
+                      $scope.GroupSets.choices = [];
+
+                      $scope.AcLedger.OpenningBalanceDc = 1;
+                      $scope.pageSizeArray = [];
+                      $scope.pageSizeArray.push({ value: 5, text: 5 });
+                      $scope.pageSizeArray.push({ value: 10, text: 10 });
+                      $scope.pageSizeArray.push({ value: 20, text: 20 });
+                      $scope.pageSizeArray.push({ value: 50, text: 50 });
+                      $scope.currentPage = 1;
+                      $scope.pageSize = 10;
+
+                  }
+                  function resetForm() {
+                      $scope.modalTitle = "Add Account Ledger";
+
+                      $scope.AcLedger = {};
+                      $scope.AcLedger.LedgerId = 0;
+                      $scope.addform.$setUntouched();
+                      $scope.addform.$setPristine();
+                      $scope.submitted = false;
+                      $scope.GroupSets = {
+                          choices: []
+                      }
+                      $scope.showChild1 = false;
+                      $scope.showChild2 = false;
+                      $scope.showChild3 = false;
+                      $scope.IsEnable = false;
+                      $scope.GroupP.Parent1 = null;
+                      
+                  }
+
+                  $scope.addNewGroup = function () {
+                      $scope.GroupSets.choices.push('');
+                      $scope.arrNum += 1;
+                      $scope.isGroup = true;
+                  }
+
+                  $scope.getGroup1 = function (Id) {
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Accounts/GetLedgersByLedgerId/' + Id
+                      }).then(function successCallback(response) {
+                          $scope.GroupsbyL = response.data.results;
+                          if ($scope.GroupsbyL.length > 0) {
+                              $scope.showChild2 = true;
+                          }
+                      }, function errorCallback(response) {
+                          //toastr["warning"](response.data.Message);
+                      });
+
+                  }
+
+                  $scope.getGroup2 = function (Id) {
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Accounts/GetLedgersByLedgerId/' + Id
+                      }).then(function successCallback(response) {
+                          $scope.GroupsbyL3 = response.data.results;
+                          if ($scope.GroupsbyL3.length > 0) {
+                              $scope.showChild3 = true;
+                          }
+                      }, function errorCallback(response) {
+                          //toastr["warning"](response.data.Message);
+                      });
+                  }
+
+                  function getAcLedger() {
+                      $scope.AcLedgers = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Accounts/GetAllLedgers/'
+                      }).then(function successCallback(response) {
+                          $scope.AcLedgers = response.data.results;
+                      }, function errorCallback(response) {
+                         // toastr["warning"](response.data.Message);
+                      });
+                  }
+                  $scope.getAcRootGroups = function getAcRootGroups() {
+                      $scope.RootGroups = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Accounts/GetAllRootLedger/'
+                      }).then(function successCallback(response) {
+                          $scope.RootGroups = response.data.results;
+                      }, function errorCallback(response) {
+                          toastr["warning"](response.data.Message);
+                      });
+                  }
+
+                  $scope.getGroupById = function getGroupById(Id) {
+                      $scope.Groups = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Accounts/GetLedgersByLedgerId/' + Id
+                      }).then(function successCallback(response) {
+                          $scope.Groups = response.data.results;
+                          if ($scope.Groups.length > 0) {
+                              $scope.showChild1 = true;
+                          }
+
+                      }, function errorCallback(response) {
+                        //  toastr["warning"](response.data.Message);
+                      });
+                  }
+                  $scope.getChildByLdegerId = function getChildByLdegerId(Id) {
+                      $scope.GroupsbyG = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Accounts/GetLedgersByLedgerIdEdit/' + Id
+                      }).then(function successCallback(response) {
+                          $scope.GroupsbyL = response.data.results;
+                      }, function errorCallback(response) {
+                          toastr["warning"](response.data.Message);
+                      });
+                  }
+
+                  $scope.inactive = function (item) {
+
+                      SweetAlert.swal({
+                          title: "Are you sure  ?", type: "warning", showCancelButton: true, confirmButtonColor: "#DD6B55",
+                          confirmButtonText: "Yes, Inactive it!",
+                          
+                      },
+                function (isConfirm) {
+                    if (isConfirm) {
+
+                      if (item.LedgerId != 0) {
+                          item.Status = 'I';
+                          $http({
+                              method: 'PUT',
+                              url: baseUrl + 'Accounts/ActiveInactiveLedger/',
+                              data: item
+                          }).then(function successCallback(response) {
+                              getAcLedger();
+                              toastr["info"]("Successfully Inactivated!");
+                              resetForm();
+                          }, function errorCallback(response) {
+                              toastr["warning"](response.data.Message);
+                              resetForm();
+                              getAcLedger();
+                          });
+                      }
+                    }
+                });
+                  }
+                  $scope.active = function (item) {
+
+                      SweetAlert.swal({
+                          title: "Are you sure  ?", type: "warning", showCancelButton: true, confirmButtonColor: "#DD6B55",
+                          confirmButtonText: "Yes, Active it!",
+                          
+                      },
+                         function (isConfirm) {
+                             if (isConfirm) {
+
+                      if (item.LedgerId != 0) {
+                          item.Status = 'A';
+                          $http({
+                              method: 'PUT',
+                              url: baseUrl + 'Accounts/ActiveInactiveLedger/',
+                              data: item
+                          }).then(function successCallback(response) {
+                              getAcLedger();
+                              toastr["info"]("Successfully Activated!");
+                              resetForm();
+                          }, function errorCallback(response) {
+                              toastr["warning"](response.data.Message);
+                              resetForm();
+                              getAcLedger();
+                          });
+                      }
+                             }
+                         });
+
+                  }
+
+                  $scope.SetDisplay = function (item) {
+                      $http({
+                          method: 'PUT',
+                          url: baseUrl + 'Accounts/UpdateDisplay/',
+                          data: item
+                      }).then(function successCallback(response) {
+                          toastr["info"](response.data.message);
+                      }, function errorCallback(response) {
+                          toastr["warning"](response.data.Message);
+                          item.IsDisplay = false;
+                      });
+                  }
+
+                  $scope.edit = function (n) {
+                      $scope.modalTitle = "Edit Account Ledger";
+                      $scope.AcLedger = n;
+                      $scope.Id = n.LedgerId;
+                      $scope.GroupsbyG = [];
+                      $scope.IsEnable = true;
+
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Accounts/GetLedgersByLedgerIdEdit/' + n.ParentId
+                      }).then(function successCallback(response) {
+                          $scope.Groups = response.data.results;
+                          $scope.showChild1 = true;
+                          $scope.GroupP.Parent1 = $scope.Groups[0].Name;
+                          $scope.GroupValue = $scope.Groups[0].LedgerId;
+                                  $http({
+                                      method: 'GET',
+                                      url: baseUrl + 'Accounts/GetAllRootLedger/'
+                                  }).then(function successCallback(response) {
+                                      $scope.RootGroups = response.data.results;
+                                  }, function errorCallback(response) {
+                                      //toastr["warning"](response.data.Message);
+                                  });
+                                  $scope.GroupP.Parent0 = response.data.results[0].RootGroupId;
+                          }
+
+                      , function errorCallback(response) {
+                          toastr["warning"](response.data.Message);
+                      });
+                  }
+
+                  $scope.Search = function (val) {
+                      if (val.length >= 3)
+                          return $http.get(baseUrl + 'Accounts/SearchGroup/' + val + '/' + $scope.GroupP.Parent0, {
+                              params: {
+                              }
+                          }).then(function (response) {
+                              return response.data.results.map(function (item) {
+                                  return item;
+                              });
+                          });
+                  };
+                  $scope.onSelect = function onSelect($item, $model, $label) {
+
+                  };
+                  $scope.save = function save() {
+                      if ($scope.addform.$invalid)
+                          return;
+
+                      //if ($scope.GroupP.Parent3 != null) {
+                      //    $scope.AcLedger.ParentId = $scope.GroupP.Parent3;
+                      //    $scope.AcLedger.RootGroupId = $scope.GroupP.Parent0;
+                      //}
+                      //if ($scope.GroupP.Parent2 != null && $scope.GroupP.Parent3 == null) {
+                      //    $scope.AcLedger.ParentId = $scope.GroupP.Parent3;
+                      //    $scope.AcLedger.RootGroupId = $scope.GroupP.Parent0;
+                      //}
+                      //if ($scope.GroupP.Parent1 != null && $scope.GroupP.Parent2 == null) {
+                      //    $scope.AcLedger.ParentId = $scope.GroupP.Parent1;
+                      //    $scope.AcLedger.RootGroupId = $scope.GroupP.Parent0;
+                      //}
+                      if ($scope.GroupP.Parent0 != null && $scope.GroupP.Parent1 == null) {
+                          $scope.AcLedger.ParentId = $scope.GroupP.Parent0;
+                          $scope.AcLedger.RootGroupId = $scope.GroupP.Parent0;
+                      }
+                      if ($scope.GroupP.Parent0 != null && $scope.GroupP.Parent1 != null) {
+                          $scope.AcLedger.ParentId = $scope.GroupValue;
+                          $scope.AcLedger.RootGroupId = $scope.GroupP.Parent0;
+                      }
+
+
+                      $scope.AcLedger.IsLedger = true;
+                      if ($scope.AcLedger.LedgerId != 0) /// For Update
+                      {
+                          if ($scope.AcLedger != '') {
+                              $http({
+                                  method: 'PUT',
+                                  url: baseUrl + 'Accounts/UpdateLedgers/',
+                                  data: $scope.AcLedger
+                              }).then(function successCallback(response) {
+
+                                  $('#addmodal').modal('toggle');
+                                  getAcLedger();
+                                  toastr["info"](response.data.message);
+                                  resetForm();
+                              }, function errorCallback(response) {
+                                  toastr["warning"](response.data.Message);
+                                  $('#addmodal').modal('toggle');
+                                  resetForm();
+                                  getAcLedger();
+                              });
+                          }
+                      } else {  //  For Add
+                          if ($scope.AcLedger != {}) {
+                              //if ($scope.GroupP.Parent3 != null) {
+                              //    $scope.AcLedger.ParentId = $scope.GroupP.Parent3;
+                              //}
+                              //if ($scope.GroupP.Parent2 != null && $scope.GroupP.Parent3 == null) {
+                              //    $scope.AcLedger.ParentId = $scope.GroupP.Parent2;
+                              //}
+                              //if ($scope.GroupP.Parent1 != null && $scope.GroupP.Parent2 == null) {
+                              //    $scope.AcLedger.ParentId = $scope.GroupP.Parent1;
+                              //}
+                              //if ($scope.GroupP.Parent0 != null && $scope.GroupP.Parent1 == null) {
+                              //    $scope.AcLedger.ParentId = $scope.GroupP.Parent0;
+                              //}
+                              if ($scope.GroupP.Parent0 != null && $scope.GroupP.Parent1 == null) {
+                                  $scope.AcLedger.ParentId = $scope.GroupP.Parent0;
+                                  $scope.AcLedger.RootGroupId = $scope.GroupP.Parent0;
+                              }
+                              if ($scope.GroupP.Parent0 != null && $scope.GroupP.Parent1 != null) {
+                                  $scope.AcLedger.ParentId = $scope.GroupP.Parent1.Value;
+                                  $scope.AcLedger.RootGroupId = $scope.GroupP.Parent0;
+                              }
+                              $scope.AcLedger.IsLedger = true;
+                              $http({
+                                  method: 'POST',
+                                  url: baseUrl + 'Accounts/AddLedgers/',
+                                  data: $scope.AcLedger
+                              }).then(function successCallback(response) {
+
+                                  $('#addmodal').modal('toggle');
+                                  getAcLedger();
+                                  toastr["info"](response.data.message);
+                                  resetForm();
+                              }, function errorCallback(response) {
+                                  toastr["warning"](response.data.Message);
+                              });
+                          }
+                      }
+                  };
+                  $scope.deleteAcLedger = function deleteAcLedger(n) {
+                      SweetAlert.swal({
+                          title: "Are you sure to delete it ?", type: "warning", showCancelButton: true, confirmButtonColor: "#DD6B55",
+                          confirmButtonText: "Yes, delete it!",
+                          closeOnConfirm: false
+                      },
+                      function (isConfirm) {
+                          if (isConfirm) {
+                              if (n.Id != 0) {
+                                  n.IsDeleted = true;
+                                  $http({
+                                      method: 'PUT',
+                                      url: baseUrl + 'Accounts/DeleteGroupLedgers/',
+                                      data: n
+                                  }).then(function successCallback(response) {
+                                      getAcLedger();
+                                      SweetAlert.swal("Deleted!", "Your data has been deleted.", "success");
+                                  }, function errorCallback(response) {
+                                      toastr["warning"](response.data.Message);
+                                      getAcLedger();
+                                  });
+                              }
+                          }
+                      });
+                  };
+              }]);
+    </script>
+}

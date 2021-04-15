@@ -1,0 +1,594 @@
+﻿
+@{
+    ViewBag.Title = "Students Obtain Marks Entry By ";
+    var VersionID = Request.QueryString["VersionID"];
+    var SessionId = Request.QueryString["SessionId"];
+    var BranchID = Request.QueryString["BranchID"];
+    var ShiftID = Request.QueryString["ShiftID"];
+    var ClassId = Request.QueryString["ClassId"];
+    var GroupId = Request.QueryString["GroupId"];
+    var SectionId = Request.QueryString["SectionId"];
+    var SubjectID = Request.QueryString["SubjectID"];
+    var MainExamId = Request.QueryString["MainExamId"];
+    var SubExamId = Request.QueryString["SubExamId"];
+    var DividedExamId = Request.QueryString["DividedExamId"];
+    var VersionName = Request.QueryString["VersionName"];
+    var SessionName = Request.QueryString["SessionName"];
+    var BranchName = Request.QueryString["BranchName"];
+    var ShiftName = Request.QueryString["ShiftName"];
+    var ClassName = Request.QueryString["ClassName"];
+    var GroupName = Request.QueryString["GroupName"];
+    var SectionName = Request.QueryString["SectionName"];
+    var SubjectName = Request.QueryString["SubjectName"];
+    var MainExamName = Request.QueryString["MainExamName"];
+    var SubExamName = Request.QueryString["SubExamName"];
+    var DividedExamName = Request.QueryString["DividedExamName"];
+    var Name = Request.QueryString["FullName"];
+
+}
+<style type="text/css">
+    @@media only screen and (max-width: 600px) {
+    #mobileEntry{
+        width: 280px !important;      
+        height: 400px !important;  
+        overflow: scroll; 
+    }
+    .size{
+        font-size:10px !important;
+    }
+    .hideColumn{
+          display:none;  
+    }
+        .showColumn{
+          display:inline-block !important;  
+    }
+    .form-control {
+    width: 50px;
+    height: 25px;
+    padding: 2px 3px;
+    background-color: #fff;
+    border: 1px solid #c2cad8;
+    border-radius: 2px;
+    -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+    box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+    -webkit-transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
+    -o-transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
+    transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
+}
+
+}
+    input[type=number]::-webkit-inner-spin-button,
+    input[type=number]::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+    .AbsentMark {
+      color: white;
+      background-color: coral;
+}
+
+.ZeroMark {
+     color: #4800ff;
+     background-color: wheat !important;
+}
+
+</style>
+<div class="row" ng-controller="MarksEntryCntrl"> 
+    <div class="portlet light bordered">
+        <div class="portlet-title">
+            <div class="caption">
+                <i class="icon-settings font-green"></i>
+                <span class="caption-subject font-green sbold uppercase size">@ViewBag.Title @Name</span>
+            </div>
+        </div>
+        <div class="portlet-body">
+            <!-- BEGIN FORM-->           
+            <div class="form-body"> 
+                <div class="row">
+                    <div class="col-md-12 size">
+                        <span style="color:#ff6a00">Version :</span> @VersionName
+                        <span style="color:#ff6a00">Session : </span> @SessionName
+                        <span style="color:#ff6a00">Branch :</span> @BranchName
+                        <span style="color:#ff6a00">Shift :</span> @ShiftName
+                        <span style="color:#ff6a00">Class :</span> @ClassName
+                        <span style="color:#ff6a00">Group :</span> @GroupName
+                        <span style="color:#ff6a00">Section :</span> @SectionName                         
+                        <hr style="margin-top:7px; margin-bottom:5px" />
+                        <span style="color:#ff6a00">Subject :</span> @SubjectName
+                        <span style="color:#ff6a00">Main Exam :</span> @MainExamName
+                        <span style="color:#ff6a00">Sub Exam :</span> @SubExamName
+                        <span style="color:#ff6a00"> Divided Exam : </span> @DividedExamName
+                        <span style="color:#ff6a00;display:none; font-weight:bold" class="showColumn"> &nbsp; Full Marks : &nbsp; </span><span style="display:none; color:forestgreen; font-size:12px; font-weight:bold" class="showColumn">{{StudentInfos[0].FullMarks}}</span>
+                        <a style="margin-left:3px;" href="@Url.Action("StudentMarks","Report")?VersionID=@VersionID&SessionId=@SessionId&BranchID=@BranchID&ShiftID=@ShiftID&ClassId=@ClassId&GroupId=@GroupId&SectionId=@SectionId&SubjectID=@SubExamId&MainExamId=@MainExamId&SubExamId=@SubExamId&DividedExamId=@DividedExamId" class="btn btn-primary" target="_blank">Report</a>
+                        <a href="/Employee/TeacherSubjectList" class="btn red">Back</a>
+                    </div>
+                </div>
+            </div>
+          </div> 
+    </div>
+    <clearfix></clearfix>
+   <!-- Default panel contents onkeypress="return (event.charCode == 8 || event.charCode == 0) ? null : event.charCode >= 48 && event.charCode <= 57" -->              
+    <div id="mobileEntry" ng-show="StudentInfos.length > 0" class="table-container size">
+        <table class="table table-bordered table-inverse fixed-table-toolbar">
+                        <thead class="btn-primary">
+                            <tr>
+                                <th  class="size"> ID </th>
+                                <th  class="size"> Roll </th>
+                                <th  class="size"> Name </th>
+                                <th  class="size">Absent</th>
+                                <th  class="size hideColumn"> Full Mark </th>
+                                <th  class="size"> Obtain Mark </th>
+                                <th  class="size hide">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-class="{'bg-red-haze' : item.ObtainMarks == 0}" ng-repeat="item in StudentInfos" class="size">
+                                <td class="size"> {{item.StudentInsID}} </td>
+                                <td class="size"> {{item.RollNo}} </td>
+                                <td width="25%" class="size"> {{item.FullName}} </td>
+                                <td width="10%" class="size"><input type="checkbox" id="Absent" ng-model="item.IsAbsent" ng-checked="item.IsAbsent==1" /></td>
+                                <td width="25%" class="size hideColumn">{{item.FullMarks}}<span ng-show="item.IsAbsent==1" style="color:#000000; font-weight:bold">&nbsp;&nbsp;&nbsp;A</span></td>
+                                <td width="25%" ng-class="{ 'has-error' : item.FullMarks < item.ObtainMarks}">
+                                    <input type="number" ng-disabled="item.IsAbsent == 1" ng-model="item.ObtainMarks" ng-class="{AbsentMark: item.ObtainMarks == 0 && item.IsAbsent==1, ZeroMark: item.ObtainMarks == 0 && item.IsAbsent==0}" ng-click="touchClick(item);" class="form-control inputs" placeholder="Obtain Mark">
+                                    <span class="help-block" ng-show="item.FullMarks < item.ObtainMarks">Invalid!</span>
+                                </td>
+                                <td width="5%" class="hide">
+                                    <a href="javascript:;" ng-click="MainExamDeleteMark(item.MarksId)" ng-show="item.MarksId!=0" class="btn btn-icon-only red">
+                                        <i class="fa fa-trash">&nbsp;</i>
+                                    </a>
+                                </td>
+                            </tr>
+                            <tr ng-show="StudentInfos.length > 0" >
+                                <td colspan="10">
+                                    <button ng-click="Save()" ng-disabled="MainExamMarkValidation() || btnDis" class="btn btn-primary pull-right"> <i ng-show="spin" class="fa fa-spinner fa-spin" style="font-size:20px"></i> Save &nbsp;</button>
+                                    <button ng-click="MainExamDeleteAllMark()" ng-disabled="MainExamDeleteValidation()" class="btn red pull-right"> Delete &nbsp;</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+        <!-- Table -->
+    </div> 
+</div>
+       
+        <!-- END FORM-->    
+
+@section Scripts{
+
+    <script type="text/javascript">
+
+        OEMSApp.controller("MarksEntryCntrl", ["$scope", "$http", "SweetAlert", "blockUI",
+          function ($scope, $http, SweetAlert, blockUI) {
+
+                  init();
+                  function init() {
+                      initialize();
+                      Search();
+                      getAllDropdowns();
+                      getAllCommons();
+                  }
+                  function initialize() {
+                      $scope.touchList = [];
+                      $scope.touch = 0;
+                      $scope.StudentExamFilter = {};
+                      $scope.studentInfo = {};
+                      $scope.StudentInfos = [];
+                      $scope.Dropdowns = [];
+                      $scope.CommonFeilds = [];
+                      $scope.Versions = [];
+                      $scope.MainExams = [];
+                      $scope.SubExams = [];
+                      $scope.DividedExams = [];
+                      $scope.Subjects = [];
+                      $scope.Search=Search;
+
+                      $scope.currentPage = 1;
+                      $scope.pageno = 1;
+                      $scope.pagesize = 10;
+                      $scope.total_count = 12;
+                      $scope.txtsearch = '';
+                      $scope.getAllDropdowns = getAllDropdowns;
+                      $scope.Search = Search;
+                      $scope.getAllCommons = getAllCommons; 
+                      $scope.btnDis = false;
+                      $scope.spin = false;
+
+                  };              
+                  $scope.touchClick = function touchClick(item) {
+                      if (item.MarksId == 0) {
+                          var add = true;
+                          angular.forEach($scope.touchList, function (value, key) {
+                              if (value == item.StudentIID) {
+                                  add = false;
+                              }
+                          });
+                          if (add) {
+                              $scope.touchList.push(id);
+                          }
+                      }
+                  };
+                  function setProgress(s) {
+                      $scope.btnDis = s;
+                      $scope.spin = s;
+                  }
+                  $scope.MainExamMarkValidation = function MainExamMarkValidation() {
+                      var res = false;
+                      angular.forEach($scope.StudentInfos, function (value, key) {
+                          if (value.FullMarks < value.ObtainMarks) {
+                              res = true;     
+                          }  
+                      });
+                      return res;
+                  };
+                  $scope.MainExamDeleteValidation = function MainExamDeleteValidation() {
+                      var res = false;
+                      angular.forEach($scope.StudentInfos, function (value, key) {
+                          if (value.MarksId > 0)
+                              res = false;
+                          else
+                              res = true;
+                      });
+                      return res;
+                  };
+
+                  $scope.GetGroup = function GetGroup(classid) {
+                      $scope.Groups = [];
+
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Common/GetGroup/' + classid
+                      }).then(function successCallback(response) {
+                          $scope.Groups = response.data.results;
+
+
+                      }, function errorCallback(response) {
+                          toastr["info"](response.data.message);
+                      });
+
+                  }
+                  $scope.GetSection = function GetSection() {
+                      $scope.Sections = [];     
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Common/GetSection/' + $scope.StudentExamFilter.SessionId + "/" + $scope.StudentExamFilter.ShiftId + "/" + $scope.StudentExamFilter.ClassId + "/" + $scope.StudentExamFilter.GroupId
+                      }).then(function successCallback(response) {
+                          $scope.Sections = response.data.results;  
+                      }, function errorCallback(response) {
+                          toastr["info"](response.data.message);
+                      });
+
+                  }
+
+                  function Report() {
+                      $scope.StudentInfos = [];
+                      if ($scope.frmFilter.$invalid == true)
+                          return;
+                      $http({
+                          method: 'POST',
+                          url: baseUrl + 'Report/StudentMarks/',
+                          data: $scope.StudentExamFilter
+                      }).then(function successCallback(response) {
+                          $scope.StudentInfos = response.data.results;
+                          toastr["success"](response.data.message);
+                          blockUI.stop();
+                      }, function errorCallback(response) {
+                          toastr["info"]("opps! Something went wrong. Data not found.");
+                          blockUI.stop();
+                      });
+
+                  };               
+                  function Search() {
+                      $scope.StudentInfos = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Result/GetMarksForTeacher/@VersionID/@SessionId/@BranchID/@ShiftID/@ClassId/@GroupId/@SectionId/@SubjectID/@MainExamId/@SubExamId/@DividedExamId'
+                          }).then(function successCallback(response) {
+                          $scope.StudentInfos = response.data.results;
+
+                      }, function errorCallback(response) {
+                          toastr["info"](response.data.message);
+                      });
+                  };
+
+
+              $scope.Save = function Save() {
+                  if ($scope.StudentInfos.length == 0)
+                      return;
+                  var total = $scope.StudentInfos.length;
+                  var touched = $scope.touchList.length;
+                  alert($scope.touchList.length + '' + $scope.StudentInfos.length);
+                  var zero = 0;
+                  if (touched == 0) {
+                      setProgress(true);
+                      $http({
+                          method: 'POST',
+                          url: baseUrl + 'Result/SaveMarks/',
+                          data: $scope.StudentInfos
+                      }).then(function successCallback(response) {
+                          $scope.spin = false;
+                          setProgress(false);
+                          toastr["success"](response.data.message);
+
+                          Search();
+                      }, function errorCallback(response) {
+                          toastr["info"](response.data.message);
+                      });
+                  }
+                  else //if(total > touched)
+                  {
+                      angular.forEach($scope.StudentInfos, function (value, key) {
+                          if (value.ObtainMarks == 0 && value.MarksId == 0) {
+                              zero += 1;
+                          }
+                      });
+
+                      SweetAlert.swal({
+                          title: "Total Student : " + total + ",  Marks Entry Left : " + touched + " Are you sure to Save it ?", type: "warning", showCancelButton: true, confirmButtonColor: "#DD6B55",
+                          confirmButtonText: "Yes, Save it!",
+                          closeOnConfirm: false
+                      },
+                      function (isConfirm) {
+                          if (isConfirm) {
+                              $http({
+                                  method: 'POST',
+                                  url: baseUrl + 'Result/SaveMarks/',
+                                  data: $scope.StudentInfos
+                              }).then(function successCallback(response) {
+                                  if (response.data.HasError == true) {
+                                      toastr["error"](response.data.message);
+                                  }
+                                  else {
+                                      SweetAlert.swal("Saved!", "Your data has been Saved.", "success");
+                                  }
+                                  Search();
+                              }, function errorCallback(response) {
+                                  toastr["error"](response.data.message);
+                              });
+                          }
+                      });
+                  }
+
+
+              };
+              //$scope.Save = function Save() {
+              //         if ($scope.StudentInfos.length == 0)
+              //             return;
+              //         setProgress(true);
+              //         $http({
+              //             method: 'POST',
+              //             url: baseUrl + 'Result/SaveMarks/',
+              //             data: $scope.StudentInfos
+              //         }).then(function successCallback(response) {
+              //             $scope.spin = false;
+              //             setProgress(false);
+              //             toastr["success"](response.data.message);
+
+              //             Search();
+              //         }, function errorCallback(response) {
+              //             toastr["info"](response.data.message);
+              //         });
+
+              //   };
+              $scope.MainExamDeleteMark = function MainExamDeleteMark(item) {
+                  $http({
+                      method: 'DELETE',
+                      url: baseUrl + 'Result/DeleteStudentMark/' + item.MarksId + '/' + item.MainExamID
+                  }).then(function successCallback(response) {
+                      toastr["info"](response.data.message);
+                      Search();
+                  }, function errorCallback(response) {
+                      toastr["info"](response.data.message);
+                  });
+              }
+        
+              $scope.MainExamDeleteAllMark = function MainExamDeleteAllMark() {
+                     if ($scope.StudentInfos.length == 0)
+                         return;
+                     $http({
+                         method: 'POST',
+                         url: baseUrl + 'Result/BulkDeleteStudentMark/',
+                         data: $scope.StudentExamFilter
+                     }).then(function successCallback(response) {
+                         toastr["info"](response.data.message);
+                         Search();
+                     }, function errorCallback(response) {
+                         toastr["info"](response.data.message);
+                     });
+          }
+              $scope.Reset = function Reset() {
+
+                      initialize();
+                      $scope.frmFilter.$setPristine();
+                      $scope.frmFilter.$setUntouched();
+                      getAllDropdowns();
+                      getAllCommons();
+                      $scope.isSubmitted = false;
+                  };
+              $scope.ResetSource = function ResetSource() {
+                      $scope.StudentInfos = [];
+              };
+
+
+              function getAllDropdowns() {
+                      $scope.Dropdowns = [];
+
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Common/GetAllDropDown/'
+                      }).then(function successCallback(response) {
+                          $scope.Dropdowns = response.data.results;
+
+
+                      }, function errorCallback(response) {
+                          toastr["info"](response.data.message);
+                      });
+                  }
+
+              function getAllCommons() {
+                      $scope.CommonFeilds = [];
+
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Common/GetCommonItem/'
+                      }).then(function successCallback(response) {
+                          $scope.CommonFeilds = response.data.results;
+
+                      }, function errorCallback(response) {
+                          toastr["info"](response.data.message);
+                      });
+              }
+              function getAllVersions() {
+                  $scope.Versions = [];
+
+                  $http({
+                      method: 'GET',
+                      url: baseUrl + 'Common/GetCommonItem/'
+                  }).then(function successCallback(response) {
+                      $scope.Versions = response.data.results;
+                  }, function errorCallback(response) {
+                      toastr["error"](response.data.message);
+                  });
+              }
+              function getAllSeesion() {
+                  $scope.Sessions = [];
+
+                  $http({
+                      method: 'GET',
+                      url: baseUrl + 'Common/GetCommonItem/'
+                  }).then(function successCallback(response) {
+                      $scope.Sessions = response.data.results;
+                  }, function errorCallback(response) {
+                      toastr["error"](response.data.message);
+                  });
+              }
+
+              function getAllShift() {
+                  $scope.Shifts = [];
+
+                  $http({
+                      method: 'GET',
+                      url: baseUrl + 'Common/GetCommonItem/'
+                  }).then(function successCallback(response) {
+                      $scope.Shifts = response.data.results;
+                  }, function errorCallback(response) {
+                      toastr["error"](response.data.message);
+                  });
+              }
+              function getAllClass() {
+                  $scope.CommonFeilds = [];
+
+                  $http({
+                      method: 'GET',
+                      url: baseUrl + 'Common/GetCommonItem/'
+                  }).then(function successCallback(response) {
+                      $scope.CommonFeilds = response.data.results;
+                  }, function errorCallback(response) {
+                      toastr["error"](response.data.message);
+                  });
+              }
+              function getAllSection() {
+                  $scope.CommonFeilds = [];
+
+                  $http({
+                      method: 'GET',
+                      url: baseUrl + 'Common/GetCommonItem/'
+                  }).then(function successCallback(response) {
+                      $scope.CommonFeilds = response.data.results;
+                      //$scope.CommonFeilds = [];
+                  }, function errorCallback(response) {
+                      toastr["error"](response.data.message);
+                  });
+              }
+
+
+              $scope.getMainExam = function getMainExam() {
+                  $scope.MainExams = [];
+                  $http({
+                      method: 'GET',
+                      url: baseUrl + 'ExamSetup/GetMainExamForTeacherMarksEntry/' + $scope.StudentExamFilter.SubjectID
+                  }).then(function successCallback(response) {
+
+                      $scope.MainExams = response.data.results;
+                  }, function errorCallback(response) {
+                      toastr["error"](response.data.message);
+                  });
+              }
+              $scope.getSubExam = function getSubExam() {
+                  $scope.SubExams = [];
+                  $http({
+                      method: 'GET',
+                      url: baseUrl + 'ExamSetup/GetSubExamForTeacherMarksEntry/' + $scope.StudentExamFilter.SubjectID + "/" + $scope.StudentExamFilter.MainExamId
+                  }).then(function successCallback(response) {
+                      $scope.SubExams = response.data.results;
+                  }, function errorCallback(response) {
+                      toastr["error"](response.data.message);
+                  });
+
+              };
+              $scope.getDividedExam = function getDividedExam() {
+                  $scope.DividedExams = [];
+                  $http({
+                      method: 'GET',
+                      url: baseUrl + 'ExamSetup/GetDividedExamForTeacherMarksEntry/' + $scope.StudentExamFilter.SubExamId + '/' + $scope.StudentExamFilter.SubjectID
+                  }).then(function successCallback(response) {
+                      $scope.DividedExams = response.data.results;
+                  }, function errorCallback(response) {
+                      toastr["error"](response.data.message);
+                  });
+
+              };
+
+              $scope.getSubjects = function getSubjects() {
+                 $scope.Subjects = [];
+                  $http({
+                      method: 'GET',
+                      url: baseUrl + 'SubjectSetup/GetAllSubjectForTeacherMarksEntry/' + $scope.StudentExamFilter.VersionID + "/" + $scope.StudentExamFilter.ClassId + "/" + $scope.StudentExamFilter.SessionId + "/" + $scope.StudentExamFilter.GroupId
+                  }).then(function successCallback(response) {
+                      $scope.Subjects = response.data.results;
+                  }, function errorCallback(response) {
+                      toastr["error"](response.data.message);
+                  });
+              }
+
+
+
+              }]);
+    </script>
+
+    <script type="text/javascript">
+
+
+        $(document).ready(function ($) {
+
+            // Disable scroll when focused on a number input.
+            $(document).on('focus', 'input[type=number]', function (e) {
+                $(this).on('wheel', function (e) {
+                    e.preventDefault();
+                });
+            });
+
+            // Restore scroll on number inputs.
+            $(document).on('blur', 'input[type=number]', function (e) {
+                $(this).off('wheel');
+            });
+
+            // Disable up and down keys.
+            $(document).on('keydown', 'input[type=number]', function (e) {
+                if (e.which == 38 || e.which == 40)
+                    e.preventDefault();
+                //if (e.keyCode == 13) {
+                //    $(this).next('input[type=number]').focus();
+                //}
+                if (e.which === 13 ||  e.which == 40) {
+                    var index = $('.inputs').index(this) + 1;
+                    $('.inputs').eq(index).focus();
+                }
+                if ( e.which == 38 ) {
+                    var index = $('.inputs').index(this) - 1;
+                    $('.inputs').eq(index).focus();
+                }
+            });
+
+
+        });
+    </script>
+}

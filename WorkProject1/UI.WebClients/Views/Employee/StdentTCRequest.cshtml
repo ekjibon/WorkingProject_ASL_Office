@@ -1,0 +1,473 @@
+﻿
+@{
+    ViewBag.Title = "EmployeeRequest";
+    Layout = "~/Views/Shared/_EmpLayout.cshtml";
+}
+<style>
+    #custom-button {
+        padding: 5px;
+        color: #009db8;
+        background-color: rgb(228, 244, 247);
+        /*opacity:0.6;*/
+        border: 1px solid #009db8;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 18px;
+    }
+
+
+    #custom_text {
+        margin-left: 10px;
+        font-family: sans-serif;
+        color: #aaa;
+    }
+
+    .btnColor {
+        background-color: #009db8;
+        color: white;
+        font-family: inherit;
+    }
+
+    .button-wrapper {
+        position: relative;
+        width: 150px;
+        text-align: center;
+        /*margin: 20% auto;*/
+    }
+
+    .pending {
+        background: rgba(252, 122, 82, 0.5);
+        color: #FC7B52;
+        padding: 8px 16px;
+        border-radius: 27px;
+    }
+
+    .button-wrapper span.label {
+        position: relative;
+        z-index: 0;
+        display: inline-block;
+        width: 100%;
+        background: #c4e9f5;
+        cursor: pointer;
+        color: #5ebcda;
+        padding: 10px 0;
+        text-transform: uppercase;
+        font-size: 12px;
+    }
+
+    #upload {
+        display: inline-block;
+        position: absolute;
+        z-index: 1;
+        width: 100%;
+        height: 50px;
+        top: 0;
+        left: 0;
+        opacity: 0;
+        cursor: pointer;
+    }
+
+    .Approved {
+        background: rgba(0, 156, 184, 0.521);
+        color: #009DB8;
+        padding: 8px 16px;
+        border-radius: 27px;
+    }
+</style>
+<style>
+    .Approved {
+        background: rgba(0, 156, 184, 0.521);
+        color: #009DB8;
+        padding: 8px 16px;
+        border-radius: 27px;
+    }
+
+    .pending {
+        background: rgba(252, 122, 82, 0.5);
+        color: #FC7B52;
+        padding: 8px 16px;
+        border-radius: 27px;
+    }
+
+    .Rejected {
+        background: #dc3545;
+        color: white;
+        padding: 8px 16px;
+        border-radius: 27px;
+    }
+
+    .edit {
+        font-size: 25px;
+        color: #6b6565;
+            cursor: pointer;
+    }
+
+    .view {
+        font-size: 25px;
+        color: #58cf91;
+            cursor: pointer;
+    }
+</style>
+<div class="row mt-3" ng-controller="StdTCRequest">
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="emp-header">
+               Student TC Request
+            </div>
+            <div class="card-body">
+              
+                <div class="portlet-body" ng-show="StdTCList.length>0">
+                    <div class="table-container">
+                        <div id="sample_3_wrapper" class="dataTables_wrapper no-footer">
+                            <div class="row">
+                                <div class="col-md-4 col-sm-5 col-xs-6">
+                                    <div class="form-group row">
+                                        <div class="col-md-2 col-sm-5  col-xs-4">
+                                            <label for="search" class="control-label" style="padding-top: 5px;">Items</label>
+                                        </div>
+                                        <div class="col-lg-4 col-md-8 col-sm-4 col-xs-8" style="padding-left:0px">
+                                            <select class="form-control" ng-model="pageSize" ng-options="P.value as P.text for P in pageSizeArray"></select>
+                                        </div>
+
+                                    </div>
+                                </div>
+                                <div class="col-md-5 col-sm-3 col-xs-1">
+                                </div>
+                                <div class="col-md-3 col-sm-4 col-xs-5">
+                                    <div id="sample_3_filter" class="pull-right">
+                                        <input ng-model="q" id="search" class="form-control" placeholder="Filter text">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="table-scrollable"> </div>
+                            <table class="table table-bordered table-inverse">
+                                <thead class="btnColor">
+                                    <tr>
+                                        <th>Student</th>
+                                        <th class="text-center" >Class</th>
+                                        <th class="text-center">ID</th>
+                                        <th class="text-center">Apply On</th>
+                                        <th class="text-center">Leave Date</th>
+                                        <th class="text-center">Reason</th>
+                                        <th class="text-center">Description</th>
+                                        <th class="text-center">Status</th>
+                                        <th class="text-center">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody style="overflow:scroll">
+                                    <tr ng-show="StdTCList.length <= 0"><td colspan="5" style="text-align:center;"><i class="fa fa-refresh"></i> Loading new data!!</td></tr>
+                                    <tr dir-paginate="item in StdTCList| filter:q  | itemsPerPage: pageSize " current-page="currentPage" ng-style="{'background-color':$even?evenColor:oddColor}">
+                                        <td>{{item.StudentName}}</td>
+                                        <td class="text-center">{{item.ClassName}}</td>
+                                        <td class="text-center">{{item.StudentInsID}}</td>
+                                        <td class="text-center">{{item.AddDate | date:"dd/MM/yyyy"}}</td>
+                                        <td class="text-center">{{item.LeaveDate | date:"dd/MM/yyyy"}}</td>
+                                        <td class="text-center">{{item.Reason}}</td>
+                                        <td class="text-center">{{item.Description}}</td>
+                                        <td ng-if="item.Remarks=='Pending'" class="text-center"><span class="pending ">{{item.Remarks}}</span></td>
+                                        <td ng-if="item.Remarks=='Approved'" class="text-center"><span class="Approved ">{{item.Remarks}}</span></td>
+                                        <td ng-if="item.Remarks=='Rejected'" class="text-center"><span class="Rejected ">{{item.Remarks}}</span></td>
+                                        <td class="text-center" ng-show="item.Remarks=='Pending'">
+                                            <select class="form-control"  ng-model="ActionOfTeacher" ng-change="AcceptRejectRequest(item.StudentIID,item.RequestId,ActionOfTeacher)" name="RequestType" ng-options="m.Id as m.RequestName for m in RequestListType">
+                                                <option value="">Select</option>
+                                            </select>
+                                          
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                            <div class="row">
+                                <dir-pagination-controls boundary-links="true" template-url="~/assets/angular/lib/dirPagination.tpl.html"></dir-pagination-controls>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts{
+  
+    <script type="text/javascript">
+        OEMSApp.controller("StdTCRequest", ["$scope", "$http", "SweetAlert", "blockUI", "$window", "$filter",
+                     function ($scope, $http, SweetAlert, blockUI, $window, $filter) {
+                         init();
+                         function init() {
+                             initialize();
+                         }
+                         function initialize() {
+                             $scope.pageSizeArray = [];
+                             $scope.pageSizeArray.push({ value: 5, text: 5 });
+                             $scope.pageSizeArray.push({ value: 10, text: 10 });
+                             $scope.pageSizeArray.push({ value: 20, text: 20 });
+                             $scope.pageSizeArray.push({ value: 50, text: 50 });
+                             $scope.currentPage = 1;
+                             $scope.pageSize = 10;
+                             $scope.hstep = 1;
+                             $scope.mstep = 15;
+                             $scope.ActionOfTeacher = '';
+                             $scope.oddColor = '#E4F4F7';
+
+                             getStdTCList();
+                             var RequesType = [
+                                              { Id: "Approved", RequestName: "Approve" },
+                                              { Id: "Rejected", RequestName: "Reject" }
+                                              
+                             ];
+                            
+                             $scope.RequestListType = RequesType;
+                         };
+
+
+                         $scope.AcceptRejectRequest = function AcceptRejectRequest(StudentIID, RequestId, ActionOfTeacher) {
+                             console.log(ActionOfTeacher);
+                             if (ActionOfTeacher == 'Rejected')
+                             {
+                                 SweetAlert.swal({
+                                     title: "Are you sure to reject the request ?", type: "warning", showCancelButton: true, confirmButtonColor: "#DD6B55",
+                                     confirmButtonText: "Yes, reject!",
+                                     closeOnConfirm: false
+                                 },
+                      function (isConfirm) {
+                          if (isConfirm) {
+
+                              $http({
+                                  method: 'POST',
+                                  url: baseUrl + 'Employee/AcceptRejectRequest/' + RequestId + '/' + ActionOfTeacher
+                              }).then(function successCallback(response) {
+                                  SweetAlert.swal("Success!", "Request Rejected Successfully.", "success");
+                                  getStdTCList();
+                                  toastr["success"](response.data.message);
+                              }, function errorCallback(response) {
+                                  GetAllRequestList();
+                                  toastr["error"](response.data.message);
+                              });
+
+                          }
+                      });
+                             }
+                             else if (ActionOfTeacher == 'Approved')
+                            {
+                                 SweetAlert.swal({
+                                     title: "Are you sure to Accept the request ?", type: "warning", showCancelButton: true, confirmButtonColor: "#DD6B55",
+                                     confirmButtonText: "Yes, Accept!",
+                                     closeOnConfirm: false
+                                 },
+                      function (isConfirm) {
+                          if (isConfirm) {
+
+                              $http({
+                                  method: 'POST',
+                                  url: baseUrl + 'Employee/AcceptRejectRequest/' + RequestId + '/' + ActionOfTeacher
+                              }).then(function successCallback(response) {
+                                  SweetAlert.swal("Success!", "Request Accepted Successfully.", "success");
+                                  getStdTCList();
+                                  toastr["success"](response.data.message);
+                              }, function errorCallback(response) {
+                                  GetAllRequestList();
+                                  toastr["error"](response.data.message);
+                              });
+
+                          }
+                      });
+                             }
+                             else
+                             {
+
+                             }
+                         }
+
+                         $scope.reset = function reset() {
+                             $scope.Request = {};
+                             $scope.Request.Id = 0;
+                             $scope.modalTitle = 'Add ';
+                             $scope.btnTitle = 'Save';
+
+                             $scope.Leave = {};
+                             $("#custom_text").html("No file chosen, yet.");
+                             $(".demoInputBox").css("color", "#aaa");
+                         }
+
+                       function resetform() {
+                             $scope.Request = {};
+                             $scope.Request.Id = 0;
+                             $scope.modalTitle = 'Add ';
+                             $scope.btnTitle = 'Save';
+
+                             $scope.Leave = {};
+                             $("#custom_text").html("No file chosen, yet.");
+                             $(".demoInputBox").css("color", "#aaa");
+                         }
+
+                         $scope.view = function (n) {
+                             //console.log(n);
+                             $scope.Request = n;
+                             $scope.Request.Id = n.Id;
+                             $scope.Request.RequestType = n.ReqID;
+                             $scope.Request.NOCType = n.NOCType;
+                             Request.Description = n.Description;
+                             $scope.Request.Date = new Date(n.Date);
+                             if ($scope.Request.RequestType == 1) {
+                                 $scope.Request.CategoryId = n.CategoryId.toString();
+                                 Request.Text = n.Text;
+                                 $scope.Request.Time = new Date(n.Time);
+                             }
+                             if ($scope.Request.NOCType == 1) {
+
+                                 $scope.Request.TravelDesination = n.TravelDesination;
+                                 $scope.Request.TravelFrom = new Date(n.TravelFrom);
+                                 $scope.Request.TravelTo = new Date(n.TravelTo);
+
+                             }
+                             if ($scope.Request.RequestType == 4) {
+                                 $scope.Request.LeaveDate = new Date(n.LeaveDate);
+
+                             }
+                             if ($scope.Request.RequestType == 5) {
+                                 $scope.Request.LeaveTypeId = n.LeaveTypeId;
+                                 $scope.Request.Request = new Date(n.RequestOn);
+                                 $scope.Request.From = new Date(n.FromDate);
+                                 $scope.Request.To = new Date(n.ToDate);
+
+                             }
+
+                         }
+                      
+                         function getStdTCList() {
+                             $scope.StdTCList = [];
+                             blockUI.start();
+                             $http({
+                                 method: 'GET',
+                                 url: baseUrl + 'Employee/GetStudentRequestList/'
+                             }).then(function SuccessCallback(response) {
+                                 $scope.StdTCList = response.data.results;
+                                 blockUI.stop();
+                             });
+                         }
+
+                         $scope.DeleteRequest = function DeleteRequest(Id) {
+
+                             SweetAlert.swal({
+                                 title: "Are you sure to delete it ?", type: "warning", showCancelButton: true, confirmButtonColor: "#DD6B55",
+                                 confirmButtonText: "Yes, delete it!",
+                                 closeOnConfirm: false
+                             },
+                         function (isConfirm) {
+                             if (isConfirm) {
+
+                                 $http({
+                                     method: 'POST',
+                                     url: baseUrl + 'Employee/DeleteRequest/' + Id
+                                 }).then(function successCallback(response) {
+                                     SweetAlert.swal("Deleted!", "Your data has been deleted.", "success");
+                                     GetAllRequestList();
+                                     toastr["success"](response.data.message);
+                                 }, function errorCallback(response) {
+                                     GetAllRequestList();
+                                     toastr["error"](response.data.message);
+                                 });
+
+                             }
+                         });
+                         }
+                         $scope.CalculateDuratoin = function CalculateDuratoin() {
+                             var From = new Date($scope.Request.From);
+                             var To = new Date($scope.Request.To);
+                             if (To < From) {
+                                 toastr["info"]("Please Select a Valid Date Range.");
+                                 $scope.Request.To = null;
+                                 $scope.Request.Duration = null;
+                             } else {
+                                 $scope.Request.Duration = (((((To - From) / 1000) / 60) / 60) / 24) + 1;
+                             }
+                             //var Durat = To-From
+                             //alert(From);
+                             //alert(To);
+                             //alert(duration)
+                         }
+                         function validate() {
+                             $("#file_error").html("");
+                             $(".demoInputBox").css("color", "#dc3545");
+                             var file_size = $('#real_file')[0].files[0].size;
+                             if (file_size > 2097152) {
+                                 $("#custom_text").html("(Maximum 2MB)");
+                                 //console.log("File size is greater than 2MB");
+                                 //$("#file_error").html("File size is greater than 2MB");
+                                 $(".demoInputBox").css("border-color", "#FF0000");
+                                 return false;
+                             }
+                             return true;
+                         }
+                         function GetAllRequestList() {
+                             blockUI.start();
+                             $http({
+                                 method: 'GET',
+                                 url: baseUrl + 'Employee/GetAllRequestList/'
+                             }).then(function SuccessCallback(response) {
+                                 $scope.RequestList = response.data.results;
+                                 console.log($scope.RequestList);
+                                 blockUI.stop();
+                             })
+                         }
+
+                         $scope.LoadCategory = function LoadCategory() {
+
+                             $http({
+                                 method: 'GET',
+                                 url: baseUrl + 'Employee/GetAllCategory/'
+                             }).then(
+                             function SuccessCallback(response) {
+                                 $scope.CategoryList = response.data.results;
+                                 //console.log(DepartmentList);
+
+                             }
+                             )
+                         }
+                         $scope.LoadDesignation = function LoadDesignation(Id) {
+
+                             $http({
+                                 method: 'GET',
+                                 url: baseUrl + 'PortalRequest/GetAllDesignation/' + Id
+                             }).then(
+                             function SuccessCallback(response) {
+                                 $scope.DesignationList = response.data.results;
+                                 //console.log(DesignationList);
+                             }
+                             )
+                         }
+
+
+
+                         function getAllDropdowns() {
+                             $scope.Dropdowns = [];
+
+                             $http({
+                                 method: 'GET',
+                                 url: baseUrl + 'Common/GetAllDropDown/'
+                             }).then(function successCallback(response) {
+                                 //console.log(response.data.results);
+                                 $scope.Dropdowns = response.data.results;
+                             }, function errorCallback(response) {
+                             });
+
+                         }
+                         function GetAllLeaveType() {
+                             $http({
+                                 method: 'GET',
+                                 url: baseUrl + 'Attendance/GetAllLeaveType'
+                             }).then(function successCallback(response) {
+                                 $scope.LeaveType = response.data.results;
+
+                             }, function errorCallback(response) {
+                                 toastr["warning"](response.data.message);
+                             });
+                         };
+
+                     }]);
+    </script>
+}
+
+

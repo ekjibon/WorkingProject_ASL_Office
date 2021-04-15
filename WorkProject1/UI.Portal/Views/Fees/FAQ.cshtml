@@ -1,0 +1,100 @@
+﻿
+@{
+    ViewBag.Title = "FAQ";
+}
+<style>
+    .accordion {
+        background-color: #eee;
+        color: #444;
+        cursor: pointer;
+        padding: 18px;
+        width: 100%;
+        border: none;
+        text-align: left;
+        outline: none;
+        font-size: 15px;
+        transition: 0.4s;
+    }
+
+        .active, .accordion:hover {
+            background-color: #ccc;
+        }
+
+        .accordion:after {
+            content: '\002B';
+            color: #777;
+            font-weight: bold;
+            float: right;
+            margin-left: 5px;
+        }
+
+    .active:after {
+        content: "\2212";
+    }
+
+    .panel {
+        padding: 0 18px;
+        background-color: white;
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.2s ease-out;
+    }
+</style>
+<div ng-controller="FAQCtrl">
+    
+    <h2 style="text-decoration-color:crimson">Frequently Asked Question</h2>
+    <button class="accordion">1. Is this payment system secure?</button>
+    <div class="panel">
+        <p>Yes</p>
+    </div>
+
+    <button class="accordion">2. Is this payment system mobile responsive?</button>
+    <div class="panel">
+        <p>No, currently not.</p>
+    </div>
+
+    <button class="accordion">3. I can't pay. When I click on "yes pay", it redirects me to a page that shows an error massage. What's the problem? </button>
+    <div class="panel">
+        <p>Use google chrome browser and make sure the browser is up to date. Check your device's date and time settings. If you are using any pirated anti-virus, disable it.</p>
+    </div>
+    <button class="accordion">4. It shows "Invalid request"  or "Payment Unsuccessful" after I submit my OTP.</button>
+    <div class="panel">
+        <p>May be your card doesn't support online transaction. Please contact with the card provider bank.</p>
+    </div>
+    <button class="accordion">5. I have paid and my bKash balance has decreased but I can still see the due on student portal.</button>
+    <div class="panel">
+        <p>Don't worry. Its may be a technical glitch. Please provide us the transaction ID and payment time. Your payment will be updated accordingly.</p>
+    </div>
+    <button class="accordion">6. Each time I generate the voucher, it is automatically downloaded to my PC but I don't know where.</button>
+    <div class="panel">
+        <p>Please check your default download folder/Desktop/Documents folder. Additionally, you can press Ctrl+J from keyboard. The downloads page of your browser will open. From there, click on "Show in folder" option.</p>
+    </div>
+</div>
+@section Scripts{
+
+    <script type="text/javascript">
+
+        OEMSApp.controller("FAQCtrl", ["$scope", "$http", "SweetAlert", "blockUI", "$window", "$filter",
+   function ($scope, $http, SweetAlert, blockUI, $window, $filter) {
+       init();
+
+       function init() {
+
+       }
+       var acc = document.getElementsByClassName("accordion");
+       var i;
+       for (i = 0; i < acc.length; i++) {
+           acc[i].addEventListener("click", function () {
+               this.classList.toggle("active");
+               var panel = this.nextElementSibling;
+               if (panel.style.maxHeight) {
+                   panel.style.maxHeight = null;
+               } else {
+                   panel.style.maxHeight = panel.scrollHeight + "px";
+               }
+           });
+       }
+   }]);
+    </script>
+    
+}

@@ -1,0 +1,314 @@
+﻿
+@{
+    ViewBag.Title = "ForMeetingList";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<div ng-controller="StdRequestApply">
+    <div class="portlet light bordered ">
+        <div class="portlet-title">
+            <div class="caption">
+                <i class="icon-settings font-green"></i>
+                <span class="caption-subject font-green sbold uppercase">For Meeting</span>
+            </div>
+
+        </div>
+        <div class="portlet-body" ng-show="RequestList.length>0">
+            <div class="table-container">
+                <div id="sample_3_wrapper" class="dataTables_wrapper no-footer">
+                    <div class="row">
+                        <div class="col-md-4 col-sm-5 col-xs-6">
+                            <div class="form-group">
+                                <div class="col-lg-4 col-md-8 col-sm-4 col-xs-8" style="padding-left:0px">
+                                    <select class="form-control" ng-model="pageSize" ng-options="P.value as P.text for P in pageSizeArray"></select>
+                                </div>
+                                <div class="col-md-7  col-sm-8  col-xs-4">
+
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 col-sm-3 col-xs-1">
+                        </div>
+                        <div class="col-md-4 col-sm-4 col-xs-5">
+                            <div id="sample_3_filter" class="pull-right">
+                                <input ng-model="q" id="search" class="form-control ng-pristine ng-untouched ng-valid ng-empty" placeholder="Filter text">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="table-scrollable"> </div>
+                    <table class="table table-bordered table-inverse">
+                        <thead class="btnColor">
+                            <tr class="bg-primary">
+                                <th>Request Type</th>
+                                <th>Requested By</th>
+                                <th>Meet With</th>
+                                <th>Date of Submission</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody style="overflow:scroll">
+                            <tr ng-show="RequestList.length <= 0"><td colspan="5" style="text-align:center;"><i class="fa fa-refresh"></i> Loading new data!!</td></tr>
+                            <tr dir-paginate="item in RequestList| filter:q  | itemsPerPage: pageSize " current-page="currentPage" ng-style="{'background-color':$even?evenColor:oddColor}">
+                                <td>{{item.RequestType}}</td>
+                                <td>{{item.RequestedBy}}</td>
+                                <td>{{item.Text}}</td>
+                                <td>{{item.AddDate | date:"dd/MM/yyyy"}}</td>
+                                <td>{{item.Status}}</td>
+                                <td>
+                                    <div class="btn-group ">
+                                        <button class="btn btn-xs green dropdown-toggle" type="button" data-toggle="dropdown" aria-expanded="false">
+                                            Options
+                                            <i class="fa fa-angle-down"></i>
+                                        </button>
+                                        <ul class="dropdown-menu" role="menu" style="left: -10%;">
+                                            <li>
+                                                <a href="#" ng-show="item.Status=='Pending'" data-target="#ViewDetails" data-toggle="modal" ng-click="view(item)">
+                                                    View Details
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a href="#" ng-show="item.Status=='Pending'" data-target="#MeetingRequest" data-toggle="modal" ng-click="edit(item)">
+                                                  Approve
+                                                </a>
+                                            </li>
+                                          
+                                            <li>
+                                                <a href="javascript:;" ng-hide="item.Status=='Rejected'" ng-click="updateStatus(item.Id,Status='Rejected')">
+                                                    Reject
+                                                </a>
+                                            </li>
+                                      </ul>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="row">
+                        <dir-pagination-controls boundary-links="true" template-url="~/assets/angular/lib/dirPagination.tpl.html"></dir-pagination-controls>
+                   </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="MeetingRequest" class="modal fade" tabindex="-1" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form name="mform" ng-submit="save()" class="form-horizontal" id="form_sample_1" novalidate>
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">X</button>
+                        <h4 class="modal-title">Meeting Request</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-body">
+                            <div class="form-group" ng-class="{ 'has-error' : submitted && mform.MeetingIssue.$invalid}">
+                                <label class="col-md-3 control-label">
+                                  Meeting Issue
+                                    <span class="required">*</span>
+                                </label>
+                                <div class="col-md-9">
+                                    <input type="text" ng-model="Rqst.MeetingIssue" class="form-control" placeholder="Meeting Issue" name="MeetingIssue" >
+                                    <div class="form-control-focus"> </div>
+                                    <span ng-show="submitted && mform.MeetingIssue.$error.required" class="help-block">Meeting Issue Required</span>
+                                </div>
+                            </div>
+                            <div class="form-group row" ng-class="{ 'has-error' : submitted && mform.Time.$invalid}">
+                                <label class="col-md-3 control-label">
+                                         Update Meeting Time
+                                    <span class="required">*</span>
+                                </label>
+                                <div class="col-md-9">
+                                    <div uib-timepicker ng-model="Rqst.Time" @*ng-required="Request.Time==null"*@ name="Time"
+                                         onkeypress='return event.charCode >= 48 && event.charCode <= 57' ng-change="changed()" readonly-time="false"
+                                         readonly-date="false" disabled-date="false" hour-step="hstep" minute-step="mstep" show-meridian="true"></div>
+                                    <div class="form-control-focus"> </div>
+                                    <span ng-show="submitted &&  mform.Time.$error.required" class="required">Invalid Time </span>
+                                </div>
+                            </div>
+                            <div class="form-group" ng-class="{ 'has-error' : submitted && mform.Remarks.$invalid}">
+                                <label class="col-md-3 control-label">
+                                    Remarks
+                                    <span class="required">*</span>
+                                </label>
+                                <div class="col-md-9">
+                                    <input type="text" ng-model="Rqst.Remarks" class="form-control" placeholder="Remarks" name="Remarks" >
+                                    <div class="form-control-focus"> </div>
+                                    <span ng-show="submitted && mform.Remarks.$error.required" class="help-block">Remarks Required</span>
+                                </div>
+                            </div>
+                       </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" data-dismiss="modal" class="btn dark btn-outline" ng-click="resetForm();submitted=false">Cancel</button>
+                        <button type="submit" ng-click="submitted=true" class="btn green">Save</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div id="ViewDetails" class="modal fade" tabindex="-1" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form name="addform"  class="form-horizontal" id="form_sample_1" novalidate>
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">X</button>
+                        <h4 class="modal-title">View Details</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-body">
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <div class="form-group">
+                                         <label class="col-md-4 control-label">Name </label>
+                                        <div class="col-md-8">
+                                            <label class="form-control" style="height:auto"> {{View.RequestedBy}}</label>
+                                          <div class="form-control-focus"> </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-4 control-label">Father's Name</label>
+                                        <div class="col-md-8">
+                                            <label class="form-control" style="height:auto"> {{View.FatherName}}</label>
+                                            <div class="form-control-focus"> </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-4 control-label">Mother's Name</label>
+                                        <div class="col-md-8">
+                                            <label class="form-control" style="height:auto"> {{View.MotherName}}</label>
+                                            <div class="form-control-focus"> </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group" >
+                                        <label class="col-md-4 control-label">Meeting Date</label>
+                                        <div class="col-md-8">
+                                            <label class="form-control"> {{View.Date | date:"dd/MM/yyyy"}}</label>
+                                            <div class="form-control-focus"> </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-4 control-label">Meeting Time</label>
+                                        <div class="col-md-8">
+                                            <label class="form-control"> {{View.Time | date:'hh: mm a'}}</label>
+                                            <div class="form-control-focus"> </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div >
+                                        <img src="/Request/StudentImgByStudnetIId?StudentIId={{View.StudentIID}}" alt="" style="width: 180px;max-width: 300px;height: 180px;">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="form-group">
+                                    <label class="col-md-3 control-label">Description</label>
+                                    <div class="col-md-8">
+                                       <textarea class="form-control" readonly  rows="10" cols="30">{{View.Reason}}</textarea>
+
+                                        <div class="form-control-focus"> </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" data-dismiss="modal" class="btn dark btn-outline">Cancel</button>
+                        
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts{
+
+    <script type="text/javascript">
+        OEMSApp.controller("StdRequestApply", ["$scope", "$http", "SweetAlert", "blockUI", "$window", "$filter",
+                     function ($scope, $http, SweetAlert, blockUI, $window, $filter) {
+                         init();
+                         function init() {
+                             initialize();
+                         }
+                         function initialize() {
+                             $scope.pageSizeArray = [];
+                             $scope.pageSizeArray.push({ value: 5, text: 5 });
+                             $scope.pageSizeArray.push({ value: 10, text: 10 });
+                             $scope.pageSizeArray.push({ value: 20, text: 20 });
+                             $scope.pageSizeArray.push({ value: 50, text: 50 });
+                             $scope.currentPage = 1;
+                             $scope.pageSize = 10;
+                             $scope.Rqst = {};
+                             $scope.View = {};
+                             $scope.RequestList = [];
+                             $scope.CategoryList = [];
+                             $scope.DesignationList = [];
+                             $scope.Status = '';
+                             $scope.hstep = 1;
+                             $scope.mstep = 15;
+                             GetAllRequestList();
+
+                         };
+                         $scope.resetForm = function resetForm() {
+                             $scope.Rqst = {};
+                         }
+                         $scope.view = function view(n) {
+                             $scope.View = n;
+                         }
+                         $scope.edit = function edit(n) {
+                             $scope.Rqst.Id = n.Id;
+                             $scope.Rqst.StudentId = n.StudentIID;
+                             $scope.Rqst.Time = new Date(n.Time);
+                         }
+                         $scope.save = function save() {
+                             if ($scope.mform.$invalid)
+                                 return;
+                             
+                             $http({
+                                 method: 'POST',
+                                 url: baseUrl + 'Student/Request/ApproveStatus',
+                                 data: $scope.Rqst
+                             }).then(function successCallback(response) {
+                                 $('#MeetingRequest').modal('toggle');
+                                 GetAllRequestList();
+                                  toastr["success"](response.data.message);
+                             }, function errorCallback(response) {
+                                 GetAllRequestList();
+                                 // toastr["error"](response.data.message);
+                             });
+
+                         }
+
+                         $scope.updateStatus = function updateStatus(Id,Status) {
+                             $http({
+                                 method: 'POST',
+                                 url: baseUrl + 'Student/Request/UpdateStatus/' + Id +'/'+ Status
+                             }).then(function successCallback(response) {
+                               
+                                 GetAllRequestList();
+                                // toastr["success"](response.data.message);
+                             }, function errorCallback(response) {
+                                 GetAllRequestList();
+                                // toastr["error"](response.data.message);
+                             });
+                         }
+                    function GetAllRequestList() {
+                             $http({
+                                 method: 'GET',
+                                 url: baseUrl + 'Student/Request/GetForMeetingList/'
+                             }).then(function SuccessCallback(response) {
+                                 $scope.RequestList = response.data.results;
+                                 //console.log($scope.RequestList);
+                             })
+                         }
+
+
+
+                     }]);
+    </script>
+}
+
+
+
+

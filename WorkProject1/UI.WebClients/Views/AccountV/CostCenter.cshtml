@@ -1,0 +1,320 @@
+﻿
+@{
+    ViewBag.Title = "Cost Center";
+}
+
+<div class="kt-container  kt-container--fluid  kt-grid__item kt-grid__item--fluid" ng-controller="CostCenter"> 
+
+    <div class="row">
+        <div class="kt-portlet kt-portlet--mobile">
+            <div class="kt-portlet__head kt-portlet__head--lg">
+                <div class="kt-portlet__head-label">
+                    <h3 class="kt-portlet__head-title">
+                        Cost Center
+                    </h3>
+                </div>
+                <div class="kt-portlet__head-toolbar">
+                    <div class="kt-portlet__head-wrapper">
+                        <div class="dropdown dropdown-inline">
+                            <button ng-click="resetForm()" type="button" class="btn btn-brand btn-icon-sm" data-toggle="modal" data-target="#addmodal" aria-haspopup="true" aria-expanded="false">
+                                <i class="flaticon2-plus"></i> Add Cost Center
+                            </button>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="kt-portlet__body">
+
+
+                <div class="row">
+                    <div class="col-md-4 col-sm-5 col-xs-6">
+                        <div class="form-group">
+                            <div class="col-lg-3 col-md-5 col-sm-4 col-xs-8" style="padding-left:0px">
+
+                                <select class="form-control kt-font-brand" ng-model="pageSize" ng-options="P.value as P.text for P in pageSizeArray"></select>
+                            </div>
+
+                        </div>
+
+                    </div>
+                    <div class="col-md-4 col-sm-3 col-xs-1">
+                    </div>
+                    <div class="col-md-4 col-sm-4 col-xs-5">
+                        <div id="sample_3_filter" class="pull-right">
+                            <input ng-model="q" id="search" class="form-control" placeholder="Filter text">
+                        </div>
+                    </div>
+                </div>
+                <table class="table table-bordered table-hover rounded">
+                    <thead>
+                        <tr class="btn-primary">
+                            <th style="text-align:center">Cost Category</th>
+                            <th style="text-align:center">Ledger Name</th>
+                            <th style="text-align:center"> Cost Center</th>
+                            <th style="text-align:center">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-show="CostCenters.length <= 0"><td colspan="5" style="text-align:center;"><i class="fa fa-refresh"></i> Loading new data!!</td></tr>
+                        <tr dir-paginate="item in CostCenters | filter:q  | itemsPerPage: pageSize " current-page="currentPage">
+                            <td align="center">{{item.CostCategoryName}}</td>
+                            <td align="center">{{item.LedgerName}}</td>
+                            <td align="center">{{item.CostCenterName}}</td>
+                            <td align="center">
+                                <a class="btn btn-outline-brand btn-elevate btn-icon" ng-click="edit(item)" data-target="#addmodal" data-toggle="modal">
+                                    <i class="fa fa-edit"></i>
+                                </a>
+                                <a ng-click="deleteProductCate(item)" href="javascript:;" class="btn btn-outline-primary btn-elevate btn-icon">
+                                    <i class="fa fa-trash"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="row">
+                    <dir-pagination-controls boundary-links="true" template-url="~/assets/angular/lib/dirPagination.tpl.html"></dir-pagination-controls>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--Modal Area Start-->
+    <div id="addmodal" class="modal fade" tabindex="-1" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form name="addform" ng-submit="save()" class="form-horizontal" id="form_sample_1" novalidate>
+                    <div class="modal-header">
+                        <h4 class="modal-title">{{modalTitle}}</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-body">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group row" ng-class="{ 'has-error' : submitted && addform.Category.$invalid}">
+                                        <label class="col-md-4 control-label"style="text-align:right">
+                                            Category:
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-8">
+                                            <select class="form-control" required name="Category" ng-model="CostCenter.CostCategoryId" ng-options="c.Id  as c.CostCategoryName for c in CostCategorys">
+                                                <option selected value="">Choose Options</option>
+                                            </select>
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted && addform.Category.$error.required" class="help-block">Category Required</span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group row " ng-class="{ 'has-error' : submitted && addform.LedgerId.$invalid}">
+                                        <label class="col-md-4" style="text-align:right">
+                                            Ledger Name :
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-8">
+                                            <select class="form-control" ng-model="CostCenter.LedgerId" required name="LedgerId" ng-options="acledger.LedgerId as acledger.Name for acledger in AcHeadlist">
+                                                <option value="" selected="selected">Choose Option</option>
+                                            </select>
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted && addform.LedgerId.$error.required" class="help-block">Ledger Name Required</span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group row" ng-class="{ 'has-error' : submitted && addform.CostCenter.$invalid}">
+                                        <label class="col-md-4 control-label"style="text-align:right">
+                                            Cost Center :
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-8">
+                                            <input type="text" ng-model="CostCenter.CostCenterName" class="form-control" placeholder="Cost Center" name="CostCenter" required>
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted && addform.CostCenter.$error.required" class="help-block">Cost Center Required</span>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" data-dismiss="modal" class="btn btn-secondary" ng-click="resetForm();getCostCenters()">Cancel</button>
+                        <button type="submit" ng-click="submitted=true" class="btn btn-success" ng-disabled="btnDis">Save <i ng-show="spin" class="fa fa-spinner fa-spin" style="font-size:20px"></i></button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!--Modal Area End-->
+</div>
+
+@section Scripts{
+
+    <script type="text/javascript">
+
+        OEMSApp.controller("CostCenter", ["$scope", "$http", "SweetAlert",
+              function ($scope, $http, SweetAlert) {
+
+                  init();
+                  function init() {
+                      initialize();
+                      getCostCategorys(1);
+                      getCostCenters(1);
+                      getAcHeadlist();
+
+                  }
+                  function initialize() {
+                      $scope.modalTitle = "Add CostCenter";
+                      //object Create
+                      $scope.CostCenter = {};
+                      $scope.CostCenter.Id = 0;
+                       ///Array Create
+                   //   $scope.ProductCategorys = [];
+                      $scope.CostCenters = [];
+                      $scope.pageSizeArray = [];
+
+                    //  $scope.getProductCategorys = getProductCategorys;
+                   //   $scope.getCostCentergorys = getCostCentergorys;
+                      $scope.resetForm = resetForm;
+                      $scope.getCostCenters = getCostCenters;
+                      $scope.pageSizeArray.push({ value: 5, text: 5 });
+                      $scope.pageSizeArray.push({ value: 10, text: 10 });
+                      $scope.pageSizeArray.push({ value: 20, text: 20 });
+                      $scope.pageSizeArray.push({ value: 50, text: 50 });
+                      $scope.currentPage = 1;
+                      $scope.pageSize = 10;
+                      $scope.pageno = 1;
+                      $scope.total_count = 12;
+
+
+
+                  }
+
+                  function resetForm() {
+                      $scope.modalTitle = "Add Cost Center";
+                      $scope.CostCenter = {};
+                      $scope.CostCenter.Id = 0;
+                      $scope.addform.$setUntouched();
+                      $scope.addform.$setPristine();
+                      $scope.submitted = false;
+                     // getCostCentergorys(1);
+                  }
+
+
+                  $scope.edit = function (n) {
+                      $scope.modalTitle = "Update Cost Center";
+                      $scope.CostCenter = n;
+                      $scope.CostCenter.Id = n.Id;
+                  };
+                  $scope.save = function save(e) {
+                      if (Validation()) {
+                          if ($scope.CostCenter.Id != 0) /// For Update
+                          {
+                              if ($scope.CostCenter != '') {
+                                  $http({
+                                      method: 'PUT',
+                                      url: baseUrl + 'Accounts/UpdateCostCenter/',
+                                      data: $scope.CostCenter
+                                  }).then(function successCallback(response) {
+                                      toastr["info"](response.data.message);
+                                      resetForm();
+                                      getCostCenters(1);
+                                      $('#addmodal').modal('toggle');
+                                  }, function errorCallback(response) {
+                                      toastr["warning"](response.data.Message);
+                                  });
+                              }
+                          } else {  //  For Add
+                              if ($scope.CostCenter != {}) {
+                                  $http({
+                                      method: 'POST',
+                                      url: baseUrl + '/Accounts/AddCostCenter/',
+                                      data: $scope.CostCenter
+                                  }).then(function successCallback(response) {
+                                      toastr["info"](response.data.message);
+                                      resetForm();
+                                      getCostCenters(1);
+                                      $('#addmodal').modal('toggle');
+                                  }, function errorCallback(response) {
+                                      toastr["warning"](response.data.Message);
+                                  });
+                              }
+                          }
+                      } else {
+                          //toastr["warning"]('Form Invalid');
+                      }
+
+
+                  };
+
+                  $scope.deleteProductCate = function deleteProductCate(n) {
+                      // SweetAlert.swal("Good job!", "You clicked the button!", "success");
+                      SweetAlert.swal({
+                          title: "Are you sure to delete it ?", type: "warning", showCancelButton: true, confirmButtonColor: "#DD6B55",
+                          confirmButtonText: "Yes, delete it!",
+                          closeOnConfirm: false
+                      },
+                      function (isConfirm) {
+                          if (isConfirm) {
+                              $http({
+                                  method: 'POST',
+                                  url: baseUrl + 'Accounts/DeleteCostCenter/',
+                                  data: n
+                              }).then(function successCallback(response) {
+                                  SweetAlert.swal("Deleted!", "Your data has been deleted.", "success");
+                                  getCostCenters(1);
+                              }, function errorCallback(response) {
+                                  toastr["warning"](response.data.Message);
+                              });
+                          }
+                      });
+                  };
+
+                  function getCostCategorys(pageno) {
+                      $scope.CostCategorys = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Accounts/GetCostCategorys/'
+                      }).then(function successCallback(response) {
+                          $scope.CostCategorys = response.data.results;
+                          //toastr["info"](response.data.message);
+                      }, function errorCallback(response) {
+                          //toastr["warning"](response.data.Message);
+                      });
+                  }
+                  function getCostCenters(pageno) {
+                      $scope.CostCenters = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Accounts/GetCostCenters/'
+                      }).then(function successCallback(response) {
+                          $scope.CostCenters = response.data.results;
+                          //toastr["info"](response.data.message);
+                      }, function errorCallback(response) {
+                          //toastr["warning"](response.data.Message);
+                      });
+                  }
+                  function getAcHeadlist() {
+                      //$scope.CommonFeilds = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Accounts/GetAllLedgers/'
+                      }).then(function successCallback(response) {
+                          $scope.AcHeadlist = response.data.results;
+                          //consol.log($scope.AcBranchlist);
+                      }, function errorCallback(response) {
+                      });
+                  }
+
+                  function Validation() {
+                      if ($scope.addform.$invalid) {
+                          return false;
+                      }
+                      if ($scope.addform.$valid) {
+                          return true;
+                      }
+                  }
+
+              }]);
+    </script>
+
+}
+

@@ -1,0 +1,332 @@
+﻿
+@{
+    ViewBag.Title = "ECA";
+}
+<style>
+    .tableh{
+         background: #FC7B52;
+             color: #fff;
+          font-size: 22px;
+         padding: 9px;
+        margin-bottom: 1%;
+  
+    }
+</style>
+<div class="row mt-3" ng-controller="ECAListClt">
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-header Leave-card-header">
+                @ViewBag.Title
+            </div>
+          
+            <div class="card-body">
+               <div class="row">
+                   <div class="col-md-6">
+                       @if (ViewBag.ApplyCount >0 && ViewBag.ClubName == null)
+                       {
+                           <div>
+                               <h4>Your Application is Pending for Approval!</h4>
+                           </div>
+                       }
+
+                       @if(ViewBag.ClubName != null)
+                       {
+                        <div class="row">
+                            <div class="col-md-4">
+                                <h5> Current Year ECA :</h5>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-control"> @ViewBag.ClubName</label>
+                            </div>
+                        </div>
+                       }
+                      
+                    </div>
+                   <div class="leave-button text-right col-md-6" style="margin-bottom: 1%;">
+                       @if (ViewBag.ApplyCount == 2)
+                       {
+                           <a class="btn apply btn-lg" ng-click="Check()" href="" data-whatever="fat" >ECA Apply</a>
+                        @*<a class="btn apply btn-lg" disabled="disabled" style="" href="" data-whatever="fat">ECA Apply</a>*@
+                       }
+                       else
+                       {
+                        <a class="btn apply btn-lg" ng-click="AddECA()" href="" data-whatever="fat">ECA Apply</a>
+                       }
+
+
+                   </div>
+               </div>
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="tableh">
+                            @ViewBag.Title List
+                        </div>
+                    </div>
+                    <div class="col-lg-12">
+                        <div class="portlet-body" @*ng-show="RequestList.length>0"*@>
+                            <div class="table-container">
+                                <div id="sample_3_wrapper" class="dataTables_wrapper no-footer">
+                                    <div class="row">
+                                        <div class="col-md-4 col-sm-5 col-xs-6">
+                                            <div class="form-group row">
+                                                <div class="col-md-2 col-sm-5  col-xs-4">
+                                                    <label for="search" class="control-label" style="padding-top: 5px;">Items</label>
+                                                </div>
+                                                <div class="col-lg-4 col-md-8 col-sm-4 col-xs-8" style="padding-left:0px">
+                                                    <select class="form-control" ng-model="pageSize" ng-options="P.value as P.text for P in pageSizeArray"></select>
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                        <div class="col-md-5 col-sm-3 col-xs-1">
+                                        </div>
+                                        <div class="col-md-3 col-sm-4 col-xs-5">
+                                            <div id="sample_3_filter" class="pull-right">
+                                                <input ng-model="q" id="search" class="form-control" placeholder="Filter text">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="table-scrollable"> </div>
+                                    <table class="table table-bordered table-inverse">
+                                        <thead class="btnColor">
+                                            <tr>
+                                                <th>Choice</th>
+                                                <th class="text-center">Term Name</th>
+                                               <th class="text-center">Club Name</th>
+                                                <th class="text-center">Status</th>
+
+                                            </tr>
+                                        </thead>
+                                        <tbody style="overflow:scroll">
+                                            <tr ng-show="ECAList.length <= 0"><td colspan="5" style="text-align:center;"><i class="fa fa-refresh"></i> Loading new data!!</td></tr>
+                                            <tr dir-paginate="item in ECAList | filter:q  | itemsPerPage: pageSize " current-page="currentPage" ng-style="{'background-color':$even?evenColor:oddColor}">
+                                                <td>{{item.Choice}}</td>
+                                                 <td class="text-center">{{item.TermName}}</td>
+                                                 <td class="text-center">{{item.ClubName}}</td>
+                                                 <td class="text-center">{{item.Status}}</td>
+
+                                            </tr>
+                                        </tbody>
+                                    </table>
+
+                                    <dir-pagination-controls boundary-links="true" template-url="~/assets/angular/lib/dirPagination.tpl.html"></dir-pagination-controls>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row" >           
+                    <div class="col-lg-12">
+                        <div class="tableh">
+                            @ViewBag.Title Change Request
+                        </div>
+                    </div>
+                    <div class="col-lg-12">
+                        <div class="portlet-body" @*ng-show="RequestList.length>0"*@>
+                            <div class="table-container">
+                                <div id="sample_3_wrapper" class="dataTables_wrapper no-footer">
+                                    <form name="formCommonFeilds"  class="form-horizontal" ng-submit="ChangeClub();submitted=true" id="form_sample_1" novalidate autocomplete="off">
+                                        <div  class="modal-body">
+                                            <div class="form-body">
+                                                <div class="row">
+                                                    <div class="col-md-6">
+                                                        <div class="form-group row" ng-class="{ 'has-error' : submitted && formCommonFeilds.ToClubId.$invalid}">
+                                                            <label class="col-lg-2 col-md-6 col-sm-6 control-label">
+                                                                ECA Club:
+                                                                <span class="required">*</span>
+                                                            </label>
+                                                            <div class="col-lg-10 col-md-6 col-sm-6">
+                                                                <select class="form-control" ng-model="Club.ToClubId" name="ToClubId" ng-options="C.ClubId as C.ClubName for C in ClubList" required>
+                                                                    <option value="" selected="selected">Choose Option</option>
+                                                                </select>
+                                                                <div class="form-control-focus"> </div>
+                                                                <span style="color:red" ng-show="submitted && formCommonFeilds.ToClubId.$error.required" class="help-block">ECA Club Required</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div class="form-group row" ng-class="{ 'has-error' : submitted && formCommonFeilds.Reason.$invalid}">
+                                                            <label class="col-lg-2 col-md-6 col-sm-6 control-label">
+                                                               Reason:
+                                                                <span class="required">*</span>
+                                                            </label>
+                                                            <div class="col-lg-10 col-md-6 col-sm-6">
+                                                                <textarea class="form-control" cols="15" rows="8" ng-model="Club.Reason" name="Reason" required></textarea> 
+                                                                <div class="form-control-focus"> </div>
+                                                                <span ng-show="submitted && formCommonFeilds.Reason.$error.required" style="color:red" class="help-block">Reason Required</span>
+                                                            </div>
+                                                        </div>
+                                                        
+                                                   </div>
+                                                    <div>
+                                                        <p>
+                                                            Changing Fee 1000 taka.
+                                                        </p>
+                                                    </div>
+                                                    <div @*class="pull-right"*@ style="margin-left: 84%;">
+                                                        <button type="reset" class="btn btn-danger">Reset</button>
+                                                        <button type="submit"  class="btn btn-success">Submit</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                    </form> 
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>  @*Change Request*@
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="tableh">
+                            @ViewBag.Title Changing History
+                        </div>
+                    </div>
+                    <div class="col-lg-12">
+                        <div class="portlet-body">
+                            <div class="table-container">
+                                <div id="sample_3_wrapper" class="dataTables_wrapper no-footer">
+                                    @*<div class="row">
+                                <div class="col-md-4 col-sm-5 col-xs-6">
+                                    <div class="form-group row">
+                                        <div class="col-md-2 col-sm-5  col-xs-4">
+                                            <label for="search" class="control-label" style="padding-top: 5px;">Items</label>
+                                        </div>
+                                        <div class="col-lg-4 col-md-8 col-sm-4 col-xs-8" style="padding-left:0px">
+                                            <select class="form-control" ng-model="pageSize" ng-options="P.value as P.text for P in pageSizeArray"></select>
+                                        </div>
+
+                                    </div>
+                                </div>
+                                <div class="col-md-5 col-sm-3 col-xs-1">
+                                </div>
+                                <div class="col-md-3 col-sm-4 col-xs-5">
+                                    <div id="sample_3_filter" class="pull-right">
+                                        <input ng-model="q" id="search" class="form-control" placeholder="Filter text">
+                                    </div>
+                                </div>
+                            </div>*@
+                                    <div class="table-scrollable"> </div>
+                                    <table class="table table-bordered table-inverse">
+                                        <thead class="btnColor">
+                                            <tr>
+                                                <th>Changed To</th>
+                                                <th class="text-center">Changed From</th>
+                                                <th class="text-center">Requested On</th>
+                                                
+                                            </tr>
+                                        </thead>
+                                        <tbody style="overflow:scroll">
+                                            @*<tr ng-show="ECAChangingHistory.length <= 0"><td colspan="5" style="text-align:center;"><i class="fa fa-refresh"></i> Loading new data!!</td></tr>*@
+                                           <tr dir-paginate="item in ECAChangingHistory | filter:q  | itemsPerPage: pageSize " current-page="currentPage" ng-style="{'background-color':$even?evenColor:oddColor}">
+                                               <td>{{item.ChangedTo}}</td>
+                                               <td class="text-center">{{item.ChangedFrom}}</td>
+                                            <td class="text-center">{{item.ChangingDate | date:"dd/MM/yyyy"}}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+
+                                    <dir-pagination-controls boundary-links="true" template-url="~/assets/angular/lib/dirPagination.tpl.html"></dir-pagination-controls>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+             </div>
+        </div>
+    </div>
+</div>
+@section Scripts{
+ <script type="text/javascript">
+     OEMSApp.controller("ECAListClt", ["$scope", "$http", "SweetAlert", "blockUI", "$window", "$filter",
+                     function ($scope, $http, SweetAlert, blockUI, $window, $filter) {
+                         init();
+                         function init() {
+                             initialize();
+                             GetECAChangingHistory();
+                             GetECAList();
+                             
+                         }
+                         function initialize() {
+                             $scope.oddColor = '#E4F4F7';
+                             $scope.ECAChangingHistory = [];
+                             $scope.showing = false;
+                             $scope.pageSizeArray = [];
+                             $scope.pageSizeArray.push({ value: 5, text: 5 });
+                             $scope.pageSizeArray.push({ value: 10, text: 10 });
+                             $scope.pageSizeArray.push({ value: 20, text: 20 });
+                             $scope.pageSizeArray.push({ value: 50, text: 50 });
+                             $scope.currentPage = 1;
+                             $scope.pageSize = 10;    
+                         };
+                        $scope.AddECA = function AddECA() {
+                            window.open('@Url.Action("AddECA", "ECA")', '_blank');
+                            $scope.showing = true;
+                         }
+                         $scope.ChangeClub = function ChangeClub() {
+                             if ($scope.formCommonFeilds.$invalid)
+                                 return;
+                             $http({
+                                 method: 'POST',
+                                 url: baseUrl + 'PortalECA/ChangeECAClub/',
+                                 data:$scope.Club
+                             }).then(function successCallback(response) {
+                                 toastr["success"](response.data.message);
+                                 $scope.Club = {};
+                                 $scope.submitted = false;
+                                 GetECAChangingHistory();
+                             }, function errorCallback(response) {
+                                 $scope.Club = {};
+                                 $scope.submitted = false;
+                                 GetECAChangingHistory();
+                                 toastr["error"](response.data.Message);
+                             });
+                         }
+                         function ECAClubList() {
+                             $scope.ClubList = [];
+                             $http({
+                                 method: 'GET',
+                                 url: baseUrl + 'PortalECA/GetDaywiseClubListByStudentID/'
+                             }).then(function SuccessCallback(response) {
+                                 $scope.ClubList = response.data.results;
+                
+                                 //console.log($scope.ClubList);
+                             }, function errorCallback(reponse) { });
+                         }
+                         $scope.Check = function () {
+                             toastr["warning"]('You can apply only Twice.');
+                         }
+                         function GetECAList() {
+                             $scope.ECAList = [];
+                             $http({
+                                 method: 'GET',
+                                 url: baseUrl + 'PortalECA/GetECAListByStuID/'
+                             }).then(function SuccessCallback(response) {
+                                 $scope.ECAList = response.data.results;
+                                 angular.forEach($scope.ECAList, function (item, key) {
+                                     //alert(item.Status);
+                                     if (item.Status == 'Approved') {
+                                         ECAClubList();
+                                     }
+                                 });
+
+                             }, function errorCallback(reponse) { });
+                         }
+
+                         function GetECAChangingHistory() {
+                             $scope.ECAChangingHistory = [];
+                             $http({
+                                 method: 'GET',
+                                 url: baseUrl + 'PortalECA/GetECAChangingHistory/'
+                             }).then(function SuccessCallback(response) {
+                                 $scope.ECAChangingHistory = response.data.results;
+                             }, function errorCallback(reponse) { });
+                         }
+
+                     }]);
+    </script>
+}
+

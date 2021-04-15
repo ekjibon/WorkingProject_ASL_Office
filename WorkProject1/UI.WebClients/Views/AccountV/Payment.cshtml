@@ -1,0 +1,666 @@
+﻿@{
+    ViewBag.Title = "Payment";
+}
+<div class="kt-container  kt-container--fluid  kt-grid__item kt-grid__item--fluid" ng-controller="AcPaymentCtrl">
+    <!-- Begin: life time stats -->
+    <div class="row">
+        <div class="kt-portlet kt-portlet--mobile">
+            <div class="kt-portlet__head kt-portlet__head--lg">
+                <div class="kt-portlet__head-label">
+                    <span class="kt-portlet__head-icon">
+                        @*<i class="kt-font-brand flaticon2-line-chart"></i>*@
+                    </span>
+                    <h3 class="kt-portlet__head-title">
+                        <!----Titel Text-->
+                     
+                        <span class="caption-subject font-green sbold uppercase">@ViewBag.Title</span>
+                        <!----Titel Text -->
+                    </h3>
+                </div>
+                <div class="kt-portlet__head-toolbar">
+                    <div class="kt-portlet__head-wrapper">
+                        <div class="dropdown dropdown-inline">
+                            @*<button type="button" class="btn btn-brand btn-icon-sm" data-toggle="modal" data-target="#addmodal" aria-haspopup="true" aria-expanded="false">
+                               
+                                <i class="flaticon2-plus"></i> Add New
+                   
+                            </button>*@
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="kt-portlet__body">
+
+                <form name="addform" ng-submit="save()" class="form-horizontal" id="form_sample_1" novalidate autocomplete="off">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="form-group row" ng-class="{ 'has-error' : submitted && addform.name.$invalid}">
+                                <label class="col-md-5 control-label" style="text-align:right">
+                                    Fiscal Year:
+                                </label>
+                                <div class="col-md-7">
+                                    @*<input type="text" class="form-control" ng-model="" placeholder="Fiscal Year" name="name" disabled>*@
+                                    <label>{{FiscalYear}}</label>
+                                    <input type="hidden" name="FisId" value="{{vm.FiscalYearId}}" ng-model="vm.FiscalYearId" />
+                                    <div class="form-control-focus"> </div>
+                                    <span ng-show="submitted &&  addform.name.$error.required" class="help-block">Name Required</span>
+                                </div>
+                            </div>
+                            <div class="form-group row" ng-class="{ 'has-error' : submitted && addform.BranchId.$invalid}">
+                                <label class="col-md-5 control-label" style="text-align:right">
+                                    Account Branch :
+                                    <span class="required">*</span>
+                                </label>
+                                <div class="col-md-7">
+                                    <select class="form-control" ng-model="vm.AccBranchId" required name="BranchId" ng-options="acpayment.AccBranchId as acpayment.Name for acpayment in AcBranchlist">
+                                        <option value="" selected="selected">Choose Option</option>
+                                    </select>
+
+                                    <div class="form-control-focus"> </div>
+                                    <span ng-show="submitted && addform.BranchId.$error.required" class="help-block">Branch Required</span>
+                                </div>
+
+                            </div>
+
+                            <div class="form-group row" ng-show="vm.PayMode==2" ng-class="{ 'has-error' : submitted && addform.cheque.$invalid}">
+                                <label class="col-md-5 control-label" style="text-align:right">
+                                    Cheque No:
+                                    <span class="required">*</span>
+                                </label>
+                                <div class="col-md-7">
+                                    <input type="text" ng-model="vm.ChequeNo" ng-required="vm.PayMode==2" name="cheque" placeholder="Enter Cheque No"
+                                           class="form-control">
+                                    <div class="form-control-focus"> </div>
+                                    <span ng-show="submitted && addform.cheque.$error.required" class="help-block">Cheque No Required</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="form-group row" ng-class="{ 'has-error' : submitted && addform.Date.$invalid}">
+                                <label class="col-md-4 control-label" style="text-align:right">
+                                    Date:
+                                    <span class="required">*</span>
+                                </label>
+                                <div class="col-md-8">
+                                    <input class="form-control" type="text" ng-click="p1=true" is-open="p1" readonly placeholder="Date" ng-model="vm.Date" uib-datepicker-popup="dd/MM/yyyy" name="Date" required />
+                                    <span ng-show="submitted &&  addform.Date.$error.required" class="help-block">Date Required</span>
+                                </div>
+                            </div>
+                            <div class="form-group row" ng-class="{ 'has-error' : submitted && addform.PayTo.$invalid}">
+                                <label class="col-md-4 control-label" style="text-align:right">
+                                    Pay To :
+                                    <span class="required">*</span>
+                                </label>
+                                <div class="col-md-8">
+                                    <input type="text" ng-model="vm.PayTo" name="PayTo" required placeholder="Enter Account Name / Person Name"
+                                           class="form-control">
+                                    <div class="form-control-focus"> </div>
+                                    <span ng-show="submitted &&  addform.PayTo.$error.required" class="help-block">Pay To Required</span>
+                                </div>
+                            </div>
+                            <div class="form-group row" ng-class="{ 'has-error' : submitted && addform.ChequeDate.$invalid}" ng-show="vm.PayMode==2">
+                                <label class="col-md-4 control-label" style="text-align:right">
+                                    Cheque Date:
+                                    <span class="required">*</span>
+                                </label>
+                                <div class="col-md-8">
+                                    <input class="form-control" type="text" ng-required="vm.PayMode==2" ng-click="p2=true" is-open="p2" readonly placeholder="Date" ng-model="vm.ChequeDate" uib-datepicker-popup="dd/MM/yyyy" name="ChequeDate" />
+                                    <span ng-show="submitted &&  addform.ChequeDate.$error.required" class="help-block">Date Required</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group row" ng-class="{ 'has-error' : submitted && addform.Description.$invalid}">
+                                <label class="col-md-4 control-label" style="text-align:right">
+                                    Description:
+                                </label>
+                                <div class="col-md-8">
+                                    <textarea rows="4" class="form-control" ng-model="vm.Remarks" placeholder="Description" name="Description" style="height: 40px;"></textarea>
+                                    <div class="form-control-focus"> </div>
+                                    <span ng-show="submitted &&  addform.Description.$error.required" class="help-block">Description Required</span>
+                                </div>
+                            </div>
+
+                            <div class="form-group row" ng-class="{ 'has-error' : submitted && addform.PaymentType.$invalid}">
+                                <label class="col-md-4 control-label" style="text-align:right">
+                                    Pay Mode :
+                                </label>
+                                <div class="col-md-8">
+                                    <select class="form-control" required name="PaymentType" ng-model="vm.PayMode" ng-change="resetFormPaymode();$scope.state= true;">
+                                        <option selected value="">Choose Options</option>
+                                        <option value="2">Cheque</option>
+                                        <option value="1">Cash</option>
+                                        <option value="3">On Credit</option>
+                                        <option value="4">Bank</option>
+                                    </select>
+                                    <div class="form-control-focus"> </div>
+                                    <span ng-show="submitted &&  addform.PaymentType.$error.required" class="help-block">Payment Type Required</span>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div style="height:2px;border-width:0;color:gray;background-color:gray;opacity:0.2;margin-bottom:10px;"></div>
+
+                    <div class="row" ng-show="$scope.state">
+                        <div class="col-lg-7">
+                            <p style="margin-bottom:0; text-align:center; font-size:18px;">Debit</p>
+                            <table class="table table-bordered table-hover rounded">
+                                <thead>
+                                    <tr class="btn-primary">
+                                        <th>Ledger Name</th>
+                                        <th style="width:45%">Cost Center Details</th>
+                                        <th class="center">Amount</th>
+                                        <th style="width:10%">Action</th>
+                                        <th style="width:15%">Current Balance</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="drRow  in vm.TransactionDetail | filter:{DC:1}:true">
+                                        <td>
+                                            <input type="text" ng-model="drRow.SearchLedger" typeahead-on-select='onSelect($item, $model, $label,drRow)' placeholder="Search Ledger by Name"
+                                                   uib-typeahead="i  as i.Text for i in SearchDR($viewValue)" typeahead-loading="loadingLocations" typeahead-no-results="noResults" class="form-control">
+                                            <i ng-show="loadingLocations" class="glyphicon glyphicon-refresh"></i>
+                                            <div ng-show="noResults"><i class="glyphicon glyphicon-remove"></i> No Results Found</div>
+                                        </td>
+                                        <td>
+                                            <table class="table">
+                                                <tr ng-repeat="drRowCC  in drRow.lsCostCenter ">
+                                                    <td>
+                                                        <input type="text" ng-model="drRowCC.SearchLedger" typeahead-on-select='onSelectcc($item, $model, $label,drRowCC)' placeholder="Search Cost Center"
+                                                               uib-typeahead="i  as i.Text for i in SearchCostCenter($viewValue)" typeahead-loading="loadingLocations" typeahead-no-results="noResults1" class="form-control">
+                                                        <i ng-show="loadingLocations" class="glyphicon glyphicon-refresh"></i>
+                                                        <div ng-show="noResults1"><i class="glyphicon glyphicon-remove"></i> No Results Found</div>
+                                                    </td>
+                                                    <td>
+                                                        <input ng-change="calculationCC($index)" type="text" onkeypress='return (event.charCode >= 48 && event.charCode <= 57) ||
+    event.charCode == 0 || event.charCode == 46' ng-disabled="drRow.LedgerId == ''" class="form-control" ng-model="drRowCC.Amount" placeholder="Amount" name="Amount" required>
+                                                    </td>
+                                                    <td>
+                                                        <div class="btn-group">
+                                                            <button type="button" ng-click="addRowCC(drRow)" class="btn btn-outline-primary btn-elevate btn-icon" style="margin-right:5px;"><i class="fa fa-plus"></i></button>
+                                                            <button type="button" ng-click="removeRowcc(drRowCC)" class="btn btn-outline-danger btn-elevate btn-icon"><i class="fa fa-minus"></i></button>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </td>
+                                        <td>
+                                            <input type="text" ng-change="calculation();calculationCC($index)" onkeypress='return (event.charCode >= 48 && event.charCode <= 57) ||
+    event.charCode == 0 || event.charCode == 46' ng-disabled="drRow.LedgerId == ''" class="form-control" ng-model="drRow.Amount" placeholder="Amount" name="Amount" required>
+                                        </td>
+                                        <td>
+                                            <div class="btn-group">
+                                                <button type="button" ng-click="addRow(1)" class="btn btn-outline-primary btn-elevate btn-icon" style="margin-right:5px;"><i class="fa fa-plus"></i></button>
+                                                <button type="button" ng-click="removeRow(drRow)" class="btn btn-outline-danger btn-elevate btn-icon"><i class="fa fa-minus"></i></button>
+                                            </div>
+                                        </td>
+                                        <td ng-model="drRow.CurrentBalance">
+                                            {{drRow.CurrentBalance}}
+                                        </td>
+                                    </tr>
+
+                                    <tr>
+                                        <td colspan="5" class="text-center" ng-model="vm.DrTotal">Total Debit: {{vm.DrTotal}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="col-lg-5">
+                            <p style="margin-bottom:0; text-align:center; font-size:18px;">Credit</p>
+                            <table class="table table-bordered table-hover rounded">
+                                <thead>
+                                    <tr class="btn-primary">
+                                        <th>Ledger Name</th>
+                                        <th class="center" style="width:25%">Amount</th>
+                                        <th style="width:18%">Action</th>
+                                        <th style="width:26%">Current Balance</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="crRow in vm.TransactionDetail | filter:{DC:2}:true">
+                                        <td>
+                                            @*<select ng-model="crRow.LedgerId" class="form-control js-data-example-ajax" name="Category" ng-change="GetLedgerByLedgerId(crRow)" ng-options="Ledger.LedgerId as Ledger.Name for Ledger in Ledgers">
+                                        <option value="">Select One</option>
+                                    </select>*@
+                                            <input type="text" ng-model="crRow.SearchLedger" typeahead-on-select='onSelect($item, $model, $label,crRow)' placeholder="Search Ledger by Name"
+                                                   uib-typeahead="i  as i.Text for i in SearchCR($viewValue)" typeahead-loading="loadingLocations" typeahead-no-results="noResults" class="form-control">
+                                            <i ng-show="loadingLocations" class="glyphicon glyphicon-refresh"></i>
+                                            <div ng-show="noResults"><i class="glyphicon glyphicon-remove"></i> No Results Found</div>
+                                        </td>
+                                        <td>
+                                            <input ng-change="calculation(crRow)" ng-model="crRow.Amount" ng-disabled="crRow.LedgerId == ''" type="text" onkeypress='return (event.charCode >= 48 && event.charCode <= 57) ||
+    event.charCode == 0 || event.charCode == 46' class="form-control" placeholder="Amount" name="Amount" required>
+                                        </td>
+                                        <td>
+                                            <div class="btn-group">
+                                                <button type="button" ng-click="addRow(2)" class="btn btn-outline-primary btn-elevate btn-icon" style="margin-right:5px;"><i class="fa fa-plus"></i></button>
+                                                <button type="button" ng-click="removeRow(crRow)" class="btn btn-outline-danger btn-elevate btn-icon"><i class="fa fa-minus"></i></button>
+                                            </div>
+                                        </td>
+                                        <td ng-model="crRow.CurrentBalance">
+                                            {{crRow.CurrentBalance}}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="4" class="text-center" ng-model="Contra.CrTotal">Total Credit: {{vm.CrTotal}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="row" ng-show="hideSave">
+                        <div class="col-lg-12 text-center">
+                            <span class="font-red bold uppercase">
+                                <p style="margin-bottom:0">Debit and Credit amount needs to be same!</p><br />
+                                <p>Differents: {{vm.DifDrTotal}}</p>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-12 text-right">
+                            <button type="submit" ng-show="!hideSave" ng-click="submitted=true" class="btn btn-success"><i class="fa fa-save"></i> Save</button>
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+
+
+
+   
+    <!-- End: life time stats -->
+
+</div>
+
+@section Scripts{
+    <script type="text/javascript">
+        OEMSApp.controller("AcPaymentCtrl", ["$scope", "$http", "SweetAlert", "$filter",
+              function ($scope, $http, SweetAlert, $filter) {
+
+                  init();
+                  function init() {
+                      initialize();
+                      GetActiveFiscalYear();
+                      calculation();
+                      getAcBranchlist();
+
+                  }
+                  function initialize() {
+                      $scope.submitted = false;
+                      $scope.currentPage = 1;
+                      $scope.pageno = 1;
+                      $scope.pagesize = 10;
+                      $scope.total_count = 12;
+                      $scope.search = '';
+                      $scope.res = {};
+                      $scope.data = {};
+                      $scope.resetForm = resetForm;
+                      $scope.resetFormPaymode = resetFormPaymode;
+                      $scope.calculation = calculation;
+                      $scope.calculationCC = calculationCC;
+                      $scope.hstep = 1;
+                      $scope.mstep = 15;
+                      $scope.CommonFeilds = [];
+                      $scope.vm = {};
+                      $scope.vm.TransactionDetail = [];
+                      $scope.vm.lsCostCenter = [];
+                      $scope.vm.lsCostCenter.push({ LedgerId: 0, CostCenterId: 0, Amount: 0 });
+                      $scope.vm.TransType = 2;
+                      $scope.hideSave = false;
+                      $scope.state= false;
+                      $scope.vm.TransactionDetail.push({ LedgerId: 0, Amount: 0, CurrentBalance: 0, DC: 2 });
+                      $scope.vm.TransactionDetail.push({ LedgerId: 0, Amount: 0, CurrentBalance: 0, DC: 1, lsCostCenter: $scope.vm.lsCostCenter });
+                      
+                      $scope.VoucherNo = 0;
+
+                      $scope.pageSizeArray = [];
+                      $scope.pageSizeArray.push({ value: 5, text: 5 });
+                      $scope.pageSizeArray.push({ value: 10, text: 10 });
+                      $scope.pageSizeArray.push({ value: 20, text: 20 });
+                      $scope.pageSizeArray.push({ value: 50, text: 50 });
+                      $scope.currentPage = 1;
+                      $scope.pageSize = 10;
+
+                  }
+                  function resetForm() {
+                      $scope.addform.$setUntouched();
+                      $scope.addform.$setPristine();
+                      $scope.submitted = false;
+                      $scope.vm = {};
+                      GetActiveFiscalYear();
+                      $scope.vm.TransType = 2;
+                      $scope.vm.TransactionDetail = [];
+                      $scope.vm.lsCostCenter = [];
+                      $scope.vm.lsCostCenter.push({ LedgerId: 0, CostCenterId: 0, Amount: 0 });
+                      $scope.hideSave = false;
+                      $scope.vm.TransactionDetail.push({ LedgerId: 0, Amount: 0, CurrentBalance: 0, DC: 2 });
+                      $scope.vm.TransactionDetail.push({ LedgerId: 0, Amount: 0, CurrentBalance: 0, DC: 1, lsCostCenter: $scope.vm.lsCostCenter });
+                      
+                      
+                  }
+                  function resetFormPaymode() {
+                      $scope.vm.TransactionDetail = [];
+                      $scope.vm.lsCostCenter = [];
+                      $scope.vm.lsCostCenter.push({ LedgerId: 0, CostCenterId: 0, Amount: 0 });
+                      $scope.hideSave = false;
+                      $scope.vm.TransactionDetail.push({ LedgerId: 0, Amount: 0, CurrentBalance: 0, DC: 2 });
+                      $scope.vm.TransactionDetail.push({ LedgerId: 0, Amount: 0, CurrentBalance: 0, DC: 1, lsCostCenter: $scope.vm.lsCostCenter });
+                      
+                  }
+                  $scope.addRow = function (no) {
+
+                      if (no == 1) {
+                          var ccarrary = [];
+                          ccarrary.push({ LedgerId: 0, CostCenterId: 0, Amount: 0 });
+                          $scope.vm.TransactionDetail.push({ LedgerId: 0, Amount: 0, CurrentBalance: 0, DC: no, lsCostCenter: ccarrary });
+                      }
+                      else {
+                          $scope.vm.TransactionDetail.push({ LedgerId: '', Amount: 0, CurrentBalance: 0, DC: no });
+                      }
+                      calculation();
+                  }
+                  
+                  $scope.addRowCC = function (row) {
+
+                      row.lsCostCenter.push({ LedgerId: 0, CostCenterId: 0, Amount: 0 })
+                      
+
+                  }
+                 
+                  $scope.removeRow = function (row) {
+                      var index = $scope.vm.TransactionDetail.indexOf(row);
+                      if ($scope.vm.TransactionDetail.length > 2) {
+                          if (row.Amount > 0) {
+                              toastr["warning"]("Can't Delete Amount available!");
+                          } else {
+                              $scope.vm.TransactionDetail.splice(index, 1);
+                          }
+                      } else {
+                          toastr["warning"]("Atleast one Transaction needed!");
+                      }
+
+                      calculation();
+                  }
+                  $scope.removeRowcc = function (row) {
+                      var index = $scope.vm.lsCostCenter.indexOf(row);
+                      if ($scope.vm.lsCostCenter.length > 1) {
+                          if (row.Amount > 0) {
+                              toastr["warning"]("Can't Delete Amount available!");
+                          } else {
+                              $scope.vm.lsCostCenter.splice(index, 1);
+                          }
+                      } else {
+                          toastr["warning"]("Atleast one Cost center needed!");
+                      }
+
+                      calculation();
+                  }
+                  
+                  $scope.removeDrRow = function (index) {
+                      var index = $scope.Contra.DrRows.indexOf(index);
+                      $scope.vm.TransactionDetail.splice(index, 1);
+                      calculation();
+                  }
+                  function GetAllLedgers() {
+                      $scope.Ledgers = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Accounts/GetAllLedgers/'
+                      }).then(function successCallback(response) {
+                          $scope.Ledgers = response.data.results;
+                      }, function errorCallback(response) {
+                          //toastr["warning"](response.data.Message);
+                      });
+                  }
+
+                  $scope.GetLedgerByLedgerId = function (drRow) {
+                      drRow.CurrentBalance = 0;
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Accounts/GetLedgersByLedgerIdEdit/' + drRow.LedgerId
+                      }).then(function successCallback(response) {
+                          $scope.LedgersById = response.data.results;
+                          drRow.CurrentBalance = $scope.LedgersById[0].CurrentBalance
+                      }, function errorCallback(response) {
+                          //toastr["warning"](response.data.Message);
+                      });
+                  }
+
+                  function GetActiveFiscalYear() {
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Accounts/GetActiveFiscalYear/'
+                      }).then(function successCallback(response) {
+                          $scope.FiscalYears = response.data.results;
+                          $scope.vm.FiscalYearId = $scope.FiscalYears[0].Id;
+                          $scope.FiscalYear = $scope.FiscalYears[0].Name;
+                      }, function errorCallback(response) {
+                          //toastr["warning"](response.data.Message);
+                      });
+                  }
+
+
+                  function getAcBranchlist() {
+                      //$scope.CommonFeilds = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + '/Accounts/GetAllAssignedAccountBranch/'
+                      }).then(function successCallback(response) {
+                          $scope.AcBranchlist = response.data.results;
+                          //consol.log($scope.AcBranchlist);
+                      }, function errorCallback(response) {
+                      });
+                  }
+
+                  function calculationCC(n) {
+                      debugger;
+                      //$scope.vm.DrTotal = 0;
+                      //$scope.vm.CrTotal = 0;
+                      $scope.vm.CcTotal = 0;
+                      $scope.vm.IndexDrAmount = 0;
+                      $scope.IndexCCAmount = 0;
+                      angular.forEach($scope.vm.TransactionDetail, function (n, lsCostCenter) {
+                              //$scope.vm.DrTotal += num(value.Amount);
+                              var index = $scope.vm.TransactionDetail.indexOf(n);
+                          //    toastr["warning"](index);
+                              //$scope.vm.TransactionDetail[index].LedgerId = value.LedgerId;
+                              $scope.vm.IndexDrAmount = num(n.Amount);
+
+
+                              $scope.vm.CcTotal = 0;
+                              angular.forEach($scope.vm.lsCostCenter, function (value, key) {                                  
+                                      $scope.vm.CcTotal += num(value.Amount);
+                                      var index = $scope.vm.lsCostCenter.indexOf(value);
+                                      $scope.vm.lsCostCenter[index].Amount = value.Amount;                                    
+                                      $scope.vm.index = $scope.vm.lsCostCenter.indexOf(value);
+                                  //  $scope.IndexCCAmount = value.Amount;  
+                                      //if ($scope.vm.CcTotal > $scope.vm.IndexDrAmount) {
+                                      //    debugger;
+                                      //    toastr["warning"]("Cost Center amount and ledger amount are not same !!");
+                                      //}
+                              });
+
+                       
+                      });
+                      //if ($scope.vm.CcTotal > $scope.vm.IndexDrAmount) {
+                      //    $scope.vm.lsCostCenter[$scope.vm.index].Amount = "";                        
+                      //    toastr["warning"]("Cost Center amount and ledger amount are not same !!");
+                      //}
+                  }
+    
+
+                  function calculation() {
+                      $scope.hideSave = false;
+                      $scope.vm.DifDrTotal = 0
+                      $scope.vm.DrTotal = 0;
+                      $scope.vm.CrTotal = 0;
+                      //$scope.vm.CcTotal = 0;
+                      $scope.IndexDrAmount = 0;
+                      //$scope.IndexCCAmount = 0;
+                      angular.forEach($scope.vm.TransactionDetail, function (value, key) {
+                          if (value.DC == 1) {
+                              $scope.vm.DrTotal += num(value.Amount);
+                              var index = $scope.vm.TransactionDetail.indexOf(value);
+                              $scope.vm.TransactionDetail[index].DrAmount = value.Amount;
+                              $scope.IndexDrAmount = value.Amount;
+                          }
+                          if (value.DC == 2) {
+                              $scope.vm.CrTotal += num(value.Amount);
+                              var index = $scope.vm.TransactionDetail.indexOf(value);
+                              $scope.vm.TransactionDetail[index].CrAmount = value.Amount;
+                          }
+                          if ($scope.vm.CrTotal != $scope.vm.DrTotal) {
+                              if ($scope.vm.DrTotal > $scope.vm.CrTotal) {
+                                  $scope.vm.DifDrTotal = $scope.vm.DrTotal - $scope.vm.CrTotal;
+                              } else {
+                                  $scope.vm.DifDrTotal = $scope.vm.CrTotal - $scope.vm.DrTotal;
+                              }
+                              $scope.hideSave = true;
+                          } else {
+                              $scope.hideSave = false;
+                          }
+                      });
+                      //angular.forEach($scope.vm.lsCostCenter, function (value, key) {
+                      //    $scope.vm.CcTotal += num(value.Amount);
+                      //    var index = $scope.vm.lsCostCenter.indexOf(value);
+                      //    $scope.vm.lsCostCenter[index].Amount = value.Amount;
+                      //});
+                  }
+
+                  //for Ledger Search for auto complete text box ......
+                  $scope.SearchDR = function (val) {
+                      $scope.vm.AccType = 'DR';
+                      if (val.length >= 2)
+                          return $http.get(baseUrl + 'Accounts/SearchLedger/' + val + '/' + $scope.vm.TransType + '/' + $scope.vm.AccType + '/' + $scope.vm.PayMode,
+                           {
+                               params: {}
+                           }).then(function (response) {
+                               return response.data.results.map(function (item) {
+                                   return item;
+                               });
+                           });
+                  };
+
+                  $scope.SearchCR = function (val) {
+                      $scope.vm.AccType = 'CR';
+                      if (val.length >= 2)
+                          return $http.get(baseUrl + 'Accounts/SearchLedger/' + val + '/' + $scope.vm.TransType + '/' + $scope.vm.AccType + '/' + $scope.vm.PayMode,
+                           {
+                               params: {}
+                           }).then(function (response) {
+                               return response.data.results.map(function (item) {
+                                   return item;
+                               });
+                           });
+                  };
+
+                  // for dropdown select list event....
+                  $scope.onSelect = function onSelect($item, $model, $label, itemRow) {
+                      var hasLedger = 0;
+                      var keepGoing = true;
+                      if (keepGoing) {
+                          angular.forEach($scope.vm.TransactionDetail, function (value, key) {
+                              if (value.LedgerId == num($item.Value)) {
+                                  console.log("Item Found!");
+                                  //toastr["error"]("Ledger Allready selected!!!");
+                                  hasLedger = true;
+                                  keepGoing = false;
+                                  return;
+                              }
+                          });
+                      }
+                      if (hasLedger) {
+                          toastr["error"]("Ledger Allready selected!!!");
+                          itemRow.LedgerId = 0;
+                          itemRow.CurrentBalance = 0;
+                          return;
+                      }
+                      $scope.studentSearchs = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Accounts/GetLedgersByLedgerIdEdit/' + $item.Value
+                      }).then(function successCallback(response) {
+                          $scope.LedgersById = response.data.results;
+                          itemRow.CurrentBalance = $scope.LedgersById[0].CurrentBalance;
+                          itemRow.LedgerId = num($item.Value);
+                      }, function errorCallback(response) {
+                          toastr["error"](response.data.Message);
+                      });
+                  };
+
+                  
+
+                  $scope.SearchCostCenter = function (val) {
+                      if (val.length >= 2)
+                          return $http.get(baseUrl + 'Accounts/GetCostCenterforTransaction/' + val + '/' + $scope.LedgersById[0].LedgerId,
+                           {
+                               params: {}
+                           }).then(function (response) {
+                               return response.data.results.map(function (item) {
+                                   return item;
+                               });
+                           });
+                  };
+
+                  $scope.onSelectcc = function onSelectcc($item, $model, $label, itemRow) {
+                      itemRow.CostCenterId = num($item.Value);
+                     
+                  };
+
+
+
+                  $scope.save = function save() {
+                      if ($scope.addform.$invalid)
+                          return;
+                      if ($scope.vm.DrTotal == 0 || $scope.vm.CrTotal == 0) {
+                          toastr["error"]("Please insert at least one transaction");
+                          return;
+                      }
+                      //if ($scope.vm.DrTotal !=$scope.vm.CcTotal ) {
+                      //    toastr["error"]("Transaction amount and Cost center amount must be same");
+                      //    return;
+                      //}
+
+                      SweetAlert.swal({
+                          title: "Are you sure to Payment?", type: "info", showCancelButton: true, confirmButtonColor: "#DD6B55",
+                          confirmButtonText: "Yes, save it!",
+                          closeOnConfirm: false
+                      },
+                    function (isConfirm) {
+                      if (isConfirm) {
+                          $http({
+                              method: 'POST',
+                              url: baseUrl + 'Accounts/AddTransaction/',
+                              data: $scope.vm
+                          }).then(function successCallback(response) {
+                              $scope.submitted = true;
+                              resetForm();
+                              SweetAlert.swal("Saved!", response.data.message, "success");
+                              toastr["success"]('Saved Successfully!');
+                          }, function errorCallback(response) {
+                              toastr["error"](response.data.Message);
+                          });
+                      }
+                  });
+
+                  }
+                  function num(n) {
+
+                      if ($.isNumeric(n)) {
+                          return parseFloat(n);
+                      } else {
+                          return 0;
+                      }
+                  }
+
+              }]);
+    </script>
+}

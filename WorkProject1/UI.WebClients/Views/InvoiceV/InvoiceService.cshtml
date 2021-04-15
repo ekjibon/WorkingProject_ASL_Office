@@ -1,0 +1,305 @@
+﻿
+@{
+    ViewBag.Title = "Service";
+}
+
+<div class="kt-container  kt-container--fluid  kt-grid__item kt-grid__item--fluid" ng-controller="ctrlInvoiceService">
+    <div class="row">
+        <div class="kt-portlet kt-portlet--mobile">
+            <div class="kt-portlet__head kt-portlet__head--lg">
+                <div class="kt-portlet__head-label">
+                    <h3 class="kt-portlet__head-title">
+                        All Service
+                    </h3>
+                </div>
+                <div class="kt-portlet__head-toolbar">
+                    <div class="kt-portlet__head-wrapper">
+                        <div class="dropdown dropdown-inline">
+                            <button type="button" class="btn btn-brand btn-icon-sm" data-toggle="modal" data-target="#addmodal" aria-haspopup="true" aria-expanded="false">
+                                <i class="flaticon2-plus"></i> Add New Service
+                            </button>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="kt-portlet__body">
+
+
+                <div class="row">
+                    <div class="col-md-4 col-sm-5 col-xs-6">
+                        <div class="form-group">
+                            <div class="col-lg-3 col-md-5 col-sm-4 col-xs-8" style="padding-left:0px">
+
+                                <select class="form-control kt-font-brand" ng-model="pageSize" ng-options="P.value as P.text for P in pageSizeArray"></select>
+                            </div>
+
+                        </div>
+
+                    </div>
+                    <div class="col-md-4 col-sm-3 col-xs-1">
+                    </div>
+                    <div class="col-md-4 col-sm-4 col-xs-5">
+                        <div id="sample_3_filter" class="pull-right">
+                            <input ng-model="q" id="search" class="form-control" placeholder="Filter text">
+                        </div>
+                    </div>
+                </div>
+                <table class="table table-bordered table-hover rounded">
+                    <thead>
+                        <tr class="btn-primary">
+                            <th style="text-align:center">SL#</th>
+                            <th style="text-align:center">Service Name</th>
+                            <th style="text-align:center">Active Status</th>
+                            <th style="text-align:center">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-show="invoiceServiceList.length <= 0"><td colspan="5" style="text-align:center;"><i class="fa fa-refresh"></i> Loading new data!!</td></tr>
+                        <tr dir-paginate="item in invoiceServiceList| filter:q  | itemsPerPage: pageSize" current-page="currentPage">
+                            <td align="center">{{$index+1}}</td>
+                            <td align="center">{{item.ServiceName}}</td>
+
+                            <td align="center" ng-if="item.Status=='A'">
+                                <a class="label label-md label-primary" ng-click="changeActivityStatus(item)">Active</a>
+                            </td>
+
+                            <td align="center" ng-if="item.Status=='I'">
+                                <a class="label label-md label-warning" ng-click="changeActivityStatus(item)">Inactive</a>
+                            </td>
+
+                            <td align="center">
+                                <a href="javascript:;" class="btn btn-outline-brand btn-elevate btn-icon" ng-click="editInvoiceService(item)" data-target="#addmodal" data-toggle="modal">
+                                    <i class="fa fa-edit"></i>
+                                </a>
+                                <a ng-click="deleteInvoiceService(item.Id)" href="javascript:;" class="btn btn-outline-danger btn-elevate btn-icon">
+                                    <i class="fa fa-trash"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="row">
+                    <dir-pagination-controls boundary-links="true" template-url="~/assets/angular/lib/dirPagination.tpl.html"></dir-pagination-controls>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--Modal Area Start-->
+    <div id="addmodal" class="modal fade" tabindex="-1" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form name="addBasic" ng-submit="save()" class="form-horizontal" id="form_sample_1" novalidate autocomplete="off">
+                    <div class="modal-header">
+                        <h4 class="modal-title">{{modalTitle}}</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true" ng-click="resetForm();submitted=false"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-body">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group row" ng-class="{ 'has-error' : submitted && addBasic.ServiceName.$invalid}">
+                                        <label class="col-md-4 control-label">
+                                            Service Name :
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-8">
+                                            <input type="text" ng-model="invoiceService.ServiceName" class="form-control" placeholder="Service Name" name="ServiceName" required>
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted &&  addBasic.ServiceName.$error.required" class="help-block">Service Name Required</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" data-dismiss="modal" class="btn btn-secondary" ng-click="resetForm();submitted=false">Cancel</button>
+                        <button type="submit" ng-click="submitted=true" class="btn btn-success">{{modalbutton}}</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!--Modal Area End-->
+</div>
+
+@section Scripts{
+
+    <script type="text/javascript">
+        OEMSApp.controller("ctrlInvoiceService", ["$scope", "$http", "SweetAlert",
+              function ($scope, $http, SweetAlert) {
+                  init();
+                  function init() {
+                      initialize();
+                      getAllInvoiceService();
+                  }
+
+                  function initialize() {
+                      $scope.modalbutton = 'Save';
+                      $scope.modalTitle = 'Add New Service';
+
+                      //new Invoice Service
+                      $scope.invoiceService = {};
+                      $scope.invoiceServiceList = [];
+                      $scope.resetForm = resetForm;
+
+                      $scope.checkUpdateId = 0;
+                      $scope.pagesize = 10;
+                      $scope.pageSizeArray = [];
+                      $scope.pageSizeArray.push({ value: 5, text: 5 });
+                      $scope.pageSizeArray.push({ value: 10, text: 10 });
+                      $scope.pageSizeArray.push({ value: 20, text: 20 });
+                      $scope.pageSizeArray.push({ value: 50, text: 50 });
+                      $scope.currentPage = 1;
+                      $scope.pageSize = 10;
+                  }
+
+                  function getAllInvoiceService() {
+                      $scope.clientList = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Invoice/GetAllInvoiceService/'
+                      }).then(function successCallback(response) {
+                          $scope.invoiceServiceList = response.data.results;
+                          console.log($scope.invoiceServiceList);
+                      }, function errorCallback(response) {
+                          toastr["info"](response.data.Message);
+                      });
+                  }
+                  $scope.changeActivityStatus = function changeActivityStatus(item) {
+                      $scope.invoiceService.Id = item.Id;
+                      $scope.invoiceService.Status = item.Status;
+
+                      SweetAlert.swal({
+                          title: "Are you sure you want to change Activity Status ?", type: "warning", showCancelButton: true, confirmButtonColor: "#DD6B55",
+                          confirmButtonText: "Yes, change it!",
+                          closeOnConfirm: true
+                      },
+                        function (isConfirm) {
+                            if (isConfirm) {
+                                $http({
+                                    method: 'PUT',
+                                    url: baseUrl + 'Invoice/changeActivityStatus/',
+                                    data: $scope.invoiceService
+                                }).then(function successCallback(response) {
+                                    toastr["info"](response.data.message);
+                                    if (response.data.httpStatusCode != 305) {
+                                        getAllInvoiceService();
+                                        resetForm();
+                                    }
+
+                                }, function errorCallback(response) {
+                                    toastr["warning"](response.data.Message);
+                                });
+                            }
+                        });
+                  }
+                  $scope.save = function save() {
+                      if ($scope.addBasic.$invalid)
+                          return;
+                      else {
+
+                          var result = validation();
+                          if (result) {
+                              if ($scope.checkUpdateId != 10002) {
+                                  $http({
+                                      method: 'POST',
+                                      url: baseUrl + 'Invoice/AddInvoiceService/',
+                                      data: $scope.invoiceService
+                                  }).then(function successCallback(response) {
+                                      $('#addmodal').modal('toggle');
+                                      toastr["info"](response.data.message);
+                                      getAllInvoiceService();
+                                      resetForm();
+                                  }, function errorCallback(response) {
+                                      toastr["warning"](response.data.Message);
+                                  });
+                              }
+                              if ($scope.checkUpdateId == 10002) {
+                                  $http({
+                                      method: 'PUT',
+                                      url: baseUrl + 'Invoice/UpdateInvoiceService/',
+                                      data: $scope.invoiceService
+                                  }).then(function successCallback(response) {
+                                      toastr["info"](response.data.message);
+                                      if (response.data.httpStatusCode != 305) {
+                                          $('#addmodal').modal('toggle');
+                                          getAllInvoiceService();
+                                          resetForm();
+                                      }
+
+                                  }, function errorCallback(response) {
+                                      toastr["warning"](response.data.Message);
+                                  });
+                              }
+                              
+                          }
+                      }
+                  }
+                  $scope.deleteInvoiceService = function deleteInvoiceService(id) {
+                      SweetAlert.swal({
+                          title: "Are you sure to delete it ?", type: "warning", showCancelButton: true, confirmButtonColor: "#DD6B55",
+                          confirmButtonText: "Yes, delete it!",
+                          closeOnConfirm: false
+                      },
+                        function (isConfirm) {
+                            if (isConfirm) {
+                                $http({
+                                    method: 'DELETE',
+                                    url: baseUrl + 'Invoice/DeleteInvoiceService/' + id,
+                                }).then(function successCallback(response) {
+                                    SweetAlert.swal("Deleted!", "Your data has been deleted.", "success");
+                                    getAllInvoiceService();
+                                }, function errorCallback(response) {
+                                    toastr["error"](response.data.Message);
+                                });
+                            }
+                        });
+                  }
+
+                  $scope.editInvoiceService = function editInvoiceService(item) {
+                      console.log(item);
+                      $scope.modalTitle = "Update Service";
+                      $scope.modalbutton = 'Update';
+                      $scope.invoiceService.Id = item.Id;
+                      $scope.invoiceService.ServiceName = item.ServiceName;
+                      $scope.invoiceService.Status = item.Status;
+
+                      $scope.checkUpdateId = 10002;
+                  }
+
+                  function resetForm() {
+                      $scope.modalTitle = "Add New Service";
+                      $scope.invoiceService = {};
+                      $scope.Id = '';
+                      $scope.checkUpdateId = 0;
+                      $scope.addBasic.$setUntouched();
+                      $scope.addBasic.$setPristine();
+                      $scope.submitted=false;
+                      $scope.modalbutton = 'Save';
+                  }
+
+                  function validation() {
+
+                      if ($scope.invoiceService.Id == undefined) {
+                          return true;
+                      }
+                      else {
+                          if ($scope.invoiceService.ServiceName == null) {
+                              toastr["info"]("Please Select any option..!");
+                              return false;
+                          }
+                          else {
+                              
+                              return true;
+                          }
+                      }
+                  }
+               }]);
+
+    </script>
+}
+

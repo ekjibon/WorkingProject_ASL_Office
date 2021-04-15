@@ -1,0 +1,167 @@
+﻿
+@{
+    ViewBag.Title = "PaymentYearly";
+}
+
+<div ng-controller="PaymentearlyCtrl">
+
+
+
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="fessPayment">
+                <h3>Yearly Payment Summary</h3>
+
+                <div class="table-responsive recentAtnTable headerFixTable">
+                    <table class="table table-striped">
+                        <thead class="tableHead">
+                            <tr>
+                                <th scope="col">Details</th>
+                                <th scope="col">Year</th>
+                                <th scope="col">Jan</th>
+                                <th scope="col">Feb</th>
+                                <th scope="col">Mar</th>
+                                <th scope="col">Apr</th>
+                                <th scope="col">May</th>
+                                <th scope="col">Jun</th>
+                                <th scope="col">Jul</th>
+                                <th scope="col">Aug</th>
+                                <th scope="col">Sep</th>
+                                <th scope="col">Oct</th>
+                                <th scope="col">Nov</th>
+                                <th scope="col">Dec</th>
+                                <th scope="col">Total</th>
+
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-show="PaymentsYearly.length <= 0"><td colspan="15" style="text-align:center;"><i class="fa fa-refresh"></i> Loading new data!!</td></tr>
+                            <tr dir-paginate="item in PaymentsYearly| filter:q  | itemsPerPage: pageSize" current-page="currentPage">
+                                <td class="ng-style: item.Dt=='Total Paid' && {'font-weight':' bold'}">{{item.Dt}}</td>
+                                <td class="ng-style: item.Dt=='Total Paid' && {'font-weight':' bold'}">{{item.Year}}</td>
+                                <td class="ng-style: item.Dt=='Total Paid' && {'font-weight':' bold'}">{{item.January}}</td>
+                                <td class="ng-style: item.Dt=='Total Paid' && {'font-weight':' bold'}">{{item.February}}</td>
+                                <td class="ng-style: item.Dt=='Total Paid' && {'font-weight':' bold'}">{{item.March}}</td>
+                                <td class="ng-style: item.Dt=='Total Paid' && {'font-weight':' bold'}">{{item.April}}</td>
+
+                                <td class="ng-style: item.Dt=='Total Paid' && {'font-weight':' bold'}">{{item.May}}</td>
+                                <td class="ng-style: item.Dt=='Total Paid' && {'font-weight':' bold'}">{{item.June}}</td>
+                                <td class="ng-style: item.Dt=='Total Paid' && {'font-weight':' bold'}">{{item.July}}</td>
+                                <td class="ng-style: item.Dt=='Total Paid' && {'font-weight':' bold'}">{{item.August}}</td>
+
+                                <td class="ng-style: item.Dt=='Total Paid' && {'font-weight':' bold'}">{{item.September}}</td>
+                                <td class="ng-style: item.Dt=='Total Paid' && {'font-weight':' bold'}">{{item.October}}</td>
+                                <td class="ng-style: item.Dt=='Total Paid' && {'font-weight':' bold'}">{{item.November}}</td>
+                                <td class="ng-style: item.Dt=='Total Paid' && {'font-weight':' bold'}">{{item.December}}</td>
+
+                                <td id="totalamt"></td>
+
+                            </tr>
+
+
+                        </tbody>
+                        @*<tfoot>
+                               <tr><td colspan="2" style="text-align:Right;"> Total</td>
+                                   <td>{{PaymentSum.TotalAmount}}</td>
+                                   <td>{{PaymentSum.DueAmount}}</td>
+                                   <td></td>
+                                   <td>{{PaymentSum.DiscountAmount}}</td>
+                                   <td>{{PaymentSum.PaidAmount}}</td>
+                                   <td>{{PaymentSum.AdvanceAmount}}</td>
+                               </tr>
+
+
+                            </tfoot>*@
+                    </table>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+@section Scripts{
+
+
+    <script type="text/javascript">
+
+        OEMSApp.controller("PaymentearlyCtrl", ["$scope", "$http", "SweetAlert", "blockUI", "$window", "$filter",
+   function ($scope, $http, SweetAlert, blockUI, $window, $filter) {
+       init();
+
+       function init() {
+
+
+
+           getPaymentYearly();
+
+           getSum();
+           $scope.PaymentSum = {};
+           $scope.PaymentsYearly = [];
+           $scope.P = 0;
+           $scope.pageSizeArray = [];
+           $scope.pageSizeArray.push({ value: 5, text: 5 });
+           $scope.pageSizeArray.push({ value: 10, text: 10 });
+           $scope.pageSizeArray.push({ value: 20, text: 20 });
+           $scope.pageSizeArray.push({ value: 50, text: 50 });
+           $scope.currentPage = 1;
+           $scope.pageSize = 15;
+
+       }
+
+
+
+
+       function getPaymentYearly() {
+           $scope.PaymentsYearly = [];
+           $http({
+               method: 'GET',
+               url: baseUrl + 'PortalFees/PaymentYearly/'
+           }).then(function successCallback(response) {
+               //console.log(response);
+               $scope.PaymentsYearly = response.data.results;
+
+
+               //console.log($scope.TotalAm);
+           }, function errorCallback(response) {
+               toastr["warning"](response.data.Message);
+           });
+       }
+
+
+       function getSum() {
+           $scope.PaymentSum = {};
+           $http({
+               method: 'GET',
+               url: baseUrl + 'PortalFees/SumPaymentYearly/'
+           }).then(function successCallback(response) {
+               //console.log(response);
+               $scope.PaymentSum = response.data.results[0];
+
+
+               //console.log($scope.TotalAm);
+           }, function errorCallback(response) {
+               toastr["warning"](response.data.Message);
+           });
+       }
+
+       function getTotalAmount() {
+
+           angular.forEach($scope.PaymentsYearly, function (item) {
+
+               totalamt += Number(item.April);
+               console.log(totalamt);
+
+           });
+
+           $scope.total = totalInvoice;
+       }
+
+
+
+   }]);
+    </script>
+}
+

@@ -1,0 +1,649 @@
+﻿
+@{
+    ViewBag.Title = "Generate Reports";
+}
+
+<style type="text/css">
+    input[type=number]::-webkit-inner-spin-button,
+    input[type=number]::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+
+    #ClientId {
+        width: 260px;
+    }
+
+    .DrpdwnWidth ul {
+        width: 350px;
+    }
+</style>
+
+<div class="kt-container  kt-container--fluid  kt-grid__item kt-grid__item--fluid" ng-controller="AdminCollectionCntrl">
+
+    <div class="row">
+        <div class="kt-portlet kt-portlet--mobile">
+            <div class="kt-portlet__head kt-portlet__head--lg">
+                <div class="kt-portlet__head-label">
+                    <h3 class="kt-portlet__head-title">
+                        Generate Reports
+                    </h3>
+                </div>
+            </div>
+            <div class="kt-portlet__body">
+                <!-- BEGIN FORM-->
+                <form class="form-horizontal" ng-submit="Report()" name="addBasic" id="addBasic" method="post" enctype="multipart/form-data" novalidate>
+                    <div class="form-body">
+                        <div class="row">
+                            <div class="col-md-2"></div>
+                            <div class="col-md-6">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="form-group row" ng-hide="mngmntVwM" ng-class="{ 'has-error' : submitted && addBasic.Client.$invalid}">
+                                            <label class="col-md-5 control-label" style="text-align:right">
+                                                Client:
+                                            </label>
+                                            <div class="col-md-7 DrpdwnWidth">
+                                                <input type="text" ng-model="EMP" typeahead-on-select='onSelect($item, $model, $label)'
+                                                       placeholder="Enter client name or ID" uib-typeahead="i  as i.Text for i in Searchtext($viewValue)"
+                                                       typeahead-loading="loadingLocations" typeahead-no-results="noResults" class="form-control">
+                                                <i ng-show="loadingLocations" class="glyphicon glyphicon-refresh"></i>
+                                                <div ng-show="noResults"><i class="glyphicon glyphicon-remove"></i> No Results Found</div>
+                                                <input type="hidden" name="Client" ng-model="collectionObj.ClientId" ng-value="Std.Value" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12">
+                                        <div class="form-group row" ng-class="{ 'has-error' : isSubmitted && addBasic.ReportType.$invalid}">
+                                            <label class="col-md-5 control-label" style="text-align:right">
+                                                Report Type:
+                                                <span class="required">*</span>
+                                            </label>
+                                            <div class="col-md-7">
+                                                <select ng-model="collectionObj.ReportType" class="form-control" placeholder="Web Portal" name="ReportType" ng-change="filterButton();" required>
+                                                    <option value=''>Select Report</option>
+                                                    @*<option value='1'>Collection Report</option>
+                                                        <option value='2'>Due Report</option>*@
+                                                    <option value='3'>Collection summary Report</option>
+                                                    <option value='4'>Collection Details Report monthly</option>
+                                                    <option value='5'>Collection Details Report yearly</option>
+                                                    <option value='6'>Due Report monthly</option>
+                                                    <option value='7'>Due Report Yearly</option>
+                                                    <option value='8'>Monthly status report</option>
+                                                    <option value='9'>Management view report monthly</option>
+                                                    <option value='10'>Management view report Yearly</option>
+                                                    <option value='11'>Adjustment/Extra income report</option>
+                                                </select>
+                                                <div class="form-control-focus"> </div>
+                                                <span ng-show="isSubmitted &&  addBasic.ReportType.$error.required" class="help-block">Report Type is Required</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12" ng-show="collectionObj.ReportType==6||collectionObj.ReportType==7||collectionObj.ReportType==8||collectionObj.ReportType==9||collectionObj.ReportType==10">
+                                        <div class="form-group row" ng-class="{ 'has-error' : isSubmitted && addBasic.FilterType.$invalid}">
+                                            <label class="col-md-5 control-label" style="text-align:right">
+                                                Filter Type:
+                                                <span class="required">*</span>
+                                            </label>
+                                            <div class="col-md-7">
+                                                <select ng-model="collectionObj.FilterType" class="form-control" placeholder="Web Portal" name="FilterType">
+                                                    <option value=''>Select Filter Type</option>
+                                                    <option value='1'>Process Month</option>
+                                                    <option value='2'>Due Month</option>
+
+                                                </select>
+                                                <div class="form-control-focus"> </div>
+                                                <span ng-show="isSubmitted &&  addBasic.FilterType.$error.required" class="help-block">Filter Type is Required</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12">
+                                        <div class="form-group row" ng-show="collctnRptY||dueRptY ||mngmntVwM||mngmntVwY||monthlyStRpt" ng-class="{ 'has-error' :isSubmitted && addBasic.Value.$invalid}">
+                                            <label class="col-md-5 control-label" style="text-align:right">
+                                                Year :  <span class="required">*</span>
+                                            </label>
+                                            <div class="col-md-7">
+                                                <select class="form-control" name="Value" ng-model="collectionObj.Value" ng-options="aYear.Value as aYear.Text for aYear in YearList" ng-change="getAllMonth()">
+                                                    <option value="" selected="selected">Please Select</option>
+                                                </select>
+                                                <span ng-show="isSubmitted && addBasic.Value.$error.required" class="help-block">Year Required</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12">
+                                        <div class="form-group row" ng-show="collctnRpt" ng-class="{ 'has-error' :isSubmitted && addBasic.Year.$invalid}">
+                                            <label class="col-md-5 control-label" style="text-align:right">
+                                                Year:
+                                            </label>
+                                            <div class="col-md-7">
+                                                <select class="form-control" name="Year" ng-model="collectionObj.Year" ng-options="aYear.Value as aYear.Text for aYear in YearList">
+                                                    <option value="" selected="selected">Please Select</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12">
+                                        <div class="form-group row" ng-show="monthlyStRpt||mngmntVwM" ng-class="{ 'has-error' : isSubmitted && addBasic.Month.$invalid}">
+                                            <label class="col-md-5 control-label" style="text-align:right">
+                                                Month:
+                                                <span class="required">*</span>
+                                            </label>
+                                            <div class="col-md-7">
+                                                <select class="form-control" name="Month" ng-model="collectionObj.MonthFilter" ng-options="aMonth.Value as aMonth.Text for aMonth in MonthListFilter">
+                                                    <option value="" selected="selected">Please Select</option>
+                                                </select>
+                                                <div class="form-control-focus"> </div>
+                                                <span ng-show="isSubmitted &&  addBasic.Month.$error.required" class="help-block">Month is Required</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12">
+                                        <div class="form-group row" ng-show="monthlyStRpt" ng-class="{ 'has-error' : isSubmitted && addBasic.Status.$invalid}">
+                                            <label class="col-md-5 control-label" style="text-align:right">
+                                                Status :
+                                            </label>
+                                            <div class="col-md-7">
+                                                <select ng-model="collectionObj.Status" class="form-control" placeholder="Web Portal" name="Status">
+                                                    <option value=''>Select Status</option>
+                                                    <option value="Paid">Paid</option>
+                                                    <option value="Partial Paid">Partial Paid</option>
+                                                    <option value="Due">Due</option>
+                                                    @*<option value="No Due">No Due</option>*@
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12">
+                                        <div class="form-group row" ng-show="collctnRpt||collctnSummRpt|| collctnRptM" ng-class="{ 'has-error' : isSubmitted && addBasic.FromDate.$invalid}">
+                                            <label class="col-md-5 control-label" style="text-align:right">
+                                                From:
+                                                <span class="required">*</span>
+                                            </label>
+                                            <div class="col-md-7">
+                                                <input class="form-control" name="FromDate" type="datetime" placeholder="From Date" readonly ng-click="p1=true" is-open="p1" uib-datepicker-popup="dd/MM/yyyy" ng-model="collectionObj.From" />
+                                                <div class="form-control-focus"> </div>
+                                                <span ng-show="isSubmitted && addBasic.FromDate.$error.required" class="help-block">From Date Required</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12">
+                                        <div class="form-group row" ng-show="collctnRpt || collctnSummRpt || collctnRptM" ng-class="{ 'has-error' : isSubmitted && addBasic.ToDate.$invalid}">
+                                            <label class="col-md-5 control-label" style="text-align:right">
+                                                To:
+                                                <span class="required">*</span>
+                                            </label>
+                                            <div class="col-md-7">
+                                                <input class="form-control" name="ToDate" type="datetime" placeholder="To Date" readonly ng-click="p2=true" is-open="p2" uib-datepicker-popup="dd/MM/yyyy" ng-model="collectionObj.To" />
+                                                <div class="form-control-focus"> </div>
+                                                <span ng-show="isSubmitted && addBasic.ToDate.$error.required" class="help-block">To Date Required</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12">
+                                        <div class="form-group row" ng-show="dueRptM" ng-class="{ 'has-error' : isSubmitted && addBasic.FromDate.$invalid}">
+                                            <label class="col-md-5 control-label" style="text-align:right">
+                                                Start Month:
+                                                <span class="required">*</span>
+                                            </label>
+                                            <div class="col-md-7">
+                                                <input class="form-control" name="FromDate" type="datetime" placeholder="Start Month" readonly ng-click="p1=true" is-open="p1" uib-datepicker-popup="dd/MM/yyyy" ng-model="collectionObj.From" />
+                                                <div class="form-control-focus"> </div>
+                                                <span ng-show="isSubmitted && addBasic.FromDate.$error.required" class="help-block">Start Month Required</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12">
+                                        <div class="form-group row" ng-show="dueRptM" ng-class="{ 'has-error' : isSubmitted && addBasic.ToDate.$invalid}">
+                                            <label class="col-md-5 control-label" style="text-align:right">
+                                                End Month:
+                                                <span class="required">*</span>
+                                            </label>
+                                            <div class="col-md-7">
+                                                <input class="form-control" name="ToDate" type="datetime" placeholder="End Month" readonly ng-click="p2=true" is-open="p2" uib-datepicker-popup="dd/MM/yyyy" ng-model="collectionObj.To" />
+                                                <div class="form-control-focus"> </div>
+                                                <span ng-show="isSubmitted && addBasic.ToDate.$error.required" class="help-block">End Month Required</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12">
+                                        <div class="form-group row" ng-show="collctnRpt" ng-class="{ 'has-error' : isSubmitted && addBasic.Month.$invalid}">
+                                            <label class="col-md-5 control-label" style="text-align:right">
+                                                Month:
+                                            </label>
+                                            <div class="col-md-7">
+                                                <select class="form-control" ng-model="collectionObj.Month" name="Month" id="MonthId" ng-options="aMonth.Value as aMonth.Text for aMonth in MonthList">
+                                                    <option value="" selected="selected">Choose Option</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12">
+                                        <div class="form-group row" ng-show="btndis" ng-class="{ 'has-error' : isSubmitted && addBasic.Service.$invalid}">
+                                            <label class="col-md-5 control-label" style="text-align:right">
+                                                Service Name:
+                                                <span class="required"></span>
+                                            </label>
+                                            <div class="col-md-7">
+                                                <select class="form-control" ng-model="collectionObj.InvoiceServiceId" name="Service" ng-options="aInvService.Id as aInvService.ServiceName for aInvService in invoiceServiceList">
+                                                    <option value="" selected="selected">Choose Option</option>
+                                                </select>
+                                                <div class="form-control-focus"> </div>
+                                                <span ng-show="isSubmitted && addBasic.Service.$error.required" class="help-block">Service Name Required</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12">
+                                        <div class="form-group row" ng-show="btndis" ng-class="{ 'has-error' : isSubmitted && addBasic.BillingHead.$invalid}">
+                                            <label class="col-md-5 control-label" style="text-align:right">
+                                                Billing Head:
+                                                <span class="required"></span>
+                                            </label>
+                                            <div class="col-md-7">
+                                                <select class="form-control" ng-model="collectionObj.BillingHeadId" name="BillingHead" ng-options="aBillingHead.Id as aBillingHead.BillingHeadName for aBillingHead in BillingHeadList">
+                                                    <option value="" selected="selected">Choose Option</option>
+                                                </select>
+                                                <div class="form-control-focus"> </div>
+                                                <span ng-show="isSubmitted && addBasic.BillingHead.$error.required" class="help-block">Billing Head Required</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4"></div>
+                            <div class="col-md-5">
+                                <div class="row">
+                                    <div class="col-md-5"></div>
+                                    <div class="col-md-7">
+                                        <div class="form-group">
+                                            <button ng-click="isSubmitted=true" class="btn btn-primary">Report</button>
+                                            <button class="btn btn-danger" ng-click="resetForm();isSubmitted=false;">Reset</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    <script type="text/javascript">
+        OEMSApp.controller("AdminCollectionCntrl", ["$scope", "$http", "SweetAlert", "blockUI", "$window", "$filter",
+          function ($scope, $http, SweetAlert, blockUI, $window, $filter) {
+
+              init();
+              function init() {
+                  initialize();
+
+                  getAllMonth();
+                  getAllYear();
+              }
+              function initialize() {
+                  $scope.collectionObj = {};
+                  $scope.collectionObj.Status = "";
+                  $scope.EMP = "";
+                  $scope.InvoiceGeneratelist = [];
+                  $scope.txtsearch = '';
+                  $scope.Report = Report;
+                  $scope.resetForm = resetForm;
+                  $scope.spin = false;
+                  getAllInvoiceService();
+                  GetAllInvoiceBillingHead();
+                  getForFilterAllMonth();
+                  $scope.btndis = false;
+              };
+
+              $scope.Searchtext = function (val) {
+
+                  return $http.get(baseUrl + 'Client/SearchClient/' + val, {
+                      params: {}
+                  }).then(function (response) {
+                      return response.data.results.map(function (item) {
+
+                          return item;
+                      });
+                  });
+              };
+              $scope.onSelect = function onSelect($item, $model, $label) {
+                  $scope.collectionObj.ClientId = $item.Value;
+              };
+              function getForFilterAllMonth() {
+                  $scope.MonthList = [];
+                  $http({
+                      method: 'GET',
+                      url: baseUrl + 'Common/GetAllMonth/'
+                  }).then(function successCallback(response) {
+                      $scope.MonthListFilter = response.data.results.Table;
+                  }, function errorCallback(response) {
+                      toastr["warning"](response.data.Message);
+                  });
+              }
+              function getAllYear() {
+                  $scope.YearList = [];
+                  $http({
+                      method: 'GET',
+                      url: baseUrl + 'Common/GetAllYear/'
+                  }).then(function successCallback(response) {
+                      $scope.YearList = response.data.results.Table;
+                  }, function errorCallback(response) {
+                      toastr["warning"](response.data.Message);
+                  });
+              }
+
+              $scope.selectAll = function () {
+                  angular.forEach($scope.InvoiceGeneratelist, function (item) {
+                      item.Selected = $scope.selectedAll;
+                  });
+
+              };
+
+              $scope.checkIfAllSelected = function () {
+                  $scope.selectedAll = $scope.InvoiceGeneratelist.every(function (item) {
+                      return item.Selected == true
+                  })
+              };
+
+              function getAllMonth() {
+                  $scope.MonthList = [];
+                  $http({
+                      method: 'GET',
+                      url: baseUrl + 'Common/GetAllMonth/'
+                  }).then(function successCallback(response) {
+                      $scope.MonthList = response.data.results.Table;
+                      angular.forEach($scope.MonthList, function (aMonth) {
+                          aMonth.IsChecked = false;
+                      });
+                  }, function errorCallback(response) {
+                      toastr["warning"](response.data.Message);
+                  });
+              };
+
+              function getAllInvoiceService() {
+                  $scope.invoiceServiceList = [];
+                  $http({
+                      method: 'GET',
+                      url: baseUrl + 'Invoice/GetAllInvoiceService/'
+                  }).then(function successCallback(response) {
+                      $scope.invoiceServiceList = response.data.results;
+                  }, function errorCallback(response) {
+                      toastr["info"](response.data.Message);
+                  });
+              }
+              function GetAllInvoiceBillingHead() {
+                  $scope.BillingHeadList = [];
+                  $http({
+                      method: 'GET',
+                      url: baseUrl + 'Invoice/GetAllActiveInvoiceBillingHead'
+                  }).then(function successCallback(response) {
+                      $scope.BillingHeadList = response.data.results;
+                  }, function errorCallback(response) {
+                      toastr["info"](response.data.Message);
+                  });
+              }
+              $scope.filterButton = function filterButton() {
+                  if ($scope.collectionObj.ReportType == "3") {
+                      $scope.collctnSummRpt = true;
+                      $scope.collctnRpt = false;
+                      $scope.collctnRptM = false;
+                      $scope.collctnRptY = false;
+                      $scope.dueRptM = false;
+                      $scope.dueRptY = false;
+                      $scope.monthlyStRpt = false;
+                      $scope.mngmntVwM = false;
+                      $scope.mngmntVwY = false;
+                  }
+                  else if ($scope.collectionObj.ReportType == "4") {
+                      $scope.collctnSummRpt = false;
+                      $scope.collctnRpt = false;
+                      $scope.collctnRptM = true;
+                      $scope.collctnRptY = false;
+                      $scope.dueRptM = false;
+                      $scope.dueRptY = false;
+                      $scope.monthlyStRpt = false;
+                      $scope.mngmntVwY = false;
+                      $scope.mngmntVwM = false;
+                  }
+                  else if ($scope.collectionObj.ReportType == "5") {
+                      $scope.collctnSummRpt = false;
+                      $scope.collctnRpt = false;
+                      $scope.collctnRptM = false;
+                      $scope.collctnRptY = true;
+                      $scope.dueRptM = false;
+                      $scope.dueRptY = false;
+                      $scope.monthlyStRpt = false;
+                      $scope.mngmntVwM = false;
+                      $scope.mngmntVwY = false;
+                  }
+                  else if ($scope.collectionObj.ReportType == "6") {
+                      $scope.collctnSummRpt = false;
+                      $scope.collctnRpt = false;
+                      $scope.collctnRptM = false;
+                      $scope.collctnRptY = false;
+                      $scope.dueRptM = true;
+                      $scope.monthlyStRpt = false;
+                      $scope.dueRptY = false;
+                      $scope.mngmntVwM = false;
+                      $scope.mngmntVwY = false;
+                  }
+                  else if ($scope.collectionObj.ReportType == "7") {
+                      $scope.collctnSummRpt = false;
+                      $scope.collctnRpt = false;
+                      $scope.collctnRptM = false;
+                      $scope.collctnRptY = false;
+                      $scope.dueRptM = false;
+                      $scope.monthlyStRpt = false;
+                      $scope.dueRptY = true;
+                      $scope.mngmntVwM = false;
+                      $scope.mngmntVwY = false;
+                  }
+                  else if ($scope.collectionObj.ReportType == "8") {
+                      $scope.collctnSummRpt = false;
+                      $scope.collctnRpt = false;
+                      $scope.collctnRptM = false;
+                      $scope.collctnRptY = false;
+                      $scope.dueRptM = false;
+                      $scope.dueRptY = false;
+                      $scope.monthlyStRpt = true;
+                      $scope.mngmntVwM = false;
+                      $scope.mngmntVwY = false;
+                  }
+                  else if ($scope.collectionObj.ReportType == "9") {
+                      $scope.collctnSummRpt = false;
+                      $scope.collctnRpt = false;
+                      $scope.collctnRptM = false;
+                      $scope.collctnRptY = false;
+                      $scope.dueRptM = false;
+                      $scope.dueRptY = false;
+                      $scope.monthlyStRpt = false;
+                      $scope.mngmntVwM = true;
+                      $scope.mngmntVwY = false;
+                  }
+                  else if ($scope.collectionObj.ReportType == "10") {
+                      $scope.collctnSummRpt = false;
+                      $scope.collctnRpt = false;
+                      $scope.collctnRptM = false;
+                      $scope.collctnRptY = false;
+                      $scope.dueRptM = false;
+                      $scope.dueRptY = false;
+                      $scope.monthlyStRpt = false;
+                      $scope.mngmntVwM = false;
+                      $scope.mngmntVwY = true;
+                  }
+                  else if ($scope.collectionObj.ReportType == "11") {
+                      $scope.collctnSummRpt = true;
+                      $scope.collctnRpt = false;
+                      $scope.collctnRptM = false;
+                      $scope.collctnRptY = false;
+                      $scope.dueRptM = false;
+                      $scope.dueRptY = false;
+                      $scope.monthlyStRpt = false;
+                      $scope.mngmntVwM = false;
+                      $scope.mngmntVwY = false;
+                  }
+              }
+              function resetForm() {
+                  $scope.collectionObj = {};
+                  $scope.EMP = "";
+                  $scope.isSubmitted = false;
+              };
+              function Report() {
+                  console.log($scope.collectionObj);
+
+                  var FromDate = $filter('date')($scope.collectionObj.From, "MM/dd/yyyy");
+                  var ToDate = $filter('date')($scope.collectionObj.To, "MM/dd/yyyy");
+
+                  var FromDateV = $filter('date')($scope.collectionObj.From, "yyyyMMdd");
+                  var ToDateV = $filter('date')($scope.collectionObj.To, "yyyyMMdd");
+                  var FilterType = $scope.collectionObj.FilterType;
+
+                  console.log($scope.collectionObj);
+
+                  if (FromDateV > ToDateV) {
+                      toastr["warning"]('FromDate is greater than ToDate ');
+                      return;
+                  }
+                  else {
+                      if ($scope.collectionObj.ReportType == "3") {
+                          if (FromDate == null) {
+                              toastr["info"]("From date is Required.");
+                              return;
+                          }
+                          else if (ToDate == null) {
+                              toastr["info"]("To date is Required.");
+                              return;
+                          }
+                          $scope.uri = "@Url.Action("CollectionSummary", "Report")?ClientId=" + $scope.collectionObj.ClientId + "&InvoiceServiceId=" + $scope.collectionObj.InvoiceServiceId + '&BillingHeadId=' + $scope.collectionObj.BillingHeadId + "&FromDate=" + FromDate + '&ToDate=' + ToDate;
+                          $window.open($scope.uri, '_blank');
+                      }
+                      else if ($scope.collectionObj.ReportType == "4") {
+                          if (FromDate == null) {
+                              toastr["info"]("From date is Required.");
+                              return;
+                          }
+                          else if (ToDate == null) {
+                              toastr["info"]("To date is Required.");
+                              return;
+                          }
+                          $scope.uri = "@Url.Action("CollectionDetailsMonthly", "Report")?ClientId=" + $scope.collectionObj.ClientId + "&FromDate=" + FromDate + '&ToDate=' + ToDate;
+                          $window.open($scope.uri, '_blank');
+                      }
+                      else if ($scope.collectionObj.ReportType == "5") {
+                          var year = Number($scope.collectionObj.Value);
+                          if ($scope.collectionObj.Value == null) {
+                              toastr["info"]("Year is Required.");
+                              return;
+                          }
+                          $scope.uri = "@Url.Action("CollectionDetailsYearly", "Report")?ClientId=" + $scope.collectionObj.ClientId + "&Year=" + year;
+                          $window.open($scope.uri, '_blank');
+                      }
+                      else if ($scope.collectionObj.ReportType == "6") {
+                          if (FromDate == null) {
+                              toastr["info"]("Start month is Required.");
+                              return;
+                          }
+                          else if (ToDate == null) {
+                              toastr["info"]("End month is Required.");
+                              return;
+                          }
+                          else if (FilterType == null) {
+                              toastr["info"]("Filter Type is Required.");
+                              return;
+                          }
+                          $scope.uri = "@Url.Action("DueDetailsMonthly", "Report")?ClientId=" + $scope.collectionObj.ClientId + "&FromDate=" + FromDate + '&ToDate=' + ToDate + '&FilterType=' + $scope.collectionObj.FilterType;
+                          $window.open($scope.uri, '_blank');
+                      }
+                      else if ($scope.collectionObj.ReportType == "7") {
+                          var year = Number($scope.collectionObj.Value);
+                          if ($scope.collectionObj.Value == null) {
+                              toastr["info"]("Year is Required.");
+                              return;
+                          }
+                          else if (FilterType == null) {
+                              toastr["info"]("Filter Type is Required.");
+                              return;
+                          }
+                          $scope.uri = "@Url.Action("DueDetailsYearly", "Report")?ClientId=" + $scope.collectionObj.ClientId + "&Year=" + year + '&FilterType=' + $scope.collectionObj.FilterType;
+                          $window.open($scope.uri, '_blank');
+                      }
+                      else if ($scope.collectionObj.ReportType == "8") {
+                          var year = Number($scope.collectionObj.Value);
+
+                          if ($scope.collectionObj.Value == null) {
+                              toastr["info"]("Year is Required.");
+                              return;
+                          }
+                          else if ($scope.collectionObj.MonthFilter == null) {
+                              toastr["info"]("month is Required.");
+                              return;
+                          }
+                          else if (FilterType == null) {
+                              toastr["info"]("Filter Type is Required.");
+                              return;
+                          }
+                          $scope.uri = "@Url.Action("MonthlyStatus", "Report")?ClientId=" + $scope.collectionObj.ClientId + "&Year=" + year + '&MonthId=' + $scope.collectionObj.MonthFilter + '&Status=' + $scope.collectionObj.Status + '&FilterType=' + $scope.collectionObj.FilterType;
+                          $window.open($scope.uri, '_blank');
+                      }
+                      else if ($scope.collectionObj.ReportType == "9") {
+                          var year = Number($scope.collectionObj.Value);
+                          if ($scope.collectionObj.Value == null) {
+                              toastr["info"]("Year is Required.");
+                              return;
+                          }
+                          else if ($scope.collectionObj.MonthFilter == null) {
+                              toastr["info"]("month is Required.");
+                              return;
+                          }
+                          else if (FilterType == null) {
+                              toastr["info"]("Filter Type is Required.");
+                              return;
+                          }
+                          $scope.uri = "@Url.Action("ManagementViewMonthly", "Report")?Year=" + year + "&MonthId=" + $scope.collectionObj.MonthFilter + '&FilterType=' + $scope.collectionObj.FilterType;
+                          $window.open($scope.uri, '_blank');
+                      }
+                      else if ($scope.collectionObj.ReportType == "10") {
+                          var year = Number($scope.collectionObj.Value);
+                          if ($scope.collectionObj.Value == null) {
+                              toastr["info"]("Year is Required.");
+                              return;
+                          }
+                          else if (FilterType == null) {
+                              toastr["info"]("Filter Type is Required.");
+                              return;
+                          }
+                          $scope.uri = "@Url.Action("ManagementViewYearly", "Report")?Year=" + year + '&FilterType=' + $scope.collectionObj.FilterType;
+                          $window.open($scope.uri, '_blank');
+                      }
+                      else if ($scope.collectionObj.ReportType == "11") {
+                          if (FromDate == null) {
+                              toastr["info"]("From date is Required.");
+                              return;
+                          }
+                          else if (ToDate == null) {
+                              toastr["info"]("To date is Required.");
+                              return;
+                          }
+                          $scope.uri = "@Url.Action("AdjustmentExtraincome", "Report")?ClientId=" + $scope.collectionObj.ClientId + "&FromDate=" + FromDate + '&ToDate=' + ToDate;
+                          $window.open($scope.uri, '_blank');
+                      }
+                  }
+              };
+          }]);
+    </script>
+
+}
+
+
+
+
+
+
+
+

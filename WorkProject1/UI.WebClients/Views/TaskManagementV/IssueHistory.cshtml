@@ -1,0 +1,140 @@
+﻿
+@{
+    ViewBag.Title = "IssueHistory";
+}
+
+<div class="portlet box blue-hoki" style="width: 100%" ng-controller="ctrlIssueHistory">
+    <!-- Begin: life time stats -->
+    <div class="portlet light bordered">
+        <div class="portlet-title">
+            <div class="caption">
+                <i class="icon-settings font-green"></i>
+                <span class="caption-subject font-green sbold uppercase">All IssueHistory</span>
+            </div>
+            @*<div class="actions">
+                <div class="btn-group btn-group-solid">
+                    <button ng-click="submitted=false" class="btn green" data-target="#addmodal" data-toggle="modal"> <i class="fa fa-plus"></i> Add New IssueHistory</button>
+                </div>
+            </div>*@
+        </div>
+        <div class="portlet-body">
+            <div class="table-container">
+                <div id="sample_3_wrapper" class="dataTables_wrapper no-footer">
+                    <div class="row">
+                        <div class="col-md-4 col-sm-5 col-xs-6">
+                            <div class="form-group">
+                                <div class="col-lg-3 col-md-5 col-sm-4 col-xs-8" style="padding-left:0px">
+                                    <select class="form-control" ng-model="pageSize" ng-options="P.value as P.text for P in pageSizeArray"></select>
+                                </div>
+                                <div class="col-md-7  col-sm-8  col-xs-4">
+                                    @*<label for="search" class="control-label" style="padding-top:5px">Items</label>*@
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 col-sm-3 col-xs-1">
+                        </div>
+                        <div class="col-md-4 col-sm-4 col-xs-5">
+                            <div id="sample_3_filter" class="pull-right">
+                                <input ng-model="q" id="search" class="form-control" placeholder="Filter text">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="table-scrollable"> </div>
+                    <table class="table table-bordered table-hover">
+                        <thead>
+                            <tr class="btn-primary">
+                                <th>SL#</th>
+                                <th>HistoryId</th>
+                                <th>UserId </th>
+                                <th>Type</th>
+                                <th>Description </th>
+                                <th>IssueId</th>
+                                <th>ParentId </th>
+                                <th>SprinttId</th>
+                                <th>ModifyDate</th>
+                                @*<th style="text-align:center">Action</th>*@
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-show="IssueHistoryList.length <= 0"><td colspan="5" style="text-align:center;"><i class="fa fa-refresh"></i> Loading new data!!</td></tr>
+                            <tr dir-paginate="item in IssueHistoryList| filter:q  | itemsPerPage: pageSize" current-page="currentPage">
+                                <td>{{$index+1}}</td>
+                                <td>{{item.HistoryId}}</td>
+                                <td>{{item.UserId}}</td>
+                                <td>{{item.Type}}</td>
+                                <td>{{item.Description}}</td>
+                                <td>{{item.IssueId}}</td>
+                                <td>{{item.ParentId}}</td>
+                                <td>{{item.SprinttId}}</td>
+                                <td>{{item.ModifyDate}}</td>
+
+                               
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="row">
+                        <dir-pagination-controls boundary-links="true" template-url="~/assets/angular/lib/dirPagination.tpl.html"></dir-pagination-controls>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- End: life time stats -->
+   
+</div>
+<!-- END FORM-->
+@section Scripts{
+
+    <script type="text/javascript">
+        OEMSApp.controller("ctrlIssueHistory", ["$scope", "$http", "SweetAlert",
+              function ($scope, $http, SweetAlert) {
+                  init();
+                  function init() {
+                      initialize();
+                      getAllIssueHistory();
+                  }
+
+                  function initialize() {
+                      $scope.modalbutton = 'Save';
+                   //   $scope.modalTitle = 'Add New IssueHistory';
+                     // $scope.projectInfo = {};
+                    //  $scope.projectInfo.Id = 0;
+                      $scope.IssueHistoryList = [];
+                      $scope.resetForm = resetForm;
+                      $scope.pagesize = 10;
+                      $scope.pageSizeArray = [];
+                      $scope.pageSizeArray.push({ value: 5, text: 5 });
+                      $scope.pageSizeArray.push({ value: 10, text: 10 });
+                      $scope.pageSizeArray.push({ value: 20, text: 20 });
+                      $scope.pageSizeArray.push({ value: 50, text: 50 });
+                      $scope.currentPage = 1;
+                      $scope.pageSize = 10;
+                  }
+
+                  function resetForm() {
+                    //  $scope.modalTitle = "Add New IssueHistory";
+                      $scope.addBasic.$setUntouched();
+                      $scope.addBasic.$setPristine();
+                      $scope.modalbutton = 'Save';
+                  }
+
+                 
+                  function getAllIssueHistory() {
+                      $scope.IssueHistoryList = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'TaskManagement/GetAllIssueHistory/' + issueId
+                      }).then(function successCallback(response) {
+                          $scope.IssueHistoryList = response.data.results;
+                      }, function errorCallback(response) {
+                          toastr["info"](response.data.Message);
+                      });
+                  }
+
+
+                  
+              }]);
+
+    </script>
+}
+

@@ -1,0 +1,310 @@
+﻿
+@{
+    ViewBag.Title = "Designation";
+}
+
+@model OEMS.Models.Model.Employee.EmpCategory
+
+<div class="kt-container  kt-container--fluid  kt-grid__item kt-grid__item--fluid" ng-controller="CtrlDesignation">
+    <div class="row">
+        <div class="kt-portlet kt-portlet--mobile">
+            <div class="kt-portlet__head kt-portlet__head--lg">
+                <div class="kt-portlet__head-label">
+                    <h3 class="kt-portlet__head-title">
+                        <!----Title Text-->
+                        Designation
+                        <!----Title Text -->
+                    </h3>
+                </div>
+                <div class="kt-portlet__head-toolbar">
+                    <div class="kt-portlet__head-wrapper">
+                        <div class="dropdown dropdown-inline">
+                            <button type="button" class="btn btn-brand btn-icon-sm" data-toggle="modal" data-target="#addmodal" aria-haspopup="true" aria-expanded="false">
+                                <!----Add Button -->
+                                <i class="flaticon2-plus"></i> Add Designation
+                                <!----Add Button -->
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="kt-portlet__body">
+                <div class="row">
+                    <div class="col-md-4 col-sm-5 col-xs-6">
+                        <div class="form-group">
+                            <div class="col-lg-3 col-md-5 col-sm-4 col-xs-8" style="padding-left:0px">
+                                <select class="form-control kt-font-brand" ng-model="pageSize" ng-options="P.value as P.text for P in pageSizeArray"></select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-sm-3 col-xs-1">
+                    </div>
+                    <div class="col-md-4 col-sm-4 col-xs-5">
+                        <div id="sample_3_filter" class="pull-right">
+                            <input ng-model="q" id="search" class="form-control" placeholder="Filter text">
+                        </div>
+                    </div>
+                </div>
+                <table class="table table-bordered table-hover rounded">
+                    <thead>
+                        <tr class="btn-primary">
+                            <th width="30%">Designation</th>
+                            <th width="10%">Category</th>
+                            <th width="40%">Des. Order</th>
+                            <th width="10%">Action</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        <tr ng-show="designation.results.length <= 0"><td colspan="5" style="text-align:center;"><i class="fa fa-refresh"></i> Loading new data!!</td></tr>
+                        <tr dir-paginate="item in designations.results | filter:q  | itemsPerPage: pageSize " current-page="currentPage">
+
+                            <td>{{item.DesignationName}}</td>
+                            <td>{{item.CategoryID}}</td>
+                            <td>{{item.DesignationOrder}}</td>
+                            <td>
+                                <a href="javascript:;" class="btn btn-outline-brand btn-elevate btn-icon" ng-click="edit(item)" data-target="#addmodal" data-toggle="modal">
+                                    <i class="fa fa-edit"></i>
+                                </a>
+                                <a ng-click="deleteDesignation(item)" href="javascript:;" class="btn btn-outline-danger btn-elevate btn-icon" id="kt_sweetalert_demo_9">
+                                    <i class="fa fa-trash"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="row">
+                    <dir-pagination-controls boundary-links="true" template-url="~/assets/angular/lib/dirPagination.tpl.html"></dir-pagination-controls>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--Modal Area Start-->
+    <div id="addmodal" class="modal fade" tabindex="-1" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form name="addform" ng-submit="save()" class="form-horizontal" id="form_sample_1" novalidate>
+                    <div class="modal-header">
+                        <h4 class="modal-title">{{modalTitle}}</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-body">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group row" ng-class="{ 'has-error' : submitted && addform.contact.$invalid}">
+                                        <label class="col-md-4 control-label"style="text-align:right">
+                                            Designation :
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-8">
+                                            <input type="text" ng-model="designation.DesignationName" class="form-control" placeholder="Category Name" name="contact" required>
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted &&  addform.contact.$error.required" class="help-block">Designation Required</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group row" ng-class="{ 'has-error' : submitted && addform.class.$invalid}">
+                                        <label class="col-md-4 control-label"style="text-align:right">
+                                            Category:
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-8">
+
+                                            <select class="form-control" ng-model="designation.CategoryID" name="class"  required ng-options="cat.CategoryID as cat.CategoryName for cat in categories">
+                                                <option value="" selected="selected" class="">Select Category</option>
+                                            </select>
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted && addform.class.$error.required" class="help-block">Class Name Required</span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group row" ng-class="{ 'has-error' : submitted && addform.DesignationOrder.$invalid}">
+                                        <label class="col-md-4 control-label" style="text-align:right">
+                                            Designation Order :
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-8">
+                                            <input type="number" ng-model="designation.DesignationOrder" class="form-control" placeholder="Designation Order" name="DesignationOrder" required>
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted &&  addform.DesignationOrder.$error.required" class="help-block">Designation Required</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" data-dismiss="modal" class="btn  btn-secondary" ng-click="resetForm();submitted=false">Cancel</button>
+                        <button type="submit" ng-click="submitted=true" class="btn btn-success" ng-disabled="btnDis">Save <i ng-show="spin" class="fa fa-spinner fa-spin" style="font-size:20px"></i></button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!--Modal Area End-->
+</div>
+    @section Scripts{
+
+        <script type="text/javascript">
+
+            OEMSApp.controller("CtrlDesignation", ["$scope", "$http", "SweetAlert",
+              function ($scope, $http, SweetAlert) {
+
+                  init();
+                  function init() {
+                      initialize();
+                      getDesignation(1);
+                      getCategory();
+                  }
+                  function initialize() {
+                      $scope.modalTitle = "Add Designation";
+                      $scope.designation = {};
+                      $scope.designation.DesignationID = 0;
+                      $scope.currentPage = 1;
+                      $scope.pageno = 1;
+                      $scope.pagesize = 10;
+                      $scope.total_count = 12;
+                      $scope.search = '';
+                      $scope.categories = [];
+                      $scope.designations = [];
+
+                      $scope.getDesignation = getDesignation;
+                      $scope.res = {};
+                      $scope.data = {};
+                      $scope.resetForm = resetForm;
+
+                      $scope.btnDis = false;
+                      $scope.spin = false;
+                      $scope.pageSizeArray = [];
+                      $scope.pageSizeArray.push({ value: 5, text: 5 });
+                      $scope.pageSizeArray.push({ value: 10, text: 10 });
+                      $scope.pageSizeArray.push({ value: 20, text: 20 });
+                      $scope.pageSizeArray.push({ value: 50, text: 50 });
+                      $scope.currentPage = 1;
+                      $scope.pageSize = 10;
+                  }
+
+                  function setProgress(s)
+                  {
+                      $scope.btnDis = s;
+                      $scope.spin = s;
+                  }
+
+                  function resetForm() {
+                      $scope.modalTitle = "Add Designation";
+                      $scope.designation = {};
+                      $scope.designation.DesignationID = 0;
+                      $scope.addform.$setUntouched();
+                      $scope.addform.$setPristine();
+                      $scope.submitted = false;
+                      $scope.Id = '';
+                      setProgress(false);
+                  }
+
+                  function getDesignation(pageno) {
+                      $scope.designations = [];
+                     
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Employee/GetDesignations/'
+                      }).then(function successCallback(response) {
+                          $scope.designations = response.data;
+                      }, function errorCallback(response) {
+                          toastr["info"](response.data.message);
+                      });
+                  }
+
+                  $scope.edit = function (n) {
+                      $scope.modalTitle = "Update Designation";
+                      $scope.designation = n;
+                      $scope.designation.CategoryID = Number(n.CategoryID);
+                      $scope.designation.DesignationID = n.DesignationID;
+                      $scope.Id = n.DesignationID;
+                  };
+
+                  $scope.save = function save(e) {
+                      if ($scope.addform.$invalid)
+                          return;
+                      setProgress(true);
+                      if ($scope.designation.DesignationID != 0) /// For Update
+                      {
+                          if ($scope.designation != '') {
+                              $http({
+                                  method: 'PUT',
+                                  url: baseUrl + 'Employee/UpdateDesignation/',
+                                  data: $scope.designation
+                              }).then(function successCallback(response) {
+
+                                  $('#addmodal').modal('toggle');
+                                  getDesignation(1);
+                                  toastr["info"](response.data.Message);
+                                  resetForm();
+                              }, function errorCallback(response) {
+                                  toastr["info"](response.data.Message);
+                                  getDesignation(1);
+                                  setProgress(false);
+                              });
+                          }
+                      } else {  //  For Add
+                          if ($scope.designation != {}) {
+                              $http({
+                                  method: 'POST',
+                                  url: baseUrl + '/Employee/AddDesignation/',
+                                  data: $scope.designation
+                              }).then(function successCallback(response) {
+
+                                  $('#addmodal').modal('toggle');
+                                  getDesignation(1);
+                                  toastr["info"](response.data.Message);
+                                  resetForm();
+                              }, function errorCallback(response) {
+                                  toastr["info"](response.data.Message);
+                                  getDesignation(1);
+                                  setProgress(false);
+                              });
+                          }
+                      }
+
+                  };
+
+                  $scope.deleteDesignation = function deleteDesignation(n) {
+
+                      SweetAlert.swal({
+                          title: "Are you sure to delete it ?", type: "warning", showCancelButton: true, confirmButtonColor: "#DD6B55",
+                          confirmButtonText: "Yes, delete it!",
+                          closeOnConfirm: false
+                      },
+                      function (isConfirm) {
+                          if (isConfirm) {
+                              $http({
+                                  method: 'DELETE',
+                                  url: baseUrl + '/Employee/DeleteDesignation/' + n.DesignationID,
+                              }).then(function successCallback(response) {
+                                  SweetAlert.swal("Deleted!", "Your data has been deleted.", "success");
+                                  getDesignation(1);
+                              }, function errorCallback(response) {
+                                  toastr["info"](response.data.message);
+                              });
+                          }
+                      });
+                  };
+
+                  function getCategory() {
+                      $scope.categories = [];                    
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + '/Employee/GetAllCategories/'
+                      }).then(function successCallback(response) {
+                          $scope.categories = response.data.results;
+                      }, function errorCallback(response) {
+                          toastr["error"](response.data.message);
+                      });
+                  }
+              }]);
+
+        </script>
+
+
+    }
+

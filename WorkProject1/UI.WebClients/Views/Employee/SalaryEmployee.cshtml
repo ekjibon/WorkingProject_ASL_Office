@@ -1,0 +1,396 @@
+﻿
+@{
+    ViewBag.Title = "SalaryEmployee";
+}
+
+<div class="portlet box blue-hoki" style="width: 100%" ng-controller="ctrlSalaryEmployee">
+    <!-- Begin: life time stats -->
+    <div class="portlet light bordered">
+        <div class="portlet-title">
+            <div class="caption">
+                <i class="icon-settings font-green"></i>
+                <span class="caption-subject font-green sbold uppercase">Salary Employee</span>
+            </div>
+            <div class="actions">
+                <div class="btn-group btn-group-solid">
+                    <button ng-click="submitted=false" class="btn green" data-target="#addmodal" data-toggle="modal"> <i class="fa fa-plus"></i> Add Salary Employee</button>
+                </div>
+            </div>
+        </div>
+        <div class="portlet-body">
+            <div class="table-container">
+                <div id="sample_3_wrapper" class="dataTables_wrapper no-footer">
+                    <div class="row">
+                        <div class="col-md-4 col-sm-5 col-xs-6">
+                            <div class="form-group">
+                                <div class="col-lg-3 col-md-5 col-sm-4 col-xs-8" style="padding-left:0px">
+                                    <select class="form-control" ng-model="pageSize" ng-options="P.value as P.text for P in pageSizeArray"></select>
+                                </div>
+                                <div class="col-md-7  col-sm-8  col-xs-4">
+                                    @*<label for="search" class="control-label" style="padding-top:5px">Items</label>*@
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 col-sm-3 col-xs-1">
+                        </div>
+                        <div class="col-md-4 col-sm-4 col-xs-5">
+                            <div id="sample_3_filter" class="pull-right">
+                                <input ng-model="q" id="search" class="form-control" placeholder="Filter text">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="table-scrollable"> </div>
+                    <table class="table table-bordered table-hover">
+                        <thead>
+                            <tr class="btn-primary">
+                                <th>SI</th>
+                                <th>Period Name</th>
+                                <th>Head Salary</th>
+                                <th>Employee Name</th>
+                                <th>Grade</th>
+                                <th>Tax Year</th>
+                                <th>Amount</th>
+                                <th style="text-align:center">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-show="Versions.results.length <= 0"><td colspan="5" style="text-align:center;"><i class="fa fa-refresh"></i> Loading new data!!</td></tr>
+                            <tr dir-paginate="item in salaryEmployeeList| filter:q  | itemsPerPage: pageSize" current-page="currentPage">
+                                <td>{{$index+1}}</td>
+                                <td>{{item.PeriodName}}</td>
+                                <td>{{item.HeadName}}</td>
+                                <td>{{item.FullName}}</td>
+                                <td>{{item.GradeName}}</td>
+                                <td>{{item.YearName}}</td>
+                                <td>{{item.Amount}}</td>
+                                <td align="center">
+                                    <a href="javascript:;" class="btn btn-icon-only green" ng-click="editSalaryEmployee(item)" data-target="#addmodal" data-toggle="modal">
+                                        <i class="fa fa-edit"></i>
+                                    </a>
+                                    <a ng-click="deleteSalaryEmployee(item.Id)" href="javascript:;" class="btn btn-icon-only red">
+                                        <i class="fa fa-trash"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="row">
+                        <dir-pagination-controls boundary-links="true" template-url="~/assets/angular/lib/dirPagination.tpl.html"></dir-pagination-controls>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- End: life time stats -->
+    <!--Modal Area Start-->
+    <div id="addmodal" class="modal fade" tabindex="-1" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form name="addBasic" ng-submit="save()" class="form-horizontal" id="form_sample_1" novalidate>
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">X</button>
+                        <h4 class="modal-title">{{modalTitle}}</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-body">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group" ng-class="{ 'has-error' : submitted && addBasic.SalaryPeriodId.$invalid}">
+                                        <label class="col-md-3 control-label">
+                                            Salary Period :
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-9">
+                                            <select class="form-control" ng-model="employeeInfo.SalaryPeriodId" name="SalaryPeriodId" required ng-options="period.Id as period.PeriodName  for period in salaryPeriodList">
+                                                <option value="" selected="selected">Select Salary Period</option>
+                                            </select>
+                                            <span ng-show="submitted &&  addBasic.SalaryPeriodId.$error.required" class="help-block">Salary Period Required</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group" ng-class="{ 'has-error' : submitted && addBasic.HeadId.$invalid}">
+                                        <label class="col-md-3 control-label">
+                                            Head Salary :
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-9">
+                                            <select class="form-control" ng-model="employeeInfo.HeadId" name="HeadId" required ng-options="head.Id as head.HeadName  for head in headSalarylist">
+                                                <option value="" selected="selected">Select Head Salary</option>
+                                            </select>
+                                            <span ng-show="submitted &&  addBasic.HeadId.$error.required" class="help-block">Head Account Required</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group" ng-class="{ 'has-error' : submitted && addBasic.EmpId.$invalid}">
+                                        <label class="col-md-3 control-label">
+                                            Employee :
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-9">
+                                            <select class="form-control" ng-model="employeeInfo.EmpId" name="EmpId" required ng-options="employee.EmpBasicInfoID as employee.FullName  for employee in employeelist">
+                                                <option value="" selected="selected">Select Employee</option>
+                                            </select>
+                                            <span ng-show="submitted &&  addBasic.EmpId.$error.required" class="help-block">Employee Required</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group" ng-class="{ 'has-error' : submitted && addBasic.GradeId.$invalid}">
+                                        <label class="col-md-3 control-label">
+                                            Grade :
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-9">
+                                            <select class="form-control" ng-model="employeeInfo.GradeId" name="GradeId" required ng-options="grade.SalaryGradeId as grade.Name  for grade in gradelist">
+                                                <option value="" selected="selected">Select Grade</option>
+                                            </select>
+                                            <span ng-show="submitted &&  addBasic.GradeId.$error.required" class="help-block">Grade Required</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group" ng-class="{ 'has-error' : submitted && addBasic.TaxYearId.$invalid}">
+                                        <label class="col-md-3 control-label">
+                                            Tax Year :
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-9">
+                                            <select class="form-control" ng-model="employeeInfo.TaxYearId" name="TaxYearId" required ng-options="taxYear.Id as taxYear.YearName  for taxYear in taxYearlist">
+                                                <option value="" selected="selected">Select Tax Year</option>
+                                            </select>
+                                            <span ng-show="submitted &&  addBasic.TaxYearId.$error.required" class="help-block">Tax Year Required</span>
+                                        </div>
+                                    </div>
+
+
+                                    <div class="form-group" ng-class="{ 'has-error' : submitted && addBasic.Amount.$invalid}">
+                                        <label class="col-md-3 control-label">
+                                            Amount :
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-9">
+                                            <input type="number" ng-model="employeeInfo.Amount" class="form-control" placeholder="Amount" name="Amount" required>
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted &&  addBasic.Amount.$error.required" class="help-block">Amount Required</span>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" data-dismiss="modal" class="btn dark btn-outline" ng-click="resetForm();submitted=false">Cancel</button>
+                        <button type="submit" ng-click="submitted=true" class="btn green-haze">{{modalbutton}}</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!--Modal Area End-->
+</div>
+<!-- END FORM-->
+@section Scripts{
+    <script src="~/assets/global/plugins/bootstrap-fileinput/bootstrap-fileinput.js" type="text/javascript"></script>
+    <script src="~/assets/pages/scripts/form-repeater.min.js"></script>
+    <script type="text/javascript">
+        for (i = new Date().getFullYear() ; i > 1900; i--) {
+            $('#yearpicker').append($('<option />').val(i).html(i));
+        }
+    </script>
+    <script type="text/javascript">
+        OEMSApp.controller("ctrlSalaryEmployee", ["$scope", "$http", "SweetAlert",
+              function ($scope, $http, SweetAlert) {
+                  init();
+                  function init() {
+                      initialize();
+                      getAllSalaryEmployee();
+                      getAllSalaryHead();
+                      getAllEmployeeList();
+                      getAllGradeList();
+                      getAllTaxYearList();
+                      getAllSalaryPeriod();
+
+                  }
+
+                  function initialize() {
+                      $scope.modalbutton = 'Save';
+                      $scope.modalTitle = 'Salary Employee';
+                      $scope.brnlist = [];
+                      $scope.getAllLedger = [];
+                      $scope.taxYearlist = [];
+                      $scope.employeeInfo = {};
+                      $scope.employeeInfos = [];
+                      $scope.salaryEmployeeList = [];
+                      $scope.resetForm = resetForm;
+                      $scope.checkUpdateId = 0;
+                      $scope.pagesize = 10;
+                      $scope.pageSizeArray = [];
+                      $scope.pageSizeArray.push({ value: 5, text: 5 });
+                      $scope.pageSizeArray.push({ value: 10, text: 10 });
+                      $scope.pageSizeArray.push({ value: 20, text: 20 });
+                      $scope.pageSizeArray.push({ value: 50, text: 50 });
+                      $scope.currentPage = 1;
+                      $scope.pageSize = 10;
+                      $scope.employeelist = [];
+                      $scope.gradelist = [];
+                      $scope.salaryPeriodList = [];
+                  }
+
+                  function resetForm() {
+                      $scope.modalbutton = 'Save';
+                      $scope.modalTitle = "Add Salary Employee";
+                      $scope.employeeInfo = {};
+                      $scope.Id = '';
+                      $scope.checkUpdateId = 0;
+                      $scope.addBasic.$setUntouched();
+                      $scope.addBasic.$setPristine();
+                      //$scope.submitted = false;
+                  }
+
+                  function getAllSalaryPeriod() {
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Employee/GetAllSalaryPeriod/'
+                      }).then(function successCallback(response) {
+                          $scope.salaryPeriodList = response.data.results;
+                      }, function errorCallback(response) {
+                          toastr["info"](response.data.Message);
+                      });
+                  }
+
+                  function getAllSalaryHead() {
+                      $scope.headSalarylist = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Employee/GetAllSalaryHead/',
+                      }).then(function successCallback(response) {
+                          $scope.headSalarylist = response.data.results;
+                      }, function errorCallback(response) {
+                      });
+                  }
+
+                  function getAllEmployeeList() {
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Employee/GetAllEmployeeList/'
+                      }).then(function successCallback(response) {
+                          $scope.employeelist = response.data.results;
+                      }, function errorCallback(response) {
+                          toastr["info"](response.data.Message);
+                      });
+                  }
+
+                  function getAllGradeList()
+                  {
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Employee/GetSalaryGrade/'
+                      }).then(function successCallback(response) {
+                          $scope.gradelist = response.data.results;
+                      }, function errorCallback(response) {
+                          toastr["info"](response.data.Message);
+                      });
+                  }
+
+                  function getAllTaxYearList() {
+
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Employee/GetAllSalaryTaxYear/',
+                      }).then(function successCallback(response) {
+                          $scope.taxYearlist = response.data.results;
+                      }, function errorCallback(response) {
+                      });
+                  }
+
+                  $scope.save = function save()
+                  {
+                      if ($scope.addBasic.$invalid)
+                          return;
+                      if ($scope.checkUpdateId != 10002)
+                      {
+                          $http({
+                              method: 'POST',
+                              url: baseUrl + 'Employee/AddSalaryEmployee/',
+                              data: $scope.employeeInfo
+                          }).then(function successCallback(response) {
+                              $('#addmodal').modal('toggle');
+                              toastr["info"](response.data.message);
+                              getAllSalaryEmployee();
+                              resetForm();
+                          }, function errorCallback(response) {
+                              toastr["warning"](response.data.Message);
+                          });
+                      }
+                      if ($scope.checkUpdateId == 10002) {
+                          if ($scope.addBasic.$invalid)
+                              return;
+                          else {
+                              $http({
+                                  method: 'PUT',
+                                  url: baseUrl + 'Employee/UpdateSalaryEmployee/',
+                                  data: $scope.employeeInfo
+                              }).then(function successCallback(response) {
+                                  toastr["info"](response.data.message);
+                                  if (response.data.httpStatusCode != 305) {
+                                      $('#addmodal').modal('toggle');
+                                      resetForm();
+                                  }
+                                  getAllSalaryEmployee();
+                              }, function errorCallback(response) {
+                                  toastr["warning"](response.data.Message);
+                              });
+                          }
+                      }
+                  }
+
+                  function getAllSalaryEmployee()
+                  {
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Employee/GetAllSalaryEmployee/'
+                      }).then(function successCallback(response) {
+                          $scope.salaryEmployeeList = response.data.results;
+                      }, function errorCallback(response) {
+                          toastr["info"](response.data.Message);
+                      });
+                  }
+
+                  $scope.deleteSalaryEmployee = function deleteSalaryEmployee(salaryId)
+                  {
+                      SweetAlert.swal({
+                          title: "Are you sure to delete it ?", type: "warning", showCancelButton: true, confirmButtonColor: "#DD6B55",
+                          confirmButtonText: "Yes, delete it!",
+                          closeOnConfirm: false
+                      },
+                        function (isConfirm) {
+                            if (isConfirm) {
+                                $http({
+                                    method: 'DELETE',
+                                    url: baseUrl + 'Employee/DeleteSalaryEmployee/' + salaryId,
+                                }).then(function successCallback(response) {
+                                    SweetAlert.swal("Deleted!", "Your data has been deleted.", "success");
+                                    getAllSalaryEmployee();
+                                }, function errorCallback(response) {
+                                    toastr["info"](response.data.message);
+                                });
+                            }
+                        });
+                  }
+
+                  $scope.editSalaryEmployee = function editSalaryEmployee(item)
+                  {
+                      $scope.modalbutton = 'Update';
+                      $scope.employeeInfo.Id = item.Id;
+                      $scope.employeeInfo.SalaryPeriodId = item.SalaryPeriodId;
+                      $scope.employeeInfo.HeadId = item.HeadId;
+                      $scope.employeeInfo.EmpId = item.EmpId;
+                      $scope.employeeInfo.GradeId = item.GradeId;
+                      $scope.employeeInfo.TaxYearId = item.TaxYearId;
+                      $scope.employeeInfo.Amount = item.Amount;
+
+                      $scope.checkUpdateId = 10002;
+                  }
+              }]);
+    </script>
+}
+

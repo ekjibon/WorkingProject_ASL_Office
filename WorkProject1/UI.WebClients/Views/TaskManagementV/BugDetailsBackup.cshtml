@@ -1,0 +1,602 @@
+﻿
+@using UI.Admin.Models.Task;
+@using UI.Admin.Models;
+@using UI.Admin.Models.Customer;
+@{
+    Bug bug = ViewData["Bug"] as Bug;
+    List<BugAttachment> bugAttachment = ViewData["BugAttachment"] as List<BugAttachment>;
+
+    Modules modules = ViewData["Module"] as Modules;
+    TestSite testsite = ViewData["TestSite"] as TestSite;
+
+}
+@{
+    ViewBag.Title = "Bug Details";
+}
+
+<style>
+    .kyc_card_header {
+        padding: 0px 9px;
+        background: #f0f8ff;
+        border-bottom: 0;
+    }
+
+        .kyc_card_header h3 {
+            font-size: 22px;
+            font-family: 'Ubuntu', sans-serif;
+            font-weight: 500;
+            color: #222;
+        }
+
+        .kyc_card_header p {
+            font-size: 13px;
+            font-family: 'Ubuntu', sans-serif;
+            font-weight: 800;
+            color: #666666;
+        }
+
+        .kyc_card_header span {
+            font-size: 18px;
+            font-family: 'Ubuntu', sans-serif;
+            font-weight: 800;
+            color: #666666;
+        }
+
+    .kyc_card_header {
+        padding: 0px 9px;
+        background: #f0f8ff;
+        border-bottom: 0;
+    }
+
+        .kyc_card_header h3 {
+            font-size: 22px;
+            font-family: 'Ubuntu', sans-serif;
+            font-weight: 500;
+            color: #222;
+        }
+
+        .kyc_card_header p {
+            font-size: 13px;
+            font-family: 'Ubuntu', sans-serif;
+            font-weight: 800;
+            color: #666666;
+        }
+
+        .kyc_card_header span {
+            font-size: 18px;
+            font-family: 'Ubuntu', sans-serif;
+            font-weight: 800;
+            color: #666666;
+        }
+
+    .orange_icon {
+        margin-top: 55px;
+    }
+
+        .orange_icon i {
+            width: 37px;
+            height: 37px;
+            border: 2px solid #777;
+            color: #222;
+            line-height: 35px;
+            font-size: 20px;
+            border-radius: 6px;
+            transition: all linear .3s;
+            cursor: pointer;
+        }
+
+            .orange_icon i:hover {
+                background: #999;
+                color: #fff;
+            }
+
+    .Description_text input {
+        width: 100%;
+        height: 100%;
+    }
+
+    .description_list {
+        border: 0px solid #ddd;
+    }
+
+    .Description_text {
+        width: 100%;
+        height: 50px;
+        border: 2px solid #ddd;
+        margin-bottom: 12px;
+    }
+
+    .description_main p {
+        font-size: 13px;
+        font-weight: 700;
+    }
+
+    .development p {
+        font-size: 11px;
+        font-family: 'Ubuntu', sans-serif;
+        font-weight: 400;
+        color: #444;
+        margin-bottom: 5px;
+    }
+
+    .development span {
+        font-size: 10px;
+        color: #444;
+        margin-bottom: 5px;
+    }
+
+    .man {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        background: #c00;
+        overflow: hidden;
+    }
+
+    .assain p {
+        font-size: 14px;
+        margin-bottom: 1px;
+    }
+
+    .assain h4 {
+        font-size: 13px;
+    }
+
+    .assain h5 {
+        font-size: 10px;
+    }
+
+    #comments_created {
+        height: 60px;
+        margin-bottom: 12px;
+    }
+
+    .comments {
+        border: 2px solid #ddd;
+        padding-left: 10px;
+        height: 90px;
+    }
+
+    .comment_main {
+        width: 28%;
+        float: left;
+    }
+
+    .Progress {
+        width: 72%;
+        display: flex;
+    }
+
+        .Progress td {
+            font-size: 14px;
+        }
+
+    .progress_table {
+        margin-top: 25px;
+    }
+
+    .comments p {
+        font-size: 18px;
+        margin-bottom: 0;
+    }
+
+    .comments span {
+        font-size: 18px;
+        font-family: 'Ubuntu', sans-serif;
+        font-weight: 800;
+    }
+
+    .comments h5 {
+        font-size: 12px;
+        ;
+    }
+
+    .comments_text textarea {
+        height: 100%;
+        width: 100%;
+        resize: none;
+    }
+
+    .comments_text {
+        margin-top: -22px;
+    }
+
+    .date p {
+        font-size: 16px;
+        margin-bottom: 2px;
+    }
+
+    .date i {
+        font-size: 20px;
+        color: #444;
+    }
+
+    .date span {
+        font-size: 18px;
+    }
+
+    .file {
+        margin-top: -10px;
+        background: #faebd7;
+        padding: 5px 0;
+    }
+
+        .file i {
+            font-size: 20px;
+            color: #444;
+        }
+
+        .file span {
+            font-size: 15px;
+        }
+
+    .Activities span {
+        margin-left: 12px;
+        font-size: 16px;
+    }
+
+    .Activities {
+        margin-top: 15px;
+    }
+
+        .Activities i {
+            font-size: 20px;
+        }
+
+        .Activities p {
+            font-size: 12px;
+            margin-bottom: 3px;
+        }
+
+            .Activities p span {
+                font-size: 12px;
+                font-weight: 700;
+            }
+
+    .comments_area {
+        margin-top: -20px;
+    }
+
+        .comments_area textarea {
+            width: 100%;
+            font-size: 18px;
+            height: 60px;
+        }
+
+    .people i {
+        font-size: 20px;
+    }
+
+    .people span {
+        font-size: 16px;
+        padding-left: 0px;
+    }
+
+    .thumbnail {
+        padding: 0px;
+    }
+
+    .panel {
+        position: relative;
+    }
+
+        .panel > .panel-heading:after, .panel > .panel-heading:before {
+            position: absolute;
+            top: 11px;
+            left: -16px;
+            right: 100%;
+            width: 0;
+            height: 0;
+            display: block;
+            content: " ";
+            border-color: transparent;
+            border-style: solid solid outset;
+            pointer-events: none;
+        }
+
+        .panel > .panel-heading:after {
+            border-width: 7px;
+            border-right-color: #f7f7f7;
+            margin-top: 1px;
+            margin-left: 2px;
+        }
+
+        .panel > .panel-heading:before {
+            border-right-color: #ddd;
+            border-width: 8px;
+        }
+</style>
+<div ng-controller="bugDetails" class="card" id="kyc_card">
+    <div class="row" style="margin-top: -1%;">
+        <div class="col-lg-9 card-header kyc_card_header">
+            <h3>#@bug.Id Bug ( @bug.Title )</h3>
+            <p> <i class="fas fa-plus-circle"></i> Added by: <span>@ViewData["BugAddedByFullName"] </span>at @bug.AddDate.ToShortDateString() </p>
+        </div>
+        <div class="col-lg-3  orange_card">
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-9">
+            <div class="row">
+                <div class="col-lg-4">
+                    <div class="development">
+                        <table class="table table-borderless">
+                            <tbody>
+                               
+                                <tr>
+                                    <td class="p-0">Status:</td>
+                                    @{
+                                        if (bug.Status == "1")
+                                        {
+                                            <td style="font-size:15px;" class="p-0"><p class="label label-success" style="font-style: italic;font-size: medium;padding-left: 28%;padding-right: 28%;color: white;">Pending</p></td>
+                                        }
+                                        else if(bug.Status == "2")
+                                        {
+                                            <td style="font-size:15px;" class="p-0"><p class="label label-success" style="font-style: italic;font-size: medium;padding-left: 26%;padding-right: 26%;color: white;">In Progress</p></td>
+                                        }
+                                        else if (bug.Status == "3")
+                                        {
+                                            <td style="font-size:15px;" class="p-0"><p class="label label-primary" style="font-style: italic;font-size: medium;padding-left: 26%;padding-right: 26%;color: white;">Test Pending</p></td>
+                                        }
+                                        else if (bug.Status == "4")
+                                        {
+                                            <td style="font-size:15px;" class="p-0"><p class="label label-success" style="font-style: italic;font-size: medium;padding-left: 16%;padding-right: 16%;color: white;">Test In Progress</p></td>
+                                        }
+                                        else if (bug.Status == "5")
+                                        {
+                                            <td style="font-size:15px;" class="p-0"><p class="label label-danger" style="font-style: italic;font-size: medium;padding-left: 26%;padding-right: 26%;color: white;">Not Solve</p></td>
+                                        }
+                                        else if (bug.Status == "0")
+                                        {
+                                            <td style="font-size:15px;" class="p-0"><p class="label label-default" style="font-style: italic;font-size: medium;padding-left: 26%;padding-right: 26%;color: white;">Closed</p></td>
+                                        }
+                                    }
+                                </tr>
+                                @*<tr>
+                                    <td class="p-0">Task Status:</td>
+                                    @if (task == null)
+                                    {
+                                        <td style="font-size:15px;" class="p-0"><p class="label label-warning" style="font-style: italic;font-size: medium;padding-left: 34%;padding-right: 34%;color: white;">N/A</p></td>
+                                    }
+                                    else if (task.Status == "In Progress")
+                                    {
+                                        <td style="font-size:15px;" class="p-0"><p class="label label-info" style="font-style: italic;font-size: medium;padding-left: 9%;padding-right: 9%;color: white;">@task.Status</p></td>
+                                    }
+                                    else if (task.Status == "Pending")
+                                    {
+                                        <td style="font-size:15px;" class="p-0"><p class="label label-primary" style="font-style: italic;font-size: medium;padding-left: 19%;padding-right: 19%;color: white;">@task.Status</p></td>
+                                    }
+                                    else if (task.Status == "Paused")
+                                    {
+                                        <td style="font-size:15px;" class="p-0"><p class="label label-warning" style="font-style: italic;font-size: medium;padding-left: 21%;padding-right: 21%;color: white;">@task.Status</p></td>
+                                    }
+                                    else if (task.Status == "Resolved")
+                                    {
+                                        <td style="font-size:15px;" class="p-0"><p class="label label-success" style="font-style: italic;font-size: medium;padding-left: 15%;padding-right: 15%;color: white;">@task.Status</p></td>
+                                    }
+
+                                </tr>*@
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="development">
+                        <table class="table table-borderless">
+                            <tbody>
+                                <tr>
+                                    <td class="p-0">Module :</td>
+
+                                    @{
+                                        if (modules == null)
+                                        {
+                                            <td class="p-0">N/A</td>
+                                        }
+                                        else
+                                        {
+                                            <td class="p-0" style="font-style: italic;">@modules.ModuleName</td>
+                                        }
+                                    }
+
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="development">
+                        <table class="table table-borderless">
+                            <tbody>
+                                <tr>
+                                    <td class="p-0">Test Site :</td>
+
+                                    @{
+                                        if (testsite == null)
+                                        {
+                                            <td class="p-0">N/A</td>
+                                        }
+                                        else
+                                        {
+                                            <td class="p-0" style="font-style: italic;">@testsite.SiteName</td>
+                                        }
+                                    }
+
+                                </tr>
+                        
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3">
+            <div class="row" style="margin-top: 5%;">
+                <div class="col-lg-12">
+                </div>
+            </div>
+            @*<div class="date">
+                <p style="font-size: x-large;background-color: gainsboro;text-align:center"><i class="fas fa-calendar-alt" style="padding-right: 3%;"></i><i style="padding-right: 19%;">Close Date</i></p>
+                <span>@ticket.ClosedDate.ToShortDateString()</span>
+            </div>*@
+        </div>
+    </div>
+    <div class="row" style="margin-top: -1%;">
+        <div class="col-lg-9">
+            <p style="font-size: larger;text-decoration: underline; font-weight: bold; font-size: 18px;">Description :</p>
+            <p style="">@bug.Description</p>
+        </div>
+        <div class="col-lg-3  orange_card">
+            <p style="font-size: x-large;background-color: gainsboro;text-align:center"><i class="fas fa-paperclip" style="padding-right: 3%;"></i><i style="padding-right: 8%;">Attachments</i></p>
+            <div class="file">
+                <table>
+                    <tbody>
+                        @{
+                            if (bugAttachment == null)
+                            {
+                                <tr>
+                                    <td> No File</td>
+                                </tr>
+                            }
+                            else
+                            {
+                                int count = 1;
+                                foreach (BugAttachment item in bugAttachment)
+                                {
+                                    <tr>
+                                        <td class="text-left" style="width:200px;">
+
+                                            <label>@count)</label>
+                                            <a href="@Url.Content(item.Path)" target="_blank">
+                                                @bug.Title
+                                            </a>
+
+                                        </td>
+                                    </tr>
+                                    count++;
+                                }
+                                @*foreach (TicketsAttachment item in ticketAttachment)
+                                {
+                                    <tr>
+                                        <td class="text-left" style="width:200px;">
+
+                                            <label>@count)</label>
+                                            <a href="@Url.Content(item.Path)" target="_blank">
+                                                @item.FileName
+                                            </a>
+
+                                        </td>
+                                    </tr>
+                                    count++;
+                                }*@
+                            }
+                        }
+                        <tr></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="row" style="margin-top: -1%;">
+        <div class="col-lg-9">
+            <div  class="comments  mb-3 mt-4" style="" id="comments_created">
+                <div ng-repeat="item in CommentList">
+                    <div class="col-sm-1">
+                        <div class="thumbnail" style="height: 47px;width: 46px;">
+                            <img class="img-responsive user-photo" src="/UserAPI/GetProfileImage?UserName={{item.AddBy}}">
+                        </div>
+                    </div>
+                    <div class="col-sm-11">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <strong>{{item.AddBy}}</strong> <span class="text-muted">at {{item.AddDate.replace('/Date(','').replace(')/','') |   date:'dd-MM-yyyy'}}</span>
+
+                            </div>
+                            <div class="panel-body">
+                                {{item.Description}}
+                            </div>
+                          
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        @*<div class="col-lg-3  orange_card">
+            <div class="Activities" style="margin-left: 1%;">
+                <p style="font-size: x-large;background-color: gainsboro;text-align:center"><i class="fas fa-users" style="padding-right: 3%;"></i><i>People Involved</i></p>
+                <p><span></span></p>
+            </div>
+        </div>*@
+    </div>
+    <form class="form-inline" name="frm" role="form" novalidate ng-submit="Submit()">
+        <div class="row" style="margin-top: -1%;" ng-class="{ 'has-error' : submitted && frm.Description.$invalid}">
+            <div class="col-lg-9">
+                <label class="label label-success" style="margin-left: 10%;font-size: initial;">Write your Reply</label>
+                <textarea class="col-lg-9" required ng-model="Comments.Description" name="Description" style="margin-left: 10%;width: 88%;"></textarea>
+            </div>
+            <div class="col-lg-3  orange_card">
+
+            </div>
+        </div>
+        <div class="row" style="margin-left: 8%;">
+            <span ng-show="submitted &&  frm.Description.$error.required" class="text-danger">Description is Required</span>
+        </div>
+        <div class="row" style="margin-top: 1%; margin-left: 6%;">
+            <div class="col-lg-9">
+                <a href="@Url.Action("BugList","Home")" class="btn btn-primary" title="Go To Task List"><i class="fas fa-arrow-left"><span> Back to List</span></i></a>
+                <input style="margin-left: 70%;" type="submit" class="btn btn-primary" ng-click="submitted=true" value="Post" />
+            </div>
+            <div class="col-lg-3">
+
+            </div>
+        </div>
+    </form>
+</div>
+<script type="text/javascript">
+    AddieApp.controller("bugDetails", ["$scope", "$http", "SweetAlert",
+          function ($scope, $http, SweetAlert) {
+              init();
+              function init() {
+                  initialize();
+                  $scope.Comments = {};
+                  //$scope.Comments.RefId = ;
+                  $scope.Comments = {};
+                  $scope.Comments.RefId = '@ViewBag.Id';
+                  $scope.submitted = false;
+                  LoadCommentList();
+              }
+
+              function initialize() {
+              };
+              $scope.Submit = function () {
+                  if ($scope.frm.$invalid)
+                      return;
+                  $http.post(baseUrl + 'BugTest/AddCommentBug', $scope.Comments).
+                        then(function (response) {
+                            if (response.data == 1) {
+                                $scope.Comments.Description = '';
+                                LoadCommentList();
+                                $scope.submitted=false;
+                            } else {
+                            }
+                        });
+              }
+              
+              function LoadCommentList() {
+                  $http.get(baseUrl + 'BugTest/GetCommentBug?BugId=' + '@ViewBag.Id').
+                         then(function (response) {
+                             //console.log(response.data);
+                             $scope.CommentList = response.data;
+                         });
+              }
+
+              $scope.ResetFrm = function () {
+                  $scope.Project = {};
+                  $scope.btnTitle = 'Save';
+                  $scope.IsEdit = 0;
+                  $scope.submitted = false;
+
+              }
+          }]);
+</script>
+

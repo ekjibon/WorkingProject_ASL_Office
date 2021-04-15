@@ -1,0 +1,162 @@
+﻿
+@{
+    ViewBag.Title = "Class Subject Config";
+}
+<div ng-controller="ClassSubjectConfig">
+    <!-- Begin: life time stats -->
+    <div class="portlet light bordered">
+        <div class="portlet-title">
+            <div class="caption">
+                <i class="icon-settings font-green"></i>
+                <span class="caption-subject font-green sbold uppercase">@ViewBag.Title</span>
+            </div>
+        </div>
+        <div class="portlet-body">
+            <form name="formCommonFeilds" ng-submit="scarch()" class="form-horizontal" id="form_sample_1" novalidate>
+                <div class="form-body">
+                    <div class="row">
+                        <div class="col-md-5">
+                            <div class="form-group" ng-class="{ 'has-error' : submitted && formCommonFeilds.Version.$invalid}">
+                                <label class="col-md-5 control-label">
+                                    Version :
+                                    <span class="required">*</span>
+                                </label>
+                                <div class="col-md-7">
+                                    <select class="form-control" ng-model="Sbject.VersionId" required name="Version" ng-options="Sbject.VersionId as Sbject.VersionName for Sbject in Versions">
+                                        <option value="" selected="selected">Choose Option</option>
+                                    </select>
+                                    <div class="form-control-focus"> </div>
+                                    <span ng-show="submitted && formCommonFeilds.Version.$error.required" class="help-block">Version Required</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-5">
+                            <div class="form-group" ng-class="{ 'has-error' : submitted && formCommonFeilds.Session.$invalid}">
+                                <label class="col-md-5 control-label">
+                                    Session :
+                                    <span class="required">*</span>
+                                </label>
+                                <div class="col-md-7">
+                                    <select class="form-control" ng-model="Sbject.SessionId" required name="Session" ng-options="Sbject.SessionId as Sbject.SessionName for Sbject in Sessions">
+                                        <option value="" selected="selected">Choose Option</option>
+                                    </select>
+
+                                    <div class="form-control-focus"> </div>
+                                    <span ng-show="submitted && formCommonFeilds.Session.$error.required" class="help-block">Session Required</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <button type="submit" ng-click="submitted=true" class="btn green-haze">Show</button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+            <div class="table-container">
+                <div id="sample_3_wrapper" class="dataTables_wrapper no-footer">
+                    <div class="table-scrollable"> </div>
+                    <table class="table table-bordered table-hover">
+                        <thead>
+                            <tr class="btn-primary">
+                                <th style="text-align:center">SL</th>
+                                <th>Class</th>
+                                <th>Group</th>
+                                <th>Total Sub</th>
+                                <th>Total Compolsary</th>
+                                <th>Total Selective</th>
+                                <th>Total Third</th>
+                                <th>Total Forth</th>
+                            </tr>
+                        </thead>
+                        <tbody>  
+                            <tr ng-show="GroupList.length <= 0"><td colspan="8" style="text-align:center;"><i class="fa fa-database"></i> No data found!</td></tr>
+                            <tr ng-repeat="item in GroupList">
+                                <td style="text-align:center">#{{$index +1}}</td>
+                                <td>{{item.ClassName}}</td>
+                                <td>{{item.GroupName}}</td>
+                                <td><input ng-model="item.TotalSub" type="number" class="form-control"/> </td>
+                                <td><input ng-model="item.TotalCompolsary" type="number" class="form-control"/></td>
+                                <td><input ng-model="item.TotalSelective" type="number" class="form-control"/></td>
+                                <td><input ng-model="item.TotalThird" type="number" class="form-control"/> </td>
+                                <td><input ng-model="item.TotalForth" type="number" class="form-control"/></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                   <button ng-click="save()" ng-show="GroupList.length > 0" class="btn btn-primary pull-right">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- End: life time stats -->
+</div>
+
+@section Scripts{
+
+    <script type="text/javascript">
+        OEMSApp.controller("ClassSubjectConfig", ["$scope", "$http", "SweetAlert",
+              function ($scope, $http, SweetAlert) {
+                  /// 
+                  init();
+                  function init() {
+                      initialize();
+                      getVersions();
+                      getSessions();
+                  }
+                  function initialize() {
+                      $scope.Versions = [];
+                      $scope.Sessions = [];
+                      $scope.GroupList = [];
+                  }
+                  function getVersions() {
+                      $scope.Versions = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'SetupInstitution/GetAllVersion/'
+                      }).then(function successCallback(response) {
+                          $scope.Versions = response.data.results;
+                      }, function errorCallback(response) {
+                          toastr["warning"](response.data.Message);
+                      });
+                  }
+                  function getSessions() {
+                      $scope.Sessions = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'SetupInstitution/GetSessions/'
+                      }).then(function successCallback(response) {
+                          $scope.Sessions = response.data.results;
+                      }, function errorCallback(response) {
+                          toastr["warning"](response.data.Message);
+                      });
+                  }
+                  $scope.scarch = function scarch() {
+                      if ($scope.formCommonFeilds.$invalid)
+                          return;
+                      $scope.GroupList = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'SetupInstitution/GetAllClassandGroupList/' + $scope.Sbject.VersionId + '/' + $scope.Sbject.SessionId
+                      }).then(function successCallback(response) {
+                          $scope.GroupList = response.data.results;
+                      }, function errorCallback(response) {
+                          toastr["warning"](response.data.Message);
+                      });
+                  }
+                  $scope.save = function save() {
+                      if ($scope.GroupList.length > 0)
+                      {
+                       $http({
+                           method: 'POST',
+                           url: baseUrl + 'SetupInstitution/SaveClassSubjectConfig/',
+                           data: $scope.GroupList
+                       }).then(function successCallback(response) {
+                           toastr["success"](response.data.message);
+                       }, function errorCallback(response) {
+                           toastr["warning"](response.data.Message);
+                       });
+                      } 
+                  };
+              }]);
+    </script>
+}
+

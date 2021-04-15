@@ -1,0 +1,145 @@
+﻿@{
+    ViewBag.Title = "SMS Settings";
+}
+<div ng-controller="classes">
+    <!-- Begin: life time stats -->
+    <div class="portlet light bordered">
+        <div class="portlet-title">
+            <div class="caption">
+                <i class="icon-settings font-green"></i>
+                <span class="caption-subject font-green sbold uppercase">@ViewBag.Title</span>
+            </div>
+            
+        </div>
+        <form name="addform" ng-submit="save()" class="form-horizontal" id="form_sample_1" novalidate>
+           
+            <div class="modal-body">
+                <div class="form-body">
+                    <div class="form-group" ng-class="{ 'has-error' : submitted && addform.SmsPart.$invalid}">
+                        <label class="col-md-3 control-label">
+                            Number of SMS Part
+                            <span class="required">*</span>
+                        </label>
+                        <div class="col-md-6">
+                           
+                            <select class="form-control" required ng-model="sms.NoSMSPart" name="SmsPart" ng-options="x.Value as x.Type for x in BodyType">
+                                <option value="">Choose an Option</option>
+                            </select>
+                            <div class="form-control-focus"> </div>
+                            <span ng-show="submitted && addform.SmsPart.$error.required" class="help-block">SMS Part Required</span>
+                        </div>
+                        <div class="col-md-3">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-3" style="text-align:right">
+                            Allow Unicode
+                            <span class="required">*</span>
+                        </label>
+                        <div class="col-md-6">
+                            <input type="radio" ng-model="sms.AllowUnicode" ng-value="true" /> Yes
+                            <input type="radio" ng-model="sms.AllowUnicode" ng-value="false" /> No
+                        </div>
+                        <div class="col-md-3">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-3" style="text-align:right">
+                            Load From
+                        </label>
+                        <div class="col-md-6">
+                            <label class="mt-checkbox">
+                                <input type="checkbox" class="form-control" value="true" ng-model="sms.ForStudent"> Student
+                                <span></span>
+                            </label>
+                            <label class="mt-checkbox">
+                                <input type="checkbox" value="true" ng-model="sms.ForEmployee"> Employee
+                                <span></span>
+                            </label>
+                            <div class="form-control-focus"> </div>
+                        </div>
+                        <div class="col-md-3">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-3" style="text-align:right">
+                            Receiver Number Type
+                        </label>
+                        <div class="col-md-6">
+                            <label class="mt-checkbox">
+                                <input type="checkbox" class="form-control" value="true" ng-model="sms.IsSMSNumber"> SMS No
+                                <span></span>
+                            </label>
+                            <label class="mt-checkbox">
+                                <input type="checkbox" value="true" ng-model="sms.IsFatherNumber"> Father No
+                                <span></span>
+                            </label>
+                            <label class="mt-checkbox">
+                                <input type="checkbox" value="true" ng-model="sms.IsMotherNumber"> Mother No
+                                <span></span>
+                            </label>
+                            <div class="form-control-focus"> </div>
+                        </div>
+                        <div class="col-md-3">
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+               <button type="submit" ng-click="submitted=true" class="btn green">Save</button>
+            </div>
+        </form>
+
+    </div>
+    <!-- End: life time stats -->
+
+</div>
+@section Scripts{
+    <script type="text/javascript">
+        OEMSApp.controller("classes", ["$scope", "$http", "SweetAlert",
+           function ($scope, $http, SweetAlert) {
+               init();
+               function init() {
+                   initialize();
+                   firstSave();
+               }
+               function initialize() {
+                   $scope.sms = {};
+                   $scope.sms.SettingsId = 1;
+                   $scope.firstSave = firstSave;
+                   $scope.BodyType = [{ Type: "1", Value: 1 }, { Type: "2", Value: 2 }, { Type: "3", Value: 3 }, { Type: "4", Value: 4 }, { Type: "5", Value: 5 }];
+               }
+
+               $scope.save = function save() {
+                   if ($scope.addform.$invalid)
+                       return;
+                   
+                       $http({
+                           method: 'PUT',
+                           url: baseUrl + 'SMS/UpdateSmsPart/',
+                           data: $scope.sms
+                       }).then(function successCallback(response) {
+                           toastr["info"](response.data.message);
+                       }, function errorCallback(response) {
+                           toastr["warning"](response.data.Message);
+                       });
+                   
+               };
+               function firstSave() {
+
+                   $http({
+                       method: 'POST',
+                       url: baseUrl + 'SMS/FirstSave/',
+                   }).then(function successCallback(response) {
+                       //toastr["info"](response.data.message);
+                       $scope.sms = response.data.results;
+                   }, function errorCallback(response) {
+                       //toastr["warning"](response.data.Message);
+                   });
+
+               };
+       
+           }]);
+    </script>
+}

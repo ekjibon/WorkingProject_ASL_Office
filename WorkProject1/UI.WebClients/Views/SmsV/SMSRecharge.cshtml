@@ -1,0 +1,225 @@
+﻿
+@{
+    ViewBag.Title = "SMSRecharge";
+}
+
+<div ng-controller="SMSRechargeCrlt">
+    <!-- Begin: life time stats -->
+    @*<div class="portlet light bordered col-md-6">
+            <div class="portlet-title">
+                <div class="caption">
+                    <span class="caption-subject font-green sbold uppercase">SMS Balance</span>
+                </div>
+            </div>
+            <div class="portlet-body">
+                <div class="table-container row">
+                       <div class="form-group">
+                           <label class="col-md-4 control-label">
+                               SMS No :
+                           </label>
+                           <div class="col-md-8">
+                              {{SMSBalance.TotalBalance}}
+                           </div>
+                   </div>
+                </div>
+            </div>
+        </div>*@
+    <!-- End: life time stats -->
+    <!-- Begin: life time stats -->
+    <div class="portlet light bordered col-md-12">
+        <div class="portlet-title">
+            <div class="caption">
+                <span class="caption-subject font-green sbold uppercase">SMS Recharge</span>
+            </div>
+        </div>
+        <div class="portlet-body">
+            <div class="table-container">
+                <div class="form-body">
+                    <form name="addform" class="form-horizontal" id="form_sample_1" novalidate>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group row" style="background: #0cb8ca; width: 100%; margin-left: 0px; padding: 0px 0; border-radius: 10px !important;">
+                                    <div class="col-lg-6">
+                                        <div class="form-group row">
+                                            <label class="col-md-4 control-label">
+                                                <span class="smsSpan">Current Blance :</span>
+                                            </label>
+                                            <div class="col-md-8" style="margin-top:8px;">
+                                                <span class="smsSpan SmsBlance">{{SMSBalance.TotalBalance}}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-6">
+                                        <div class="form-group row">
+                                            <label class="col-md-4 control-label">
+                                                <span class="smsSpan">SMS Unit Price :</span>
+                                            </label>
+                                            <div class="col-md-2 control-label" style="margin-top:3px;">
+                                                <span class="smsSpan SmsUnit">{{SMSBalance.UnitPrice}}</span>
+                                            </div>
+                                        </div>
+
+                                    </div>
+
+                                </div>
+                                <div ng-repeat="item in Packges">
+                                    <div class="col-lg-4 col-md-6">
+                                        <div class="panel panel-primary">
+                                            <div class="panel-heading">
+                                                <div class="row">
+                                                    @*<div class="col-xs-3">
+                                                            <div class="widget-icon">
+                                                                <img src="/assets/global/img/dashboard/total-col.png" style="height: 30px;width: 40px;" alt="Total Student">
+                                                            </div>
+                                                        </div>*@
+                                                    <div class="col-xs-12 text-center">
+
+                                                        <div class="ng-binding" ng-model="NoOfSMS">
+                                                            <h4 class="bdtSms" style="margin-top: -3px;">{{item.Text}} <span>SMS</span></h4>
+
+                                                        </div>
+                                                        <div style=" margin-top -13px; margin-bottom 15px;">
+                                                            <span class="bdt">BDT :</span> <span class="bdt">{{item.Price | currency: "" : 0}}</span>
+                                                        </div>
+                                                        <div class="purcess">
+                                                            <a ng-click="save(item.Text)">Purchase</a>
+                                                        </div>
+                                                        @*<div class="huge ng-binding" ng-model="NoOfSMS">{{item.Text}}</div>
+                                                            <div>{{item.Price}} BDT</div>*@
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                @*<div class="form-group">
+                                        <label class="col-md-4 control-label">
+                                            SMS No :
+                                        </label>
+                                        <div class="col-md-7">
+                                            <select ng-model="SMSBalance.NoOfSMS" class="form-control" name="ReNoSMS" required>
+                                                <option value=''>Select Option</option>
+                                                <option value="100">100</option>
+                                                <option value="200">200</option>
+                                                <option value="500">500</option>
+                                                <option value="1000">1000</option>
+                                                <option value="1200">1200</option>
+                                                <option value="1500">1500</option>
+                                                <option value="2000">2000</option>
+                                            </select>
+                                        </div>
+                                    </div>*@
+                                @*<div class="form-group row">
+                                        <label class="col-md-4 control-label">
+                                            Total Amount :
+                                        </label>
+                                        <div class="col-md-2 control-label">
+                                            {{SMSBalance.NoOfSMS*SMSBalance.UnitPrice}}
+                                        </div>
+                                    </div>*@
+                                <br />
+                                <div class="col-md-6">
+                                    @*<div class="form-group">
+                                            <div class="text-center">
+                                                <button type="submit" ng-click="submitted=true" class="btn green-haze">Recharge</button>
+                                            </div>
+                                        </div>*@
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- End: life time stats -->
+</div>
+@section Scripts{
+    <script type="text/javascript">
+        OEMSApp.controller("SMSRechargeCrlt", ["$scope", "$http", "SweetAlert",
+              function ($scope, $http, SweetAlert) {
+                  init();
+                  function init() {
+                      initialize();
+                      GetSMSBalance();
+                  }
+                  function initialize() {
+                      $scope.search = '';
+                      $scope.Id = '';
+                      $scope.res = {};
+                      $scope.SMSBalance = [];
+                  }
+                  function resetForm() {
+                      $scope.modalTitle = "Add Shift";
+                      $scope.addform.$setUntouched();
+                      $scope.addform.$setPristine();
+                      $scope.submitted = false;
+                      $scope.Id = '';
+                      GetSMSBalance();
+                  }
+                  function GetSMSBalance() {
+                      $scope.SMSBalance = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'SMS/GetSMSBalance/'
+                      }).then(function successCallback(response) {
+                          $scope.SMSBalance = response.data.results.Result;
+                          Packgelist($scope.SMSBalance);
+                      }, function errorCallback(response) {
+                          toastr["warning"](response.data.Message);
+                      });
+                  }
+
+                  function Packgelist(n) {
+                      $scope.Packges = [];
+                      $scope.Packges.push({ Text: "10", Price: (10 * n.UnitPrice) }
+                                            , { Text: "100", Price: (100 * n.UnitPrice) }
+                                            , { Text: "200", Price: (200 * n.UnitPrice) }
+                                            , { Text: "500", Price: (500 * n.UnitPrice) }
+                                            , { Text: "1000", Price: (1000 * n.UnitPrice) }
+                                            , { Text: "5000", Price: (5000 * n.UnitPrice) }
+                                            , { Text: "10000", Price: (10000 * n.UnitPrice) }
+                                          );
+                      console.log($scope.Packges);
+                  }
+                  $scope.save = function save(n) {
+
+                      if ($scope.addform.$invalid)
+                          return;
+
+                      SweetAlert.swal({
+                          title: "Do you want to Recharge ?",
+
+                          type: "info",
+                          showCancelButton: true,
+                          confirmButtonColor: "#DD6B55", confirmButtonText: "Yes, Recharge !",
+                          cancelButtonText: "Cancel",
+                          closeOnConfirm: false,
+                          closeOnCancel: true
+                      },
+                    function (isConfirm) {
+                        if (isConfirm) {
+                            $http({
+                                method: 'POST',
+                                url: baseUrl + 'SMS/SMSRecharge/' + n,
+                            }).then(function successCallback(response) {
+                                //SweetAlert.swal("Deleted!", "Your imaginary file has been deleted.", "success");
+                                window.location.href = response.data.results.gatewayUrl;
+                                resetForm();
+                            }, function errorCallback(response) {
+                                toastr["warning"](response.data.Message);
+                            });
+                        }
+
+                    });
+
+
+                  };
+              }]);
+    </script>
+
+}
+
+
+

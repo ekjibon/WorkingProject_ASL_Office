@@ -1,0 +1,211 @@
+﻿
+@{
+    ViewBag.Title = "Salary Process";
+}
+
+<div class="kt-container  kt-container--fluid  kt-grid__item kt-grid__item--fluid" ng-controller="ctrlSalaryProcess">
+    <div class="row">
+        <div class="kt-portlet kt-portlet--mobile">
+            <div class="kt-portlet__head kt-portlet__head--lg">
+                <div class="kt-portlet__head-label">
+                    <h3 class="kt-portlet__head-title">
+                        Salary Process
+                    </h3>
+                </div>
+            </div>
+            <div class="kt-portlet__body">
+                <!-- BEGIN FORM-->
+                <form name="addBasic" ng-submit="Process()" class="form-horizontal" id="form_sample_1" novalidate>
+                    <div class="row">
+                        <div class="col-md-4">
+
+
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group" ng-class="{ 'has-error' : submitted && addBasic.PeriodId.$invalid}">
+                                <label class="col-md-6 control-label">
+                                    Salary Period :
+                                    <span class="required">*</span>
+                                </label>
+                                <div class="col-md-6">
+                                    <select class="form-control" ng-model="SalaryProcess.PeriodId" name="PeriodId" required ng-options="sp.Id as sp.PeriodName  for sp in salaryPeriodList">
+                                        <option value="" selected="selected">Choose Options</option>
+                                    </select>
+                                    <span ng-show="submitted &&  addBasic.PeriodId.$error.required" class="help-block">Salary Period Required</span>
+                                </div>
+                            </div>
+                            <div style="margin-left:25%;margin-bottom: 2%">
+
+                                <button type="submit" ng-click="submitted=true" class="btn btn-success">Process</button>
+                                <button type="button" ng-click="processClear();submitted=true" class="btn btn-danger">Clear</button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+                <!-- END FORM-->
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+@section Scripts{
+    <script type="text/javascript">
+        OEMSApp.controller("ctrlSalaryProcess", ["$scope", "$http", "SweetAlert",
+              function ($scope, $http, SweetAlert) {
+                  init();
+                  function init() {
+                      initialize();
+                      getDepartments();
+                      getDesignation();
+                      getAllSalaryPeriod();
+
+                  }
+                  function initialize() {
+       
+                      $scope.SalaryProcess = {};
+                     
+                      $scope.employeeInfos = [];
+                      $scope.SalaryProcess.longholiday = false;
+                      $scope.SalaryProcess.DeductTax = false;
+                      $scope.resetForm = resetForm;
+                     
+                      $scope.MonthList = [{ MonthId: 1, Name: 'January' },
+                          { MonthId: 2, Name: 'February' },
+                          { MonthId: 3, Name: 'March' },
+                          { MonthId: 4, Name: 'April' },
+                          { MonthId: 5, Name: 'May' },
+                          { MonthId: 6, Name: 'June' },
+                          { MonthId: 7, Name: 'July' },
+                          { MonthId: 8, Name: 'August' },
+                          { MonthId: 9, Name: 'September' },
+                          { MonthId: 10, Name: 'October' },
+                          { MonthId: 11, Name: 'November' },
+                          { MonthId: 12, Name: 'December' },
+                      ];
+                      $scope.pagesize = 10;
+                      $scope.pageSizeArray = [];
+                      $scope.pageSizeArray.push({ value: 5, text: 5 });
+                      $scope.pageSizeArray.push({ value: 10, text: 10 });
+                      $scope.pageSizeArray.push({ value: 20, text: 20 });
+                      $scope.pageSizeArray.push({ value: 50, text: 50 });
+                      $scope.currentPage = 1;
+                      $scope.pageSize = 10;
+                  }
+                  function resetForm() {
+                    
+                      $scope.SalaryProcess = {};
+                  
+
+                      $scope.addBasic.$setUntouched();
+                      $scope.addBasic.$setPristine();
+                      //$scope.submitted = false;
+
+                  }
+
+
+                  $scope.Process = function Process() {
+                      if ($scope.addBasic.$invalid)
+                          return;
+                    
+                      $http({
+                          method: 'POST',
+                          url: baseUrl + 'Employee/ProcessSalary/',
+                          data: $scope.SalaryProcess
+                      }).then(function successCallback(response) {
+                          //toastr["info"](response.data.message);
+                          SweetAlert.swal("Salary Processed Successfully", "", "success");
+
+                      }, function errorCallback(response) {
+                          toastr["info"](response.data.Message);
+                      });
+                      
+                  }
+
+                  $scope.processClear = function processClear() {
+                      if ($scope.addBasic.$invalid)
+                          return;
+
+                      $http({
+                          method: 'POST',
+                          url: baseUrl + 'Employee/processClear/',
+                          data: $scope.SalaryProcess
+                      }).then(function successCallback(response) {
+                          //toastr["info"](response.data.message);
+                          SweetAlert.swal("Process Clear Successfully", "", "success");
+
+                      }, function errorCallback(response) {
+                          toastr["info"](response.data.Message);
+                      });
+
+                  }
+
+                  function getDesignation() {
+                      $scope.designations = [];
+
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Employee/GetDesignations/'
+                      }).then(function successCallback(response) {
+                          $scope.designations = response.data.results;
+                          
+                      }, function errorCallback(response) {
+                          toastr["info"](response.data.message);
+                      });
+                      
+                  }
+                  function getAllSalaryPeriod() {
+                      $scope.salaryHeadList = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Employee/GetAllSalaryPeriod/'
+                      }).then(function successCallback(response) {
+                          $scope.salaryPeriodList = response.data.results;
+                          
+                      }, function errorCallback(response) {
+                          toastr["info"](response.data.Message);
+                      });
+                  }
+                  function getDepartments() {
+                      $scope.departments = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + '/Employee/GetDepartments/'
+                      }).then(function successCallback(response) {
+                          $scope.departments = response.data.results;
+                        
+                      }, function errorCallback(response) {
+                          toastr["info"](response.data.message);
+                      });
+                     
+                  }
+
+                  $scope.deleteSalaryTaxYear = function deleteSalaryTaxYear(taxId) {
+                      SweetAlert.swal({
+                          title: "Are you sure to delete it ?", type: "warning", showCancelButton: true, confirmButtonColor: "#DD6B55",
+                          confirmButtonText: "Yes, delete it!",
+                          closeOnConfirm: false
+                      },
+                        function (isConfirm) {
+                            if (isConfirm) {
+                                $http({
+                                    method: 'DELETE',
+                                    url: baseUrl + 'Employee/DeleteSalaryTaxYear/' + taxId,
+                                }).then(function successCallback(response) {
+                                    SweetAlert.swal("Deleted!", "Your data has been deleted.", "success");
+                                    getAllSalaryTaxYear();
+                                }, function errorCallback(response) {
+                                    toastr["info"](response.data.message);
+                                });
+                            }
+                        });
+                  }
+
+              }]);
+    </script>
+}
+
+
+
+

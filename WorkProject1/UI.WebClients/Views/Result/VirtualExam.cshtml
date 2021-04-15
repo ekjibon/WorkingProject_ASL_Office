@@ -1,0 +1,454 @@
+﻿
+@{
+    ViewBag.Title = "Virtual Exam";
+}
+<div class="portlet box" style="background-color:#678069" ng-controller="MarksUploadCntrl">
+    <div class="portlet-title">
+        <div class="caption">
+            <i class="fa fa-user-plus" style="color:#ffffff"></i>Virtual Exam Setup
+        </div>
+
+    </div>
+    <div class="portlet-body form">
+        <!-- BEGIN FORM-->
+        <form class="form-horizontal" ng-submit="getVirtualExam()" name="frmVirtualExam" novalidate>
+            <div class="form-body">
+
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label class="col-md-5 control-label">
+                                Version :
+                            </label>
+                            <div class="col-md-7" ng-class="{ 'has-error' :isSubmitted  && frmVirtualExam.Version.$invalid}">
+                                <select class="form-control" ng-model="VirtualExamSetup.VersionID" required name="Version" ng-options="VirtualExamSetup.VersionId as VirtualExamSetup.VersionName for VirtualExamSetup in CommonFeilds.Version">
+                                    <option value="" selected>Please Select</option>
+                                </select>
+                                <div class="form-control-focus"> </div>
+                                <span ng-show="isSubmitted && frmVirtualExam.Version.$error.required " class="help-block">Version Required</span>
+
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-5 control-label">
+                                Session :
+                            </label>
+                            <div class="col-md-7" ng-class="{ 'has-error' :isSubmitted && frmVirtualExam.SessionId.$invalid}">
+                                <select class="form-control" name="SessionId" ng-model="VirtualExamSetup.SessionId" required ng-options="VirtualExamSetup.SessionId as VirtualExamSetup.SessionName for VirtualExamSetup in CommonFeilds.Session | filter:{VersionId:VirtualExamSetup.VersionId}:true">
+                                    <option value="" selected="selected">Please Select</option>
+                                </select>
+                                <span ng-show="isSubmitted && frmVirtualExam.SessionId.$error.required" class="help-block">Session Required</span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-5 control-label" style="padding-left:5px">
+                                MainExam wise clone :                                 
+                            </label>
+                            <div class="col-md-7" ng-show="VirtualExamSetup.MainExamId!=null">    
+                                <input style="margin-top:12px" type="checkbox" ng-disabled="VirtualExamSetup.MainExamId==null" ng-change="filterMainExam();" ng-model="VirtualExamSetup.Clone" ng-checked="VirtualExamSetup.Clone==true">                           
+                                <div class="form-control-focus"> </div>
+                            </div>
+                        </div>  
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label class="col-md-5 control-label">
+                                Class :
+                            </label>
+                            <div class="col-md-7" ng-class="{ 'has-error' :isSubmitted && frmVirtualExam.ClassId.$invalid}">
+                                <select class="form-control" name="ClassId" ng-disabled="VirtualExamSetup.VersionID == null" ng-model="VirtualExamSetup.ClassId" ng-change="GetGroup(VirtualExamSetup.ClassId)" ng-options="VirtualExamSetup.ClassId as VirtualExamSetup.ClassName for VirtualExamSetup in CommonFeilds.ClassInfo | filter:{VersionId:VirtualExamSetup.VersionID}:true" required>
+                                    <option value="" selected="selected">Please Select</option>
+                                </select>
+                                <span ng-show="isSubmitted && frmVirtualExam.ClassId.$error.required " class="help-block">Class Required</span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-5 control-label">
+                                Group :
+                            </label>
+                            <div class="col-md-7" ng-class="{ 'has-error' : isSubmitted && frmVirtualExam.GroupId.$invalid}">
+                                <select class="form-control" name="GroupId" ng-change="getSubjects();" ng-model="VirtualExamSetup.GroupId" ng-disabled="VirtualExamSetup.ClassId==null" ng-options="G.GroupId as G.GroupName for G in Groups" required>
+                                    <option value="" selected="selected">Select</option>
+                                </select>
+                                <div class="form-control-focus"> </div>
+                                <span ng-show="isSubmitted && frmVirtualExam.GroupId.$error.required" class="help-block">Group Required</span>
+                            </div>
+                        </div>
+                        <div class="form-group" ng-show="VirtualExamSetup.Clone==true">
+                            <label class="col-md-5 control-label">
+                                Clone Main Exam :
+                            </label>
+                            <div class="col-md-7">
+                                <select class="form-control" ng-model="VirtualExamSetup.NewMainExamId" name="NewMainExam" ng-options="mainexam.MainExamId as mainexam.MainExamName for mainexam in CloneMainExams">
+                                    <option value="" selected="selected">Please Select</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+
+                        <div class="form-group">
+                            <label class="col-md-5 control-label">
+                                Subject :
+                            </label>
+                            <div class="col-md-7" ng-class="{ 'has-error' :isSubmitted && frmVirtualExam.SubID.$invalid}">
+                                <select class="form-control" name="SubID" ng-model="VirtualExamSetup.SubjectID" ng-change="getMainExam();getCloneMainExam();" ng-options="item.SubID as item.SubjectName for item in Subjects" required>
+                                    <option value="" selected="selected">Please Select</option>
+                                </select>
+                                <span ng-show="isSubmitted && frmVirtualExam.SubID.$error.required " class="help-block">Subject Required</span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-5 control-label">
+                                Main Exam :
+                            </label>
+                            <div class="col-md-7" ng-class="{'has-error' : isSubmitted && frmVirtualExam.mainExam.$invalid}">
+                                <select class="form-control" ng-model="VirtualExamSetup.MainExamId" name="mainExam" ng-options="mainexam.MainExamId as mainexam.MainExamName for mainexam in MainExams" required>
+                                    <option value="" selected="selected">Please Select</option>
+                                </select>
+                                <span ng-show="isSubmitted && frmVirtualExam.mainExam.$error.required" class="help-block">Main Exam Required</span>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="row">
+                    <div class="col-md-4 pull-right">
+                        <button ng-show="VirtualExamSetup.Clone==true && VirtualExamSetup.NewMainExamId!=null && VirtualExamSetup.MainExamId!=null" type="button" ng-click="Clone();" class="btn green-haze">Clone</button>                        
+                        <button ng-click="isSubmitted=true" class="btn btn-info">Show</button>
+                        <a ng-click="ResetSource()" class="btn btn-warning">Reset</a>
+                        <a href="@Url.Action("VirtualExamSetupReport","Report")?ClassId={{VirtualExamSetup.ClassId}}&GroupId={{VirtualExamSetup.GroupId}}&MainExamId={{VirtualExamSetup.MainExamId}}&Versionid={{VirtualExamSetup.VersionID}}&SessionId={{VirtualExamSetup.SessionId}}&SubjectID={{VirtualExamSetup.SubjectID}}" class="btn  btn-primary" target="_blank">Report</a>
+                    </div>
+                </div>  
+                <br />
+                <br />  
+                <table class="table table-bordered table-inverse fixed-table-toolbar">
+                    <thead style="background-color:#0DBAD1">
+                        <tr>
+                            <th> Sub Exam </th>
+                            <th> Virtual Exam 1 </th>
+                            <th>Pass Mark</th>
+                            <th>Is %</th>
+                            <th> Virtual Exam 2 </th>
+                            <th>Pass Mark</th>
+                            <th>Is %</th>
+
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="item in VirtualExams">
+                            <td> {{item.SubExamName}} </td>
+                            <td>
+                                <select class="form-control" ng-model="item.DivExamTypeVirtual1" name="type">
+                                    <option value="" selected="selected">Select</option>
+                                    <option value="S">Subjective</option>
+                                    <option value="O">Objective</option>
+                                    <option value="P">Practical</option>
+                                    <option value="W1">Writen-1</option>
+                                    <option value="W2">writen-2</option>
+                                    <option value="W3">writen-3</option>
+                                </select>
+                            </td>
+                            <td width="25%">
+                                <input type="text" onkeypress='return event.charCode >= 48 && event.charCode <= 57' ng-model="item.VirtualPassMark1" class="form-control" placeholder="Pass Mark">
+
+                            </td>
+                            <td>
+                                <input type="checkbox" class="form-control" ng-model="item.VirtualPassMarkIsPercent1" ng-checked="item.VirtualPassMarkIsPercent1==true" name="IsPercentage1" />
+                            </td>
+                            <td>
+                                <select class="form-control" ng-model="item.DivExamTypeVirtual2" name="type">
+                                    <option value="" selected="selected">Select</option>
+                                    <option value="S">Subjective</option>
+                                    <option value="O">Objective</option>
+                                    <option value="P">Practical</option>
+                                    <option value="W1">Writen-1</option>
+                                    <option value="W2">writen-2</option>
+                                    <option value="W3">writen-3</option>
+                                </select>
+                            </td>
+                            <td width="25%"> <input type="text" onkeypress='return event.charCode >= 48 && event.charCode <= 57' ng-model="item.VirtualPassMark2" class="form-control" placeholder="Pass Mark"> </td>
+                            <td>
+                                <input type="checkbox" class="form-control" ng-model="item.VirtualPassMarkIsPercent2" ng-checked="item.VirtualPassMarkIsPercent2==true" name="IsPercentage2" />
+                            </td> 
+                        </tr>
+                        <tr ng-show="VirtualExams.length > 0">
+                            <td colspan="10">
+                                <button ng-click="DeleteVirtualExam()" class="btn red pull-right">Delete</button>
+                                <button ng-click="Save()" ng-disabled="PassMarkSameValidation()" class="btn btn-success pull-right"> <i ng-show="spin" class="fa fa-spinner fa-spin" style="font-size:20px"></i> Save</button>
+
+                            </td>
+                        </tr>
+
+                    </tbody>
+                </table>
+
+            </div>
+        </form>
+    </div>
+
+    <!-- END FORM-->
+</div>
+
+
+@section Scripts{
+
+    <script type="text/javascript">
+
+        OEMSApp.controller("MarksUploadCntrl", ["$scope", "$http", "SweetAlert",
+              function ($scope, $http, SweetAlert) {
+
+                  init();
+                  function init() {
+                      initialize();
+                      getAllDropdowns();
+                      getAllCommons();                       
+                      //getSubjects();
+
+                  }
+                  function initialize() {
+                      $scope.VirtualExamSetup = {};
+                      $scope.VirtualExams = [];
+                      $scope.Dropdowns = [];
+                      $scope.CommonFeilds = [];
+                      $scope.Versions = [];
+                      $scope.MainExams = [];
+                      $scope.SubExams = [];
+                      $scope.DividedExams = [];
+                      $scope.Subjects = [];
+
+                      $scope.currentPage = 1;
+                      $scope.pageno = 1;
+                      $scope.pagesize = 10;
+                      $scope.total_count = 12;
+                      $scope.txtsearch = '';
+                      $scope.getAllDropdowns = getAllDropdowns;
+                      //$scope.Search = Search;
+                      $scope.getAllCommons = getAllCommons;
+                      $scope.getVirtualExam = getVirtualExam;
+
+                      $scope.btnDis = false;
+                      $scope.spin = false;
+
+                  };
+                  function setProgress(s) {
+                      $scope.btnDis = s;
+                      $scope.spin = s;
+                  }
+
+
+                  $scope.GetGroup = function GetGroup(classid) {
+                      $scope.Groups = [];
+
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Common/GetGroup/' + classid
+                      }).then(function successCallback(response) {
+                          $scope.Groups = response.data.results;
+
+
+                      }, function errorCallback(response) {
+
+                      });
+
+                  }
+                  $scope.MarkEachVaild = function MarkEachVaild() {
+
+
+                      var res = false;
+
+                      angular.forEach($scope.VirtualExams, function (value, key) {
+                          if (value.VirtualPassMark1 != value.VirtualPassMark1)
+                              res = true;
+
+                      });
+                      return res;
+                  };
+
+                  function getVirtualExam() {
+                      $scope.VirtualExams = [];
+                      //if ($scope.frmVirtualExam.$invalid == true)
+                      //    return;
+
+                      $http({
+                          method: 'POST',
+                          url: baseUrl + 'Result/GetVirtualExam/',
+                          data: $scope.VirtualExamSetup
+                      }).then(function successCallback(response) {
+                          $scope.VirtualExams = response.data.results;
+                          toastr["success"](response.data.message);
+                      }, function errorCallback(response) {
+                          toastr["info"]("opps! Something went wrong. Data not found.");
+                      });
+
+                  };
+                  $scope.filterMainExam = function filterMainExam() {
+                      var keepGoing1 = true;
+                      angular.forEach($scope.CloneMainExams, function (value, key) {
+                          if (keepGoing1) {
+                              if (value.MainExamId == $scope.VirtualExamSetup.MainExamId) {
+                                  var index = $scope.CloneMainExams.indexOf(value);
+                                  $scope.CloneMainExams.splice(index, 1);
+                                  keepGoing1 = false;
+                              }
+                          }
+                      });
+                  }
+                  $scope.Clone = function () {
+                      if ($scope.VirtualExamSetup.Clone == true) {
+                          $http({
+                              method: 'GET',
+                              url: baseUrl + 'Result/CloneVirtualExam/' + $scope.VirtualExamSetup.Clone + '/' + $scope.VirtualExamSetup.VersionID + '/' + $scope.VirtualExamSetup.SessionId + '/' + $scope.VirtualExamSetup.MainExamId + '/' + $scope.VirtualExamSetup.NewMainExamId
+                          }).then(function successCallback(response) {
+                              toastr["info"](response.data.message);
+                              //$scope.MeritConfigs = response.data.results;
+                              //reset();
+                          }, function errorCallback(response) {
+                              toastr["info"](response.data.message);
+
+                          });
+                      }
+                  };
+                  $scope.Save = function Save() {
+                      if ($scope.VirtualExams.length == 0)
+                          return;
+
+
+                      $http({
+                          method: 'POST',
+                          url: baseUrl + 'Result/AddVirtualExam/',
+                          data: $scope.VirtualExams
+                      }).then(function successCallback(response) {
+                          toastr["success"](response.data.message);
+
+                      }, function errorCallback(response) {
+                          toastr["info"](response.data.message);
+                      });
+
+                  };
+
+                  $scope.Reset = function Reset() {
+
+                      initialize();
+                      $scope.frmVirtualExam.$setPristine();
+                      $scope.frmVirtualExam.$setUntouched();
+                      getAllDropdowns();
+                      getAllCommons();
+                      $scope.isSubmitted = false;
+                  };
+                  $scope.ResetSource = function ResetSource() {
+                      $scope.VirtualExams = [];
+                  };
+
+                  function getAllDropdowns() {
+                      $scope.Dropdowns = [];
+
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Common/GetAllDropDown/'
+                      }).then(function successCallback(response) {
+                          $scope.Dropdowns = response.data.results;
+
+
+                      }, function errorCallback(response) {
+                      });
+                  }
+
+                  function getAllCommons() {
+                      $scope.CommonFeilds = [];
+
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Common/GetCommonItem/'
+                      }).then(function successCallback(response) {
+                          $scope.CommonFeilds = response.data.results;
+
+                      }, function errorCallback(response) {
+                      });
+                  }               
+
+                  $scope.getMainExam = function getMainExam() {
+                      $scope.MainExams = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'ExamSetup/GetMainExamForMarksEntry/' + $scope.VirtualExamSetup.VersionID + "/" + $scope.VirtualExamSetup.SessionId + "/" + $scope.VirtualExamSetup.ClassId + "/" + $scope.VirtualExamSetup.GroupId + "/" + $scope.VirtualExamSetup.SubjectID
+                      }).then(function successCallback(response) {
+                          $scope.MainExams = response.data.results;
+                      }, function errorCallback(response) {
+                      });
+                  }
+                  $scope.getCloneMainExam = function getCloneMainExam() {
+                      $scope.CloneMainExams = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'ExamSetup/GetMainExamForMarksEntry/' + $scope.VirtualExamSetup.VersionID + "/" + $scope.VirtualExamSetup.SessionId + "/" + $scope.VirtualExamSetup.ClassId + "/" + $scope.VirtualExamSetup.GroupId + "/" + $scope.VirtualExamSetup.SubjectID
+                      }).then(function successCallback(response) {
+                          $scope.CloneMainExams = response.data.results;
+                      }, function errorCallback(response) {
+                      });
+                  }                  
+                  $scope.getSubjects = function getSubjects() {
+                      $scope.Subjects = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'SubjectSetup/GetAllSubjectForVirtualExam/' + $scope.VirtualExamSetup.VersionID + "/" + $scope.VirtualExamSetup.ClassId + "/" + $scope.VirtualExamSetup.SessionId + "/" + $scope.VirtualExamSetup.GroupId
+                      }).then(function successCallback(response) {
+
+
+                          $scope.Subjects = response.data.results;
+                      }, function errorCallback(response) {
+                      });
+                  }
+
+                  $scope.DeleteVirtualExam = function DeleteVirtualExam() {
+                      $http({
+                          method: 'POST',
+                          url: baseUrl + 'Result/DeleteVirtualExam/',
+                          data: $scope.VirtualExams
+                      }).then(function successCallback(response) {
+                          toastr["info"](response.data.message);
+                          getVirtualExam();
+                      }, function errorCallback(response) {
+                          toastr["info"](response.data.message);
+                      });
+                  }
+
+
+                  //For_pass Mark Same
+                  $scope.PassMarkSameValidation = function PassMarkSameValidation() {
+
+
+                      var res = false;
+
+                      var count = $scope.VirtualExams.length;
+                      if (count == 2) {
+                          if ((($scope.VirtualExams[0].VirtualPassMark1 != $scope.VirtualExams[1].VirtualPassMark1) || ($scope.VirtualExams[0].VirtualPassMarkIsPercent1 != $scope.VirtualExams[1].VirtualPassMarkIsPercent1)) || (($scope.VirtualExams[0].VirtualPassMark2 != $scope.VirtualExams[1].VirtualPassMark2) || ($scope.VirtualExams[0].VirtualPassMarkIsPercent2 != $scope.VirtualExams[1].VirtualPassMarkIsPercent2))) {
+                              res = true;
+                          }
+                      }
+                      else if (count == 3) {
+                          if (((($scope.VirtualExams[0].VirtualPassMark1 != $scope.VirtualExams[1].VirtualPassMark1) ||
+                              ($scope.VirtualExams[0].VirtualPassMark1 != $scope.VirtualExams[2].VirtualPassMark1) ||
+                              ($scope.VirtualExams[1].VirtualPassMark1 != $scope.VirtualExams[2].VirtualPassMark1))
+
+                              || (($scope.VirtualExams[0].VirtualPassMarkIsPercent1 != $scope.VirtualExams[1].VirtualPassMarkIsPercent1) ||
+                              ($scope.VirtualExams[0].VirtualPassMarkIsPercent1 != $scope.VirtualExams[2].VirtualPassMarkIsPercent1) ||
+                              ($scope.VirtualExams[1].VirtualPassMarkIsPercent1 != $scope.VirtualExams[2].VirtualPassMarkIsPercent1))
+                              )
+
+                              //|| (($scope.VirtualExams[0].VirtualPassMark2 != $scope.VirtualExams[1].VirtualPassMark2 != $scope.VirtualExams[2].VirtualPassMark2)
+                              //|| ($scope.VirtualExams[0].VirtualPassMarkIsPercent2 != $scope.VirtualExams[1].VirtualPassMarkIsPercent2 != $scope.VirtualExams[2].VirtualPassMarkIsPercent2))
+                              ) {
+                              res = true;
+                          }
+                      }
+
+
+                      return res;
+                  };
+
+
+              }]);
+    </script>
+}

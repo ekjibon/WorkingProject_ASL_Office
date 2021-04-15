@@ -1,0 +1,1035 @@
+﻿
+@{
+    ViewBag.Title = "Employee List";
+
+}
+<style>
+    .sweet-alert {
+    background-color: #ffffff;
+    width: 478px;
+    padding: 17px;
+    border-radius: 5px;
+    text-align: center;
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    margin-left: -256px;
+    margin-top: -200px;
+    overflow: hidden;
+    display: none;
+    z-index: 99999;
+}
+    
+</style>
+@section Styles{
+    <link href="~/assets/global/plugins/bootstrap-fileinput/bootstrap-fileinput.css" rel="stylesheet" type="text/css" />
+}
+
+
+<div class="kt-container  kt-container--fluid  kt-grid__item kt-grid__item--fluid" ng-controller="employeeList">
+    <div class="row">
+        <div class="kt-portlet kt-portlet--mobile">
+            <div class="kt-portlet__head kt-portlet__head--lg">
+                <div class="kt-portlet__head-label">
+                    <h3 class="kt-portlet__head-title">
+                        <!----Titel Text-->
+                        Employee List
+                        <!----Titel Text -->
+                    </h3>
+                </div>
+                @*<div class="kt-portlet__head-toolbar">
+                    <div class="kt-portlet__head-wrapper">
+                        <div class="dropdown dropdown-inline">
+                            <button type="button" class="btn btn-brand btn-icon-sm" data-toggle="modal" data-target="#addmodal" aria-haspopup="true" aria-expanded="false">
+                                <!----Add Button -->
+                                <i class="flaticon2-plus"></i> Add New
+                                <!----Add Button -->
+                            </button>
+
+                        </div>
+                    </div>
+                </div>*@
+            </div>
+
+            <div class="kt-portlet__body">
+
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group row" ng-class="{ 'has-error' : submitted1 && formCommonFeilds.Branch.$invalid}">
+                            <label class="col-md-4 control-label text-right">
+                                Branch
+                            </label>
+                            <div class="col-md-8">
+                                <select class="form-control" ng-model="employeeInfo.BranchID" name="Branch" ng-options="employeeInfo.BranchId as employeeInfo.BranchName for employeeInfo in CommonFeilds.Branch">
+                                    <option value="" selected="selected">Select</option>
+                                </select>
+                                <div class="form-control-focus"> </div>
+                                <span ng-show="submitted1 && formCommonFeilds.Branch.$error.required" class="help-block">Branch Name Required</span>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-md-4 control-label text-right">
+                                Category
+                            </label>
+                            <div class="col-md-8">
+                                <select class="form-control" ng-model="employeeInfo.CategoryID" name="Class" ng-change="" ng-options="employeeInfo.CategoryID as employeeInfo.CategoryName for employeeInfo in CommonFeilds.Category">
+                                    <option value="" selected="selected">Select</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-md-4 control-label text-right">
+                                DOB From
+                            </label>
+                            <div class="col-md-8">
+                                <input class="form-control" type="text" ng-click="p1=true" is-open="p1" readonly ng-model="employeeInfo.DateOfBirth" name="DateOfBirth" placeholder="DOB From" uib-datepicker-popup="dd/MM/yyyy" />
+                                <div class="form-control-focus"> </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group row">
+                            <label class="col-md-4 col-sm-offset-0 control-label text-right">
+                                Department
+
+                            </label>
+                            <div class="col-sm-8">
+                                <select class="form-control" ng-model="employeeInfo.DepartmentID" name="Department" ng-options="employeeInfo.DepartmentID as employeeInfo.DepartmentName for employeeInfo in CommonFeilds.Department">
+                                    <option value="" selected="selected">Select</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <label class="col-md-4 col-sm-offset-0 control-label text-right">
+                                Designation
+
+                            </label>
+                            <div class="col-sm-8">
+                                <select class="form-control" ng-model="employeeInfo.DesignationID" name="Designation" ng-options="employeeInfo.DesignationID as employeeInfo.DesignationName for employeeInfo in CommonFeilds.Designation">
+                                    <option value="" selected="selected">Select</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <label class="col-md-4 control-label text-right">
+                                DOB To
+                            </label>
+                            <div class="col-md-8">
+                                <input class="form-control" type="text" ng-click="p2=true" is-open="p2" readonly ng-model="employeeInfo.ConfirmationDate" name="ConfirmationDate" placeholder="DOB To" uib-datepicker-popup="dd/MM/yyyy" />
+                                <div class="form-control-focus"> </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+
+                        <div class="form-group row">
+                            <label class="col-md-4 control-label text-right">
+                                Status
+                            </label>
+                            <div class="col-md-8">
+                                <select class="form-control" ng-model="employeeInfo.Status" name="Status">
+                                    <option value="" selected="selected">Select</option>
+                                    <option value="A">Active</option>
+                                    <option value="I">Inactive</option>
+                                </select>
+                                <div class="form-control-focus"> </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <label class="col-sm-4 control-label pull-left text-right">
+                                Emp.
+                            </label>
+                            <div class="col-md-8">
+                                @*<input type="text" ng-model="employeeInfo.EmpID" class="form-control" placeholder="EmpID" name="EmpID">*@
+                                <input type="text" name="StudentId" ng-model="Std" typeahead-on-select='onSelect($item, $model, $label)'
+                                       placeholder="Search name/ID SMS Notification"
+                                       uib-typeahead="i  as i.Text for i in Search($viewValue)"
+                                       typeahead-loading="loadingLocations" typeahead-no-results="noResults" class="form-control">
+                                <i ng-show="loadingLocations" class="glyphicon glyphicon-refresh"></i>
+                                <div ng-show="noResults"><i class="glyphicon glyphicon-remove"></i> No Results Found</div>
+                                <input type="hidden" name="StudentIID" ng-value="Std.Value" />
+                                <div class="form-control-focus"> </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <label class="col-md-4 control-label text-right">
+                                Joining
+                            </label>
+                            <div class="col-md-8">
+                                <input class="form-control" type="text" ng-click="p3=true" is-open="p3" readonly ng-model="employeeInfo.JoiningDate" name="JoiningDate" placeholder="Joining Date" uib-datepicker-popup="dd/MM/yyyy" />
+                                <div class="form-control-focus"> </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row" style="margin-bottom: 2%;">
+                    <div class="col-md-12">
+
+                        <a style="margin-right: 2%;" href="@Url.Action("EmployeeSearchReportList","Report")?EmpID={{employeeInfo.EmpID}}&BranchID={{employeeInfo.BranchID}}&DesignationID={{employeeInfo.DesignationID}}&CategoryID={{employeeInfo.CategoryID}}&StatusID={{employeeInfo.StatusID}}&ShiftID={{0}}&DepartmentID={{0}}&SubjectID={{0}}&SectionID={{0}}&IsClassTeacher={{0}}&DateOfBirth={{employeeInfo.DateOfBirth}}&ConfirmationDate={{employeeInfo.ConfirmationDate}}&JoiningDate={{employeeInfo.JoiningDate}}&StatusName={{employeeInfo.Status}}" class="btn btn-primary pull-right" target="_blank">List Report</a>
+                        <button type="submit" ng-click="ResetFilter()" class="btn btn-danger pull-right" style="margin-right: 2%;">Reset</button>
+                        <button type="submit" ng-click="GetEmployeeList()" class="btn btn-primary pull-right" style="margin-right: 2%;">Show</button>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4 col-sm-5 col-xs-6">
+                        <div class="form-group row">
+                            <div class="col-lg-3 col-md-5 col-sm-4 col-xs-8" style="padding-left:0px">
+                                <select class="form-control" ng-model="pageSize" ng-options="P.value as P.text for P in pageSizeArray"></select>
+                            </div>
+                            <div class="col-md-7  col-sm-8  col-xs-4">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-sm-3 col-xs-1">
+                    </div>
+                    <div class="col-md-4 col-sm-4 col-xs-5">
+                        <div id="sample_3_filter" class="pull-right">
+                            <input ng-model="q" id="search" class="form-control" placeholder="Filter text">
+                        </div>
+
+                    </div>
+                </div>
+                <table class="table table-bordered table-hover rounded">
+                    <thead>
+                        <tr class="btn-primary">
+                            @*<td>  <input type="checkbox" ng-model="selectedAll" ng-click="selectAll()" /></td>*@
+                            <td><label style="width: min-content;"> Employee</label></td>
+                            <td>  Photo</td>
+                            <td style="width: 16%;">  Department </td>
+                            <td>Category</td>
+                            <td style="width: 16%;">  Designation </td>
+                            <td>  Joining Date </td>
+                            <td> SMS Notification Number </td>
+                            <td> Status </td>
+                            <td> Display Order</td>
+                            <td>  Options </td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr dir-paginate="item in employeeInfos| filter: q  | itemsPerPage: pageSize" current-page="currentPage">
+                            @*<td><input type="checkbox" ng-model="item.Selected" value="false" /></td>*@
+                            <td><label>{{item.EmpID}} <br />{{item.FullName}}</label> </td>
+                            <td>
+                                <img ng-show="item.Image!=null" class="preview-img" data-ng-src="@String.Format("data:image/jpg;base64,{0}", "{{item.Image}}")" alt="" width="80" height="80" />
+                                <img ng-show="item.Image==null" class="preview-img" src="~/assets/global/no image.jpg" alt="Preview Image" width="80" height="80" />
+                            </td>
+                            <td>{{item.DepartmentName}} </td>
+                            <td>{{item.CategoryName}}</td>
+                            <td>{{item.DesignationName}} </td>
+                            <td>{{item.JoiningDate | date}} </td>
+                            <td>{{item.SMSNotificationNo}} </td>
+                            <td ng-show="item.Status=='A'" style="color:blue">Active</td>
+                            <td ng-hide="item.Status=='A'" style="color:red">Inactive</td>
+                            <td><input ng-blur="DisplayOrder(item.EmpBasicInfoID,EmpDisOrder[$index].Order,$index)" ng-model="EmpDisOrder[$index].Order" style="width: 90px;" type="number" value="{{item.DisOrder | number:0}}" /></td>
+                            <td>
+                                <div class="btn-group">
+                                    <button class="btn btn-xs green dropdown-toggle" type="button" data-toggle="dropdown" aria-expanded="false">
+                                        Actions
+                                    </button>
+                                    <ul class="dropdown-menu" role="menu" style="left:-135%;">
+                                        <li>
+                                            <a target="_blank" href="/Employee/EmployeeProfile?EmpId={{item.EmpBasicInfoID}}">
+                                                <i class="fa fa-search-plus"></i> View
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a target="_blank" href="/Employee/EmployeeProfileEdit?EmpId={{item.EmpBasicInfoID}}">
+                                                <i class="fa fa-edit"></i> Edit
+                                            </a>
+                                        </li>
+
+                                        <li ng-show="item.Status=='A'">
+                                            <a data-toggle="modal" data-target="#Inactive" ng-click="incactivefunc(item)">
+                                                <i class="icon-lock"></i> Inactive
+                                            </a>
+                                        </li>
+                                        <li ng-show="item.Status!='A'">
+                                            <a href="javascript:;" ng-click="lockuser(item)">
+                                                <i class="icon-lock"></i> Active
+                                            </a>
+                                        </li>
+                                        <!--start report options-->
+                                        <li>
+                                            <a data-toggle="modal" data-target="#ExperienceCertificate" ng-click="EmpCertificateFunc(item)">
+                                                <i class="icon-list"></i> Experience Certificate
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a data-toggle="modal" data-target="#EmpReleaseLetter" ng-click="EmpReleaseLtr(item)">
+                                                <i class="icon-list"></i> Release Letter
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a data-toggle="modal" data-target="#EmpNOC" ng-click="EmpNOC(item)">
+                                                <i class="icon-list"></i> NOC
+                                            </a>
+                                        </li>
+
+                                        <!--end report options-->
+                                        <li>
+                                            <button class="btn btn-xs green dropdown-toggle" type="button" data-toggle="dropdown2" aria-expanded="false">
+                                                Status-- {{item.StatusName}}
+                                            </button>
+                                            <ul class="dropdown2-menu" role="menu">
+                                                <li ng-repeat="item2 in statuses">
+                                                    <a href="javascript:;" ng-click="lockuser(item, item2.ID)">
+                                                        <i class="icon-lock"></i> {{item2.Statusname}}
+                                                    </a>
+                                                </li>
+                                            </ul>
+                                    </ul>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="row">
+                    <dir-pagination-controls boundary-links="true" template-url="~/assets/angular/lib/dirPagination.tpl.html"></dir-pagination-controls>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--Modal Area Start-->
+    <div id="Inactive" class="modal fade" tabindex="-1" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form name="addform" class="form-horizontal" id="form_sample_1" novalidate>
+                    <div class="modal-header">
+                        <h4 class="modal-title"></h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-body">
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <div class="form-group row" style="margin-left:-90px">
+                                        <label class="col-lg-4 control-label text-right">Remarks</label>
+                                        <div class="col-lg-7">
+                                            <input type="text" class="form-control" name="remarks" ng-model="EmpIncactive.Remarks" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <div class="form-group row">
+                                        <label class="col-md-4 control-label text-right">
+                                            <input type="radio" name="flag" ng-model="EmpIncactive.flag" value="1">
+                                            General Inactive
+                                        </label>
+                                        <label class="col-md-4 control-label text-right" style="margin-left:10px">
+                                            <input type="radio" name="flag" ng-model="EmpIncactive.flag" value="2">
+                                            Ethical Exit
+                                        </label>
+                                        <label class="col-md-4 control-label text-right" style="margin-left:-14px">
+                                            <input type="radio" name="flag" ng-model="EmpIncactive.flag" value="3">
+                                            Unethical Exit
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" data-dismiss="modal" class="btn  btn-secondary" submitted=false">Cancel</button>
+                        <button type="submit" ng-click="InactiveEmp()" class="btn green-haze">Ok </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div id="ExperienceCertificate" class="modal fade" tabindex="-1" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <form name="addform" class="form-horizontal" id="form_sample_1" novalidate>
+                    <div class="modal-header">
+                        <h4 class="modal-title">Employee Experience Certificate</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-body">
+                            <div class="row" style="padding:5px;">
+                                <div class="col-md-6">
+                                    <div class="form-group row">
+                                        <label class="col-md-5 control-label text-right" style="font-weight:bold">
+                                            Employee Name :
+                                        </label>
+                                        <div class="col-md-7">
+                                            <label style="font-weight: 800;font-style: italic;">{{EmpCertificate.FullName}}</label>
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label class="col-md-5 control-label text-right" style="font-weight:bold">
+                                            Designation :
+                                        </label>
+                                        <div class="col-md-7">
+                                            <label style="font-weight: 800;font-style: italic;">{{EmpCertificate.DesignationName}}</label>
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label class="col-md-5 control-label text-right" style="font-weight:bold">
+                                            Joining Date :
+                                        </label>
+                                        <div class="col-md-7">
+                                            <label style="font-weight: 800;font-style: italic;">{{EmpCertificate.JoiningDate | date:'dd-MMMM-yyyy'}}</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group row">
+                                        <label class="col-md-5 control-label text-right" style="font-weight:bold">
+                                            Branch :
+                                        </label>
+                                        <div class="col-md-7">
+                                            <label style="font-weight: 800;font-style: italic;">{{EmpCertificate.BranchName}}</label>
+                                            <div class="form-control-focus"> </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group row" ng-class="{ 'has-error' : submitted && addBasic.Gender.$invalid}">
+                                        <label class="col-md-5 control-label text-right" style="font-weight:bold">
+                                            Issue Date :
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-7">
+                                            <input class="form-control" id="EmpCertificateIssueDate" type="text" ng-click="p5=true" is-open="p5" readonly ng-model="EmpCertificate.IssueDate" placeholder="Issue Date" uib-datepicker-popup="dd-MMMM-yyyy" />
+                                            <div class="form-control-focus"> </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" data-dismiss="modal" class="btn  btn-secondary" submitted=false">Cancel</button>
+                        <button type="submit" ng-click="ShowEmpExpCert()" class="btn btn-success">Report </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div id="EmpReleaseLetter" class="modal fade" tabindex="-1" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <form name="addform" class="form-horizontal" id="form_sample_1" novalidate>
+                    <div class="modal-header">
+                        <h4 class="modal-title">Employee Release Letter</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group row">
+                                        <label class="col-md-5 control-label text-right" style="font-weight:bold">
+                                            Employee Name :
+                                        </label>
+                                        <div class="col-md-7">
+                                            <label style="font-weight: 800;font-style: italic;">{{EmpRelease.FullName}}</label>
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label class="col-md-5 control-label text-right" style="font-weight:bold">
+                                            Designation :
+                                        </label>
+                                        <div class="col-md-7">
+                                            <label style="font-weight: 800;font-style: italic;">{{EmpRelease.DesignationName}}</label>
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label class="col-md-5 control-label text-right" style="font-weight:bold">
+                                            Joining Date :
+                                        </label>
+                                        <div class="col-md-7">
+                                            <label style="font-weight: 800;font-style: italic;">{{EmpRelease.JoiningDate | date:'dd-MMMM-yyyy'}}</label>
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label class="col-md-5 control-label text-right" style="font-weight:bold">
+                                            Branch :
+                                        </label>
+                                        <div class="col-md-7">
+                                            <label style="font-weight: 800;font-style: italic;">{{EmpRelease.BranchName}}</label>
+                                            <div class="form-control-focus"> </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group row">
+                                        <label class="col-md-5 control-label text-right" style="font-weight:bold">
+                                            Issue Date :
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-7">
+                                            <input class="form-control" type="text" ng-click="p5=true" is-open="p5" id="EmpReleaseIssueDate" readonly ng-model="EmpRelease.IssueDate" placeholder="Issue Date" uib-datepicker-popup="dd-MMMM-yyyy" />
+                                            <div class="form-control-focus"> </div>
+                                        </div>
+                                    </div>
+                                    @*<div class="form-group row">
+                                            <label class="col-md-5 control-label" style="font-weight:bold">
+                                                Apply Date :
+                                                <span class="required">*</span>
+                                            </label>
+                                            <div class="col-md-7">
+                                                <input class="form-control" type="text" ng-click="p6=true" is-open="p6" id="EmpReleaseApplyDate" readonly ng-model="EmpRelease.ApplyDate" placeholder="Apply Date" uib-datepicker-popup="dd-MMMM-yyyy" />
+                                                <div class="form-control-focus"> </div>
+                                            </div>
+                                        </div>*@
+                                    <div class="form-group row">
+                                        <label class="col-md-5 control-label text-right" style="font-weight:bold;padding-right: 0%;">
+                                            Release Date :
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-7">
+                                            <input class="form-control" type="text" ng-click="p7=true" is-open="p7" id="EmpReleaseReleaseDate" readonly ng-model="EmpRelease.ReleaseDate" placeholder="Release Date" uib-datepicker-popup="dd-MMMM-yyyy" />
+                                            <div class="form-control-focus"> </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" data-dismiss="modal" class="btn  btn-secondary" submitted=false">Cancel</button>
+                        <button type="submit" ng-click="ShowEmpReleaseLetter()" class="btn btn-success">Report </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div id="EmpNOC" class="modal fade" tabindex="-1" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <form name="addform" class="form-horizontal" id="form_sample_1" novalidate>
+                    <div class="modal-header">
+                        <h4 class="modal-title">Employee NOC</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group row">
+                                        <label class="col-md-4 control-label text-right" style="font-weight:bold">
+                                            Employee Name :
+                                        </label>
+                                        <div class="col-md-8">
+                                            <label style="font-weight: 800;font-style: italic;">{{EmpNoc.FullName}}</label>
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label class="col-md-4 control-label text-right" style="font-weight:bold">
+                                            Designation :
+                                        </label>
+                                        <div class="col-md-8">
+                                            <label style="font-weight: 800;font-style: italic;">{{EmpNoc.DesignationName}}</label>
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label class="col-md-4 control-label text-right" style="font-weight:bold">
+                                            Joining Date :
+                                        </label>
+                                        <div class="col-md-8">
+                                            <label style="font-weight: 800;font-style: italic;">{{EmpNoc.JoiningDate | date:'dd-MMMM-yyyy'}}</label>
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label class="col-md-4 control-label text-right" style="font-weight:bold">
+                                            Branch :
+                                        </label>
+                                        <div class="col-md-8">
+                                            <label style="font-weight: 800;font-style: italic;">{{EmpNoc.BranchName}}</label>
+                                            <div class="form-control-focus"> </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group row">
+                                        <label class="col-md-4 control-label text-right" style="font-weight:bold">
+                                            NOC Type :
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-8">
+                                            <select class="form-control" ng-model="EmpNoc.TravelType">
+                                                <option value="" selected="selected">Choose Option</option>
+                                                <option value="1">Travelling NOC</option>
+                                                <option value="0">Not Travelling NOC</option>
+                                            </select>
+
+                                        </div>
+                                    </div>
+                                    <div class="form-group row" ng-show="EmpNoc.TravelType=='1'">
+                                        <label class="col-md-4 control-label text-right" style="font-weight:bold">
+                                            Travel Destination:
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-8">
+                                            <input class="form-control" type="text" placeholder="Travel destination" ng-model="EmpNoc.Destination" />
+                                        </div>
+                                    </div>
+                                    <div class="form-group row" ng-show="EmpNoc.TravelType=='1'">
+                                        <label class="col-md-4 control-label text-right" style="font-weight:bold">
+                                            Travel from:
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-8">
+                                            <input class="form-control" type="text" ng-click="p9=true" is-open="p9" readonly id="EmpNocTravelFromDate" ng-model="EmpNoc.TravelFromDate" placeholder="From Date" uib-datepicker-popup="dd-MMMM-yyyy" />
+                                            <div class="form-control-focus"> </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group row" ng-show="EmpNoc.TravelType=='1'">
+                                        <label class="col-md-4 control-label text-right" style="font-weight:bold">
+                                            Travel to:
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-8">
+                                            <input class="form-control" type="text" ng-click="p10=true" is-open="p10" id="EmpNocTravelToDate" readonly ng-model="EmpNoc.TravelToDate" placeholder="To Date" uib-datepicker-popup="dd-MMMM-yyyy" />
+                                            <div class="form-control-focus"> </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label class="col-md-4 control-label text-right" style="font-weight:bold">
+                                            Issue Date :
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-8">
+                                            <input class="form-control" type="text" ng-click="p8=true" is-open="p8" readonly id="EmpNocIssueDate" ng-model="EmpNoc.IssueDate" placeholder="Issue Date" uib-datepicker-popup="dd-MMMM-yyyy" />
+                                            <div class="form-control-focus"> </div>
+                                        </div>
+                                    </div>
+
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" data-dismiss="modal" class="btn  btn-secondary" submitted="false">Cancel</button>
+                        <button type="submit" ng-click="ShowEmpNOC()" class="btn btn-success">Report </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    <script src="~/assets/global/plugins/bootstrap-fileinput/bootstrap-fileinput.js" type="text/javascript"></script>
+    <script type="text/javascript">
+        OEMSApp.controller("employeeList", ["$scope", "$http", "SweetAlert",
+              function ($scope, $http, SweetAlert) {
+                  init();
+                  function init() {
+                      initialize();
+                      getAllDropdowns();
+                      getAllCommons();
+                  }
+                  function initialize() {
+                      $scope.tblshow = false;
+                      $scope.modalTitle = "Edit Employee Info";
+                      $scope.GetEmployeeList = GetEmployeeList;
+                      $scope.employeeInfo = {};
+                      $scope.employeeInfoView = {};
+                      $scope.EmpDisOrder = [];
+                      $scope.EmpID = '';
+                      $scope.EmpBasicInfoID = '';
+                      $scope.employeeInfos = [];
+                      $scope.CommonFeilds = [];
+
+                      $scope.employeeInfoListShow = {};
+                      $scope.employeeInfo2 = {};
+
+                      $scope.getAllCommons = getAllCommons;
+                      $scope.getAllDropdowns = getAllDropdowns;
+                      //Edit
+                      $scope.EditFormEmployee = EditFormEmployee;
+                      $scope.UpdateEmployee = UpdateEmployee;
+                      //view
+                      $scope.search = '';
+                      $scope.resetForm = resetForm;
+                      $scope.Dropdowns = [];
+                      $scope.CommonFeilds = [];
+                      $scope.getAllDropdowns = getAllDropdowns;
+                      //reports model
+                      $scope.EmpCertificate = {};
+                      $scope.EmpRelease = {};
+                      $scope.EmpNoc = {};
+                      $scope.EmpIncactive = {};
+
+
+                      $scope.currentPage = 1;
+                      $scope.pageno = 1;
+                      $scope.pagesize = 10;
+                      $scope.total_count = 12;
+                      $scope.pageSizeArray = [];
+                      $scope.pageSizeArray.push({ value: 5, text: 5 });
+                      $scope.pageSizeArray.push({ value: 10, text: 10 });
+                      $scope.pageSizeArray.push({ value: 20, text: 20 });
+                      $scope.pageSizeArray.push({ value: 50, text: 50 });
+                      $scope.currentPage = 1;
+                      $scope.pageSize = 10;
+                  }
+                  
+                  $scope.ReortModelClear=function()
+                  {
+                      //reports model
+                      $scope.EmpCertificate = {};
+                      $scope.EmpRelease = {};
+                      $scope.EmpNoc = {};
+                      $scope.EmpIncactive = {};
+                      $('#EmpCertificateIssueDate').val('');
+                      $('#EmpReleaseIssueDate').val('');
+                      $('#EmpReleaseApplyDate').val('');
+                      $('#EmpReleaseReleaseDate').val('');
+                      $('#EmpNocTravelFromDate').val('');
+                      $('#EmpNocTravelToDate').val('');
+                      $('#EmpNocIssueDate').val('');
+                  }
+                  $scope.ShowEmpNOC = function () {
+                      if ($scope.EmpNoc.TravelType == null || $scope.EmpNoc.TravelType == '') {
+                          toastr.warning('Please select NOC type.');
+                          return;
+                      }
+                      else if ($scope.EmpNoc.TravelType == '1')
+                      {
+                          if ($scope.EmpNoc.Destination == null || $scope.EmpNoc.Destination == '') {
+                              toastr.warning('Please enter travelling destination.');
+                              return;
+                          }
+                          if ($scope.EmpNoc.TravelFromDate == null || $scope.EmpNoc.TravelFromDate == '') {
+                              toastr.warning('Please enter travel from date.');
+                              return;
+                          }
+                          if ($scope.EmpNoc.TravelToDate == null || $scope.EmpNoc.TravelToDate == '')
+                          {
+                              toastr.warning('Please enter travel to date.');
+                              return;
+                          }
+                      }
+                      if ($scope.EmpNoc.IssueDate == null) {
+                          toastr.warning('Please select issue date.');
+                          return;
+                      }
+                    
+                      var url = '/Report/EmployeeNOC?EmpId=' + $scope.EmpNoc.EmpBasicInfoID
+                       + '&IssueDate=' + $scope.EmpNoc.IssueDate
+                       + '&TravelType=' + $scope.EmpNoc.TravelType
+                      + '&Destination=' + $scope.EmpNoc.Destination
+                      + '&TravelFromDate=' + $scope.EmpNoc.TravelFromDate
+                      + '&TravelToDate=' + $scope.EmpNoc.TravelToDate;
+                      $scope.EmpNoc = {};
+                      window.open(url, "_blank");
+                      $('#EmpNOC').modal('hide');
+                  }
+
+                  $scope.EmpNOC=function(item)
+                  {
+                      $scope.ReortModelClear();
+                      $scope.EmpNoc = item;
+                  }
+
+                  $scope.ShowEmpReleaseLetter = function () {
+                      if ($scope.EmpRelease.IssueDate == null) {
+                          toastr.warning('Please select issue date');
+                          return;
+                      }
+                      
+                      //if ($scope.EmpRelease.ApplyDate == null) {
+                      //    toastr.warning('Please select apply date');
+                      //    return;
+                      //}
+                      if ($scope.EmpRelease.ReleaseDate == null) {
+                          toastr.warning('Please select release date');
+                          return;
+                      }
+                      var url = '/Report/EmployeeReleaseLetter?EmpId=' + $scope.EmpRelease.EmpBasicInfoID
+                       + '&IssueDate=' + $scope.EmpRelease.IssueDate
+                       //+ '&ApplyDate=' + $scope.EmpRelease.ApplyDate
+                       + '&ReleaseDate=' + $scope.EmpRelease.ReleaseDate;
+                      $scope.EmpRelease = {};
+                      window.open(url, "_blank");
+                      $('#EmpReleaseLetter').modal('hide');
+                  }
+                  $scope.EmpReleaseLtr = function (item) {
+                      $scope.ReortModelClear(); 
+                      $scope.EmpRelease = item;
+                  }
+
+                  $scope.EmpCertificateFunc = function (item) {
+                      $scope.ReortModelClear();
+                      $scope.EmpCertificate = item;
+                  }
+                  $scope.incactivefunc = function (item) {
+                      $scope.ReortModelClear();
+                      $scope.EmpIncactive = item;
+                  }
+                  $scope.ShowEmpExpCert=function()
+                  {
+                      if($scope.EmpCertificate.IssueDate==null)
+                      {
+                          toastr.warning('Please select issue date');
+                          return;
+                      }
+                      var url = '/Report/EmployeeExprienceCertificate?EmpId=' + $scope.EmpCertificate.EmpBasicInfoID + '&IssueDate=' + $scope.EmpCertificate.IssueDate;
+                      $scope.EmpCertificate = {};
+                      $scope.EmpCertificate.IssueDate = '';
+                      window.open(url, "_blank");
+                      $('#ExperienceCertificate').modal('hide');
+                  }
+                 
+                  $scope.DisplayOrder=function(EmpId,Order,index)
+                  {
+                      if (Order != undefined)
+                      {
+                          $http({
+                              method: 'PUT',
+                              url: baseUrl + 'Employee/EmployeeDisplayOrderChange?EmpId=' + EmpId + '&EmpOrder=' + Order
+                          }).then(function successCallback(response) {
+                              toastr.success(response.data.message);
+                          }, function errorCallback(response) {
+                              $scope.EmpDisOrder[index].Order = 0;
+                              toastr.warning(response.data.Message);
+                          });
+                      }
+                  }
+
+                  $scope.ResetFilter =function ResetFilter()
+                  {
+                      $scope.employeeInfo = {};
+                      $scope.submitted = false;
+                      $scope.Std = null;
+                  }
+
+                  function resetForm() {
+
+                      $scope.employeeInfo.EmpID = '';
+                      $scope.submitted = false;
+                      $scope.Id = '';
+
+                  }
+
+                  $scope.Search = function (val) {
+                      return $http.get(baseUrl + 'Employee/SearchEmployee/' + val, {
+                          params: {
+
+                          }
+                      }).then(function (response) {
+                          return response.data.results.map(function (item) {
+                              return item;
+                          });
+                      });
+                  };
+
+                  $scope.onSelect = function onSelect($item, $model, $label) {
+                      $scope.employeeInfo.EmpID = $item.Value;
+                      SearchEmployeeId($item.Value);
+                  };
+
+                  function SearchEmployeeId(EmpID) {
+                      $scope.employeeInfos = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Employee/GetEmployeeID/' + EmpID
+                      }).then(function successCallback(response) {
+                          $scope.employeeInfos = response.data.results;
+                          $scope.tblshow = true;
+                      }, function errorCallback(response) {
+                          toastr["error"](response.data.Message);
+                      });
+                  }
+
+                  $scope.lockuser = function lockuser(Ob) {
+                      console.log(Ob);
+                      var x = $scope.employeeInfos.indexOf(Ob);
+                      var statustxt;
+                      console.log(x);
+                      if (Ob.Status == 'A')
+                      {
+                          statustxt = 'Inactive';
+                          Ob.Status = 'I';
+                      }
+                      else
+                      {
+                          statustxt = 'Active';
+                          Ob.Status = 'A';
+                      }
+                      SweetAlert.swal({
+                          title: "Are you sure to " + statustxt + " this employee    (" + Ob.FullName + ")?", type: "warning", showCancelButton: true, confirmButtonColor: "#DD6B55",
+                          confirmButtonText: "Yes",
+                          closeOnConfirm: false
+                      },
+                      function (isConfirm) {
+                          if (isConfirm) {
+                              $http({
+                                  method: 'PUT',
+                                  url: baseUrl + 'Employee/UpdateEmployeeStatus/' + Ob.EmpID + '/' + statustxt
+                              }).then(function successCallback(response) {
+                                  SweetAlert.swal(statustxt + "!", "This user is  " + Ob.FullName + ", Action success");
+
+                              }, function errorCallback(response) {
+
+                              });
+
+                          }
+                      });
+                  };
+                  $scope.InactiveEmp = function InactiveEmp() {
+                      var statustxt;
+                      if ($scope.EmpIncactive.Status == 'A') {
+                          if ($scope.EmpIncactive.flag == 1) {
+                              statustxt = "General Inactive"
+                          }
+                          if ($scope.EmpIncactive.flag == 2) {
+                              statustxt = "Ethical Exit"
+                          }
+                          if ($scope.EmpIncactive.flag == 3) {
+                              statustxt = "Unethical Exit"
+                          }
+
+                      }
+
+                      SweetAlert.swal({
+                          title: "Are you sure to " + statustxt + " this employee    (" + $scope.EmpIncactive.FullName + ")?", type: "warning", showCancelButton: true, confirmButtonColor: "#DD6B55",
+                          confirmButtonText: "Yes",
+                          closeOnConfirm: false
+                      },
+                      function (isConfirm) {
+                          if (isConfirm) {
+                              $http({
+                                  method: 'PUT',
+                                  url: baseUrl + 'Employee/InactiveEmp/' + $scope.EmpIncactive.EmpBasicInfoID + '/' + statustxt + '/' + $scope.EmpIncactive.Remarks
+                              }).then(function successCallback(response) {
+                                  $('#Inactive').modal('hide');
+                                  SweetAlert.swal(statustxt + "!", "This user is  " + $scope.EmpIncactive.FullName + ", Action success");
+
+                              }, function errorCallback(response) {
+
+                              });
+
+                          }
+                      });
+                  };
+
+                  function GetEmployeeList() {
+                      $scope.employeeInfos = [];
+                      $http({
+                          method: 'POST',
+                          url: baseUrl + 'Employee/GetEmployeeInfo/',
+                          data: $scope.employeeInfo
+                      }).then(function successCallback(response) {
+                          $scope.employeeInfos = response.data.results;
+                          $scope.tblshow = true;
+                          toastr["info"](response.data.message);
+
+                      }, function errorCallback(response) {
+                          toastr["error"](response.data.Message);
+                      });
+
+                  }
+                  //Edit
+                  function EditFormEmployee(n) {
+                      $scope.EmpBasicInfoID = n;
+                      // $scope.employeeInfo = {};
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Employee/GetSingleEmployeeInfo/' + $scope.EmpBasicInfoID
+                      }).then(function successfullCallback(respons) {
+                          $scope.employeeInfo2 = respons.data.results;
+                          $("#EditEmployeeForm").modal('toggle');
+                      },
+                      function errorCallback(respons) {
+                          toastr["info"](respons.data.message);
+
+                      });
+
+                  }
+
+                  function UpdateEmployee(n) {
+                      $scope.employeeInfo2 = n;
+                      $http({
+                          method: 'PUT',
+                          url: baseUrl + 'Employee/UpdateEmployee',
+                          data: $scope.employeeInfo2
+                      }).then(function successfullCallback(respons) {
+
+                          GetEmployeeList();
+                          toastr["info"](respons.data.message);
+
+                      })
+                  }
+
+                  $scope.selectAll = function () {
+                      angular.forEach($scope.employeeInfos, function (item) {
+                          item.Selected = $scope.selectedAll;
+                      });
+
+                  };
+
+                  $scope.CreateNewUsers = function CreateNewUsers() {
+                      var Ids = [];
+                      angular.forEach($scope.employeeInfos, function (item) {
+                          if (item.Selected) {
+                              Ids.push(item.EmpBasicInfoID);
+                          }
+                      });
+                      if (Ids.length == 0) {
+                          toastr["warning"]("No Teacher Selected");
+                          return;
+                      }
+
+                      $http({
+                          method: 'POST',
+                          url: baseUrl + 'users/BulkEmpUserCreate/',
+                          data: Ids
+                      }).then(function successCallback(response) {
+
+                          toastr["success"](response.data.message);
+
+                      }, function errorCallback(response) {
+                          toastr["error"](response.data.message);
+                      });
+                  };
+
+                  function getAllCommons() {
+                      $scope.CommonFeilds = [];
+
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Common/GetCommonItemEmp/'
+                      }).then(function successCallback(response) {
+                          $scope.CommonFeilds = response.data.results;
+                      }, function errorCallback(response) {
+                      });
+                  }
+
+                  function getAllDropdowns() {
+                      $scope.Dropdowns = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Common/GetAllDropDown/'
+                      }).then(function successCallback(response) {
+                          $scope.Dropdowns = response.data.results;
+                      }, function errorCallback(response) {
+                      });
+                  }
+
+                  function getAllCommons() {
+                      $scope.CommonFeilds = [];
+
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Common/GetCommonItemEmp/'
+                      }).then(function successCallback(response) {
+                          $scope.CommonFeilds = response.data.results;
+                      }, function errorCallback(response) {
+                      });
+                  }
+
+              }]);
+    </script>
+}

@@ -1,0 +1,1795 @@
+﻿
+@{
+    ViewBag.Title = "MyProfile";
+    Layout = "~/Views/Shared/_adminLayout.cshtml";
+}
+<link href="~/assets/global/plugins/bootstrap-fileinput/bootstrap-fileinput.css" rel="stylesheet" />
+<script src='http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js'></script>
+
+
+<script>
+    $(document).ready(function () {
+
+        $(".set > a").on("click", function () {
+
+            if ($(this).hasClass("active")) {
+                $(this).removeClass("active");
+                $(this)
+                  .siblings(".content")
+                  .slideUp(500);
+                $(".set > a i")
+                  .removeClass("fa-minus")
+                  .addClass("fa-plus");
+            } else {
+                $(".set > a i")
+                  .removeClass("fa-minus")
+                  .addClass("fa-plus");
+                $(this)
+                  .find("i")
+                  .removeClass("fa-plus")
+                  .addClass("fa-minus");
+                $(".set > a").removeClass("active");
+                $(this).addClass("active");
+                $(".content").slideUp(500);
+                $(this)
+                  .siblings(".content")
+                  .slideDown(500);
+            }
+        });
+    });
+</script>
+<style>
+    .input-group-addon {
+        padding: 9px 12px;
+        font-size: 14px;
+        font-weight: 400;
+        line-height: 1;
+        color: #555;
+        text-align: center;
+        background-color: #eee;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+    }
+
+
+    .btnColor {
+        background-color: #009db8;
+        color: white;
+        font-family: inherit;
+    }
+
+    .accordion-container {
+        /*position: relative;
+    max-width: 500px;
+    height: auto;
+    margin: 10px auto;*/
+        /*background-color:aqua;*/
+    }
+
+    .required {
+        color: red;
+    }
+
+    .accordion-container > h2 {
+        text-align: center;
+        color: #fff;
+        padding-bottom: 5px;
+        margin-bottom: 20px;
+        padding-bottom: 15px;
+        border-bottom: 1px solid #ddd;
+    }
+
+    .set {
+        position: relative;
+        width: 100%;
+        height: auto;
+        background-color: #b8e4eb;
+    }
+
+        .set > a {
+            display: block;
+            padding: 10px 15px;
+            text-decoration: none;
+            color: #555;
+            font-weight: 600;
+            border-bottom: 5px solid #ddd;
+            -webkit-transition: all 0.2s linear;
+            -moz-transition: all 0.2s linear;
+            transition: all 0.2s linear;
+        }
+
+            .set > a i {
+                float: right;
+                margin-top: 2px;
+            }
+
+            .set > a.active {
+                background-color: #b8e4eb;
+                color: black;
+            }
+
+    .content {
+        background-color: #fff;
+        border-bottom: 1px solid #ddd;
+        display: none;
+    }
+
+        .content p {
+            padding: 10px 15px;
+            margin: 0;
+            color: #333;
+        }
+
+
+    #datepicker i {
+        position: absolute;
+        top: 12px;
+        right: 27px;
+    }
+</style>
+<div class="row main-row" ng-controller="MyProfileCtrl">
+    <div class="col-lg-3 pl-0">
+        <div class="main">
+            <div class="row">
+                <div class="col-lg-12 text-center profil-student">
+                    <div class="profile-image m-auto">
+                        <img src="@Url.Action("GetImage","Account")" class="img-fulid w-100" alt="">
+                    </div>
+                    <h6>{{StuDetail.StudentBasicInfo.FullName}} </h6>
+                    <p><span>ID:</span> @User.Identity.Name</p>
+                    <div>
+                        <a class="btn btnColor" id="pills-Sibling-tab" target="_blank" href="@Url.Action("MyProfile","PortalReport")" aria-selected="false">Details</a>
+                    </div>
+                </div>
+
+            </div>
+            <div class="row">
+                <div class="col-lg-6">
+                    <div class="verson">
+                        <p>Branch</p>
+                        <h6>{{StuDetail.StudentBasicInfo.BranchName}}</h6>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="admision">
+                        <p>Admission Date</p>
+                        <h6>{{StuDetail.StudentBasicInfo.AdmissionDate| date:'dd-MM-yyyy'}}</h6>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mb-2">
+                <div class="col-lg-6">
+                    <div class="verson">
+                        <p>Session</p>
+                        <h6>{{StuDetail.StudentBasicInfo.SessionName}} </h6>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="admision">
+                        <p>Shift</p>
+                        <h6>{{StuDetail.StudentBasicInfo.ShiftName}} </h6>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mb-2">
+                <div class="col-lg-6">
+                    <div class="verson">
+                        <p>Class</p>
+                        <h6>{{StuDetail.StudentBasicInfo.ClassName}}</h6>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="admision">
+                        <p>Section</p>
+                        <h6>{{StuDetail.StudentBasicInfo.SectionName}}</h6>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-9 Student-Information">
+
+        <div class="row">
+            <div class="col-lg-12">
+                <ul class="nav nav-pills mb-3 row" id="pills-tab" role="tablist">
+                    <li class="nav-item col-lg-2 p-0">
+                        <a class="nav-link active" id="pills-Basic-tab" data-toggle="pill" href="#pills-Basic" role="tab" aria-controls="pills-home" aria-selected="true">Basic</a>
+                    </li>
+                    <li class="nav-item col-lg-2 p-0">
+                        <a class="nav-link" id="pills-Guardian-tab" data-toggle="pill" href="#pills-Guardian" role="tab" aria-controls="pills-contact" aria-selected="false">Parents</a>
+                    </li>
+                    <li class="nav-item col-lg-2 p-0">
+                        <a class="nav-link" id="pills-Academic-tab" data-toggle="pill" href="#pills-Academic" role="tab" aria-controls="pills-contact" aria-selected="false">Academic</a>
+                    </li>
+                    <li class="nav-item col-lg-2 p-0">
+                        <a class="nav-link" id="pills-contact-tab" data-toggle="pill" href="#pills-contact" role="tab" aria-controls="pills-contact" aria-selected="false">Contact</a>
+                    </li>
+                    <li class="nav-item col-lg-2 p-0">
+                        <a class="nav-link" id="pills-Sibling-tab" data-toggle="pill" href="#pills-Sibling" role="tab" aria-controls="pills-contact" aria-selected="false">Sibling</a>
+                    </li>
+                    <li class="nav-item col-lg-2 p-0">
+                        <a class="nav-link other" id="pills-Sibling-tab" ng-click="CollectionReport()" data-toggle="pill" href="#pills-Other" role="tab" aria-controls="pills-contact" aria-selected="false">Collection Card</a>
+
+                    </li>
+                </ul>
+            </div>
+            <div class="col-lg-12">
+                <div class="tab-content" id="pills-tabContent">
+                    <div class="tab-pane fade show active" id="pills-Basic" role="tabpanel" aria-labelledby="pills-Basic-tab">
+                        <form name="addBasicS" ng-submit="SaveStudentBasicInfo()" class="form-horizontal" novalidate autocomplete="off">
+                            <div class="row">
+                                <div class="col-lg-12 p-0">
+                                    <div class="Student-Information-head">
+                                        <h4>Student Information</h4>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row mt-2">
+                                <div class="col-lg-6">
+                                    <div class="form-group row">
+                                        <label for="text" class="col-sm-5 col-form-label">SMS Notification Number</label>
+                                        <div class="col-sm-7">
+                                            <label class="form-control">{{StuDetail.StudentBasicInfo.SMSNotificationNo}}</label>
+                                            @*<input type="text" class="form-control" ng-model="StuDetail.StudentBasicInfo.SMSNotificationNo" name="SMSNotificationNo" ng-pattern="/^(?:\+?88)?01[15-9]\d{8}$/" onkeypress='return event.charCode >= 48 && event.charCode <= 57' />*@
+                                            @*<input type="text" readonly disabled ng-model="StuDetail.StudentBasicInfo.SMSNotificationNo" ng-pattern="/^(?:\+?88)?01[13-9]\d{8}$/" class="form-control" placeholder="Mobile No" onkeypress='return event.charCode >= 48 && event.charCode <= 57' name="SMSNotificationNo">*@
+                                            <span style="color:red" class="help-block" ng-if="addBasicS.SMSNotificationNo.$error.pattern">Not valid Mobile No!</span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label for="text" class="col-sm-5 col-form-label">Gender</label>
+                                        <div class="col-sm-7">
+                                            <label class="form-control">{{StuDetail.StudentBasicInfo.Gender}}</label>
+                                            @*<select class="form-control" disabled  ng-model="StuDetail.StudentBasicInfo.Gender" name="Gender" ng-options="studentInfo.Value as studentInfo.Text for studentInfo in Dropdowns | filter:Type='Gender'">
+                                                    <option value="" selected="selected">Choose Option</option>
+                                                </select>*@
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label for="text" class="col-sm-5 col-form-label">Date Of Birth </label>
+                                        <div class="col-sm-7">
+                                            <label class="form-control">{{StuDetail.StudentBasicInfo.DateOfBirth | date:'dd/MM/yyyy'}}</label>
+                                            @*<input class="form-control" type="text" ng-value="StuDetail.StudentBasicInfo.DateOfBirth | date:'dd/MM/yyyy'" ng-change="calculateAge()"
+                                                ng-click="p2=true" is-open="p2" uib-datepicker-popup="{{format}}" ng-model="StuDetail.StudentBasicInfo.DateOfBirth" placeholder="Date of Birth" name="DOB" />*@
+
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label for="text" class="col-sm-5 col-form-label">Birth Certificate No</label>
+                                        <div class="col-sm-7">
+                                            <label class="form-control">{{StuDetail.StudentBasicInfo.BirthCertificate}}</label>
+                                            @*<input type="text" ng-model="StuDetail.StudentBasicInfo.Age" class="form-control" onkeypress='return event.charCode >= 48 && event.charCode <= 57' maxlength="2" placeholder="Age" name="Age" disabled>*@
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group row">
+                                        <label for="text" class="col-sm-5 col-form-label">Medical Advice</label>
+                                        <div class="col-sm-7">
+                                            <div class="input-group">
+                                                <label class="form-control">{{StuDetail.StudentBasicInfo.MedicalAdvice}}</label>
+                                                @*<input type="text" ng-model="StuDetail.StudentBasicInfo.Weight" ng-pattern="/^[0-9]\d{0,3}$/" class="form-control" placeholder="Weight in KG" name="Weight" aria-describedby="basic-addon1">*@
+
+                                            </div>
+                                            <span style="color:red" class="help-block" ng-if="addBasicS.Weight.$error.pattern">Operator Not Allow!</span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label for="text" class="col-sm-5 col-form-label">Passport Number</label>
+                                        <div class="col-sm-7">
+                                            <label class="form-control">{{StuDetail.StudentBasicInfo.PPNumber}}</label>
+                                            @*<input type="text" ng-model="StuDetail.StudentBasicInfo.Age" class="form-control" onkeypress='return event.charCode >= 48 && event.charCode <= 57' maxlength="2" placeholder="Age" name="Age" disabled>*@
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label for="text" class="col-sm-5 col-form-label">ECA</label>
+                                        <div class="col-sm-7">
+                                            <label class="form-control">{{StuDetail.StudentBasicInfo.ClubName}}</label>
+                                            @*<select class="form-control" ng-model="StuDetail.StudentBasicInfo.Religion" name="Religion" ng-options="studentInfo.Value as studentInfo.Text for studentInfo in Dropdowns | filter:Type='Religion'">
+                                                    <option value="" selected="selected">Choose Option</option>
+                                                </select>*@
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label for="text" class="col-sm-5 col-form-label">ECA Day</label>
+                                        <div class="col-sm-7">
+                                            <label class="form-control">{{StuDetail.StudentBasicInfo.DayName}}</label>
+                                            @*<input type="text" ng-model="StuDetail.StudentBasicInfo.Age" class="form-control" onkeypress='return event.charCode >= 48 && event.charCode <= 57' maxlength="2" placeholder="Age" name="Age" disabled>*@
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label for="text" class="col-sm-5 col-form-label">ECA PickUp Time</label>
+                                        <div class="col-sm-7">
+                                            <label class="form-control">{{StuDetail.StudentBasicInfo.ToTime | date:'hh:mm a'}}</label>
+                                        
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <div class="col-lg-6">
+                                    <div class="form-group row">
+                                        <label for="text" class="col-sm-5 col-form-label">Nationality </label>
+                                        <div class="col-sm-7">
+                                            <label class="form-control">{{StuDetail.StudentBasicInfo.Nationality}}</label>
+                                            @*<select class="form-control" ng-model="StuDetail.StudentBasicInfo.Nationality" selected="selected" ng-options="studentInfo.Value as studentInfo.Text for studentInfo in Dropdowns | filter:Type='Nationality'">
+                                                    <option value="" selected>Choose an Option</option>
+                                                </select>*@
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group row">
+                                        <label for="text" class="col-sm-5 col-form-label">Religion</label>
+                                        <div class="col-sm-7">
+                                            <label class="form-control">{{StuDetail.StudentBasicInfo.Religion}}</label>
+                                            @*<select class="form-control" ng-model="StuDetail.StudentBasicInfo.Religion" name="Religion" ng-options="studentInfo.Value as studentInfo.Text for studentInfo in Dropdowns | filter:Type='Religion'">
+                                                    <option value="" selected="selected">Choose Option</option>
+                                                </select>*@
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label for="text" class="col-sm-5 col-form-label">Age</label>
+                                        <div class="col-sm-7">
+                                            <label class="form-control">{{StuDetail.StudentBasicInfo.Age}}</label>
+                                            @*<input type="number" ng-model="StuDetail.StudentBasicInfo.Height" min="0" max="7.8" class="form-control ng-valid ng-not-empty ng-dirty ng-valid-number ng-touched" placeholder="Height in Ft." id="HeightFT" aria-describedby="basic-addon1" value="0" style="">*@
+
+                                        </div>
+
+                                    </div>
+                                    <div class="form-group row">
+                                        <label for="text" class="col-sm-5 col-form-label">Blood Group</label>
+                                        <div class="col-sm-7">
+                                            <label class="form-control">{{StuDetail.StudentBasicInfo.BloodGroup}}</label>
+                                            @*<select class="form-control" ng-model="StuDetail.StudentBasicInfo.BloodGroup" name="Blood" ng-options="studentInfo.Value as studentInfo.Text for studentInfo in Dropdowns | filter:Type='Blood Group'">
+                                                    <option value="" selected="selected">Choose Option</option>
+                                                </select>*@
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label for="text" class="col-sm-5 col-form-label">RS/MUN</label>
+                                        <div class="col-sm-7">
+                                            <label class="form-control">{{StuDetail.StudentBasicInfo.RS_MUN}}</label>
+                                            @*<input type="text" ng-model="StuDetail.StudentBasicInfo.Age" class="form-control" onkeypress='return event.charCode >= 48 && event.charCode <= 57' maxlength="2" placeholder="Age" name="Age" disabled>*@
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label for="text" class="col-sm-5 col-form-label">Expire Date</label>
+                                        <div class="col-sm-7">
+                                            <label class="form-control">{{StuDetail.StudentBasicInfo.PPExpireDate | date:"dd/MM/yyyy"}}</label>
+                                            @*<input type="text" ng-model="StuDetail.StudentBasicInfo.Age" class="form-control" onkeypress='return event.charCode >= 48 && event.charCode <= 57' maxlength="2" placeholder="Age" name="Age" disabled>*@
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label for="text" class="col-sm-5 col-form-label">Regular Lock Out</label>
+                                        <div class="col-sm-7">
+                                            <label class="form-control">{{StuDetail.StudentBasicInfo.LockOut | date:"hh:m a"}}</label>
+                                            @*<select class="form-control" ng-model="StuDetail.StudentBasicInfo.Religion" name="Religion" ng-options="studentInfo.Value as studentInfo.Text for studentInfo in Dropdowns | filter:Type='Religion'">
+                                                    <option value="" selected="selected">Choose Option</option>
+                                                </select>*@
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label for="text" class="col-sm-5 col-form-label">Regular PickUp Time</label>
+                                        <div class="col-sm-7">
+                                            <label class="form-control">{{StuDetail.StudentBasicInfo.PickUpTime | date:"hh:m a"}}</label>
+                                            @*<select class="form-control" ng-model="StuDetail.StudentBasicInfo.Religion" name="Religion" ng-options="studentInfo.Value as studentInfo.Text for studentInfo in Dropdowns | filter:Type='Religion'">
+                                                    <option value="" selected="selected">Choose Option</option>
+                                                </select>*@
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="tab-pane fade" id="pills-Guardian" role="tabpanel" aria-labelledby="pills-Guardian-tab">
+                        <form name="addBasic" ng-submit="saveGuardian()" class="form-horizontal" autocomplete="off">
+                            <div class="accordion-container">
+                                <div class="set">
+                                    <a href="#" class="active">
+                                        Father & Mother
+                                        <i class="fa fa-minus"></i>
+                                    </a>
+                                    <div class="content" style="display: block;">
+                                        <div class="row">
+                                            <div class="col-lg-6">
+                                                <div class="row">
+                                                    <div class="col-lg-12">
+                                                        <div class="father-information">
+                                                            <h4>Father's Information</h4>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="row mt-2">
+                                                    <div class="col-lg-12">
+                                                        <div class="form-group">
+                                                            <div class="col-md-7">
+                                                                <input type="hidden" value="A4Landscape" name="ImgType" />
+                                                                <div class="fileinput fileinput-new" data-provides="fileinput">
+                                                                    <div class="fileinput-new thumbnail" style="width: 150px;height: 150px;">
+                                                                        @*<img src="~/assets/global/no image.jpg" ng-hide="StuDetail.StudentBasicInfo.StudentPhoto!=null" />*@
+                                                                        @*<img ng-src="data:image/png;base64,{{img}}">*@
+                                                                        <img data-ng-src="@String.Format("data:image/jpg;base64,{0}", "{{StuDetail.StudentGuardianInfo.F_GuardianImage}}")" class="img-fulid w-100" alt="">
+                                                                    </div>
+                                                                    <div class="fileinput-preview fileinput-exists thumbnail img-fulid w-100" style="width: 150px;height: 85px;"> </div>
+                                                                    @*<div>
+                                                                            <span class="btn btnColor btn-file">
+                                                                                <span class="fileinput-new"> Select image </span>
+                                                                                <span class="fileinput-exists"> Change </span>
+                                                                                <input type="file" name="..." id="imgFatherImage" accept=".jpg, .png, .jpeg, .gif, .bmp, .tif, .tiff|images/*">
+                                                                            </span>
+                                                                            <a href="javascript:;" class="btn btn-danger fileinput-exists" data-dismiss="fileinput"> Remove </a>
+                                                                        </div>*@
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group row">
+                                                            <label for="text" class="col-sm-4 col-form-label">Father's Name</label>
+                                                            <div class="col-sm-8">
+                                                                <label class="form-control">{{StuDetail.StudentGuardianInfo.FatherName}}</label>
+                                                                @*<input type="text" ng-model="StuDetail.StudentGuardianInfo.FatherName" required name="FatherName" ng-value="StuDetail.StudentBasicInfo.FatherName" class="form-control" placeholder="Father's Name">*@
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group row">
+                                                            <label for="text" class="col-sm-4 col-form-label"> Qualification</label>
+                                                            <div class="col-sm-8">
+                                                                <label class="form-control">{{StuDetail.StudentGuardianInfo.F_Qualification}}</label>
+                                                                @*<select class="form-control" ng-model="StuDetail.StudentGuardianInfo.F_Qualification" ng-options="studentSearch.Text as studentSearch.Text for studentSearch in Dropdowns | filter:Type='Qualification'">
+                                                                        <option value="" selected>Select Qualification</option>
+                                                                    </select>*@
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group row">
+                                                            <label for="text" class="col-sm-4 col-form-label">Profession</label>
+                                                            <div class="col-sm-8">
+                                                                <label class="form-control">{{StuDetail.StudentGuardianInfo.F_Profession}}</label>
+                                                                @*<select class="form-control" ng-model="StuDetail.StudentGuardianInfo.F_Profession" ng-options="studentSearch.Text as studentSearch.Text for studentSearch in Dropdowns | filter:Type='FatherProfession'">
+                                                                        <option value="" selected>Select Profession</option>
+                                                                    </select>*@
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="form-group row">
+                                                            <label for="text" class="col-sm-4 col-form-label">Office Address</label>
+                                                            <div class="col-sm-8">
+                                                                <label class="form-control">{{StuDetail.StudentGuardianInfo.F_OfficeAddress}}</label>
+                                                                @*<input type="text" ng-model="StuDetail.StudentGuardianInfo.F_OfficeAddress" class="form-control" placeholder="Office Address">*@
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group row">
+                                                            <label for="text" class="col-sm-4 col-form-label"> Contact Number</label>
+                                                            <div class="col-sm-8">
+                                                                <label class="form-control">{{StuDetail.StudentGuardianInfo.F_Mobile}}</label>
+                                                                @*<input type="text" ng-model="StuDetail.StudentGuardianInfo.F_Mobile" ng-pattern="/^(?:\+?88)?01[13-9]\d{8}$/" class="form-control" placeholder="Mobile No" onkeypress='return event.charCode >= 48 && event.charCode <= 57' name="F_Mobile">*@
+                                                                <span style="color:red" ng-show="addBasic.F_Mobile.$error.pattern">Not a valid number!</span>
+                                                            </div>
+                                                        </div>  @*ng-pattern="/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/"*@
+                                                        <div class="form-group row">
+                                                            <label for="text" class="col-sm-4 col-form-label">Email</label>
+                                                            <div class="col-sm-8">
+                                                                <label class="form-control">{{StuDetail.StudentGuardianInfo.F_Email}}</label>
+                                                                @*<input type="email" ng-model="StuDetail.StudentGuardianInfo.F_Email" ng-pattern="/^[^\s]+[^\s]+\.[^\s]{3,}$/" class="form-control" placeholder="Email" name="F_Email">*@
+                                                                <span style="color:red" class="help-block" ng-if="addBasic.F_Email.$error.pattern">Not valid email!</span>
+
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group row">
+                                                            <label for="text" class="col-sm-4 col-form-label">TIN</label>
+                                                            <div class="col-sm-8">
+                                                                <label class="form-control">{{StuDetail.StudentGuardianInfo.F_TIN}}</label>
+                                                                @*<input type="text" name="F_TIN" ng-model="StuDetail.StudentGuardianInfo.F_TIN" class="form-control" ng-minlength="5" placeholder="Father TIN">*@
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group row">
+                                                            <label for="text" class="col-sm-4 col-form-label">NID</label>
+                                                            <div class="col-sm-8">
+                                                                <label class="form-control">{{StuDetail.StudentGuardianInfo.F_NIDNo}}</label>
+                                                                @*<input type="text" name="F_NIDNo" ng-model="StuDetail.StudentGuardianInfo.F_NIDNo" class="form-control" ng-minlength="10" autocomplete="off" placeholder="NID Number">*@
+                                                                <span style="color:red" ng-show="addBasic.F_NIDNo.$error.minlength">Invalid Character. Minimum Ten Character!</span>
+
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group row">
+                                                            <label for="text" class="col-sm-4 col-form-label">Passport No</label>
+                                                            <div class="col-sm-8">
+                                                                <label class="form-control">{{StuDetail.StudentGuardianInfo.F_PassportNo}}</label>
+                                                                @*<input type="text" ng-model="StuDetail.StudentGuardianInfo.F_PassportNo" class="form-control" ng-minlength="8" name="F_PassportNo" placeholder="Passport NO">*@
+                                                                <span style="color:red" ng-show="addBasic.F_PassportNo.$error.minlength">Invalid Character. Minimum Eight Character!</span>
+
+                                                            </div>
+                                                        </div>
+
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-6">
+                                                <div class="row">
+                                                    <div class="col-lg-12">
+                                                        <div class="father-information">
+                                                            <h4>Mother's Information</h4>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="row mt-2">
+                                                    <div class="col-lg-12">
+                                                        <div class="form-group">
+                                                            <div class="col-md-7">
+                                                                <input type="hidden" value="A4Landscape" name="ImgType" />
+                                                                <div class="fileinput fileinput-new" data-provides="fileinput">
+                                                                    <div class="fileinput-new thumbnail" style="width: 150px; height: 150px;">
+                                                                        <img data-ng-src="@String.Format("data:image/jpg;base64,{0}", "{{StuDetail.StudentGuardianInfo.M_GuardianImage}}")" class="img-fulid w-100" alt="">
+                                                                    </div>
+                                                                    @*<div class="fileinput-preview fileinput-exists thumbnail" style="width: 150px;height: 85px;"> </div>*@
+                                                                    @*<div>
+                                                                            <span class="btn btnColor btn-file">
+                                                                                <span class="fileinput-new"> Select image </span>
+                                                                                <span class="fileinput-exists"> Change </span>
+                                                                                <input type="file" name="..." id="imgMotherImage" accept=".jpg, .png, .jpeg, .gif, .bmp, .tif, .tiff|images/*">
+                                                                            </span>
+                                                                            <a href="javascript:;" class="btn btn-danger fileinput-exists" data-dismiss="fileinput"> Remove </a>
+                                                                        </div>*@
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group row">
+                                                            <label for="text" class="col-sm-4 col-form-label">Mother's Name</label>
+                                                            <div class="col-sm-8">
+                                                                <input type="text" ng-model="StuDetail.StudentGuardianInfo.MotherName" name="MotherName" ng-value="StuDetail.StudentBasicInfo.MotherName" class="form-control" placeholder="Mother's Name">
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group row">
+                                                            <label for="text" class="col-sm-4 col-form-label">Qualification</label>
+                                                            <div class="col-sm-8">
+                                                                <label class="form-control">{{StuDetail.StudentGuardianInfo.M_Qualification}}</label>
+                                                                @*<select class="form-control" ng-model="StuDetail.StudentGuardianInfo.M_Qualification" ng-options="studentSearch.Text as studentSearch.Text for studentSearch in Dropdowns | filter:Type='Qualification'">
+                                                                        <option value="" selected>Select Qualification</option>
+                                                                    </select>*@
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group row">
+                                                            <label for="text" class="col-sm-4 col-form-label">Profession</label>
+                                                            <div class="col-sm-8">
+                                                                <label class="form-control">{{StuDetail.StudentGuardianInfo.M_Profession}}</label>
+                                                                @*<select class="form-control" ng-model="StuDetail.StudentGuardianInfo.M_Profession" ng-options="studentSearch.Text as studentSearch.Text for studentSearch in Dropdowns | filter:Type='MotherProfession'">
+                                                                        <option value="" selected>Select Profession</option>
+                                                                    </select>*@
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="form-group row">
+                                                            <label for="text" class="col-sm-4 col-form-label">Office Address</label>
+                                                            <div class="col-sm-8">
+                                                                <label class="form-control">{{StuDetail.StudentGuardianInfo.M_OfficeAddress}}</label>
+                                                                @*<input type="text" ng-model="StuDetail.StudentGuardianInfo.M_OfficeAddress" class="form-control" placeholder="Office Address">*@
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group row">
+                                                            <label for="text" class="col-sm-4 col-form-label">Contact Number</label>
+                                                            <div class="col-sm-8">
+                                                                <label class="form-control">{{StuDetail.StudentGuardianInfo.M_Mobile}}</label>
+                                                                @*<input type="text" ng-model="StuDetail.StudentGuardianInfo.M_Mobile" ng-pattern="/^(?:\+?88)?01[13-9]\d{8}$/"
+                                                                    class="form-control" placeholder="Mobile No" onkeypress='return event.charCode >= 48 && event.charCode <= 57' name="M_Mobile">*@
+                                                                <span style="color:red" ng-show="addBasic.M_Mobile.$error.pattern">Not a valid number!</span>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group row">
+                                                            <label for="text" class="col-sm-4 col-form-label">Email</label>
+                                                            <div class="col-sm-8">
+                                                                <label class="form-control">{{StuDetail.StudentGuardianInfo.M_Email}}</label>
+                                                                @*<input type="email" ng-model="StuDetail.StudentGuardianInfo.M_Email" ng-pattern="/^[^\s]+[^\s]+\.[^\s]{3,}$/" class="form-control" placeholder="Email" name="M_Email">*@
+                                                                <span style="color:red" class="help-block" ng-if="addBasic.M_Email.$error.pattern">Not valid email!</span>
+
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group row">
+                                                            <label for="text" class="col-sm-4 col-form-label">TIN</label>
+                                                            <div class="col-sm-8">
+                                                                <label class="form-control">{{StuDetail.StudentGuardianInfo.M_TIN}}</label>
+                                                                @*<input type="text" name="M_TIN" ng-model="StuDetail.StudentGuardianInfo.M_TIN" class="form-control" ng-minlength="5" placeholder="Mother TIN">*@
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group row">
+                                                            <label for="text" class="col-sm-4 col-form-label">NID</label>
+                                                            <div class="col-sm-8">
+                                                                <label class="form-control">{{StuDetail.StudentGuardianInfo.M_NIDNo}}</label>
+                                                                @*<input type="text" name="M_NIDNo" ng-model="StuDetail.StudentGuardianInfo.M_NIDNo" class="form-control" ng-minlength="10" placeholder="NID Number">*@
+                                                                <span style="color:red" ng-show="addBasic.M_NIDNo.$error.minlength">Invalid Character. Minimum Ten Character!</span>
+
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group row">
+                                                            <label for="text" class="col-sm-4 col-form-label">Passport No</label>
+                                                            <div class="col-sm-8">
+                                                                <label class="form-control">{{StuDetail.StudentGuardianInfo.M_PassportNo}}</label>
+
+                                                                @*<input type="text" ng-model="StuDetail.StudentGuardianInfo.M_PassportNo" class="form-control" ng-minlength="8" name="M_PassportNo" placeholder="Passport NO">*@
+                                                                <span style="color:red" ng-show="addBasic.M_PassportNo.$error.minlength">Invalid Character. Minimum Eight Character!</span>
+
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="set">
+                                    <a href="#">
+                                        More Information
+                                        <i class="fa fa-plus"></i>
+                                    </a>
+                                    <div class="content">
+                                        <div class="row">
+                                            <div class="col-lg-6">
+                                                <div class="row">
+                                                    <div class="col-lg-12">
+                                                        <div class="father-information">
+                                                            <h4>Emergency Contact 1</h4>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="row mt-2">
+                                                    <div class="col-lg-12">
+                                                        <div class="form-group row">
+                                                            <label for="text" class="col-sm-4 col-form-label">Name</label>
+                                                            <div class="col-sm-8">
+                                                                <label class="form-control">{{StuDetail.StudentGuardianInfo.LG_Name}}</label>
+
+                                                                @*<input type="text" ng-model="StuDetail.StudentGuardianInfo.LG_Name" class="form-control" placeholder="Local Guardian Name">*@
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group row">
+                                                            <label for="text" class="col-sm-4 col-form-label">Relation</label>
+                                                            <div class="col-sm-8">
+                                                                <label class="form-control">{{StuDetail.StudentGuardianInfo.LG_Relation}}</label>
+                                                                @*<input type="text" ng-model="StuDetail.StudentGuardianInfo.LG_Relation" class="form-control" placeholder="Relation">*@
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group row">
+                                                            <label for="text" class="col-sm-4 col-form-label">Address</label>
+                                                            <div class="col-sm-8">
+                                                                @*<input type="text" ng-model="StuDetail.StudentGuardianInfo.LG_Address" class="form-control" placeholder="Office Address">*@
+                                                                <label class="form-control">{{StuDetail.StudentGuardianInfo.LG_Address}}</label>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group row">
+                                                            <label for="text" class="col-sm-4 col-form-label">Contact Number</label>
+                                                            <div class="col-sm-8">
+                                                                <label class="form-control">{{StuDetail.StudentGuardianInfo.LG_Mobile}}</label>
+
+                                                                @*<input type="text" ng-model="StuDetail.StudentGuardianInfo.LG_Mobile" ng-pattern="/^(?:\+?88)?01[13-9]\d{8}$/" class="form-control" placeholder="Mobile No" onkeypress='return event.charCode >= 48 && event.charCode <= 57' name="LG_Mobile">*@
+                                                                <span style="color:red" class="help-block" ng-show="addBasic.LG_Mobile.$error.pattern"> Invaild Number </span>
+
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group row">
+                                                            <label for="text" class="col-sm-4 col-form-label">Email</label>
+                                                            <div class="col-sm-8">
+                                                                <label class="form-control">{{StuDetail.StudentGuardianInfo.LG_Email}}</label>
+                                                                @*<input type="email" ng-model="StuDetail.StudentGuardianInfo.LG_Email" class="form-control" ng-pattern="/^[^\s]+[^\s]+\.[^\s]{3,}$/" placeholder="Email" name="LG_Email">*@
+                                                                <span style="color:red" class="help-block" ng-if="addBasic.LG_Email.$invalid">Not valid email!</span>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group row">
+                                                            <label for="text" class="col-sm-4 col-form-label">NID</label>
+                                                            <div class="col-sm-8">
+                                                                <label class="form-control">{{StuDetail.StudentGuardianInfo.LG_NIDNo}}</label>
+                                                                @*<input type="text" ng-model="StuDetail.StudentGuardianInfo.LG_NIDNo" ng-minlength="10" class="form-control" placeholder="NIDNo" name="LG_NIDNo">*@
+                                                                <div class="form-control-focus"> </div>
+                                                                @*<span style="color:red" ng-if="!addBasic.LG_NIDNo.$valid" class="help-block">Min Length 10</span>*@
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-6">
+                                                <div class="row">
+                                                    <div class="col-lg-12">
+                                                        <div class="father-information">
+                                                            <h4>Emergency Contact 5</h4>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="row mt-2">
+                                                    <div class="col-lg-12">
+                                                        <div class="form-group row">
+                                                            <label for="text" class="col-sm-4 col-form-label">Name</label>
+                                                            <div class="col-sm-8">
+                                                                <label class="form-control">{{StuDetail.StudentGuardianInfo.E_Name}}</label>
+
+                                                                @*<input type="text" ng-model="StuDetail.StudentGuardianInfo.E_Name" class="form-control" placeholder="Emergency Guardian Name">*@
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group row">
+                                                            <label for="text" class="col-sm-4 col-form-label">Relation</label>
+                                                            <div class="col-sm-8">
+                                                                <label class="form-control">{{StuDetail.StudentGuardianInfo.E_Relation}}</label>
+
+                                                                @*<input type="text" ng-model="StuDetail.StudentGuardianInfo.E_Relation" class="form-control" placeholder="Relation" name="E_Relation">*@
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group row">
+                                                            <label for="text" class="col-sm-4 col-form-label">Address</label>
+                                                            <div class="col-sm-8">
+                                                                <label class="form-control">{{StuDetail.StudentGuardianInfo.E_Address}}</label>
+
+                                                                @*<input type="text" ng-model="StuDetail.StudentGuardianInfo.E_Address" class="form-control" placeholder="Office Address">*@
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group row">
+                                                            <label for="text" class="col-sm-4 col-form-label">Contact Number</label>
+                                                            <div class="col-sm-8">
+                                                                <label class="form-control">{{StuDetail.StudentGuardianInfo.E_Mobile}}</label>
+
+                                                                @*<input type="text" ng-model="StuDetail.StudentGuardianInfo.E_Mobile" ng-pattern="/^(?:\+?88)?01[13-9]\d{8}$/"
+                                                                    class="form-control" placeholder="Mobile No" onkeypress='return event.charCode >= 48 && event.charCode <= 57' name="E_Mobile">*@
+                                                                <span style="color:red" ng-show="addBasic.E_Mobile.$error.pattern">Not a valid number!</span>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group row">
+                                                            <label for="text" class="col-sm-4 col-form-label">Email</label>
+                                                            <div class="col-sm-8">
+                                                                <label class="form-control">{{StuDetail.StudentGuardianInfo.E_Email}}</label>
+
+                                                                @*<input type="email" ng-model="StuDetail.StudentGuardianInfo.E_Email" class="form-control" ng-pattern="/^[^\s]+[^\s]+\.[^\s]{3,}$/" placeholder="Email" name="E_Email">*@
+                                                                <span style="color:red" class="help-block" ng-if="addBasic.E_Email.$invalid">Not valid email!</span>
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group row">
+                                                            <label for="text" class="col-sm-4 col-form-label">NID</label>
+                                                            <div class="col-sm-8">
+                                                                <label class="form-control">{{StuDetail.StudentGuardianInfo.E_NIDNo}}</label>
+
+                                                                @*<input type="text" ng-model="StuDetail.StudentGuardianInfo.E_NIDNo" ng-minlength="10" class="form-control" placeholder="NIDNo" name="E_NIDNo">*@
+
+                                                                @*<span style="color:red" ng-if="!addBasic.E_NIDNo.$valid" class="help-block">Min Length 10</span>*@
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            @*<div class="row" style="margin-left: 92%;margin-bottom: 2%;margin-top: 1%;">
+                                    <button type="submit" ng-click="submitted3=true" id="pulsate-once" class="btn btnColor">Save</button>
+                                </div>*@
+                        </form>
+                    </div>
+                    <div class="tab-pane fade" id="pills-Academic" role="tabpanel" aria-labelledby="pills-Academic-tab">
+                        <div class="portlet light bordered">
+                            <div class="portlet-title">
+                                <div class="Student-Information-head">
+                                    <h4>Academic Info</h4>
+                                </div>
+                                <div class="actions" style="margin-top: 1%;margin-bottom: 1%;">
+                                    <form novalidate name="results" class="form-horizontal">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                @*<div class="form-group row" ng-class="{ 'has-error' : submitted && results.Term.$invalid}">
+                                                        <label for="text" class="col-sm-4 col-form-label">Term</label>
+                                                        <div class="col-sm-8">
+                                                            <select class="form-control" ng-model="Result.TermId" required name="Term" ng-options="T.TermId as T.Name for T in Terms">
+                                                                    <option value='' selected>Select Option</option>
+                                                             </select>
+                                                            <span ng-show="submitted && results.Term.$error.required" style="color:red;">Term is Required.</span>
+                                                        </div>
+                                                    </div>*@
+                                            </div>
+                                            <div class="col-md-6">
+                                                <button type="button" ng-click="SubjectWiseReport();submitted=true" class="btn btn-success">Subject Wise Report</button>
+                                                <button type="button" class="btn btn-info" ng-click="SubjectWiseReport();submitted=true">Master Mark Sheet</button>
+                                                <button type="button" class="btn btn-primary" ng-click="SubjectWiseReport();submitted=true">Report Card</button>
+                                                @*<button type="reset" class="btn btn-danger" >Reset</button>*@
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                            <div class="portlet-body">
+                                <div class="table-container">
+                                    <div id="sample_3_wrapper" class="dataTables_wrapper no-footer">
+                                        <table class="table table-bordered table-hover">
+                                            <thead>
+                                                <tr class="btnColor">
+                                                    <th>PREVIOUS YEAR</th>
+                                                    <th>CLASS</th>
+                                                    <th>STATUS</th>
+                                                    <th>AWARDEE</th>
+
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @*<tr ng-repeat="item in StuDetail.StudentAcademicInfo">
+                                                        <td>{{item.ExamName}}</td>
+                                                        <td>{{item.InstituteName}}</td>
+                                                        <td>{{item.ExamYear}}</td>
+                                                        <td>{{item.ExamRoll}}</td>
+                                                        <td>{{item.GPA}}</td>
+                                                        <td>{{item.Board}}</td>
+                                                        <td>{{item.ExamGroup}}</td>
+                                                    </tr>*@
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- End: life time stats -->
+                        <!--Modal Area Start-->
+                        <div id="addmodalAcademic" class="modal fade" tabindex="-1" data-backdrop="static" data-keyboard="false">
+                            <div class="modal-dialog modal-lg">
+                                <div class="modal-content">
+                                    <form name="AcademicAddform" ng-submit="saveAcademic()" class="form-horizontal" id="form_sample_1" novalidate="">
+                                        <div class="modal-header summer-view">
+                                            <h4 class="modal-title" style="margin-left: 38%;">Academic Info</h4>
+                                            <button type="button" class="close" style="color:red;" data-dismiss="modal" aria-hidden="true">X</button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <div class="form-body">
+                                                <div class="row">
+                                                    <div class="col-lg-6">
+                                                        <div class="row mt-2">
+                                                            <div class="col-lg-12">
+                                                                <div class="form-group row" ng-class="{ 'has-error' : submitted4 && AcademicAddform.ExamName.$invalid}">
+                                                                    <label for="text" class="col-sm-4 col-form-label">
+                                                                        Exam Name
+                                                                        <span class="required">*</span>
+                                                                    </label>
+                                                                    <div class="col-sm-8">
+                                                                        <select type="text" ng-model="academic.ExamName" ng-options="item.Text as item.Text for item in Dropdowns | filter:Type='Exam'" class="form-control" placeholder="" name="ExamName" required>
+                                                                            <option value='' selected="selected">Select Exam</option>
+                                                                        </select>
+                                                                        <span style="color:red" ng-show="submitted4 && AcademicAddform.ExamName.$error.required" class="help-block">Exam Name Required</span>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group row" ng-class="{ 'has-error' : submitted4 && AcademicAddform.InstituteName.$invalid}">
+                                                                    <label for="text" class="col-sm-4 col-form-label">Institute Name<span class="required">*</span></label>
+                                                                    <div class="col-sm-8">
+                                                                        <input type="text" ng-model="academic.InstituteName" class="form-control" placeholder="Institute Name" name="InstituteName" required="required">
+                                                                        <span style="color:red" ng-show="submitted4 && AcademicAddform.InstituteName.$error.required" class="help-block">Institute Name Required</span>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group row" ng-class="{ 'has-error' : submitted4 && AcademicAddform.InstituteAddress.$invalid}">
+                                                                    <label for="text" class="col-sm-4 col-form-label">
+                                                                        Institute Address
+                                                                        <span class="required">*</span>
+                                                                    </label>
+                                                                    <div class="col-sm-8">
+                                                                        <input type="text" ng-model="academic.InstituteAddress" class="form-control" placeholder="Institute Address" name="InstituteAddress" required="required">
+                                                                        <span style="color:red" ng-show="submitted4 && AcademicAddform.InstituteAddress.$error.required" class="help-block">Institute Address Required</span>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group row">
+                                                                    <label for="text" class="col-sm-4 col-form-label">District & Thana</label>
+                                                                    <div class="col-sm-8">
+                                                                        <input type="text" ng-model="academic.DistrictThana" class="form-control" placeholder="District & Thana">
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group row">
+                                                                    <label for="text" class="col-sm-4 col-form-label">Center</label>
+                                                                    <div class="col-sm-8">
+                                                                        <input type="text" ng-model="academic.Center" class="form-control" placeholder="Center">
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group row">
+                                                                    <label for="text" class="col-sm-4 col-form-label">Group</label>
+                                                                    <div class="col-sm-8">
+                                                                        <select class="form-control" ng-model="academic.ExamGroup">
+                                                                            <option value='' selected="selected">Select Select</option>
+                                                                            <option value='Science'>Science</option>
+                                                                            <option value='Arts'>Arts</option>
+                                                                            <option value='Commerce'>Commerce</option>
+                                                                        </select>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group row">
+                                                                    <label for="text" class="col-sm-4 col-form-label">Board</label>
+                                                                    <div class="col-sm-8">
+                                                                        <input type="text" ng-model="academic.Board" class="form-control" placeholder="Board">
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group row" ng-class="{ 'has-error' : submitted4 && AcademicAddform.GPA.$invalid}">
+                                                                    <label for="text" class="col-sm-4 col-form-label">GPA <span class="required">*</span></label>
+                                                                    <div class="col-sm-8">
+                                                                        <input type="text" required ng-model="academic.GPA" class="form-control" placeholder="GPA" name="GPA" min="1" max="5" onkeypress='return event.charCode >= 46 && event.charCode <= 53' maxlength="4">
+                                                                        <span class="required" ng-show="submitted4 && AcademicAddform.GPA.$error.required">GPA Required</span>
+                                                                        <span class="required" ng-show="submitted4 && AcademicAddform.GPA.$error.number">Not Valid GPA</span>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-lg-6">
+                                                        <div class="row mt-2">
+                                                            <div class="col-lg-12">
+                                                                <div class="form-group row" ng-class="{ 'has-error' : submitted4 && AcademicAddform.ExamYear.$invalid}">
+                                                                    <label for="text" class="col-sm-4 col-form-label"> Exam Year <span class="required">*</span></label>
+                                                                    <div class="col-sm-8">
+                                                                        <select type="text" ng-model="academic.ExamYear" class="form-control" placeholder="" name="ExamYear" required="required">
+                                                                            <option value='' selected="selected">Select Select</option>
+                                                                            <option value="2017">2017</option>
+                                                                            <option value="2016">2016</option>
+                                                                            <option value="2015">2015</option>
+                                                                            <option value="2014">2014</option>
+                                                                            <option value="2013">2013</option>
+                                                                        </select>
+                                                                        <span ng-show="submitted4 && AcademicAddform.ExamYear.$error.required" class="required">Exam Year Required</span>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group row" ng-class="{ 'has-error' : submitted4 && AcademicAddform.PassYear.$invalid}">
+                                                                    <label for="text" class="col-sm-4 col-form-label">Pass Year <span class="required">*</span></label>
+                                                                    <div class="col-sm-8">
+                                                                        <select type="text" ng-model="academic.PassYear" class="form-control" placeholder="" name="PassYear" required="required">
+                                                                            <option value='' selected="selected">Select Select</option>
+                                                                            <option value="2017">2017</option>
+                                                                            <option value="2016">2016</option>
+                                                                            <option value="2015">2015</option>
+                                                                            <option value="2014">2014</option>
+                                                                            <option value="2013">2013</option>
+                                                                        </select>
+                                                                        <span ng-show="submitted4 && AcademicAddform.PassYear.$error.required" class="required">Pass Year Required</span>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group row">
+                                                                    <label for="text" class="col-sm-4 col-form-label">Exam Session</label>
+                                                                    <div class="col-sm-8">
+                                                                        <input type="text" ng-model="academic.ExamSession" class="form-control" placeholder="Exam Session">
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group row" ng-class="{ 'has-error' : submitted4 && AcademicAddform.ExamRoll.$invalid}">
+                                                                    <label for="text" class="col-sm-4 col-form-label">Roll No <span class="required">*</span></label>
+                                                                    <div class="col-sm-8">
+                                                                        <input type="text" onkeypress='return event.charCode >= 48 && event.charCode <= 57' numericbinding ng-model="academic.ExamRoll" class="form-control" placeholder="Roll No" name="ExamRoll" required>
+                                                                        <span ng-show="submitted4 && AcademicAddform.ExamRoll.$error.required" class="required">Exam Roll Required</span>
+
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group row">
+                                                                    <label for="text" class="col-sm-4 col-form-label">Reg. No</label>
+                                                                    <div class="col-sm-8">
+                                                                        <input type="text" onkeypress='return event.charCode >= 48 && event.charCode <= 57' ng-model="academic.ExamRegNo" class="form-control" placeholder="Reg. No">
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group row" ng-class="{ 'has-error' : submitted4 && AcademicAddform.GPAWithOut4thSubject.$invalid}">
+                                                                    <label for="text" class="col-sm-4 col-form-label">GPA without 4th Subject <span class="required">*</span></label>
+                                                                    <div class="col-sm-8">
+                                                                        <input type="text" required onkeypress='return event.charCode >= 48 && event.charCode <= 57' ng-model="academic.GPAWithOut4thSubject" class="form-control" placeholder="GPA without 4th Subject" name="GPAWithOut4thSubject" min="1" max="5">
+                                                                        <span ng-show="submitted4 && AcademicAddform.GPAWithOut4thSubject.$error.required" class="required">GPA WithOut 4th Subject Required</span>
+
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group row">
+                                                                    <label for="text" class="col-sm-4 col-form-label">Grade</label>
+                                                                    <div class="col-sm-8">
+                                                                        <input type="text" ng-model="academic.Grade" class="form-control" placeholder="Grade">
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group row">
+                                                                    <label for="text" class="col-sm-4 col-form-label">Comments</label>
+                                                                    <div class="col-sm-8">
+                                                                        <input type="text" ng-model="academic.Comment" class="form-control" placeholder="Comments">
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" data-dismiss="modal" class="btn btn-secondary" ng-click="resetFormAcademic();submitted4=false">Cancel</button>
+                                            <button type="submit" ng-click="submitted4=true" class="btn btnColor">{{btnTitle}}</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        <!--Modal Area End-->
+
+
+                    </div>
+                    <div class="tab-pane fade" id="pills-contact" role="tabpanel" aria-labelledby="pills-contact-tab">
+                        <div class="portlet light bordered">
+                            <div class="portlet-body">
+                                <div class="table-container">
+                                    <div id="sample_3_wrapper" class="dataTables_wrapper no-footer">
+                                        <form name="ContactAddform" ng-submit="saveContactPresent()" class="form-horizontal" id="form_sample_1" novalidate>
+                                            <div class="row">
+                                                <div class="col-lg-6">
+                                                    <div class="row">
+                                                        <div class="col-lg-12 p-0">
+                                                            <div class="father-information">
+                                                                <h4>Present Address</h4>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row mt-2">
+                                                        <div class="col-lg-12">
+                                                            <div class="form-group row">
+                                                                <label for="text" class="col-sm-4 col-form-label">Address</label>
+                                                                <div class="col-sm-8">
+                                                                    @*<label class="form-control">{{StuDetail.StudentContactInfo.Pre_Address}}</label>*@
+
+                                                                    <textarea class="form-control" disabled ng-model="StuDetail.StudentContactInfo.Pre_Address" required name="Address" placeholder="Address"></textarea>
+                                                                </div>
+                                                            </div>
+                                                            <div class="form-group row">
+                                                                <label for="text" class="col-sm-4 col-form-label">District</label>
+                                                                <div class="col-sm-8">
+                                                                    <label class="form-control">{{StuDetail.StudentContactInfo.Pre_DisName}}</label>
+
+                                                                    @*<select class="form-control" ng-model="StuDetail.StudentContactInfo.Pre_DisId" ng-options="studentContactInfo.DistrictId as studentContactInfo.DistrictName for studentContactInfo in Districts"
+                                                                                ng-change="getPStations1(StuDetail.StudentContactInfo.Pre_DisId)">
+                                                                            <option value='' selected>Select Option</option>
+                                                                        </select>*@
+                                                                </div>
+                                                            </div>
+                                                            <div class="form-group row">
+                                                                <label for="text" class="col-sm-4 col-form-label">Police Station</label>
+                                                                <div class="col-sm-8">
+                                                                    <label class="form-control">{{StuDetail.StudentContactInfo.Pre_PSName}}</label>
+
+                                                                    @*<select class="form-control" ng-model="StuDetail.StudentContactInfo.Pre_PSId" ng-options="studentContactInfo.PsId as studentContactInfo.PsName for studentContactInfo in PStations1">
+                                                                            <option value='' selected>Select Option</option>
+                                                                        </select>*@
+                                                                </div>
+                                                            </div>
+                                                            <div class="form-group row">
+                                                                <label for="text" class="col-sm-4 col-form-label">Post Office</label>
+                                                                <div class="col-sm-8">
+                                                                    <label class="form-control">{{StuDetail.StudentContactInfo.Pre_PostOffice}}</label>
+
+                                                                    @*<input type="text" class="form-control" placeholder="Post Office" ng-model="StuDetail.StudentContactInfo.Pre_PostOffice">*@
+                                                                </div>
+                                                            </div>
+                                                            <div class="form-group row">
+                                                                <label for="text" class="col-sm-4 col-form-label">Post Code</label>
+                                                                <div class="col-sm-8">
+                                                                    <label class="form-control">{{StuDetail.StudentContactInfo.Pre_PostalCode}}</label>
+
+                                                                    @*<input type="text" class="form-control" placeholder="Post Code" ng-model="StuDetail.StudentContactInfo.Pre_PostalCode">*@
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-6">
+                                                    <div class="row">
+                                                        <div class="col-lg-12 pr-0">
+                                                            <div class="father-information">
+                                                                <h4>Permanent Address</h4>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row mt-2">
+                                                        <div class="col-lg-12">
+                                                            <div class="form-group row">
+                                                                <label for="text" class="col-sm-4 col-form-label">Address</label>
+                                                                <div class="col-sm-8">
+                                                                    <textarea class="form-control" disabled placeholder="Address" ng-model="StuDetail.StudentContactInfo.Par_Address"></textarea>
+                                                                </div>
+                                                            </div>
+                                                            <div class="form-group row">
+                                                                <label for="text" class="col-sm-4 col-form-label">District</label>
+                                                                <div class="col-sm-8">
+                                                                    <label class="form-control">{{StuDetail.StudentContactInfo.Par_DisName}}</label>
+
+                                                                    @*<select class="form-control" ng-model="StuDetail.StudentContactInfo.Par_DisId"
+                                                                                ng-options="studentContactInfo.DistrictId as studentContactInfo.DistrictName for studentContactInfo in Districts" ng-change="getPStations2(StuDetail.StudentContactInfo.Par_DisId)">
+                                                                            <option value='' selected>Select Option</option>
+                                                                        </select>*@
+                                                                </div>
+                                                            </div>
+                                                            <div class="form-group row">
+                                                                <label for="text" class="col-sm-4 col-form-label">Police Station</label>
+                                                                <div class="col-sm-8">
+                                                                    <label class="form-control">{{StuDetail.StudentContactInfo.Par_PSName}}</label>
+
+                                                                    @*<select class="form-control" ng-model="StuDetail.StudentContactInfo.Par_PSId" ng-options="studentContactInfo.PsId as studentContactInfo.PsName for studentContactInfo in PStations2">
+                                                                            <option value='' selected>Select Option</option>
+                                                                        </select>*@
+                                                                </div>
+                                                            </div>
+                                                            <div class="form-group row">
+                                                                <label for="text" class="col-sm-4 col-form-label">Post Office</label>
+                                                                <div class="col-sm-8">
+                                                                    <label class="form-control">{{StuDetail.StudentContactInfo.Par_PostOffice}}</label>
+
+                                                                    @*<input type="text" class="form-control" placeholder="Post Office" ng-model="StuDetail.StudentContactInfo.Par_PostOffice">*@
+                                                                </div>
+                                                            </div>
+                                                            <div class="form-group row">
+                                                                <label for="text" class="col-sm-4 col-form-label">Post Code</label>
+                                                                <div class="col-sm-8">
+                                                                    <label class="form-control">{{StuDetail.StudentContactInfo.Par_PostalCode}}</label>
+
+                                                                    @*<input type="text" class="form-control" placeholder="Post Code" ng-model="StuDetail.StudentContactInfo.Par_PostalCode">*@
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    @*<div class="form-group col-md-3 pull-right" style="margin-left: 78%;">
+                                                            <button type="submit" ng-click="submitted4=true" class="btn btnColor pull-right">Save</button>
+                                                        </div>*@
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tab-pane fade" id="pills-Sibling" role="tabpanel" aria-labelledby="pills-Sibling-tab">
+                        <!-- Begin: life time stats -->
+                        <div class="portlet light bordered">
+                            <div class="portlet-title">
+                                <div class="Student-Information-head">
+                                    <h4>Sibling Info</h4>
+                                </div>
+                                <div class="actions" style="margin-left: 84.5%;margin-top: 1%;margin-bottom: 1%;float: right;">
+                                    @*<div class="btn-group btn-group-solid" style="margin-left: 84.5%;margin-top: 1%;margin-bottom: 1%;float: right;">
+                                            <button ng-click="resetFormSibling();submitted5=false" class="btn btnColor" data-target="#addmodalSibling" data-toggle="modal"> <i class="fa fa-plus"></i> Add New</button>
+                                        </div>*@
+                                </div>
+                            </div>
+                            <div class="portlet-body">
+                                <div class="table-container">
+                                    <div id="sample_3_wrapper" class="dataTables_wrapper no-footer">
+                                        <div class="table-scrollable"> </div>
+                                        <table class="table table-bordered table-hover">
+                                            <thead>
+                                                <tr class="btnColor">
+                                                    <th>Sibling ID</th>
+                                                    <th>Name</th>
+                                                    <th> Shift </th>
+                                                    <th> Class</th>
+                                                    <th> Section</th>
+
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr ng-repeat="item in StuDetail.StudentSiblingInfo">
+                                                    <td>{{item.StudentInsID}}</td>
+                                                    <td>{{item.FullName}}</td>
+                                                    <td> {{ item.ShiftName}} </td>
+                                                    <td> {{ item.ClassName}} </td>
+                                                    <td>  {{ item.SectionName}}</td>
+                                                    @*<td>
+                                                            <a href="#" class="btn btn-icon-only btn-secondary" ng-click="editSibling(item)" data-target="#editmodalSibling" data-toggle="modal">
+                                                                <i class="fas fa-eye"></i>
+                                                            </a>
+                                                            <a ng-click="deleteSibling(item)" href="#" class="btn btn-danger">
+                                                                <i class="fa fa-trash"></i>
+                                                            </a>
+                                                        </td>*@
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- End: life time stats -->
+                        <!--Modal Area Start-->
+                        <!-- Button trigger modal -->
+                        <div class="modal fade" id="editmodalSibling" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered" role="document">
+                                <div class="modal-content">
+                                    <form name="addformSibling" ng-submit="saveSibling()" class="form-horizontal" id="form_sample_1" novalidate>
+                                        <div class="modal-header summer-view">
+                                            <h5 class="modal-title" id="exampleModalCenterTitle" style="margin-left: 33%;">View Sibling Info</h5>
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                        <div class="modal-body row">
+                                            <div class="col-lg-12">
+                                                <div class="form-group row" ng-class="{ 'has-error' : submitted5}">
+                                                    <label class="col-lg-4 col-form-label">
+                                                        Sibling ID
+                                                    </label>
+                                                    <div class="col-lg-8 p-0">
+                                                        <fieldset ng-disabled="isSaving">
+                                                            <div class="form-group">
+                                                                <div class="col-sm-12">
+                                                                    <input type="text" readonly name="ID" ng-model="Std1" typeahead-on-select='onSelect($item, $model, $label)' required placeholder="Search Student By ID or Name or SMS Notification No." uib-typeahead="i  as i.Text for i in Search($viewValue)" typeahead-loading="loadingLocations" typeahead-no-results="noResults" class="form-control">
+                                                                    <span ng-show="submitted5 && addformSibling.ID.$error.required" class="required">ID Required</span>
+
+                                                                    <span ng-show="" class="required"></span>
+                                                                    <i ng-show="loadingLocations" class="glyphicon glyphicon-refresh"></i>
+                                                                    <div ng-show="noResults"><i class="glyphicon glyphicon-remove"></i> No Results Found</div>
+                                                                    <input type="hidden" name="StudentIID" ng-value="Std1.Value" />
+                                                                </div>
+                                                            </div>
+
+                                                        </fieldset>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-12" ng-show="Std1.Value!=null">
+                                                <div class="form-group row">
+                                                    <label for="text" class="col-sm-4 col-form-label">Name</label>
+                                                    <div class="col-sm-8">
+                                                        <label class="form-control">{{sibling.FullName}}</label>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group row">
+                                                    <label for="text" class="col-sm-4 col-form-label">Roll</label>
+                                                    <div class="col-sm-8">
+                                                        <label class="form-control">{{sibling.RollNo}}</label>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group row">
+                                                    <label for="text" class="col-sm-4 col-form-label">Version</label>
+                                                    <div class="col-sm-8">
+                                                        <label class="form-control">{{sibling.VersionName}}</label>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group row">
+                                                    <label for="text" class="col-sm-4 col-form-label">Session</label>
+                                                    <div class="col-sm-8">
+                                                        <label class="form-control">{{sibling.SessionName}}</label>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group row">
+                                                    <label for="text" class="col-sm-4 col-form-label">Branch</label>
+                                                    <div class="col-sm-8">
+                                                        <label class="form-control">{{sibling.BranchName}}</label>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group row">
+                                                    <label for="text" class="col-sm-4 col-form-label">Shift</label>
+                                                    <div class="col-sm-8">
+                                                        <label class="form-control">{{sibling.ShiftName}}</label>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group row">
+                                                    <label for="text" class="col-sm-4 col-form-label">Class</label>
+                                                    <div class="col-sm-8">
+                                                        <label class="form-control">{{sibling.ClassName}}</label>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group row">
+                                                    <label for="text" class="col-sm-4 col-form-label">Group</label>
+                                                    <div class="col-sm-8">
+                                                        <label class="form-control">{{sibling.GroupName}}</label>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group row">
+                                                    <label for="text" class="col-sm-4 col-form-label">Section</label>
+                                                    <div class="col-sm-8">
+                                                        <label class="form-control">{{sibling.SectionName}}</label>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group row">
+                                                    <label for="text" class="col-sm-4 col-form-label">Student Type</label>
+                                                    <div class="col-sm-8">
+
+                                                        <label class="form-control">{{sibling.StudentTypeName}}</label>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group row">
+                                                    <label for="text" class="col-sm-4 col-form-label">House Name</label>
+                                                    <div class="col-sm-8">
+
+                                                        <label class="form-control">{{sibling.HouseName}}</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer-sibling pb-3" style="margin-left: 82%;">
+                                            <button type="button" data-dismiss="modal" class="btn btn-secondary" ng-click="resetFormSibling();submitted5=false">Cancel</button>
+                                            @*<button type="submit" ng-click="submitted5=true" class="btn btnColor">Save</button>*@
+                                        </div>
+                                    </form>
+
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Modal -->
+                        <div class="modal fade" id="addmodalSibling" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered" role="document">
+                                <div class="modal-content">
+                                    <form name="addformSibling" ng-submit="saveSibling()" class="form-horizontal" id="form_sample_1" novalidate>
+                                        <div class="modal-header summer-view text-center">
+                                            <h5 class="modal-title" id="exampleModalCenterTitle" style="margin-left: 33%;">Add Sibling Info</h5>
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                        <div class="modal-body row">
+                                            <div class="col-lg-12">
+                                                <div class="form-group row" ng-class="{ 'has-error' : submitted5}">
+                                                    <label class="col-lg-4 col-form-label">
+                                                        Sibling ID
+                                                    </label>
+                                                    <div class="col-lg-8 p-0">
+                                                        <fieldset ng-disabled="isSaving">
+                                                            <div class="form-group">
+                                                                <div class="col-sm-12">
+                                                                    <input type="text" name="ID" ng-model="Std1" typeahead-on-select='onSelect($item, $model, $label)' required placeholder="Search Student By ID or Name or SMS Notification No." uib-typeahead="i  as i.Text for i in Search($viewValue)" typeahead-loading="loadingLocations" typeahead-no-results="noResults" class="form-control">
+                                                                    <span ng-show="submitted5 && addformSibling.ID.$error.required" class="required">ID Required</span>
+
+                                                                    <span ng-show="" class="required"></span>
+                                                                    <i ng-show="loadingLocations" class="glyphicon glyphicon-refresh"></i>
+                                                                    <div ng-show="noResults"><i class="glyphicon glyphicon-remove"></i> No Results Found</div>
+                                                                    <input type="hidden" name="StudentIID" ng-value="Std1.Value" />
+                                                                </div>
+                                                            </div>
+
+                                                        </fieldset>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-12" ng-show="Std1.Value!=null">
+                                                <div class="form-group row">
+                                                    <label for="text" class="col-sm-4 col-form-label">Name</label>
+                                                    <div class="col-sm-8">
+                                                        <label class="form-control">{{sibling.FullName}}</label>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group row">
+                                                    <label for="text" class="col-sm-4 col-form-label">Roll</label>
+                                                    <div class="col-sm-8">
+                                                        <label class="form-control">{{sibling.RollNo}}</label>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group row">
+                                                    <label for="text" class="col-sm-4 col-form-label">Version</label>
+                                                    <div class="col-sm-8">
+                                                        <label class="form-control">{{sibling.VersionName}}</label>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group row">
+                                                    <label for="text" class="col-sm-4 col-form-label">Session</label>
+                                                    <div class="col-sm-8">
+                                                        <label class="form-control">{{sibling.SessionName}}</label>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group row">
+                                                    <label for="text" class="col-sm-4 col-form-label">Branch</label>
+                                                    <div class="col-sm-8">
+                                                        <label class="form-control">{{sibling.BranchName}}</label>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group row">
+                                                    <label for="text" class="col-sm-4 col-form-label">Shift</label>
+                                                    <div class="col-sm-8">
+                                                        <label class="form-control">{{sibling.ShiftName}}</label>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group row">
+                                                    <label for="text" class="col-sm-4 col-form-label">Class</label>
+                                                    <div class="col-sm-8">
+                                                        <label class="form-control">{{sibling.ClassName}}</label>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group row">
+                                                    <label for="text" class="col-sm-4 col-form-label">Group</label>
+                                                    <div class="col-sm-8">
+                                                        <label class="form-control">{{sibling.GroupName}}</label>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group row">
+                                                    <label for="text" class="col-sm-4 col-form-label">Section</label>
+                                                    <div class="col-sm-8">
+                                                        <label class="form-control">{{sibling.SectionName}}</label>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group row">
+                                                    <label for="text" class="col-sm-4 col-form-label">Student Type</label>
+                                                    <div class="col-sm-8">
+
+                                                        <label class="form-control">{{sibling.StudentTypeName}}</label>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group row">
+                                                    <label for="text" class="col-sm-4 col-form-label">House Name</label>
+                                                    <div class="col-sm-8">
+
+                                                        <label class="form-control">{{sibling.HouseName}}</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer-sibling text-center pb-3">
+                                            <button type="button" data-dismiss="modal" class="btn btn-secondary" ng-click="resetFormSibling();submitted5=false">Cancel</button>
+                                            <button type="submit" ng-click="submitted5=true" class="btn btnColor">Save</button>
+                                        </div>
+                                    </form>
+
+                                </div>
+                            </div>
+                        </div>
+
+                        <!--Modal Area End-->
+                    </div>
+                    <div class="tab-pane fade" id="pills-Other" role="tabpanel" aria-labelledby="pills-Other-tab">
+                        <div class="row">
+                            <div class="col-md-12 col-lg-12 col-xs-12 col-sm-12">
+                                <iframe name="CollectionCard" height="460" width="100%"></iframe>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+<script src="~/assets/global/plugins/bootstrap-fileinput/bootstrap-fileinput.js"></script>
+@section Scripts{
+    <script type="text/javascript">
+
+        OEMSApp.controller("MyProfileCtrl", ["$scope", "$http", "SweetAlert",
+           function ($scope, $http, SweetAlert) {
+               init();
+
+               function init() {
+                   //blockUI.start();
+                   $scope.StuDetail = [];
+                   $scope.Dropdowns = [];
+                   $scope.StuDetail.StudentBasicInfo = {};
+                   $scope.StuDetail.StudentContactInfo = {};
+                   $scope.academic = {};
+                   $scope.sibling = {};
+                   StuDetail();
+                   getAllDropdowns();
+                   getDistricts();
+                   getPStations();
+                   getTerms();
+                   $scope.getPStations1 = getPStations1;
+                   $scope.getPStations2 = getPStations2;
+
+               }
+
+               $scope.resetFormAcademic = function resetFormAcademic() {
+                   $scope.IsEdit = 0;
+                   $scope.btnTitle = 'Save';
+                   $scope.academic = {};
+               }
+               function StuDetail() {
+
+                   $scope.StuDetails = {};
+                   $http({
+                       method: 'GET',
+                       url: baseUrl + 'PortalStudent/GetStudentDetailbyID/'
+                   }).then(function successCallback(response) {
+                       //console.log(response.data.results);
+                       $scope.StuDetail = response.data.results;
+                       if ($scope.StuDetail.StudentGuardianInfo == null)
+                           $scope.StuDetail.StudentGuardianInfo = {};
+
+                       $scope.StuDetail.StudentGuardianInfo.FatherName = $scope.StuDetail.StudentBasicInfo.FatherName;
+                       $scope.StuDetail.StudentGuardianInfo.MotherName = $scope.StuDetail.StudentBasicInfo.MotherName;
+                       //$scope.StuDetail.StudentGuardianInfo = $scope.StuDetail.StudentGuardianInfo;
+                       $scope.StuDetail.StudentBasicInfo.AdmissionDate = $scope.StuDetail.StudentBasicInfo.AdmissionDate != null ? new Date($scope.StuDetail.StudentBasicInfo.AdmissionDate) : null;
+                       $scope.StuDetail.StudentBasicInfo.DateOfBirth = $scope.StuDetail.StudentBasicInfo.DateOfBirth != null ? new Date($scope.StuDetail.StudentBasicInfo.DateOfBirth) : null;
+                       $scope.StuDetail.StudentBasicInfo.FirstAdmittedDate = $scope.StuDetail.StudentBasicInfo.FirstAdmittedDate != null ? new Date($scope.StuDetail.StudentBasicInfo.FirstAdmittedDate) : null;
+                       $scope.StuDetail.StudentBasicInfo.PreInsInfoDate = $scope.StuDetail.StudentBasicInfo.PreInsInfoDate != null ? new Date($scope.StuDetail.StudentBasicInfo.PreInsInfoDate) : null;
+                       $scope.StuDetail.StudentBasicInfo.Height = $scope.StuDetail.StudentBasicInfo.Height != null ? parseInt($scope.StuDetail.StudentBasicInfo.Height) : 0;
+                       console.log($scope.StuDetail);
+                       //$.unblockUI();
+                       //blockUI.stop();
+                       if ($scope.StuDetail.StudentContactInfo != null) {
+                           if ($scope.StuDetail.StudentContactInfo.Pre_DisId != null || $scope.StuDetail.StudentContactInfo.Pre_DisId != 0) {
+                               //getPStations1($scope.StuDetail.StudentContactInfo.Pre_DisId)
+                           }
+                           if ($scope.StuDetail.StudentContactInfo.Par_DisId != null || $scope.StuDetail.StudentContactInfo.Par_DisId != 0) {
+                               //getPStations2($scope.StuDetail.StudentContactInfo.Par_DisId);
+                           }
+                       }
+
+                   }, function errorCallback(response) {
+                       toastr["warning"](response.data.Message);
+                   });
+
+
+               }
+               $scope.resetFormSibling = function resetFormSibling() {
+                   $scope.btnTitle = 'Save';
+                   $scope.Std1 = {};
+                   $scope.Std1.Value = null;
+                   $scope.Std1.Text = null;
+                   $scope.sibling = {};
+                   $scope.sibling.SiblingInfoId = 0;
+                   $scope.IsEdit = 0;
+
+               }
+               $scope.editSibling = function (n) {
+
+                   $scope.modalTitleSibling = "Update Sibling Info";
+                   $scope.sibling = n;
+                   $scope.Std1 = {};
+                   $scope.Std1.Value = n.StudentIID;
+                   $scope.Std1.Text = n.FullName;
+                   $scope.IsEdit = 1;
+               };
+               $scope.SaveStudentBasicInfo = function SaveStudentBasicInfo() {
+                   if ($scope.addBasicS.$invalid) {
+                       return toastr["info"]('Data Not Saved');
+                   }
+                   $http({
+                       method: 'POST',
+                       url: baseUrl + 'PortalStudent/UpdateStudent/',
+                       data: $scope.StuDetail.StudentBasicInfo
+                   }).then(function successCallback(response) {
+                       toastr["info"](response.data.message);
+                       StuDetail();
+                   }, function errorCallback(response) {
+
+                   })
+               }
+
+               $scope.CollectionReport = function CollectionReport() {
+                   window.open('@Url.Action("CollectionReportCard", "PortalReport")', 'CollectionCard');
+
+               }
+
+
+               $scope.saveAcademic = function saveAcademic() {
+
+                   if ($scope.IsEdit == 0) {
+                       if ($scope.AcademicAddform.$invalid)
+                           return;
+                       $http({
+                           method: 'POST',
+                           url: baseUrl + 'PortalStudent/AddStudentAcademic/',
+                           data: $scope.academic
+                       }).then(function successCallback(response) {
+                           $('#addmodalAcademic').hide();
+                           $('.modal-backdrop').remove();
+                           StuDetail();
+
+                           toastr["info"](response.data.message);
+                       }, function errorCallback(response) {
+                           $('#addmodalAcademic').hide();
+                           $('.modal-backdrop').remove();
+                           StuDetail();
+                           //toastr["warning"](response.data.message);
+                       })
+                   } else {
+                       if ($scope.AcademicAddform.$invalid)
+                           return;
+                       $http({
+                           method: 'PUT',
+                           url: baseUrl + 'PortalStudent/UpdateStudentAcademicInfo/',
+                           data: $scope.academic
+                       }).then(function successCallback(response) {
+                           $('#addmodalAcademic').hide();
+                           $('.modal-backdrop').remove();
+                           StuDetail();
+                           toastr["info"](response.data.message);
+                       }, function errorCallback(response) {
+                           $('#addmodalAcademic').hide();
+                           $('.modal-backdrop').remove();
+                           StuDetail();
+                           //toastr["warning"](response.data.message);
+                       })
+                   }
+               }
+
+               $scope.saveContactPresent = function saveContactPresent() {
+
+                   $http({
+                       method: 'PUT',
+                       url: baseUrl + 'PortalStudent/UpdateStudentContact/',
+                       data: $scope.StuDetail.StudentContactInfo
+                   }).then(function successCallback(response) {
+                       toastr["info"](response.data.message);
+                       StuDetail();
+                   }, function errorCallback(response) {
+
+                   });
+               }
+
+               $scope.onSelect = function onSelect($item, $model, $label) {
+                   $scope.studentSearchs = [];
+                   $http({
+                       method: 'GET',
+                       url: baseUrl + 'PortalStudent/GetStudentDetailbyID/' + $item.Value,
+                   }).then(function successCallback(response) {
+                       //alert(response.data.results[0]);
+                       $scope.sibling = response.data.results.StudentBasicInfo;
+                       //$scope.studentSearchs.push(response.data.results);
+                       // toastr["success"](response.data.message);
+                   }, function errorCallback(response) {
+                       toastr["error"](response.data.Message);
+                   });
+               };
+               $scope.Search = function (val) {
+                   if (val.length >= 3)
+                       return $http.get(baseUrl + 'PortalStudent/SearchStudent/' + val, {
+                           params: {}
+                       }).then(function (response) {
+                           return response.data.results.map(function (item) {
+                               return item;
+                           });
+                       });
+               };
+               $scope.deleteAcademic = function deleteAcademic(n) {
+                   SweetAlert.swal({
+                       title: "Are you sure to delete it ?", type: "warning",
+                       showCancelButton: true,
+                       confirmButtonColor: "#ff0000",
+                       dangerMode: true,
+                       confirmButtonText: "Yes, delete it!",
+                       closeOnConfirm: false
+                   },
+                         function (isConfirm) {
+                             if (isConfirm) {
+                                 $http({
+                                     method: 'DELETE',
+                                     url: baseUrl + 'PortalStudent/DeleteAcademicInfo/' + n.AcademicId
+                                 }).then(function successCallback(response) {
+                                     SweetAlert.swal("Deleted!", "Your data has been deleted.", "success");
+                                     //getGuardians();
+                                     StuDetail();
+                                 }, function errorCallback(response) {
+                                 });
+                             }
+                         });
+               }
+
+               $scope.editAcademic = function editAcademic(n) {
+                   $scope.academic = n;
+                   $scope.IsEdit = 1;
+                   $scope.btnTitle = 'Update';
+               }
+               $scope.saveGuardian = function saveGuardian() {
+                   if ($scope.addBasic.$invalid) {
+                       return toastr["info"]('Data Not Saved');
+                   }
+                   else {
+                       var files = $("#imgFatherImage").get(0).files;
+                       var files2 = $("#imgMotherImage").get(0).files;
+                       $http({
+                           method: 'POST',
+                           url: baseUrl + 'PortalStudent/AddGuardianInfo/',
+                           headers: { 'Content-Type': undefined },
+                           transformRequest: function (data) {
+                               var formData = new FormData();
+                               formData.append('guardianInfo', JSON.stringify($scope.StuDetail.StudentGuardianInfo));
+                               if (files.length > 0) {
+                                   formData.append("F_GuardianImage", files[0]);
+                               }
+                               if (files2.length > 0) {
+                                   formData.append("M_GuardianImage", files2[0]);
+                               }
+                               return formData;
+                           },
+                           data: { guardianInfo: $scope.StuDetail.StudentGuardianInfo }
+                       }).then(function successCallback(response) {
+                           StuDetail();
+                           toastr["info"](response.data.message);
+                           $scope.GuardianInfoId = response.data.returnvalue;
+
+                       });
+                   }
+               }
+
+               $scope.saveSibling = function saveSibling() {
+                   if ($scope.addformSibling.$invalid)
+                       return;
+                   if ($scope.IsEdit == 0) {
+                       $http({
+                           method: 'POST',
+                           url: baseUrl + 'PortalStudent/AddSiblingInfo/' + $scope.StuDetail.StudentBasicInfo.StudentIID + '/' + $scope.Std1.Value // + $scope.sibling.SiblingId,
+                           //data: $scope.sibling
+                       }).then(function successCallback(response) {
+                           $('#addmodalSibling').hide();
+                           $('.modal-backdrop').remove();
+                           StuDetail();
+                           toastr["info"](response.data.message);
+
+
+                       }, function errorCallback(response) {
+                       });
+                   } else {
+
+                   }
+               }
+               $scope.SubjectWiseReport = function () {
+                   if ($scope.results.$invalid)
+                       return;
+
+
+                   $scope.submitted = false;
+
+               }
+
+
+               function getTerms() {
+                   $scope.Terms = [];
+                   $http({
+                       method: 'GET',
+                       url: baseUrl + 'PortalStudent/GetAllTermByClassId/'
+                   }).then(function successCallback(response) {
+                       // this callback will be called asynchronously
+                       // when the response is available
+                       $scope.Terms = response.data.results;
+                       $scope.total_count = response.data.totalcount;
+                       //console.log(response.data);
+                   }, function errorCallback(response) {
+                       toastr["warning"](response.data.Message);
+                   });
+
+               }
+               $scope.deleteSibling = function deleteSibling(n) {
+                   // SweetAlert.swal("Good job!", "You clicked the button!", "success");
+                   SweetAlert.swal({
+                       title: "Are you sure to delete it ?", type: "warning", showCancelButton: true, confirmButtonColor: "#DD6B55",
+                       confirmButtonText: "Yes, delete it!",
+                       closeOnConfirm: false
+                   },
+                   function (isConfirm) {
+                       if (isConfirm) {
+                           $http({
+                               method: 'DELETE',
+                               url: baseUrl + 'PortalStudent/DeleteSiblingInfo/' + n.StudentIID + '/' + $scope.StuDetail.StudentBasicInfo.StudentIID
+                           }).then(function successCallback(response) {
+                               SweetAlert.swal("Deleted!", "Your data has been deleted.", "success");
+                               StuDetail();
+                           }, function errorCallback(response) {
+                           });
+                       }
+                   });
+               };
+               function getDistricts() {
+                   $scope.Districts = [];
+                   $http({
+                       method: 'GET',
+                       url: baseUrl + 'Common/GetDistrict/'
+                   }).then(function successCallback(response) {
+                       $scope.Districts = response.data.results;
+                   }, function errorCallback(response) {
+                   });
+               }
+               function getPStations() {
+                   $scope.PStations = [];
+                   $http.get(baseUrl + 'Common/GetPoliceStaion/').then(function (response) {
+                       $scope.PStations = response.data.results;
+
+                   });
+               }
+               function getPStations1(Pre_DisId) {
+                   if (Pre_DisId == 0)
+                       return;
+                   $scope.PStations1 = [];
+                   $http.get(baseUrl + 'PortalStudent/GetPoliceStaionByDId/' + Pre_DisId).then(function (response) {
+                       //console.log(response.data.results);
+                       $scope.PStations1 = response.data.results;
+                   });
+               }
+               function getPStations2(Par_DisId) {
+                   if (Par_DisId == 0)
+                       return;
+                   $scope.PStations2 = [];
+                   $http.get(baseUrl + 'PortalStudent/GetPoliceStaionByDId/' + Par_DisId).then(function (response) {
+                       $scope.PStations2 = response.data.results;
+                   });
+               }
+               $scope.calculateAge = function calculateAge() {
+                   var ageDifMs = new Date() - $scope.StuDetail.StudentBasicInfo.DateOfBirth
+                   $scope.StuDetail.StudentBasicInfo.Age = Math.floor(ageDifMs / 31536000000);
+                   //console.log(ageDifMs / 31536000000);
+               }
+               function getAllDropdowns() {
+                   $scope.Dropdowns = [];
+
+                   $http({
+                       method: 'GET',
+                       url: baseUrl + 'Common/GetAllDropDown/'
+                   }).then(function successCallback(response) {
+                       //console.log(response.data.results);
+                       $scope.Dropdowns = response.data.results;
+                   }, function errorCallback(response) {
+                   });
+
+               }
+
+
+           }]);
+    </script>
+}
+

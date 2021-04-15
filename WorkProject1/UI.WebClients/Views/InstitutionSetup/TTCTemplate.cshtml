@@ -1,0 +1,252 @@
+﻿@{
+    ViewBag.Title = "TTC Template";
+}<link href="~/assets/global/plugins/bootstrap-wysihtml5/bootstrap-wysihtml5.css" rel="stylesheet" />
+<link href="~/assets/global/plugins/bootstrap-summernote/summernote.css" rel="stylesheet" />
+<div class="portlet light bordered" ng-controller="CltrTemplate">
+        <div class="portlet-title">
+            <div class="caption font-green sbold uppercase">
+                <i class="fa fa-align-justify font-green"></i>Transfer/Testimonial/Character Certificate Template
+            </div>
+        </div>
+        <form class="portlet-body form form-horizontal" name="formCommonFeilds" ng-submit="SaveTCTemplate()" enctype="multipart/form-data">
+            <div class="row" style="padding-top:10px">
+         
+                <div class="col-md-4">
+                    <div class="form-group" ng-class="{ 'has-error' : submitted1 && formCommonFeilds.Branch.$invalid}">
+                        <label class="col-md-4 control-label">
+                            Branch :<span class="required">*</span>
+                        </label>
+                        <div class="col-md-8">
+                            <select class="form-control" ng-model="studentTemplete.BranchID" name="Branch" required ng-options="studentInfo.BranchId as studentInfo.BranchName for studentInfo in CommonFeilds.Branch">
+                                <option value="" selected="selected">Choose Option</option>
+                            </select>
+                            <div class="form-control-focus"> </div>
+                            <span ng-show="submitted1 && formCommonFeilds.Branch.$error.required" class="help-block">Branch Name Required</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group" ng-class="{ 'has-error' : submitted1 && formCommonFeilds.Class.$invalid}">
+                        <label class="col-md-4 control-label">
+                            Class :
+                            <span class="required">*</span>
+                        </label>
+                        <div class="col-md-8">
+                            <select class="form-control" ng-change="GetTemplate()" ng-model="studentTemplete.ClassId" name="Class"  required ng-options="studentTemplete.ClassId as studentTemplete.ClassName for studentTemplete in CommonFeilds.ClassInfo">
+                                <option value="" selected="selected">Choose Option</option>
+                            </select>
+                            <div class="form-control-focus"> </div>
+                            <span ng-show="submitted1 && formCommonFeilds.Class.$error.required" class="help-block">Class Required</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group" ng-class="{ 'has-error' : submitted1 && formCommonFeilds.Title1.$invalid}">
+                        <label class="col-md-4 control-label">
+                            Title 1 :
+                            <span class="required">*</span>
+                        </label>
+                        <div class="col-md-8">
+                            <input type="text" required placeholder="Title1" ng-model="studentTemplete.Title1" name="Title1" class="form-control" />
+                            <div class="form-control-focus"> </div>
+                            <span ng-show="submitted1 && formCommonFeilds.Title1.$error.required" class="help-block">Title 1 Required</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row ">
+                <div class="col-md-4">
+                    <div class="form-group" ng-class="{ 'has-error' : submitted1 && formCommonFeilds.Session.$invalid}">
+                        <label class="col-md-4 control-label">
+                            Session :
+                            <span class="required">*</span>
+                        </label>
+                        <div class="col-md-8">
+                            <select class="form-control" ng-model="studentTemplete.SessionId" name="Session" required ng-options="studentInfo.SessionId as studentInfo.SessionName for studentInfo in CommonFeilds.Session">
+                                <option value="" selected="selected">Choose Option</option>
+                            </select>
+                            <div class="form-control-focus"> </div>
+                            <span ng-show="submitted1 && formCommonFeilds.Session.$error.required" class="help-block">Session Required</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group" ng-class="{ 'has-error' : submitted1 && formCommonFeilds.Type.$invalid}">
+                        <label class="col-md-4 control-label">
+                            Type :
+                            <span class="required">*</span>
+                        </label>
+                        <div class="col-md-8">
+                            <select class="form-control" ng-disabled="studentTemplete.ClassId==null" ng-change="GetTemplate()" ng-model="studentTemplete.Type" name="Type" required>
+                                <option value="" selected="selected">Choose Option</option>
+                                <option value="TC">Transfer Certificate</option>
+                                <option value="TM">Testimonial Certificate</option>
+                                <option value="CC">Character Certificate </option>
+                            </select>
+                            <div class="form-control-focus"> </div>
+                            <span ng-show="submitted1 && formCommonFeilds.Type.$error.required" class="help-block">Type Required</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label class="col-md-4 control-label">
+                            Title 2 :
+                        </label>
+                        <div class="col-md-8">
+                            <input type="text" placeholder="Title2" ng-model="studentTemplete.Title2" class="form-control" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+     <div class="col-md-4">
+                    <div class="form-group">
+                        <label class="col-md-4 control-label">
+                            BG Image:
+                        </label>
+                        <div class="col-md-8">
+                            <input type="file" id="img" class="form-control" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row" style="margin-left: 1%;">
+                <div class="btn-group btn-group-xs btn-group-solid">
+                    <button id="name" data-wysihtml5-command="foreFrac" onclick="injectString('[StudentInsID]')" type="button" class="btn btn-success btn-sm">Student institute ID </button>
+                    <button id="name" data-wysihtml5-command="foreFrac" onclick="injectString('[FullName]')" type="button" class="btn btn-success btn-sm">Student Name </button>
+                    <button id="name" data-wysihtml5-command="foreFrac" onclick="injectString('[AdmissionDate]')" type="button" class="btn btn-success btn-sm">AdmissionDate </button>
+                    <button id="name" data-wysihtml5-command="foreFrac" onclick="injectString('[DOB]')" type="button" class="btn btn-success btn-sm">DOB </button>
+                    <button id="name" data-wysihtml5-command="foreFrac" onclick="injectString('[Roll]')" type="button" class="btn btn-success btn-sm">Roll </button>
+                    <button id="name" data-wysihtml5-command="foreFrac" onclick="injectString('[RegistrationNO]')" type="button" class="btn btn-success btn-sm">Registration NO </button>
+                    <button id="name" data-wysihtml5-command="foreFrac" onclick="injectString('[Version]')" type="button" class="btn btn-success btn-sm ">Version </button>
+                    <button id="name" data-wysihtml5-command="foreFrac" onclick="injectString('[Session]')" type="button" class="btn btn-success btn-sm">Session </button>
+                    <button id="name" data-wysihtml5-command="foreFrac" onclick="injectString('[Class]')" type="button" class="btn btn-success btn-sm ">Class </button>
+                    <button id="name" data-wysihtml5-command="foreFrac" onclick="injectString('[Group]')" type="button" class="btn btn-success btn-sm ">Group </button>
+                    <button id="name" data-wysihtml5-command="foreFrac" onclick="injectString('[Section]')" type="button" class="btn btn-success btn-sm ">Section </button>
+                    <button id="name" data-wysihtml5-command="foreFrac" onclick="injectString('[FatherName]')" type="button" class="btn btn-success btn-sm">Father </button>
+                    <button id="name" data-wysihtml5-command="foreFrac" onclick="injectString('[Mother]')" type="button" class="btn btn-success btn-sm">Mother </button>
+                </div>
+            </div>
+            <!-- BEGIN FORM-->
+  <div class="row" style="margin-left: 2%;margin-right: 2%;">
+      <div class="form-body">
+          <div class="form-group ">
+              <div class="form-group" ng-class="{ 'has-error' : submitted1 && formCommonFeilds.Template.$invalid}">
+                  <div class="col-md-12">
+                      <textarea name="Template" required class="form-control" rows="12" id="message"></textarea>
+                      <div class="form-control-focus"> </div>
+                      <span ng-show="submitted1 && formCommonFeilds.Template.$error.required" class="help-block">Template Required</span>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </div>
+            <div class="row" style="margin-bottom: 1%;margin-right: 1%;">
+                <div class="pull-right">
+                    <button type="submit" class="btn blue " ng-click="submitted1=true;">
+                        <i class="fa fa-check"></i> Submit
+                    </button>
+                    <button ng-click="reset()" class="btn dark btn-outline">Cancel</button>
+                </div>
+            </div>
+            <!-- END FORM-->
+        </form>
+    </div>
+@section Scripts{
+    <script src="~/assets/global/plugins/bootstrap-wysihtml5/wysihtml5-0.3.0.js"></script>
+    <script src="~/assets/global/plugins/bootstrap-wysihtml5/bootstrap-wysihtml5.js"></script>
+    <script src="~/assets/global/plugins/bootstrap-summernote/summernote.min.js"></script>
+    <script src="~/assets/pages/scripts/components-editors.js"></script>
+    <script type="text/javascript">
+        $("#message").summernote({
+            placeholder: 'write here...'
+        });
+        function injectString(str) {
+            var sel = frames.getSelection();
+            var nd = sel.anchorNode;
+            var txt = nd.data + '';
+            var pos = sel.anchorOffset || 0;
+            sel.anchorNode.data = txt.slice(0, pos) + str + txt.slice(pos);
+            $("#messageBody").focus();
+        }
+        OEMSApp.controller("CltrTemplate", ["$scope", "$http", "SweetAlert", "$window",
+          function ($scope, $http, SweetAlert, $window) {
+              init();
+              function init() {
+                  initialize();
+                  getAllCommons();
+              }
+              function initialize() {
+                  $scope.Template = " ";
+                  $scope.SaveTCTemplate = SaveTCTemplate;
+                  $scope.GetTemplate = GetTemplate;
+                  $scope.Dropdowns = [];
+                  $scope.CommonFeilds = [];
+              };
+              $scope.reset = function reset() {
+                  $scope.submitted1 = false;
+              }
+              function GetTemplate() {
+                  if (!angular.isDefined($scope.studentTemplete.ClassId) && !angular.isDefined($scope.studentTemplete.Type)) {
+                      $scope.studentTemplete.Title1 = '';
+                      $scope.studentTemplete.Title2 = '';
+                      $scope.studentTemplete.TC_TemplateId = 0;
+                      $("#message").summernote('code', null);
+                      return;
+                  }
+                  $http({
+                      method: 'GET',
+                      url: baseUrl + 'SetupInstitution/GetTCTemplateByClassTC/' + $scope.studentTemplete.ClassId +'/'+ $scope.studentTemplete.Type
+                  }).then(function successCallback(response) {
+                      //$scope.studentTemplete = response.data.results;
+                      if (response.data.results == null) {
+                          $scope.studentTemplete.Title1 = '';
+                          $scope.studentTemplete.Title2 = '';
+                          $scope.studentTemplete.TC_TemplateId = 0;
+                          $("#message").summernote('code', null);
+                          return;
+                      }
+                      $scope.studentTemplete.ClassId = response.data.results.ClassId;
+                      $scope.studentTemplete.Title1 = response.data.results.Title1;
+                      $scope.studentTemplete.Title2 = response.data.results.Title2;
+                      $scope.studentTemplete.TC_TemplateId = response.data.results.TC_TemplateId;
+                     $("#message").summernote('code', response.data.results.Text);
+                     
+                  }, function errorCallback(response) {
+                      toastr["warning"](response.data.message);
+                  });
+              }
+              function SaveTCTemplate() {
+                 
+                  $scope.studentTemplete.Text = $("#message").val();
+                  var files = $("#img").get(0).files;
+                  $http({
+                      method: 'POST',
+                      url: baseUrl + 'SetupInstitution/SaveTCTemplate',
+                      headers: { 'Content-Type': undefined },
+                      transformRequest: function (data) {
+                          var formData = new FormData();
+                          formData.append('value', JSON.stringify($scope.studentTemplete));
+                          if (files.length > 0)
+                              formData.append("img", files[0]);
+                          return formData;
+                      },
+                      data: { studentTemplete: $scope.studentTemplete }
+                  }).then(function (response) {
+                      toastr["info"](response.data.message);
+                  });
+              }
+              function getAllCommons() {
+                  $scope.CommonFeilds = [];
+                  $http({
+                      method: 'GET',
+                      url: baseUrl + 'Common/GetCommonItem/'
+                  }).then(function successCallback(response) {
+                      $scope.CommonFeilds = response.data.results;
+                  }, function errorCallback(response) {
+                  });
+              }
+          }]);
+    </script>
+}

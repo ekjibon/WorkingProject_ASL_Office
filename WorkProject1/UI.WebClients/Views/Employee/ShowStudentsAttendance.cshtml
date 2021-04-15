@@ -1,0 +1,216 @@
+﻿
+@{
+    ViewBag.Title = "ShowStudentsAttendance";
+    Layout = "~/Views/Shared/_EmpLayout.cshtml";
+    //Layout = "~/Views/Shared/_EmpLayout.cshtml";
+    // string UserId = User.Identity.GetUserId();
+    // string UserId = HttpContext.Current.User.Identity.GetUserId();
+}
+<style>
+    .btnColor {
+        background-color: #009db8;
+        color: white;
+        font-family: inherit;
+    }
+</style>
+
+<div class="row mt-3" ng-controller="ShowStudentsAttendance">
+
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="emp-header">
+                Student Daily Attendance
+            </div>
+            <div class="card-body">
+                <div class="portlet-body">
+                    <div class="table-container">
+                        <div id="sample_3_wrapper" class="dataTables_wrapper no-footer">
+                            <br />
+                            <form class="form-horizontal" name="filterform" id="form_sample_1" novalidate>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="col-md-2">
+                                        </div>
+                                        <div class="form-group col-md-4" ng-class="{ 'has-error' : submitted && filterform.Date.$invalid}">
+                                            <input class="form-control" name="Date" type="datetime" placeholder="Date" readonly ng-change="" ng-click="p2=true" is-open="p2" uib-datepicker-popup="dd-MM-yyyy" ng-model="Date" required />
+                                            <div class="form-control-focus"> </div>
+                                            <span  ng-show="submitted && filterform.Date.$error.required" class="help-block text-danger">Date Required</span>
+                                        </div>
+                                        
+                                        <div class="col-md-6">
+
+                                            <div class="form-group pull-left col-md-offset-1 col-md-5">
+                                                <button ng-click="submitted=true;Search()" class="btn apply">
+                                                    Show
+                                                </button>
+
+                                                <button ng-click="Reset()" class="btn info">Reset</button>
+
+                                                @*<button ng-click="Report();submitted=true;" class="btn apply">Daily Attendance</button>
+                                                    <button ng-click="ReportWithMissPreiod();submitted=true;" class="btn apply">Miss Period</button>*@
+
+                                            </div>
+
+                                        </div>
+
+
+                                    </div>
+
+                                </div>
+                                <br />
+                                <div class="row">
+
+                                    <div class="col-md-4 col-sm-5 col-xs-6">
+                                        <div class="form-group row">
+                                            <div class="col-md-2 col-sm-5  col-xs-4">
+                                                <label for="search" class="control-label" style="padding-top: 5px;">Items</label>
+                                            </div>
+                                            <div class="col-lg-4 col-md-8 col-sm-4 col-xs-8" style="padding-left:0px">
+                                                <select class="form-control" ng-model="pageSize" ng-options="P.value as P.text for P in pageSizeArray"></select>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                    <div class="col-md-5 col-sm-3 col-xs-1">
+                                    </div>
+                                    <div class="col-md-3 col-sm-4 col-xs-5">
+                                        <div id="sample_3_filter" class="pull-right">
+                                            <input ng-model="q" id="search" class="form-control" placeholder="Filter text">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="table-scrollable"> </div>
+                                <table class="table table-bordered table-hover">
+                                    <thead @*style="background-color:#18979b"*@ class="btnColor">
+                                        <tr>
+                                            @*<th>Id</th>*@
+                                            <th>Name</th>
+                                            <th>Roll</th>
+                                            <th>Leave</th>
+                                            <th>Early Out</th>
+                                            <th>Present</th>
+                                            <th>In Time</th>
+                                            <th>Out Time</th>
+                                            @*<th>Teacher</th>*@
+                                            <th>Late</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr ng-show="StudentAttendentInfos.length <= 0"><td colspan="5" style="text-align:center;"><i class="fa fa-refresh"></i> Loading new data!!</td></tr>
+                                        <tr dir-paginate="item in StudentAttendentInfos| filter: q  | itemsPerPage: pageSize" current-page="currentPage">
+                                            @*<td>{{item.StudentIID}}</td>*@
+                                            <td>{{item.StudentName}}</td>
+                                            <td>{{item.RollNo}}</td>
+                                            <td>{{item.LeaveStatus}}</td>
+                                            <td>{{item.EarlyOutStatus}}</td>
+                                            <td>{{item.PresentStatus}}</td>
+                                            <td>{{item.StudentInTime |date:'hh:mm a'}}</td>
+                                            <td>{{item.StudentOutTime |date:'hh:mm a'}}</td>
+                                            @*<td>{{item.TeacherName}}</td>*@
+                                            <td>{{item.LateStatus}}</td>
+
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <div class="row">
+                                    <dir-pagination-controls boundary-links="true" template-url="~/assets/angular/lib/dirPagination.tpl.html"></dir-pagination-controls>
+                                </div>
+                            </form>
+                            <div class="table-scrollable"></div>
+                        </div>
+
+                        
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+@section Scripts{
+    <script type="text/javascript">
+        OEMSApp.controller("ShowStudentsAttendance", ["$scope", "$http", "SweetAlert", "$filter", "$window", "blockUI",
+          function ($scope, $http, SweetAlert, $filter, $window, blockUI) {
+
+              init();
+              function init() {
+                  initialize();
+                  // getAllCommons();
+                  //Search();
+              }
+              function initialize() {
+                  $scope.StudentAttendentInfos = [];
+                  $scope.Date = '';
+                  //$scope.pageSize = 10;
+                  $scope.state = false;
+                  $scope.Search = Search;
+
+                  $scope.arrNum = 0;
+                  $scope.allCheck = true;
+
+                  $scope.submitted = false;
+                  $scope.currentPage = 1;
+                  $scope.pageno = 1;
+                  $scope.pagesize = 10;
+                  $scope.total_count = 12;
+                  $scope.search = '';
+                  $scope.Id = '';
+                  $scope.res = {};
+                  $scope.data = {};
+
+                  $scope.hstep = 1;
+                  $scope.mstep = 15;
+                  $scope.GroupP = {};
+                  $scope.isGroup = false;
+
+                  $scope.pageSizeArray = [];
+                  $scope.pageSizeArray.push({ value: 5, text: 5 });
+                  $scope.pageSizeArray.push({ value: 10, text: 10 });
+                  $scope.pageSizeArray.push({ value: 20, text: 20 });
+                  $scope.pageSizeArray.push({ value: 50, text: 50 });
+                  $scope.currentPage = 1;
+                  $scope.pageSize = 10;
+                  //$scope.resetForm = resetForm;
+                  //$scope.getAllRosterRegular = getAllRosterRegular;
+
+              };
+              $scope.Reset = function Reset() {
+                  $scope.Date = '';
+                  $scope.StudentAttendentInfos = [];
+                  $scope.submitted = false;
+                  //$scope.StdDailyAtteneance = [];
+                  //$scope.state = false;
+              };
+
+
+              function Search() {
+                  //if (formCommonFeilds) {
+                  //$scope.StudentAttendentInfos = [];
+                  var date = $filter('date')($scope.Date, "MM-dd-yyyy");
+                                       
+                  $http({
+                      method: 'GET',
+                      //url: baseUrl + 'Employee/ShowStudentAttendenceByClassTeacher/?UserId=' + $scope.Id +  '&date=' + date
+                      url: baseUrl + 'Employee/ShowStudentAttendenceByClassTeacher/' + date,
+                      data: date
+                  }).then(function successCallback(response) {
+                      $scope.StudentAttendentInfos = response.data.results;
+                      //$scope.state=true;
+                      //blockUI.stop();
+                      //if (response.data.message!=null)
+                      console.log(response.data.results);
+                      //toastr["success"](response.data.message);
+                  }, function errorCallback(response) {
+                      toastr["error"](response.data.message);
+                  });
+                      // }
+                 
+              };
+
+          }]);
+    </script>
+}
+

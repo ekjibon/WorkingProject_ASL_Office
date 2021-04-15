@@ -1,0 +1,1383 @@
+﻿
+@{
+    ViewBag.Title = "Task Management";
+}
+<style>
+    .statusNameViewMoreB{
+        background-color: #5d5ddc !important
+    }
+    .statusNameViewMoreT{
+        background-color: #73B6E1 !important
+    }
+    .statusNameViewMoreI{
+        background-color: #ffb822 !important
+    }
+    .statusNameViewMoreQ{
+        background-color: #BF609F !important
+    }
+    .statusNameViewMoreD{
+        background-color: #0abb87 !important
+    }
+    .overDue{
+        color: #eb071a;
+    }
+     .overDue span{
+        color: #eb071a;
+    }
+</style>
+
+<div ng-controller="ctrlScrumBoard">
+    <div class="kt-container  kt-container--fluid  kt-grid__item kt-grid__item--fluid" style="margin-left: -12px;">
+        <div class="kt-grid kt-grid--desktop kt-grid--ver-desktop  kt-todo" id="kt_todo">
+            <div class="kt-grid__item kt-grid__item--fluid kt-todo__content" id="kt_todo_content">
+                <div class="kt-todo__tasks-top">
+                    <div class="kt-portlet">
+                        <!--Begin:: Tasks Toolbar-->
+                        <div class="kt-todo__header">
+                            <div class="searchAreaTopBar">
+
+                                <div class="filterDiv">
+                                    <div class="statusTo boardStatus">
+                                        <div class="form-group row">
+
+                                            <div class="col-lg-12 col-md-9 col-sm-12">
+                                                <select ng-change="filterIssue('All')" ng-model="issueFilter.projectId" name="ProjectId" ng-options="project.Id as project.ProjectName for project in ProjectList" class="form-control kt-select2">
+                                                    <option value='' selected="selected">Project</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="statusTo boardStatus">
+                                        <div class="form-group row">
+
+                                            <div class="col-lg-12 col-md-9 col-sm-12">
+                                                <select ng-change="filterIssue('All')" ng-model="issueFilter.clientId" name="ClientId" ng-options="client.Id as client.FullName for client in ClientList" class="form-control kt-select2">
+                                                    <option value='' selected="selected">Client</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="assignTo boardStatus">
+                                        <div class="form-group row">
+
+                                            <div class="col-lg-12 col-md-9 col-sm-12">
+                                                <select ng-change="filterIssue('All')" name="AssigneeId" ng-model="issueFilter.assigneeId" ng-options="emp.EmpBasicInfoID as emp.FullName group by emp.DepartmentName for emp in AssigneeList" class="form-control kt-select2" @*id="kt_select2_9"*@>
+                                                    <option value='' selected="selected">Assginee</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="assignTo boardStatus">
+                                        <div class="form-group row">
+
+                                            <div class="col-lg-12 col-md-9 col-sm-12">
+                                                <select ng-change="filterIssue('All')" name="ReporterId" ng-model="issueFilter.reporteId" ng-options="emp.EmpBasicInfoID as emp.FullName group by emp.DepartmentName for emp in EmployeeList" class="form-control kt-select2" @*id="kt_select2_10"*@>
+                                                    <option value='' selected="selected">Reporter</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="statusTo boardStatus">
+                                        <div class="form-group row">
+                                            <div class="col-lg-12 col-md-9 col-sm-12">
+                                                <select ng-model="issueFilter.priority" ng-change="filterIssue('All')" name="Priority" class="form-control kt-select2" required>
+                                                    <option value='' selected="selected">Priority</option>
+                                                    <option value='Highest'>Highest</option>
+                                                    <option value='High'>High</option>
+                                                    <option value='Medium'>Medium</option>
+                                                    <option value='Low'>Low</option>
+                                                    <option value='Lowest'>Lowest</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="statusTo boardStatus">
+                                        <div class="form-group row">
+
+                                            <div class="col-lg-12 col-md-9 col-sm-12">
+                                                <select ng-change="filterIssue('All')" ng-model="issueFilter.issueTypeId" name="IssueTypeId" ng-options="issueType.Id as issueType.IssueTypeName for issueType in issueTypeList" class="form-control kt-select2">
+                                                    <option value='' selected="selected">Type</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="statusTo boardStatus">
+                                        <div class="form-group row">
+                                            <div class="col-lg-12 col-md-9 col-sm-12">
+                                                <input type="text" class="form-control" uib-datepicker-popup="dd/MM/yyyy" ng-change="filterIssue('All')" placeholder="Due Date" name="DueDate" ng-model="issueFilter.dueDate" is-open="end.opened" ng-click="end.opened=true" ng-required="false" close-text="Close" readonly="readonly" />
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="creatIssuNew boardcreatIssuNew">
+                                        <div class="creatIssu">
+                                            <button ng-click="resetFilter()" class="btn btn-danger">Reset</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!--End:: Tasks Toolbar-->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--BOARD SECTION-->
+    <section>
+        <div id="board">
+            <div class="column columnBackLog">
+                <div class="statusName">
+                    <p>BackLog</p>
+                </div>
+                <ul class="card-list">
+                    <li class="card" @*draggable="true"*@ ng-repeat="item in BackLogList  | limitTo: displayBackLog" data-target="#addmodal" data-toggle="modal">
+                        <div class="col-lg-12 p-0" ng-click="getBackLogListDetails(item.Id)">
+                            <div class="boardTitle" ng-show="item.ParentId == 0">
+                                <i class="fas fa-tasks mainTaskIcon {{item.IssueTypeName}}A"></i> <span><strong> {{item.Title}}</strong></span>
+                                <h6 ng-class="{'overDue' : item.IsOverDue==1}"><i class="fas fa-calendar-alt"></i> <span> {{item.DueDate | date : 'longDate'}}</span></h6>
+                            </div>
+                            <div class="boardTitle" ng-show="item.ParentId != 0">
+                                <i class="fas fa-clipboard-list subTaskIcon {{item.IssueTypeName}}A"></i> <span><strong> {{item.Title}}</strong></span>
+                                <h6 ng-class="{'overDue' : item.IsOverDue==1}"><i class="fas fa-calendar-alt"></i> <span> {{item.DueDate | date : 'longDate'}}</span></h6>
+                            </div>
+                            <div class="boardImage">
+                                <div class="issuIcon text-center" style="margin-top: -5px">
+                                    <img src="/TaskManagementV/GetImage?userId={{item.AssigneeUserId}}" />
+                                </div>
+                            </div>
+                        </div>
+
+                    </li>
+                </ul>
+                <div class="statusNameViewMore statusNameViewMoreB">
+            <a ng-click="filterIssue('BL')" >View More</a>
+        </div>
+            </div>
+            <div class="column columnTodo">
+                <div class="stTodo">
+                    <p>To Do</p>
+                </div>
+                <ul class="card-list">
+                    <li class="card" @*draggable="true"*@ ng-repeat="item in ToDoList | limitTo: displayTodo"  data-target="#addmodal" data-toggle="modal">
+                        <div class="col-lg-12 p-0" ng-click="getToDoListDetails(item.Id)">
+                            <div class="boardTitle" ng-show="item.ParentId == 0">
+                                <i class="fas fa-tasks mainTaskIcon {{item.IssueTypeName}}A"></i> <span><strong> {{item.Title}}</strong></span>
+                                <h6 ng-class="{'overDue' : item.IsOverDue==1}"><i class="fas fa-calendar-alt"></i> <span> {{item.DueDate | date : 'longDate'}}</span></h6>
+                            </div>
+                            <div class="boardTitle" ng-show="item.ParentId != 0">
+                                <i class="fas fa-clipboard-list subTaskIcon {{item.IssueTypeName}}A"></i> <span><strong> {{item.Title}}</strong></span>
+                                <h6 ng-class="{'overDue' : item.IsOverDue==1}"><i class="fas fa-calendar-alt"></i> <span> {{item.DueDate | date : 'longDate'}}</span></h6>
+                            </div>
+                            <div class="boardImage">
+                                <div class="issuIcon text-center" style="margin-top: -5px">
+                                    <img src="/TaskManagementV/GetImage?userId={{item.AssigneeUserId}}" />
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+                <div class="statusNameViewMore statusNameViewMoreT">
+                    <a ng-click="filterIssue('TD')">View More</a>
+                </div>
+            </div>
+            <div class="column columnInProgress">
+                <div class="statusName stprogress">
+                    <p>In Progress</p>
+                </div>
+                <ul class="card-list">
+                    <li class="card" @*draggable="true"*@ ng-repeat="item in InProgressList | limitTo: displayInPro"  data-target="#addmodal" data-toggle="modal">
+                        <div class="col-lg-12 p-0" ng-click="getInProgressListDetails(item.Id)">
+                            <div class="boardTitle" ng-show="item.ParentId == 0">
+                                <i class="fas fa-tasks mainTaskIcon {{item.IssueTypeName}}A"></i> <span ng-class="{ 'danger' : item.DueDate > CurrentDate && item.StatusName != 'Done'}"><strong> {{item.Title}}</strong></span>
+                                <h6 ng-class="{'overDue' : item.IsOverDue==1}"><i class="fas fa-calendar-alt"></i> <span> {{item.DueDate | date : 'longDate'}}</span></h6>
+                            </div>
+                            <div class="boardTitle" ng-show="item.ParentId != 0">
+                                <i class="fas fa-clipboard-list subTaskIcon {{item.IssueTypeName}}A"></i> <span><strong> {{item.Title}}</strong></span>
+                                <h6 ng-class="{'overDue' : item.IsOverDue==1}"><i class="fas fa-calendar-alt"></i> <span> {{item.DueDate | date : 'longDate'}}</span></h6>
+                            </div>
+                            <div class="boardImage">
+                                <div class="issuIcon text-center" style="margin-top: -5px">
+                                    <img src="/TaskManagementV/GetImage?userId={{item.AssigneeUserId}}" />
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+                <div class="statusNameViewMore statusNameViewMoreI">
+                    <a ng-click="filterIssue('IP')">View More</a>
+                </div>
+            </div>
+            <div class="column columnQaReview">
+                <div class="stInQaReview">
+                    <p>QA/Review</p>
+                </div>
+                <ul class="card-list">
+                    <li class="card" @*draggable="true"*@ ng-repeat="item in QAReviewList | limitTo: displayQA"  data-target="#addmodal" data-toggle="modal">
+                        <div class="col-lg-12 p-0" ng-click="getQAReviewListDetails(item.Id)">
+                            <div class="boardTitle" ng-show="item.ParentId == 0">
+                                <i class="fas fa-tasks mainTaskIcon {{item.IssueTypeName}}A"></i> <span><strong> {{item.Title}}</strong></span>
+                                <h6 ng-class="{'overDue' : item.IsOverDue==1}"><i class="fas fa-calendar-alt"></i> <span> {{item.DueDate | date : 'longDate'}}</span></h6>
+                            </div>
+                            <div class="boardTitle" ng-show="item.ParentId != 0">
+                                <i class="fas fa-clipboard-list subTaskIcon {{item.IssueTypeName}}A"></i> <span><strong> {{item.Title}}</strong></span>
+                                <h6 ng-class="{'overDue' : item.IsOverDue==1}"><i class="fas fa-calendar-alt"></i> <span> {{item.DueDate | date : 'longDate'}}</span></h6>
+                            </div>
+                            <div class="boardImage">
+                                <div class="issuIcon text-center" style="margin-top: -5px">
+                                    <img src="/TaskManagementV/GetImage?userId={{item.AssigneeUserId}}" />
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+                <div class="statusNameViewMore statusNameViewMoreQ">
+                    <a ng-click="filterIssue('QA')">View More</a>
+                </div>
+            </div>
+            <div class="column columnDone">
+                <div class="statusName done">
+                    <p>Done</p>
+                </div>
+                <ul class="card-list">
+                    <li class="card" @*draggable="true"*@ ng-repeat="item in DoneList" ng-show="item.StatusId==6" data-target="#addmodal" data-toggle="modal">
+                        <div class="col-lg-12 p-0" ng-click="getDoneListDetails(item.Id)">
+                            <div class="boardTitle" ng-show="item.ParentId == 0" >
+                                <i class="fas fa-tasks mainTaskIcon {{item.IssueTypeName}}A"></i> <span><strong> {{item.Title}}</strong></span>
+                                <h6 ng-class="{'overDue' : item.IsOverDue==1}"><i class="fas fa-calendar-alt" ></i> <span> {{item.DueDate | date : 'longDate'}}</span></h6>
+                            </div>
+                            <div class="boardTitle" ng-show="item.ParentId != 0">
+                                <i class="fas fa-clipboard-list subTaskIcon {{item.IssueTypeName}}A"></i> <span><strong> {{item.Title}}</strong></span>
+                                <h6 ng-class="{'overDue' : item.IsOverDue==1}"><i class="fas fa-calendar-alt"></i> <span> {{item.DueDate | date : 'longDate'}}</span></h6>
+                            </div>
+                            <div class="boardImage">
+                                <div class="issuIcon text-center" style="margin-top: -5px">
+                                    <img src="/TaskManagementV/GetImage?userId={{item.AssigneeUserId}}" />
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+                <div class="statusNameViewMore statusNameViewMoreD">
+                    <a ng-click="filterIssue('D')">View More</a>
+                </div>
+            </div>
+            <div id="modalOverlay"></div>
+        </div>
+    </section>
+
+
+    <!--begin::Modal-->
+    <div class="modal fade" id="addmodal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content issucreatModal">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel"><b>Issue Title : {{modalTitle}}</b></h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close" ng-click="resetForm();submitted=false"></button>
+                </div>
+                <div class="modal-body">
+                    <form name="addBasic" ng-submit="save()">
+
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <div class="form-group" ng-class="{ 'has-error' : submitted && addBasic.DepartmentId.$invalid}">
+                                    <div class="row">
+                                        <label class="col-md-4 control-label text-right">
+                                            Department :
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-8">
+                                            <select class="form-control" ng-model="issueCreateInfo.DepartmentId" required name="DepartmentId" ng-options="ReportInfo.DepartmentID as ReportInfo.DepartmentName for ReportInfo in CommonFeilds.Department">
+                                                <option value="" selected="selected">Choose an Option</option>
+                                            </select>
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted && addBasic.DepartmentId.$error.required" class="help-block">Department Required</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-6">
+                                <div class="form-group row" ng-class="{ 'has-error' : submitted && addBasic.ClientId.$invalid}">
+                                    <label class="col-lg-4 text-right labelLineHight" for="exampleSelect1">Client</label>
+
+                                    <div class="col-lg-8">
+                                        <select ng-model="issueCreateInfo.ClientId" name="ClientId" ng-options="client.Id as client.FullName for client in ClientList" class="form-control kt-select2">
+                                            <option value='' selected="selected">Choose Option</option>
+                                        </select>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <div class="form-group row" ng-class="{ 'has-error' : submitted && addBasic.ProjectId.$invalid}">
+                                    <label class="col-lg-4 text-right labelLineHight">Project <span class="required">*</span></label>
+
+                                    <div class="col-lg-8">
+                                        <select ng-model="issueCreateInfo.ProjectId" name="ProjectId" ng-change="getAllSprintByProject(issueCreateInfo.ProjectId,0)" ng-options="project.Id as project.ProjectName for project in ProjectList " class="form-control kt-select2" required>
+                                            <option value='' selected="selected">Choose Option</option>
+                                        </select>
+
+                                        <div class="form-control-focus"> </div>
+                                        <span ng-show="submitted &&  addBasic.ProjectId.$error.required" class="help-block">Project Required</span>
+                                    </div>
+
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="form-group row" ng-class="{ 'has-error' : submitted && addBasic.IssueTypeId.$invalid}">
+                                    <label class="col-lg-4 text-right labelLineHight" for="exampleSelect1">Issue Type <span class="required">*</span></label>
+
+                                    <div class="col-lg-8">
+                                        <select ng-model="issueCreateInfo.IssueTypeId" name="IssueTypeId" ng-options="issueType.Id as issueType.IssueTypeName for issueType in issueTypeList" class="form-control kt-select2" required>
+                                            <option value='' selected="selected">Choose Option</option>
+                                        </select>
+
+                                        <div class="form-control-focus"> </div>
+                                        <span ng-show="submitted &&  addBasic.IssueTypeId.$error.required" class="help-block">Issue Type Required</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr>
+
+
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <div class="form-group row" ng-class="{ 'has-error' : submitted && addBasic.Title.$invalid}">
+                                    <label class="col-lg-2 text-right labelLineHight">Summary <span class="required">*</span></label>
+                                    <div class="col-lg-10">
+                                        <input type="text" ng-model="issueCreateInfo.Title" name="Title" class="form-control" aria-describedby="emailHelp" placeholder="Issue Title" required>
+                                        <div class="form-control-focus"> </div>
+                                        <span ng-show="submitted &&  addBasic.Title.$error.required" class="help-block">Title Required</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row mt-5">
+                            <div class="col-lg-12">
+                                <div class="form-group row">
+                                    <label class="col-lg-2 text-right labelLineHight">Description <span class="required">*</span></label>
+                                    <div class="col-lg-10">
+                                        <div class="summernote" id="notedata"></div>
+                                        @*<textarea ng-model="issueCreateInfo.Description" name="Description" class="form-control" id="exampleTextarea" rows="3" placeholder="Description" required></textarea>*@
+                                        <div class="form-control-focus"> </div>
+                                        <span ng-show="submitted &&  addBasic.Title.$error.required" class="help-block">Description Required</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <div class="form-group row" ng-class="{ 'has-error' : submitted && addBasic.AssigneeId.$invalid}">
+                                    <label class="col-lg-4 text-right labelLineHight">Assignee</label>
+
+                                    <div class="col-lg-8">
+                                        <select ng-model="issueCreateInfo.AssigneeId" ng-options="emp.EmpBasicInfoID as emp.FullName group by emp.DepartmentName for emp in AssigneeList" class="form-control kt-select2" name="EmpBasicInfoID">
+                                            <option value='' selected="selected">Choose Option</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="form-group row" ng-class="{ 'has-error' : submitted && addBasic.ReporterId.$invalid}">
+                                    <label class="col-lg-4 text-right labelLineHight">Reporter</label>
+
+                                    <div class="col-lg-8">
+                                        <select ng-model="issueCreateInfo.ReporterId" ng-options="emp.EmpBasicInfoID as emp.FullName group by emp.DepartmentName for emp in EmployeeList" class="form-control kt-select2" name="EmpBasicInfoID">
+                                            <option value='' selected="selected">Choose Option</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <div class="form-group row" ng-class="{ 'has-error' : submitted && addBasic.DueDate.$invalid}">
+                                    <label class="col-md-4 control-label text-right">
+                                        Due Date
+                                    </label>
+                                    <div class="col-md-8">
+                                        <input type="text" class="form-control" uib-datepicker-popup="dd/MM/yyyy" placeholder="Due Date" name="DueDate" ng-model="issueCreateInfo.IssueDueDate" is-open="end.opened" ng-click="end.opened=true" ng-required="false" close-text="Close" readonly="readonly" />
+                                        <div class="form-control-focus"> </div>
+                                        <span ng-show="submitted &&  addBasic.DueDate.$error.required" class="help-block">End Date Required</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-6">
+                                <div class="form-group row">
+                                    <label class="col-lg-4 text-right labelLineHight" for="exampleSelect1">Sprint </label>
+
+                                    <div class="col-lg-8">
+                                        <select ng-model="issueCreateInfo.SprintId" name="SprintId" ng-options="sprint.Id as sprint.SprintTitle for sprint in SprintList" class="form-control kt-select2">
+                                            <option value='' selected="selected">Choose Option</option>
+                                        </select>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <div class="form-group row" ng-class="{ 'has-error' : submitted && addBasic.Priority.$invalid}">
+                                    <label class="col-lg-4 text-right labelLineHight">Priority</label>
+
+                                    <div class="col-lg-8">
+                                        <select ng-model="issueCreateInfo.Priority" class="form-control kt-select2" name="Priority">
+                                            <option value='Highest'>Highest</option>
+                                            <option value='High'>High</option>
+                                            <option value='Medium'>Medium</option>
+                                            <option value='Low'>Low</option>
+                                            <option value='Lowest'>Lowest</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="form-group row" ng-class="{ 'has-error' : submitted && addBasic.StatusId.$invalid}">
+                                    <label class="col-lg-4 text-right labelLineHight">Status</label>
+
+                                    <div class="col-lg-8">
+                                        <select ng-model="issueCreateInfo.StatusId" ng-options="status.Id as status.StatusName for status in StatusList" class="form-control kt-select2" name="StatusId">
+                                            <option value='' selected="selected">Choose Option</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal" ng-click="resetForm();submitted=false">Close</button>
+                    <button type="button" ng-click="save();submitted=true" class="btn btn-success">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--begin:: attachment Modal-->
+    <div class="modal fade" id="attachmentModal" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Attach</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <div class="form-group form-group-last">
+                                    <label>Upload Files:</label>
+
+                                    <div class="form-control dropzone dropzone-multi" id="kt_dropzone_4">
+                                        <div class="dropzone-panel">
+                                            <input type="file" name="ImageUrl" id="pdf" accept="application/pdf,image/*" />
+                                        </div>
+                                        <span class="form-text text-muted">Max file size is 1MB and max number of files is 1.</span>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-primary" ng-click="UploadAttachment()">Upload</button>
+                        </div>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <!--end:: attachment Modal-->
+
+</div>
+
+@section Scripts{
+
+
+<link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-lite.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-lite.min.js"></script>
+
+<script>
+      $('.summernote').summernote({
+        placeholder: 'Write Discription..',
+        tabsize: 3,
+        height: 150
+      });
+</script>
+
+    <script type="text/javascript">
+        OEMSApp.controller("ctrlScrumBoard", ["$scope", "$http", "SweetAlert", "blockUI",
+              function ($scope, $http, SweetAlert, blockUI) {
+                  init();
+                  function init() {
+                      initialize();
+
+                      getAllIssueType();
+                      getAllProject();
+                      getAllClient();
+                      getAllEmployee();
+                      getAllAssignee();
+                      getAllStatus();
+                      filterIssue('All');
+                      getAllCommons();
+                  }
+
+                  function initialize() {
+                      //$scope.modalbutton = 'Save';
+                      //$scope.modalTitle = 'Add New issue';
+
+                      $scope.CommonFeilds = [];
+                      $scope.Comments = {};
+
+                      $scope.webLinkinfo = {};
+                      $scope.issueAttachmentInfo = {};
+                      $scope.issueFilter = {};
+                      $scope.issueFilter.pageSize = 10;
+                      $scope.issueCreateInfo = {};
+                      $scope.issueInfo = {};
+                      $scope.issueList = [];
+
+                      $scope.BackLogList = [];
+                      $scope.ToDoList = [];
+                      $scope.InProgressList = [];
+                      $scope.QAReviewList = [];
+                      $scope.DoneList = [];
+
+                     
+                      $scope.resetForm = resetForm;
+                      $scope.resetFilter = resetFilter;
+
+                      $scope.getBackLogListDetails = getBackLogListDetails;
+                      $scope.getToDoListDetails = getToDoListDetails;
+                      $scope.getInProgressListDetails = getInProgressListDetails;
+                      $scope.getQAReviewListDetails = getQAReviewListDetails;
+                      $scope.getDoneListDetails = getDoneListDetails;
+
+                      $scope.filterIssue = filterIssue;
+                      $scope.doneIssueList = doneIssueList;
+                      $scope.inprogressIssueList = inprogressIssueList;
+                      $scope.qaReviewIssueList = qaReviewIssueList;
+                      $scope.todoIssueList = todoIssueList;
+                      $scope.backlogIssueList = backlogIssueList;
+                      
+                      $scope.subIssueTitle = '';
+                      $scope.checkUpdateId = 0;
+                      $scope.pagesize = 10;
+                      $scope.pageSizeArray = [];
+                      $scope.pageSizeArray.push({ value: 5, text: 5 });
+                      $scope.pageSizeArray.push({ value: 10, text: 10 });
+                      $scope.pageSizeArray.push({ value: 20, text: 20 });
+                      $scope.pageSizeArray.push({ value: 50, text: 50 });
+                      $scope.currentPage = 1;
+                      $scope.pageSize = 10;
+                      //localStorage.setItem("Index", 0);
+
+                      localStorage.setItem("D", $scope.issueFilter.pageSize);
+                      localStorage.setItem("TD", $scope.issueFilter.pageSize);
+                      localStorage.setItem("BL", $scope.issueFilter.pageSize);
+                      localStorage.setItem("IP", $scope.issueFilter.pageSize);
+                      localStorage.setItem("QA", $scope.issueFilter.pageSize);
+
+                      $scope.issue = {};
+                      $scope.CurrentDate = new Date();
+                  }
+
+
+
+                  function resetForm() {
+                      $scope.modalTitle = "Update Issue";
+                      //$scope.issueInfo = {};
+                      $scope.Id = '';
+                      $scope.checkUpdateId = 0;
+                      $scope.addBasic.$setUntouched();
+                      $scope.addBasic.$setPristine();
+                      //$scope.submitted = false;
+                      $scope.modalbutton = 'Save';
+                      $scope.subIssueTitle = '';
+                      $scope.webLinkinfo = {};
+                      $scope.issueCreateInfo = {};
+                      //$scope.issueCreateInfo.Priority = 'Medium';
+                      $scope.Comments = {};
+                      $scope.isCommentsEdit = 0;
+                      filterIssue('All');
+                  }
+
+
+                  function getAllCommons() {
+                      $scope.CommonFeilds = [];
+
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Common/GetCommonItemEmp/'
+                      }).then(function successCallback(response) {
+                          $scope.CommonFeilds = response.data.results;
+                      }, function errorCallback(response) {
+                      });
+                  }
+
+                  function resetFilter() {
+                      $scope.issueFilter = {};
+                      filterIssue('All');
+                      localStorage.setItem("D", $scope.issueFilter.pageSize);
+                      localStorage.setItem("TD", $scope.issueFilter.pageSize);
+                      localStorage.setItem("BL", $scope.issueFilter.pageSize);
+                      localStorage.setItem("IP", $scope.issueFilter.pageSize);
+                      localStorage.setItem("QA", $scope.issueFilter.pageSize);
+                      //localStorage.setItem("issueId", 0);
+                  }
+
+                  function filterIssue(type) {
+                      if (type == 'D') {
+                          var count = localStorage.getItem('D');                     
+                          $scope.issueFilter.pageSize = parseInt(count) + 15;
+                          localStorage.setItem("D", $scope.issueFilter.pageSize);
+                          doneIssueList();
+                      
+                          
+                      } else if (type == 'IP') {
+                          var count = localStorage.getItem('IP');
+                          $scope.issueFilter.pageSize = parseInt(count) + 15;
+                          localStorage.setItem("IP", $scope.issueFilter.pageSize);
+                          inprogressIssueList();
+                      }
+                      else if (type == 'QA') {
+                          var count = localStorage.getItem('QA');
+                          $scope.issueFilter.pageSize = parseInt(count) + 15;
+                          localStorage.setItem("QA", $scope.issueFilter.pageSize);
+                          qaReviewIssueList();
+                      } else if (type == 'BL') {
+                          var count = localStorage.getItem('BL');
+                          $scope.issueFilter.pageSize = parseInt(count) + 15;
+                          localStorage.setItem("BL", $scope.issueFilter.pageSize);
+                          backlogIssueList();
+                      } else if (type == 'TD') {
+                          var count = localStorage.getItem('TD');
+                          $scope.issueFilter.pageSize = parseInt(count) + 15;
+                          localStorage.setItem("TD", $scope.issueFilter.pageSize);
+                          todoIssueList();
+                      }
+                      else {
+                          doneIssueList();
+                          inprogressIssueList();
+                          qaReviewIssueList();
+                          todoIssueList();
+                          backlogIssueList();
+                      }
+                     
+                  }
+
+                  function doneIssueList() {
+
+                      $scope.DoneList = [];
+                      //$scope.issueFilter.StatusId = 6; // Done Issue
+                      blockUI.start("Loading...");
+                      //blockUI.start();
+                      $http({
+                          method: 'POST',
+                          url: baseUrl + 'TaskManagement/GetBoardIssueList/'+6,
+                          data: $scope.issueFilter
+                      }).then(function successCallback(response) {
+                          $scope.DoneList = response.data.results;
+                          $scope.issueFilter.pageSize = 10;
+                      }, function errorCallback(response) {
+                          toastr["warning"](response.data.Message);
+                      });
+                      blockUI.stop();
+                  }
+
+                  function inprogressIssueList() {
+                     
+                      $scope.InProgressList = [];                         
+                      //$scope.issueFilter.StatusId = 4; // In Progress Issue
+                      blockUI.start("Loading...");
+                      //blockUI.start();
+                      $http({
+                          method: 'POST',
+                          url: baseUrl + 'TaskManagement/GetBoardIssueList/'+4,
+                          data: $scope.issueFilter
+                      }).then(function successCallback(response) {
+                          $scope.InProgressList = response.data.results;
+                          $scope.issueFilter.pageSize = 10;
+                      }, function errorCallback(response) {
+                          toastr["warning"](response.data.Message);
+                      });
+                      blockUI.stop();
+                  }
+
+                  function qaReviewIssueList() {
+                        
+                      $scope.QAReviewList = [];
+                      //$scope.issueFilter.StatusId = 5; // QA Review Issue
+                      blockUI.start("Loading...");
+                      //blockUI.start();
+                      $http({
+                          method: 'POST',
+                          url: baseUrl + 'TaskManagement/GetBoardIssueList/'+5,
+                          data: $scope.issueFilter
+                      }).then(function successCallback(response) {
+                          $scope.QAReviewList = response.data.results;
+                          $scope.issueFilter.pageSize = 10;
+                      }, function errorCallback(response) {
+                          toastr["warning"](response.data.Message);
+                      });
+                      blockUI.stop();
+                  }
+
+                  function todoIssueList() {
+
+                      $scope.ToDoList = [];                   
+                      //$scope.issueFilter.StatusId = 3; // ToDo Issue
+                      blockUI.start("Loading...");
+                      //blockUI.start();
+                      $http({
+                          method: 'POST',
+                          url: baseUrl + 'TaskManagement/GetBoardIssueList/'+3,
+                          data: $scope.issueFilter
+                      }).then(function successCallback(response) {
+                          $scope.ToDoList = response.data.results;
+                          $scope.issueFilter.pageSize = 10;
+                      }, function errorCallback(response) {
+                          toastr["warning"](response.data.Message);
+                      });
+                      blockUI.stop();
+                  }
+
+
+                  function backlogIssueList() {
+
+                      $scope.BackLogList = [];                    
+                      //$scope.issueFilter.StatusId = 2; // BackLog Issue
+                      blockUI.start("Loading...");
+                      //blockUI.start();
+                      $http({
+                          method: 'POST',
+                          url: baseUrl + 'TaskManagement/GetBoardIssueList/'+2,
+                          data: $scope.issueFilter
+                      }).then(function successCallback(response) {
+                          $scope.BackLogList = response.data.results;
+                          $scope.issueFilter.pageSize = 10;
+                      }, function errorCallback(response) {
+                          toastr["warning"](response.data.Message);
+                      });
+                      blockUI.stop();
+                  }
+
+                  function getBackLogListDetails(issueId) {
+                      //console.log($scope.BackLogList.length);
+                      if ($scope.issueList != null) {
+                          $('#sprintDropdown').hide();
+                          $('#sprintText').show();
+                
+                          angular.forEach($scope.BackLogList, function (item) {
+                              if (item.Id == issueId) {
+                                  //console.log(item)
+                                  //localStorage.setItem("issueId", item.Id);
+                                  $scope.getAllSprintByProject(item.ProjectId, item.SprintId)
+                                  $scope.modalTitle = item.Title;
+                                  $scope.issueCreateInfo.Id = item.Id
+                                  $scope.issueCreateInfo.DepartmentId = item.DepartmentId
+                                  $scope.issueCreateInfo.ClientId = item.ClientId;
+                                  $scope.issueCreateInfo.ProjectId = item.ProjectId;
+                                  $scope.issueCreateInfo.IssueTypeId = item.IssueTypeId;
+                                  $scope.issueCreateInfo.Title = item.Title;
+                                  //$scope.issueCreateInfo.Description = item.Description;  
+                                  $scope.issueCreateInfo.AssigneeId = item.AssigneeId;
+                                  $scope.issueCreateInfo.ReporterId = item.ReporterId;
+                                  $scope.issueCreateInfo.Priority = item.Priority;
+                                  $scope.issueCreateInfo.StatusId = item.StatusId;
+                                  $scope.issueCreateInfo.IssueDueDate = new Date(item.DueDate);
+                                  $scope.issueCreateInfo.SprintId = item.SprintId;
+                                  var text = item.Description;
+                                  $('.summernote').summernote('code', String(text));
+                              }
+                          })
+                      }
+                  }
+
+                  function getToDoListDetails(issueId) {
+                      //console.log($scope.BackLogList.length);
+                      if ($scope.issueList != null) {
+                          $('#sprintDropdown').hide();
+                          $('#sprintText').show();
+
+                          angular.forEach($scope.ToDoList, function (item) {
+                              if (item.Id == issueId) {
+                                  //console.log(item)
+                                  //localStorage.setItem("issueId", item.Id);
+                                  $scope.getAllSprintByProject(item.ProjectId, item.SprintId)
+                                  $scope.modalTitle = item.Title;
+                                  $scope.issueCreateInfo.Id = item.Id
+                                  $scope.issueCreateInfo.DepartmentId = item.DepartmentId
+                                  $scope.issueCreateInfo.ClientId = item.ClientId;
+                                  $scope.issueCreateInfo.ProjectId = item.ProjectId;
+                                  $scope.issueCreateInfo.IssueTypeId = item.IssueTypeId;
+                                  $scope.issueCreateInfo.Title = item.Title;
+                                  //$scope.issueCreateInfo.Description = item.Description;
+                                  $scope.issueCreateInfo.AssigneeId = item.AssigneeId;
+                                  $scope.issueCreateInfo.ReporterId = item.ReporterId;
+                                  $scope.issueCreateInfo.Priority = item.Priority;
+                                  $scope.issueCreateInfo.StatusId = item.StatusId;
+                                  $scope.issueCreateInfo.IssueDueDate = new Date(item.DueDate);
+                                  $scope.issueCreateInfo.SprintId = item.SprintId;
+                                  var text = item.Description;
+                                  $('.summernote').summernote('code', String(text));
+                              }
+                          })
+                      }
+                  }
+
+                  function getInProgressListDetails(issueId) {
+                      //console.log($scope.BackLogList.length);
+                      if ($scope.issueList != null) {
+                          $('#sprintDropdown').hide();
+                          $('#sprintText').show();
+
+                          angular.forEach($scope.InProgressList, function (item) {
+                              if (item.Id == issueId) {
+                                  //console.log(item)
+                                  //localStorage.setItem("issueId", item.Id);
+                                  $scope.getAllSprintByProject(item.ProjectId, item.SprintId)
+                                  $scope.modalTitle = item.Title;
+                                  $scope.issueCreateInfo.Id = item.Id
+                                  $scope.issueCreateInfo.DepartmentId = item.DepartmentId
+                                  $scope.issueCreateInfo.ClientId = item.ClientId;
+                                  $scope.issueCreateInfo.ProjectId = item.ProjectId;
+                                  $scope.issueCreateInfo.IssueTypeId = item.IssueTypeId;
+                                  $scope.issueCreateInfo.Title = item.Title;
+                                  //$scope.issueCreateInfo.Description = item.Description;
+                                  $scope.issueCreateInfo.AssigneeId = item.AssigneeId;
+                                  $scope.issueCreateInfo.ReporterId = item.ReporterId;
+                                  $scope.issueCreateInfo.Priority = item.Priority;
+                                  $scope.issueCreateInfo.StatusId = item.StatusId;
+                                  $scope.issueCreateInfo.IssueDueDate = new Date(item.DueDate);
+                                  $scope.issueCreateInfo.SprintId = item.SprintId;
+                                  var text = item.Description;
+                                  $('.summernote').summernote('code', String(text));
+                              }
+                          })
+                      }
+                  }
+
+                  function getQAReviewListDetails(issueId) {
+                      //console.log($scope.BackLogList.length);
+                      if ($scope.issueList != null) {
+                          $('#sprintDropdown').hide();
+                          $('#sprintText').show();
+
+                          angular.forEach($scope.QAReviewList, function (item) {
+                              if (item.Id == issueId) {
+                                  //console.log(item)
+                                  //localStorage.setItem("issueId", item.Id);
+                                  $scope.getAllSprintByProject(item.ProjectId, item.SprintId)
+                                  $scope.modalTitle = item.Title;
+                                  $scope.issueCreateInfo.Id = item.Id
+                                  $scope.issueCreateInfo.DepartmentId = item.DepartmentId
+                                  $scope.issueCreateInfo.ClientId = item.ClientId;
+                                  $scope.issueCreateInfo.ProjectId = item.ProjectId;
+                                  $scope.issueCreateInfo.IssueTypeId = item.IssueTypeId;
+                                  $scope.issueCreateInfo.Title = item.Title;
+                                  //$scope.issueCreateInfo.Description = item.Description;
+                                  $scope.issueCreateInfo.AssigneeId = item.AssigneeId;
+                                  $scope.issueCreateInfo.ReporterId = item.ReporterId;
+                                  $scope.issueCreateInfo.Priority = item.Priority;
+                                  $scope.issueCreateInfo.StatusId = item.StatusId;
+                                  $scope.issueCreateInfo.IssueDueDate = new Date(item.DueDate);
+                                  $scope.issueCreateInfo.SprintId = item.SprintId;
+                                  var text = item.Description;
+                                  $('.summernote').summernote('code', String(text));
+                              }
+                          })
+                      }
+                  }
+
+                  function getDoneListDetails(issueId) {
+                      //console.log($scope.BackLogList.length);
+                      if ($scope.issueList != null) {
+                          $('#sprintDropdown').hide();
+                          $('#sprintText').show();
+
+                          angular.forEach($scope.DoneList, function (item) {
+                              if (item.Id == issueId) {
+                                  //console.log(item)
+                                  //localStorage.setItem("issueId", item.Id);
+                                  $scope.getAllSprintByProject(item.ProjectId, item.SprintId)
+                                  $scope.modalTitle = item.Title;
+                                  $scope.issueCreateInfo.Id = item.Id
+                                  $scope.issueCreateInfo.DepartmentId = item.DepartmentId
+                                  $scope.issueCreateInfo.ClientId = item.ClientId;
+                                  $scope.issueCreateInfo.ProjectId = item.ProjectId;
+                                  $scope.issueCreateInfo.IssueTypeId = item.IssueTypeId;
+                                  $scope.issueCreateInfo.Title = item.Title;
+                                  //$scope.issueCreateInfo.Description = item.Description;
+                                  $scope.issueCreateInfo.AssigneeId = item.AssigneeId;
+                                  $scope.issueCreateInfo.ReporterId = item.ReporterId;
+                                  $scope.issueCreateInfo.Priority = item.Priority;
+                                  $scope.issueCreateInfo.StatusId = item.StatusId;
+                                  $scope.issueCreateInfo.IssueDueDate = new Date(item.DueDate);
+                                  $scope.issueCreateInfo.SprintId = item.SprintId;
+                                  var text = item.Description;
+                                  $('.summernote').summernote('code', String(text));
+                              }
+                          })
+                      }
+                  }
+
+                  $scope.save = function () {
+                      //var issue = $scope.issueCreateInfo;
+                      $scope.issueCreateInfo.Description = $('.summernote').summernote('code');
+                      console.log($scope.issueCreateInfo);
+
+                      $http({
+                          method: 'PUT',
+                          url: baseUrl + 'TaskManagement/UpdateIssue/',
+                          data: $scope.issueCreateInfo
+                      }).then(function successCallback(response) {
+                          toastr["info"](response.data.message);
+                          //if (response.data.httpStatusCode != 305) {
+                              $('#addmodal').modal('toggle');
+                              filterIssue();
+                              resetForm()
+                          //}
+                      }, function errorCallback(response) {
+                          toastr["warning"](response.data.Message);
+                      });
+                  }
+
+          
+
+                  function getAllIssueType() {
+                      $scope.issueTypeList = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'TaskManagement/GetAllIssueType/'
+                      }).then(function successCallback(response) {
+                          $scope.issueTypeList = response.data.results;
+                      }, function errorCallback(response) {
+                          toastr["info"](response.data.Message);
+                      });
+                  }
+
+                  function getAllProject() {
+                      $scope.ProjectList = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'TaskManagement/GetAllProject/'
+                      }).then(function successCallback(response) {
+                          $scope.ProjectList = response.data.results;
+                      }, function errorCallback(response) {
+                          toastr["warning"](response.data.Message);
+                      });
+                  }
+
+                  function getAllClient() {
+                      $scope.ClientList = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Client/GetAllClient/'
+                      }).then(function successCallback(response) {
+                          $scope.ClientList = response.data.results;
+                      }, function errorCallback(response) {
+                          toastr["info"](response.data.Message);
+                      });
+                  }
+
+                  function getAllStatus() {
+                      $scope.StatusList = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'TaskManagement/GetAllStatus/'
+                      }).then(function successCallback(response) {
+                          $scope.StatusList = response.data.results;
+                      }, function errorCallback(response) {
+                          toastr["warning"](response.data.Message);
+                      });
+                  }
+
+                  function getAllEmployee() {
+                      $scope.EmployeeList = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'TaskManagement/GetDepertmentWiseEmpList/',
+                      }).then(function successCallback(response) {
+                          $scope.EmployeeList = response.data.results;
+                      }, function errorCallback(response) {
+                          toastr["warning"](response.data.Message);
+                      });
+                  }
+
+                  function getAllAssignee() {
+                      $scope.AssigneeList = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'TaskManagement/GetDepertmentWiseEmpList/',
+                      }).then(function successCallback(response) {
+                          $scope.AssigneeList = response.data.results;
+                          //console.log('AssigneeList', $scope.AssigneeList);
+                      }, function errorCallback(response) {
+                          toastr["warning"](response.data.Message);
+                      });
+                  }
+
+                  
+
+                  $scope.getAllSprintByProject = function getAllSprintByProject(projectId, sprintId) {
+                      if (projectId == null || projectId == '' || projectId == 0 || projectId == 'undefined') {
+                          return;
+                      }
+                      $scope.SprintList = [];
+                      //console.log('sprint-list', $scope.SprintList);
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'TaskManagement/GetSprintByProjectId/' + projectId
+                      }).then(function successCallback(response) {
+                          $scope.SprintList = response.data.results;
+                          $scope.issueCreateInfo.SprintId = sprintId;
+                          //console.log('sprint list',$scope.SprintList);
+                      }, function errorCallback(response) {
+                          toastr["warning"](response.data.Message);
+                      });
+                  }
+
+                  $("#sprintText").click(function () {
+                      $('#sprintText').hide();
+                      $('#sprintDropdown').show();
+                  });
+                  $('#sprintDropdown').hide();
+
+                  //$scope.AddComments = function () {
+                  //    if ($scope.Comments.Description == null || $scope.Comments.Description == '' || $scope.Comments.Description == 'undefined') {
+                  //        $scope.Comments.IssueId = $scope.issueInfo.Id;
+                  //        toastr["info"]("Please Enter Comment..!");
+                  //        return;
+                  //    }
+                  //    $scope.Comments.IssueId = $scope.issueInfo.Id;
+                  //    $http({
+                  //        method: 'POST',
+                  //        url: baseUrl + 'TaskManagement/AddComments',
+                  //        data: $scope.Comments
+                  //    }).then(function successCallback(response) {
+                  //        toastr["info"]("Comments Added");
+                  //        resetForm();
+                  //        filterIssue();
+                  //    }, function errorCallback(response) {
+                  //        toastr["warning"](response.data.Message);
+                  //    });
+                  //}
+
+                  //$scope.UpdateComments = function () {
+                  //    if ($scope.Comments.Description == null || $scope.Comments.Description == '' || $scope.Comments.Description == 'undefined') {
+                  //        $scope.Comments.IssueId = $scope.issueInfo.Id;
+                  //        toastr["info"]("Please Enter Comment..!");
+                  //        return;
+                  //    }
+                  //    $scope.Comments.IssueId = $scope.issueInfo.Id;
+                  //    $http({
+                  //        method: 'PUT',
+                  //        url: baseUrl + 'TaskManagement/UpdateComments',
+                  //        data: $scope.Comments
+                  //    }).then(function successCallback(response) {
+                  //        toastr["info"]("Comments Updated");
+                  //        resetForm();
+                  //        filterIssue();
+                  //    }, function errorCallback(response) {
+                  //        toastr["warning"](response.data.Message);
+                  //    });
+                  //}
+
+                  //$scope.EditComments = function (n) {
+                  //    $scope.isCommentsEdit = 1;
+                  //    $scope.Comments = n;
+                  //}
+                  //$scope.ClearComments = function () {
+                  //    $scope.Comments = {};
+                  //    $scope.isCommentsEdit = 0;
+                  //}
+
+                  //$scope.DelectComments = function (commentId) {
+                  //    SweetAlert.swal({
+                  //        title: "Are you sure to delete it ?", type: "warning", showCancelButton: true, confirmButtonColor: "#DD6B55",
+                  //        confirmButtonText: "Yes, delete it!",
+                  //        closeOnConfirm: false
+                  //    },
+                  //    function (isConfirm) {
+                  //        if (isConfirm) {
+                  //            $http({
+                  //                method: 'DELETE',
+                  //                url: baseUrl + 'TaskManagement/DeleteComments/' + commentId,
+                  //            }).then(function successCallback(response) {
+                  //                SweetAlert.swal("Deleted!", "Your data has been deleted.", "success");
+                  //                resetForm();
+                  //                filterIssue();
+                  //            }, function errorCallback(response) {
+                  //                toastr["warning"](response.data.Message);
+                  //            });
+                  //        }
+                  //    });
+                  //}
+
+                  //$scope.UpdateIssueDescription = function () {
+                  //    $scope.issue.IssueId = $scope.issueInfo.Id;
+                  //    $scope.issue.Description = $scope.issueInfo.Description;
+                  //    //console.log($scope.issue)
+                  //    $http({
+                  //        method: 'PUT',
+                  //        url: baseUrl + 'TaskManagement/UpdateIssueDescription',
+                  //        data: $scope.issue
+                  //    }).then(function successCallback(response) {
+                  //        //resetForm();
+                  //        filterIssue();
+                  //        toastr["info"]("Description Updated.");
+                  //    }, function errorCallback(response) {
+                  //        toastr["warning"](response.data.Message);
+                  //    });
+                  //}
+
+                  //$scope.UpdateIssueDescription = function () {
+                  //    $scope.issueInfo.Description = $scope.issueInfo.Description ? $scope.issueInfo.Description : 'N';
+                  //    $http({
+                  //        method: 'GET',
+                  //        url: baseUrl + 'TaskManagement/UpdateIssueDescription/' + $scope.issueInfo.Id + '/' + $scope.issueInfo.Description,
+                  //    }).then(function successCallback(response) {
+                  //        //resetForm();
+                  //        filterIssue();
+                  //        toastr["info"]("Description Updated.");
+                  //    }, function errorCallback(response) {
+                  //        toastr["warning"](response.data.Message);
+                  //    });
+                  //}
+
+                  //$scope.UpdatePriority = function () {
+                  //    $http({
+                  //        method: 'GET',
+                  //        url: baseUrl + 'TaskManagement/UpdateIssuePriority/' + $scope.issueInfo.Id + '/' + $scope.issueInfo.Priority,
+                  //    }).then(function successCallback(response) {
+                  //        resetForm();
+                  //        filterIssue();
+                  //        toastr["info"]("Priority Updated.");
+                  //    }, function errorCallback(response) {
+                  //        toastr["warning"](response.data.Message);
+                  //    });
+                  //}
+
+                  //$scope.UpdateAssignee = function (assigneeId) {
+                  //    $http({
+                  //        method: 'GET',
+                  //        url: baseUrl + 'TaskManagement/IssueAssign/' + $scope.issueInfo.Id + '/' + assigneeId
+                  //    }).then(function successCallback(response) {
+                  //        resetForm();
+                  //        filterIssue();
+                  //        toastr["info"]("Assignee Updated.");
+                  //    }, function errorCallback(response) {
+                  //        toastr["warning"](response.data.Message);
+                  //    });
+                  //}
+
+                  //$scope.UpdateReporter = function (reporterId) {
+                  //    $http({
+                  //        method: 'GET',
+                  //        url: baseUrl + 'TaskManagement/UpdateIssueReporter/' + $scope.issueInfo.Id + '/' + reporterId
+                  //    }).then(function successCallback(response) {
+                  //        resetForm();
+                  //        filterIssue();
+                  //        toastr["info"]("Reporter Updated.");
+                  //    }, function errorCallback(response) {
+                  //        toastr["warning"](response.data.Message);
+                  //    });
+                  //}
+
+                  //$scope.UpdateStatus = function () {
+                  //    $http({
+                  //        method: 'GET',
+                  //        url: baseUrl + 'TaskManagement/UpdateIssueStatus/' + $scope.issueInfo.Id + '/' + $scope.issueInfo.StatusId,
+                  //    }).then(function successCallback(response) {
+                  //        resetForm();
+                  //        filterIssue();
+                  //        toastr["info"]("Status Updated.");
+                  //    }, function errorCallback(response) {
+                  //        toastr["warning"](response.data.Message);
+                  //    });
+                  //}
+
+                  // for issue create ddl loading
+                  //$scope.getAllSprintByProjectId = function getAllSprintByProjectId() {
+                  //    $scope.SprintList = [];
+                  //    $http({
+                  //        method: 'GET',
+                  //        url: baseUrl + 'TaskManagement/GetSprintByProjectId/' + $scope.issueCreateInfo.ProjectId
+                  //    }).then(function successCallback(response) {
+                  //        $scope.SprintList = response.data.results;
+                  //    }, function errorCallback(response) {
+                  //        toastr["warning"](response.data.Message);
+                  //    });
+                  //}
+
+
+                  //$scope.UpdateSprint = function () {
+                  //    if ($scope.Sprint == {} || $scope.Sprint.Id == 0 || $scope.Sprint.Id == null || $scope.Sprint.Id == 'undefined') {
+                  //        return;
+                  //    }
+                  //    $http({
+                  //        method: 'GET',
+                  //        url: baseUrl + 'TaskManagement/UpdateIssueSprint/' + $scope.issueInfo.Id + '/' + $scope.Sprint.Id,
+                  //    }).then(function successCallback(response) {
+                  //        filterIssue();
+                  //        //var gIndex = parseInt(localStorage.getItem("Index"));
+                  //        //getIssueDetails(gIndex);
+                  //        toastr["info"]("Sprint Updated.");
+                  //        $('#sprintDropdown').hide();
+                  //        $('#sprintText').show();
+                  //    }, function errorCallback(response) {
+                  //        toastr["warning"](response.data.Message);
+                  //    });
+                  //}
+
+
+                  //function validation() {
+                  //    if ($scope.issueInfo.Id == undefined) {
+                  //        return true;
+                  //    }
+                  //    else {
+                  //        if ($scope.issueCreateInfo.ProjectId == null) {
+                  //            toastr["info"]("Please Select any option..!");
+                  //            return false;
+                  //        }
+                  //        else {
+                  //            return true;
+                  //        }
+                  //    }
+                  //}
+                  //$scope.UploadAttachment = function () {
+                  //    $scope.issueAttachmentInfo.IssueId = $scope.issueInfo.Id;
+                  //    var files = $("#pdf").get(0).files;
+                  //    if (files == null || files.length < 1) {
+                  //        toastr["warning"]('File is required');
+                  //        return;
+                  //    }
+
+                  //    $http({
+                  //        method: 'POST',
+                  //        url: baseUrl + 'TaskManagement/AddIssueAttachment/',
+                  //        headers: { 'Content-Type': undefined },
+                  //        transformRequest: function (data) {
+                  //            var formData = new FormData();
+                  //            formData.append('issueAttachment', JSON.stringify($scope.issueAttachmentInfo.IssueId));
+                  //            if (files.length > 0)
+                  //                formData.append("attachment", files[0]);
+                  //            return formData;
+                  //        },
+                  //        data: { issueAttachment: $scope.issueAttachmentInfo.IssueId }
+                  //    }).then(function successCallback(response) {
+                  //        //resetForm();
+                  //        filterIssue();
+                  //        if ($scope.issueList != null) {
+                  //            var gIndex = parseInt(localStorage.getItem("Index"));
+                  //            getIssueDetails(gIndex + 1);
+                  //        }
+                  //        toastr["success"]("Attached Successfully.");
+                  //        $('#attachmentModal').modal('hide');
+                  //    }, function errorCallback(response) {
+                  //        resetForm();
+                  //        toastr["warning"](response.data.Message);
+                  //    });
+                  //}
+
+                  //$scope.DeleteAttachment = function (attachmentId) {
+                  //    SweetAlert.swal({
+                  //        title: "Are you sure to delete it ?", type: "warning", showCancelButton: true, confirmButtonColor: "#DD6B55",
+                  //        confirmButtonText: "Yes, delete it!",
+                  //        closeOnConfirm: false
+                  //    },
+                  //    function (isConfirm) {
+                  //        if (isConfirm) {
+                  //            $http({
+                  //                method: 'DELETE',
+                  //                url: baseUrl + 'TaskManagement/DeleteIssueAttachment/' + $scope.issueInfo.Id + '/' + attachmentId,
+                  //            }).then(function successCallback(response) {
+                  //                SweetAlert.swal("Deleted!", "Your data has been deleted.", "success");
+                  //                //resetForm();
+                  //                filterIssue();
+                  //                if ($scope.issueList != null) {
+                  //                    var gIndex = parseInt(localStorage.getItem("Index"));
+                  //                    getIssueDetails(gIndex + 1);
+                  //                }
+                  //            }, function errorCallback(response) {
+                  //                toastr["warning"](response.data.Message);
+                  //            });
+                  //        }
+                  //    });
+                  //}
+
+                  //$scope.CreateIssueWeblink = function () {
+                  //    $scope.webLinkinfo.IssueId = $scope.issueInfo.Id;
+                  //    if ($scope.webLinkinfo.url == null || $scope.webLinkinfo.url == '') {
+                  //        toastr["warning"]('Valid Web Url Required.');
+                  //        return;
+                  //    }
+                  //    else if ($scope.webLinkinfo.Description == null || $scope.webLinkinfo.Description == '') {
+                  //        toastr["warning"]("Url Description Required");
+                  //        return;
+                  //    }
+                  //    else {
+                  //        $http({
+                  //            method: 'POST',
+                  //            url: baseUrl + 'TaskManagement/AddIssueWebLink/',
+                  //            data: $scope.webLinkinfo
+                  //        }).then(function successCallback(response) {
+                  //            toastr["info"](response.data.message);
+                  //            resetForm();
+                  //            filterIssue();
+                  //        }, function errorCallback(response) {
+                  //            toastr["error"](response.data.Message);
+                  //        });
+                  //    }
+                  //}
+                  //$scope.CreateSubIssue = function () {
+                  //    if ($scope.subIssueTitle == null || $scope.subIssueTitle == '') {
+                  //        toastr["warning"]('Title Required.');
+                  //        return;
+                  //    }
+                  //    else {
+                  //        $http({
+                  //            method: 'GET',
+                  //            url: baseUrl + 'TaskManagement/CreateSubIssue/' + $scope.issueInfo.Id + '/' + $scope.subIssueTitle,
+                  //        }).then(function successCallback(response) {
+                  //            toastr["info"](response.data.message);
+                  //            resetForm();
+                  //            filterIssue();
+                  //            $scope.subIssueTitle == '';
+                  //        }, function errorCallback(response) {
+                  //            toastr["error"](response.data.Message);
+                  //        });
+                  //    }
+                  //}
+
+
+
+
+
+              }]);
+
+    </script>
+}
+

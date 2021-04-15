@@ -1,0 +1,247 @@
+﻿@{
+    ViewBag.Title = "Payment";
+}
+<style type="text/css">
+    #FormTitleCase {
+        text-transform: capitalize;
+    }
+
+    .xyz {
+        width: 440px;
+        -webkit-box-shadow: 0px 1px 19px 0px rgba(51, 69, 83, 0.75);
+        -moz-box-shadow: 0px 1px 19px 0px rgba(51, 69, 83, 0.75);
+        box-shadow: 0px 1px 19px 0px rgba(51, 69, 83, 0.75);
+    }
+
+    .addie {
+        width: 100%;
+        margin-left: 5px;
+        margin-right: 10px;
+        -webkit-box-shadow: 0px 1px 19px 0px rgba(51, 69, 83, 0.75);
+        -moz-box-shadow: 0px 1px 19px 0px rgba(51, 69, 83, 0.75);
+        box-shadow: 0px 1px 19px 0px rgba(51, 69, 83, 0.75);
+    }
+
+    .col-md-7 {
+        /* width: 58.33333333%; */
+    }
+</style>
+<br /><br />
+<div class="container" style="background-color:#49afb7;margin-top:80px;width: 100%;" ng-controller="PaymentCtrl">
+    <center style="background-color:#dff0d8">
+    </center>
+    <br />
+    <div class="panel panel-success">
+        <div class="panel-heading" style="text-align:center">
+            <strong><img src="~/assets/global/img/bkash.png" /></strong>
+        </div>
+        <div class="panel-body">
+            <div id="err" class="alert alert-danger" style="display:none">
+                <p id="errmsg"></p>
+            </div>
+            <section>
+                <div  ></div>
+            </section>
+                <section style="background-color:#ddd; border-radius:10px 10px 10px 10px">
+                    <hr style="height:1px;background-color:#ffffff" />
+                    <div class="row">
+                        <div class="col-md-offset-3 col-md-6">
+                            <div class="form-group">
+                                <label class="col-md-5 control-label fa-th-large">
+                                    Institute Name :
+                                </label>
+                                <div class="col-md-7 control-label fa-th-large">
+                                    <label style="font-weight:bold">@ViewBag.InstitureName</label>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-5 control-label">
+                                    Payment For:
+                                </label>
+                                <div class="col-md-7 control-label fa-th-large pull-left" style="float:left">
+                                    <label style="font-weight:bold">Addmission application</label>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-5 control-label">
+                                    Application ID :
+                                </label>
+                                <div class="col-md-7">
+                                    <label style="font-weight:bold"><span id="AppId">@ViewBag.AppId</span></label>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-md-5 control-label">
+                                    Total Fee :
+                                </label>
+                                <div class="col-md-7">
+                                    <label style="font-weight:bold"><span >@ViewBag.AmountString</span></label>
+                                    <input type="hidden" value="@ViewBag.Amount" id="amount" />
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-5 control-label">
+
+                                </label>
+                                <div class="col-md-7">
+                                    <input style="text-align:center" type="radio" checked id="checkbox-2-2" class="regular-checkbox big-checkbox" /><label for="checkbox-2-2"></label>
+                                    <label class="control-label" style="padding-top: 4px;">
+                                        Pay With Bkash
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-7 pull-right">
+                            <br />
+                            <div class="g-recaptcha" data-sitekey="6Ld5nHgUAAAAADoE9CFNECzuCLZfy8bwxH5f_6Md" style="text-align:center"></div>
+                            <button id="bKash_button" class="btn btn-success"><span class="glyphicon glyphicon-ok"></span> Checkout</button>
+                        </div>
+                    </div>
+                    <hr style="height:1px;background-color:#ffffff" />
+                </section>
+        </div>
+    </div>
+</div>
+@section scripts{
+<script src="http://code.jquery.com/ui/1.11.0/jquery-ui.js"></script>
+<script src="~/assets/global/plugins/jquery-ui/jquery-ui.min.js"></script>
+<link href="~/assets/global/plugins/jquery-ui/jquery-ui.min.css" rel="stylesheet" />
+<script src="~/Scripts/jquery.validate.js"></script>
+<script src="~/Scripts/additional-methods.min.js"></script>
+<script src="~/assets/global/plugins/Jasny/jasny-bootstrap.min.js"></script>
+<link href="~/Content/datepicker3.min.css" rel="stylesheet" />
+<script src="~/assets/global/plugins/bootstrap-datepicker/js/bootstrap-datepicker.min.js"></script>
+    <script type="text/javascript" src="https://scripts.pay.bka.sh/versions/1.0.000-beta/checkout/bKash-checkout.js"></script>
+<script src='https://www.google.com/recaptcha/api.js'></script>
+
+    <script type="text/javascript">
+        OEMSApp.controller("PaymentCtrl", ["$scope", "$http",
+            function ($scope, $http) {
+
+                init();
+                function init() {
+                    initialize();
+                }
+
+                function initialize() {
+                    $scope.SearchApplicantID = '';
+                    $scope.ApplicantInfo = {};
+                }
+
+                function setProgress(s) {
+                    $scope.btnDis = s;
+                    $scope.spin = s;
+                }
+
+            }]);
+    </script>
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            var paymentID;
+            var paymentConfig;
+            //$('#amount').text((Math.random() * 100).toFixed(2));
+            var paymentRequest = { amount: $('#amount').val(), intent: 'sale', AppId: $('#AppId').html() };
+            bKash.init({
+                //options - 1) 'checkout'
+                //1) 'checkout' : Performs a single checkout.
+                paymentMode: 'checkout',
+                paymentRequest: paymentRequest,
+                createRequest: function (request) {
+                    // request.AppId = '512459';
+                    console.log('=> createRequest (request) :: ');
+                    console.log(request);
+                    $.ajax({
+                        url: baseUrl + '/bKashCheckOut/payment/createpayment/',
+                        type: 'POST',
+                        contentType: 'application/json',
+                        data: JSON.stringify(request),
+
+                        success: function (data) {
+                            // alert('inside success : create mandate() :; bKash-direct-old.js');
+                            console.log('got data from create  ..');
+                            console.log('data ::=>');
+                            console.log(JSON.stringify(data));
+
+                            if (data && data.paymentID != null) {
+                                paymentID = data.paymentID;
+                                bKash.create().onSuccess(data);
+
+                            } else {
+                                bKash.create().onError();//run clean up code
+                            }
+                        },
+                        error: function () {
+                            bKash.create().onError();//run clean up code
+                        }
+                    });
+                },
+                executeRequestOnAuthorization: function () {
+                    console.log('=> executeRequestOnAuthorization');
+                    console.log(paymentID);
+                    $.ajax({
+                        url: baseUrl + '/bKashCheckOut/payment/execute/' + paymentID,
+                        type: 'POST',
+                        contentType: 'application/json',
+                        data: {},
+                        success: function (data) {
+                            if (data.errorCode != null) {
+                                //swal({
+                                //    title: "Opps.. !",
+                                //    text: data.errorMessage,
+                                //    type: "warning",
+                                //    showCancelButton: false,
+                                //    confirmButtonColor: "#49a9ae",
+                                //    confirmButtonText: "OK",
+                                //    closeOnConfirm: false
+                                //},
+                                //  function (isConfirm) {
+                                //      if (isConfirm) {
+                                //          bKash.execute().onError();
+                                //          window.location.href = "../../user/Index";
+                                //      }
+                                //  });
+                                alert(data.errorMessage);
+                                bKash.execute().onError();
+                                window.location.href = "../../user/Index";
+                            }
+
+                            console.log('got data from execute  ..');
+                            console.log('data ::=>');
+                            console.log(JSON.stringify(data));
+                            if (data && data.paymentID != null) {
+                                // executeRequestOnAuthorization executed successfully
+                                // redirect to your(merchant) success page
+                                //swal({
+                                //    title: "Congratulations !",
+                                //    text: "Your Payment is sucessful.",
+                                //    type: "success",
+                                //    showCancelButton: false,
+                                //    confirmButtonColor: "#49a9ae",
+                                //    confirmButtonText: "OK",
+                                //    closeOnConfirm: false
+                                //},
+                                // function (isConfirm) {
+                                //     if (isConfirm) {
+                                //         window.location.href = "../../user/Index";
+                                //     }
+                                // });
+                                alert('Congratulation Your Payment is sucessful.');
+                                window.location.href = "../../user/Index";
+                            } else {
+                                bKash.execute().onError();//run clean up code
+                            }
+                        },
+                        error: function () {
+                            bKash.execute().onError();//run clean up code
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+
+}
+
+

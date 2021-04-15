@@ -1,0 +1,60 @@
+﻿@model UI.Portal.Models.RegisterViewModel
+@{
+    ViewBag.Title = "Register";
+    Layout = "~/Views/Shared/_LayoutLogin.cshtml";
+}
+
+<style>
+    input:invalid:focus{
+        border-color:red;
+    }
+
+</style>
+<!-- BEGIN REGISTRATION FORM -->
+@using (Html.BeginForm("Register", "Account", FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+{
+    @Html.AntiForgeryToken()
+
+   
+    <div class="login-div">    
+        <div class="logo text-center">
+            <img src="~/assets/img/logo/AddieSoft-Logo-01.svg" class="img-fulid" alt="">
+        </div>  
+        <br />
+        <h3 class="text-center">Register</h3> 
+        <div class="loginHear">
+            <form>
+                <div class="fields singin">
+                    <div class="username"><img src="~/assets/img/logo/UserIcon.svg" alt=""><input id="StudentInsId" name="StudentInsId" type="text" class="user-input" placeholder="User Name" autocomplete="off" required /></div>
+                    <div class="username"><img src="~/assets/img/logo/UserIcon.svg" alt=""><input id="PhoneNumber" name="PhoneNumber" type="text" class="user-input" placeholder="Phone Number" autocomplete="off" required /></div>
+                    <div class="password"><img src="~/assets/img/logo/passwordicon.svg" alt=""><input id="Password" name="Password" type="password" class="pass-input" placeholder="Password" autocomplete="off" required /></div>
+                    <div class="password"><img src="~/assets/img/logo/passwordicon.svg" alt=""><input id="ConfirmPassword" name="ConfirmPassword" type="password" class="pass-input" placeholder="Confirm Password" autocomplete="off" required /></div>
+                </div>
+            </form>
+        </div>
+        @Html.ValidationSummary("", new { @class = "text-danger text-center font-weight-bold" })
+        <button class="signin-button" type="submit">Sign Up</button>
+        <div class="Signin-button text-center">
+            <h5>Already have an account?<a href="@Url.Action("Login", "Account")"><span>Sign In</span></a></h5>
+        </div>
+    </div>
+}
+
+@section Scripts{
+<script type="text/javascript">
+        var password = document.getElementById("Password"), confirm_password = document.getElementById("ConfirmPassword");
+
+        function validatePassword() {
+            if (password.value != confirm_password.value) {
+                confirm_password.setCustomValidity("Passwords Don't Match");
+            } else {
+                confirm_password.setCustomValidity('');
+            }
+        }
+
+        password.onchange = validatePassword;
+        confirm_password.onkeyup = validatePassword;
+</script>
+}
+
+<!-- END REGISTRATION FORM -->

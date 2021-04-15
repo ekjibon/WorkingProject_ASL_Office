@@ -1,0 +1,439 @@
+﻿
+@{ 
+    ViewBag.Title = "OptionalSubject";
+}
+
+<style type="text/css">
+    .table thead tr th {
+        font-size: 12px !important;
+        color: white !important;
+        font-weight: 600 !important;
+    }
+</style>
+<div ng-controller="subjectSetup">
+    <!-- Begin: life time stats -->
+    <div class="portlet light bordered">
+        <div class="portlet-title">
+            <div class="caption">
+                <i class="icon-settings font-green"></i>
+                <span class="caption-subject font-green sbold uppercase">@ViewBag.Title</span>
+            </div>
+            @*<div class="actions">
+                <div class="btn-group btn-group-solid">
+                    <button ng-click="resetForm()" class="btn green" data-target="#addmodal" data-toggle="modal"> <i class="fa fa-plus"></i> Add Subject</button>
+                </div>
+
+            </div>*@
+        </div>
+        <div class="portlet-body"> 
+
+            <form class="form-horizontal" ng-submit="getSubject()" id="frmCommon" name="formCommonFeilds" novalidate>
+                <div class="form-body">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="form-group" ng-class="{ 'has-error' : !sid && submitted1 && formCommonFeilds.Version.$invalid}">
+                                <label class="col-md-5 control-label">
+                                    Version :
+                                    <span class="required">*</span>
+                                </label>
+                                <div class="col-md-7">
+                                    <select class="form-control" ng-disabled="sid" ng-model="SubjectSetup.VersionID" required name="Version" ng-options="SubjectSetup.VersionId as SubjectSetup.VersionName for SubjectSetup in CommonFeilds.Version">
+                                        <option value="" selected="selected">Select</option>
+                                    </select>
+                                    <div class="form-control-focus"> </div>
+                                    <span ng-show="!sid && submitted1 && formCommonFeilds.Version.$error.required" class="help-block">Version Required</span>
+                                </div>
+                            </div>
+                            <div class="form-group" ng-class="{ 'has-error' : !sid && submitted1 && formCommonFeilds.Session.$invalid}">
+                                <label class="col-md-5 control-label">
+                                    Session :
+                                    <span class="required">*</span>
+                                </label>
+                                <div class="col-md-7">
+                                    <select class="form-control" ng-disabled="sid" ng-model="SubjectSetup.SessionId" required name="Session" ng-options="SubjectSetup.SessionId as SubjectSetup.SessionName for SubjectSetup in CommonFeilds.Session">
+                                        <option value="" selected="selected">Select</option>
+                                    </select>
+                                    <div class="form-control-focus"> </div>
+                                    <span ng-show="!sid && submitted1 && formCommonFeilds.Session.$error.required" class="help-block">Session Required</span>
+                                </div>
+                            </div>
+                            <div class="form-group" ng-class="{ 'has-error' : !sid && submitted1 && formCommonFeilds.Branch.$invalid}">
+                                <label class="col-md-5 control-label">
+                                    Branch :
+                                    <span class="required">*</span>
+                                </label>
+                                <div class="col-md-7">
+                                    <select class="form-control" ng-disabled="sid" ng-model="SubjectSetup.BranchID" required name="Branch" ng-options="SubjectSetup.BranchId as SubjectSetup.BranchName for SubjectSetup in CommonFeilds.Branch">
+                                        <option value="" selected="selected">Select</option>
+                                    </select>
+                                    <div class="form-control-focus"> </div>
+                                    <span ng-show="!sid &&submitted1 && formCommonFeilds.Branch.$error.required" class="help-block">Branch Name Required</span>
+                                </div>
+                            </div>
+                        </div>                                           
+                        <div class="col-md-4">
+                            <div class="form-group" ng-class="{ 'has-error' : !sid && submitted1 && formCommonFeilds.Shift.$invalid}">
+                                <label class="col-md-5 control-label">
+                                    Shift :
+                                    <span class="required">*</span>
+                                </label>
+                                <div class="col-md-7">
+                                    <select class="form-control" ng-disabled="sid" ng-model="SubjectSetup.ShiftID" required name="Shift" ng-options="SubjectSetup.ShiftId as SubjectSetup.ShiftName for SubjectSetup in CommonFeilds.Shift| filter:{BranchId:SubjectSetup.BranchID}:true">
+                                        <option value="" selected="selected">Select</option>
+                                    </select>
+                                    <div class="form-control-focus"> </div>
+                                    <span ng-show="!sid && submitted1 && formCommonFeilds.Shift.$error.required" class="help-block">Shift Name Required</span>
+                                </div>
+                            </div>
+                            <div class="form-group" ng-class="{ 'has-error' : !sid && submitted1 && formCommonFeilds.Class.$invalid}">
+                                <label class="col-md-5 control-label">
+                                    Class :
+                                    <span class="required">*</span>
+                                </label>
+                                <div class="col-md-7">
+                                    <select class="form-control" ng-disabled="sid || SubjectSetup.VersionID == null" ng-model="SubjectSetup.ClassId" ng-change="GetGroup(SubjectSetup.ClassId)" name="Class" required ng-options="SubjectSetup.ClassId as SubjectSetup.ClassName for SubjectSetup in CommonFeilds.ClassInfo | filter:{VersionId:SubjectSetup.VersionID}:true">
+                                        <option value="" selected="selected">Select</option>
+                                    </select>
+                                    <div class="form-control-focus"> </div>
+                                    <span ng-show="!sid && submitted1 && formCommonFeilds.Class.$error.required" class="help-block">Class Required</span>
+                                </div>
+                            </div>
+                            <div class="form-group" ng-class="{ 'has-error' : !sid && submitted1 && formCommonFeilds.Group.$invalid}">
+                                <label class="col-md-5 control-label">
+                                    Group :
+                                    <span class="required">*</span>
+                                </label>
+                                <div class="col-md-7">
+                                    <select class="form-control" ng-change="FilterSection();" ng-disabled="sid || Groups.length <= 0 || SubjectSetup.ClassId==null" ng-model="SubjectSetup.GroupId" required name="Group" ng-options="G.GroupId as G.GroupName for G in Groups">
+                                        <option value="" selected="selected">Select</option>
+                                    </select>
+                                    <div class="form-control-focus"> </div>
+                                </div>
+                                <span ng-show="!sid && submitted1 && formCommonFeilds.Group.$error.required" class="help-block">Group Required</span>
+                            </div>
+                        </div>                         
+                       
+                        <div class="col-md-4">
+                            <div class="form-group" ng-class="{ 'has-error' : !sid && submitted1 && formCommonFeilds.Section.$invalid}">
+                                <label class="col-md-5 control-label">
+                                    Section :
+                                    <span class="required">*</span>
+                                </label>
+                                <div class="col-md-7">
+                                    <select class="form-control" ng-disabled="sid || SubjectSetup.ClassId==null" ng-model="SubjectSetup.SectionId" required name="Section" ng-options="S.SectionId as S.SectionName for S in Sections">
+                                        <option value="" selected="selected">Select</option>
+                                    </select>
+                                    <div class="form-control-focus"> </div>
+                                    <span ng-show="!sid && submitted1 && formCommonFeilds.Section.$error.required" class="help-block">Section Name Required</span>
+                                </div>
+                            </div>
+                            <div class="form-group" ng-class="{ 'has-error' : sid && submitted1 && formCommonFeilds.studentID.$invalid}">
+                                <label class="col-md-5 control-label">
+                                    Student ID &nbsp;
+                                    <span><input type="checkbox"  ng-change="SubjectSetup.SID = sid ? '' : undefined" ng-model="sid" ng-true-value="true" ng-false-value="false" /></span>
+                                </label>
+                                <div class="col-md-7" ng-show="sid">
+                                    <input type="text" ng-model="SubjectSetup.SID" class="form-control" placeholder="Student ID" name="studentID" required />
+                                    <div class="form-control-focus"> </div>
+                                    <span ng-show="sid && submitted1 && formCommonFeilds.studentID.$error.required" class="help-block">Student ID Required</span>
+                                </div>
+                            </div>
+                            <div class="btn-group btn-group-solid pull-right" style="margin-bottom:5px">
+                                <button style="margin-left:0 !important" ng-click="submitted1=true" class="btn btn-primary btn-large"><i class="fa fa-search"></i>Show</button>
+                                <a style="margin-left:3px;" href="@Url.Action("OptionalSubject","Report")?SID={{SubjectSetup.SID}}&BranchId={{SubjectSetup.BranchID}}&VersionID={{SubjectSetup.VersionID}}&ShiftID={{SubjectSetup.ShiftID }} &SessionId={{SubjectSetup.SessionId}}&ClassId={{SubjectSetup.ClassId}}&SectionId={{SubjectSetup.SectionId}}&GroupId={{SubjectSetup.GroupId}}" class="btn btn-primary" target="_blank">Report</a>
+                                
+                            </div>
+                        </div>
+                       
+                        
+                    </div>
+                    
+
+                </div>
+            </form>
+
+            <div class="table-container">
+                <div id="sample_3_wrapper" class="dataTables_wrapper no-footer">
+                    <div class="table-scrollable"> </div>
+                    <table class="table table-bordered table-hover">
+                        <thead>
+                            <tr class="bg-primary">
+                                <th width="15%">Student ID</th>
+                                <th width="20%">Student Name</th>
+                                <th width="5%">Roll</th>
+                                <th width="18%">3rd Subject</th>
+                                <th width="18%">4th Subject</th>
+                                <th width="18%">Religious</th>                                 
+                                <th width="5%">Action</th>
+
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-show="SubjectSetups.results.StudentList.length <= 0"><td colspan="5" style="text-align:center;"><i class="fa fa-refresh"></i> Data not found!</td></tr>
+                            <tr dir-paginate="item in StudentList|itemsPerPage:pagesize" total-items="total_count">
+                                <td>{{item.StudentInsID}}</td>
+                                <td>{{item.Name}}</td>
+                                <td>{{item.Roll}}</td>
+                                <td ng-class="{ 'has-error' : (item.ThirdSubjectID==item.FourthSubjectID) || item.ThirdSubjectID==null}">
+                                    <select class="form-control" ng-disabled="item.IsMarkThird > 0" ng-model="item.ThirdSubjectID" name="Third" ng-options="Third.SubID as Third.SubjectName for Third in ThirdSubject">      @*//| filter:{SubID:!item.FourthSubjectID}:true*@
+                                        <option value="" selected="selected">Select</option>
+                                    </select>
+                                    @*<span class="help-block" ng-show="(item.ThirdSubjectID==item.FourthSubjectID)">Invalid!</span>*@
+                                </td>
+                                <td ng-class="{ 'has-error' : (item.ThirdSubjectID==item.FourthSubjectID) || item.FourthSubjectID==null}">
+                                    <select class="form-control" ng-disabled="item.IsMarkFourth > 0" ng-model="item.FourthSubjectID" name="Fourth" ng-options="Fourth.SubID as Fourth.SubjectName for Fourth in FourthSubject">
+                                        <option value="" selected="selected">Select</option>
+                                    </select>
+                                    @*<span class="help-block" ng-show="(item.ThirdSubjectID==item.FourthSubjectID)">Invalid!</span>*@
+                                </td>
+                                <td ng-class="{ 'has-error' :  item.ReligiousSubjectID==null}">
+                                    <select class="form-control" ng-disabled="item.IsMarkReligious > 0" ng-model="item.ReligiousSubjectID" name="Relegious" ng-options="Religious.SubID as Religious.SubjectName for Religious in ReligiousSubject">
+                                        <option value="" selected="selected">Select</option>
+                                    </select>                                        
+                                </td>
+                                <td>
+                                    <a ng-click="deleteSbuject(item)" ng-show="item.optionalID==1 " href="javascript:;" class="btn btn-icon-only red">    @*((item.ReligiousSubjectID!=null) || (item.ThirdSubjectID!=null) || (item.FourthSubjectID!=null))&&(item.IsMarkReligious == 0 && item.IsMarkFourth == 0 && item.IsMarkThird == 0 )*@
+                                        <i class="fa fa-trash"></i>
+                                    </a>
+                                </td>
+
+                            </tr>
+                            <tr ng-show="SubjectSetups.results.StudentList.length > 0">
+                                <td colspan="10">
+                                    <button ng-click="AddOptionalSubjects()" ng-disabled="" class="btn btn-primary pull-right">&nbsp;<i class="fa fa-floppy-o"></i> Save &nbsp;</button>
+                                    <button ng-click="DeleteAllOptionalSubject()" ng-disabled="DeleteValidationAllOptionalSubject() || ViewBag.user == ''S'" class="btn red pull-right">&nbsp;<i class="fa fa-trash"></i> Delete &nbsp;</button>
+                                </td>
+                            </tr>
+                        </tbody>
+
+                    </table>
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- End: life time stats -->
+   
+
+</div>
+
+@section Scripts{
+    <script type="text/javascript">
+        OEMSApp.controller("subjectSetup", ["$scope", "$http", "SweetAlert", "blockUI",
+              function ($scope, $http, SweetAlert, blockUI) {
+
+                  init();
+                  function init() {
+                      initialize();
+                     // getSubject();
+                      getAllCommons();
+
+                  }
+                  function initialize() {                          
+                      $scope.modalTitle = "Subject Setup";
+                      //$scope.sid = 0;
+                      $scope.SubjectSetups = [];
+                      $scope.StudentList = [];                      
+                      $scope.ThirdSubject = [];
+                      $scope.FourthSubject = [];
+                      $scope.ReligiousSubject = [];
+                      $scope.SubjectSetup = {};
+                      $scope.SubjectSetup.SubID = 0;
+                      $scope.currentPage = 1;
+                      $scope.pageno = 1;
+                      $scope.pagesize = 1000;
+                      $scope.total_count = 12;
+                      $scope.search = '';
+                      
+
+                      $scope.CommonFeilds = [];
+
+                      $scope.getSubject = getSubject;
+                      $scope.res = {};
+                      $scope.data = {};
+                      $scope.resetForm = resetForm;
+                      $scope.getAllCommons = getAllCommons;
+                      $scope.click = false;
+
+                  }
+
+                  $scope.DeleteValidationAllOptionalSubject = function DeleteValidationAllOptionalSubject() {
+                      var res = false;
+                      angular.forEach($scope.StudentList, function (value, key) {
+                          if ( value.IsMarkThird > 0 || value.IsMarkFourth > 0 || value.IsMarkReligious > 0)
+                              res = true;                            
+                      });
+                      return res;
+                  };
+                  $scope.SaveOptionalSubject = function SaveOptionalSubject() {  //SaveOptionalSubject() For Save button ng-disable
+                      var res = false;
+                      angular.forEach($scope.StudentList, function (value, key) {
+                          if (value.ThirdSubjectID == value.FourthSubjectID)
+                              res = true;
+                      });
+                      return res;
+                  };
+                  $scope.FilterSection = function FilterSection() {
+                      $scope.Sections = [];   
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Common/GetSection/' + $scope.SubjectSetup.SessionId + "/" + $scope.SubjectSetup.ShiftID + "/" + $scope.SubjectSetup.ClassId + "/" + $scope.SubjectSetup.GroupId
+                      }).then(function successCallback(response) {
+                          $scope.Sections = response.data.results;  
+                      }, function errorCallback(response) {
+                          toastr["error"](response.data.Message);
+                      });
+
+                  }
+                  function resetForm() {
+                      $scope.modalTitle = "Add Subject";
+                      $scope.SubjectSetup = {};
+                      $scope.SubjectSetup.optionalID = 0;
+                      $scope.submitted1 = false;
+                      $scope.submitted = false;
+                      $scope.Id = '';
+                  }
+                  function getAllCommons() {
+                      //$scope.CommonFeilds = [];
+
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Common/GetCommonItem/'
+                      }).then(function successCallback(response) {
+                          $scope.CommonFeilds = response.data.results;
+                      }, function errorCallback(response) {
+                          toastr["error"](response.data.Message);
+                      });
+                  }
+                  $scope.GetGroup = function GetGroup(classid) {
+                      $scope.Groups = [];
+
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Common/GetGroup/' + classid
+                      }).then(function successCallback(response) {
+                          $scope.Groups = response.data.results;
+
+
+                      }, function errorCallback(response) {
+                          toastr["error"](response.data.Message);
+                      });
+
+                  }
+                  function getSubject() {
+                      //blockUI.start();
+                      $scope.SubjectSetups = [];
+                      var searchtxt = $scope.search;
+                      var id = angular.isUndefined($scope.SubjectSetup.SID);
+                     
+                      if (!id) {
+                          if ($scope.SubjectSetup.SID !== '')
+                          {
+                              $scope.SubjectSetup.BranchID = 0;
+                              $scope.SubjectSetup.VersionID = 0;
+                              $scope.SubjectSetup.ShiftID = 0;
+                              $scope.SubjectSetup.SessionId = 0;
+                              $scope.SubjectSetup.ClassId = 0;
+                              $scope.SubjectSetup.SectionId = 0;
+                              $scope.SubjectSetup.GroupId = 0;
+                          }
+                
+                      }
+
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'SubjectSetup/GetStudentList/' + $scope.SubjectSetup.SID + '/' + $scope.SubjectSetup.BranchID + '/' + $scope.SubjectSetup.VersionID + '/' + $scope.SubjectSetup.ShiftID + '/' + $scope.SubjectSetup.SessionId + '/' + $scope.SubjectSetup.ClassId + '/' + $scope.SubjectSetup.SectionId + '/' + $scope.SubjectSetup.GroupId                             
+                      }).then(function successCallback(response) {
+                          $scope.SubjectSetups = response.data;
+                          $scope.StudentList = $scope.SubjectSetups.results.StudentList;
+                          $scope.ThirdSubject = $scope.SubjectSetups.results.ThirdSubject;
+                          $scope.FourthSubject = $scope.SubjectSetups.results.FourthSubject;
+                          $scope.ReligiousSubject = $scope.SubjectSetups.results.ReligiousSubject;
+                          $scope.total_count = response.data.totalcount;
+                          if ($scope.pagesize == -1)
+                              $scope.pagesize = 500;
+                          //blockUI.stop();
+                      }, function errorCallback(response) {
+                          toastr["error"](response.data.Message);
+                      });
+
+                  }
+                  $scope.deleteSbuject = function deleteSbuject(n) {
+
+                      // SweetAlert.swal("Good job!", "You clicked the button!", "success");
+                      SweetAlert.swal({
+                          title: "Are you sure to delete it ?", type: "warning", showCancelButton: true, confirmButtonColor: "#DD6B55",
+                          confirmButtonText: "Yes, delete it!",
+                          closeOnConfirm: false
+                      },
+                      function (isConfirm) {
+                          if (isConfirm) {
+                              $http({
+                                  method: 'PUT',
+                                  url: baseUrl + 'SubjectSetup/DeleteOptionalSubject/',
+                                  data: n
+                              }).then(function successCallback(response) {
+                                  SweetAlert.swal("Deleted!", "Your data has been deleted.", "success");
+                                  getSubject();
+                              }, function errorCallback(response) {
+                                  toastr["error"](response.data.Message);
+                              });
+
+                          }
+                      });
+
+
+                  };
+                  $scope.searchData = function () {
+                      getSubject();
+                  };
+
+            
+                  $scope.AddOptionalSubjects = function AddOptionalSubjects() {
+                      $scope.click = true;
+                      if ($scope.StudentList.length > 0) /// For Update
+                      {
+                      $http({
+                          method: 'POST',
+                          url: baseUrl + 'SubjectSetup/AddOptionalSubjects/',
+                          data: $scope.StudentList
+                      }).then(function successCallback(response) {
+                          getSubject();
+                          toastr["info"](response.data.message);
+                          //resetForm();
+                      }, function errorCallback(response) {
+                          toastr["error"](response.data.Message);
+                      });
+                      }
+                      else
+                          toastr["info"]("Empty List");
+
+                  };
+                  $scope.DeleteAllOptionalSubject = function DeleteAllOptionalSubject() {
+                      if ($scope.StudentList.length > 0) /// For Update
+                      {
+                          $http({
+                              method: 'PUT',
+                              url: baseUrl + 'SubjectSetup/DeleteOptionalSubjects/',
+                              data: $scope.StudentList
+                          }).then(function successCallback(response) {
+                              getSubject();
+                              toastr["info"](response.data.message);                              
+                          }, function errorCallback(response) {
+                              toastr["error"](response.data.Message);
+                          });
+                      }
+                      else
+                          toastr["info"]("Empty List");
+
+                  };
+
+              }]);
+        $(document).ready(function () {
+            $('[data-toggle="tooltip"]').tooltip();
+        });
+    </script>
+
+}
+

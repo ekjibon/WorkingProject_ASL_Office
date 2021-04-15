@@ -1,0 +1,377 @@
+﻿
+@{
+    ViewBag.Title = "AcademicBatch";
+}
+
+<div ng-controller="sessionCLT">
+    <!-- Begin: life time stats -->
+    <div class="portlet light bordered">
+        <div class="portlet-title">
+            <div class="caption">
+                <i class="icon-settings font-green"></i>
+                <span class="caption-subject font-green sbold uppercase">@ViewBag.Title</span>
+            </div>
+            <div class="actions">
+                <div class="btn-group btn-group-solid">
+                    <button ng-click="resetForm()" class="btn green" data-target="#addmodal" data-toggle="modal"> <i class="fa fa-plus"></i> Add New</button>
+                </div>
+
+            </div>
+        </div>
+        <div class="portlet-body">
+            <div class="table-container">
+                <div id="sample_3_wrapper" class="dataTables_wrapper no-footer">
+                    <div class="row">
+                        <div class="col-md-6 col-sm-6">
+                            <div class="dataTables_length" id="sample_3_length">
+                                <label>
+                                    <select ng-model="pagesize" ng-change="searchData()" aria-controls="sample_3" class="form-control input-sm input-xsmall input-inline">
+
+                                        <option value="10" selected="selected">10</option>
+                                        <option value="15">15</option>
+                                        <option value="20">20</option>
+                                        <option value="-1">All</option>
+                                    </select> entries
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-sm-6">
+                            <div id="sample_3_filter" class="pull-right">
+                                <label>Search:<input ng-change="searchData()" type="text" ng-model="search" class="form-control input-sm input-small input-inline" placeholder="" aria-controls="sample_3"></label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="table-scrollable"> </div>
+                    <table class="table table-bordered table-hover">
+                        <thead>
+                            <tr>
+                                <th>AcademicBatch</th>
+                                <th>Code</th>
+
+                                <th>Action</th>
+
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-show="Sessions.results.length <= 0"><td colspan="5" style="text-align:center;"><i class="fa fa-refresh"></i> Loading new data!!</td></tr>
+                            <tr dir-paginate="item in Sessions.results|itemsPerPage:pagesize" total-items="total_count">
+
+                                <td>{{item.AcaBatchName}}</td>
+                                <td>{{item.AcaBatchCode}}</td>
+                                
+
+                                <td>
+                                    <a href="javascript:;" class="btn btn-icon-only green" ng-click="edit(item)" data-target="#addmodal" data-toggle="modal">
+                                        <i class="fa fa-edit"></i>
+                                    </a>
+                                    <a ng-click="deletesession(item)" href="javascript:;" class="btn btn-icon-only red">
+                                        <i class="fa fa-trash"></i>
+                                    </a>
+
+
+                                </td>
+
+                            </tr>
+                        </tbody>
+
+                    </table>
+
+
+                    <div class="row">
+                        <div class="col-sm-6 pull-right">
+                            <dir-pagination-controls max-size="8"
+                                                     direction-links="true"
+                                                     boundary-links="true"
+                                                     on-page-change="getSession(newPageNumber)">
+                            </dir-pagination-controls>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- End: life time stats -->
+    <!--Modal Area Start-->
+    <div id="addmodal" class="modal fade" tabindex="-1" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form name="addform" ng-submit="save()" class="form-horizontal" id="form_sample_1" novalidate>
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                        <h4 class="modal-title">{{aemodalTitle}}</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-body">
+
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group" ng-class="{ 'has-error' : submitted && addform.SessionName.$invalid}">
+                                        <label class="col-md-4 control-label">
+                                            Session
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-8">
+                                            <input type="text" ng-model="session.SessionName" class="form-control" placeholder="Session" name="SessionName" required>
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted && addform.SessionName.$error.required" class="help-block">Session Required</span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group" ng-class="{ 'has-error' : submitted && addform.SessionCode.$invalid}">
+                                        <label class="col-md-4 control-label">
+                                            Code
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-8">
+                                            <input type="text" ng-model="session.SessionCode" class="form-control" placeholder="Code Name" name="SessionCode" required>
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted &&  addform.SessionCode.$error.required" class="help-block">Code Required</span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group" ng-class="{ 'has-error' : submitted && addform.Session_StartDate.$invalid}">
+                                        <label class="col-md-4 control-label">
+                                            Start Date
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-8">
+                                            @*<input type="text" ng-model="Session.Session_StartDate" class="form-control" placeholder="Start Date" name="Session_StartDate" required>
+                                                <div class="form-control-focus"> </div>
+                                                <span ng-show="submitted &&  addform.Session_StartDate.$error.required" class="help-block">Start Date Required</span>*@
+                                            <input class="form-control" type="text" ng-change="getOrderbydate()" ng-click="p1=true" is-open="p1" uib-datepicker-popup="dd-MM-yyyy" ng-model="session.Session_StartDate" placeholder="Start Date" name="Session_StartDate" required />
+                                            <span ng-show="submitted &&  addform.Session_StartDate.$error.required" class="help-block">Start Date Required</span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group" ng-class="{ 'has-error' : submitted && addform.Session_EndDate.$invalid}">
+                                        <label class="col-md-4 control-label">
+                                            End Date
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-8">
+                                            @*<input type="text" ng-model="Session.Session_EndDate" class="form-control" placeholder="End Date" name="Session_EndDate" required>
+                                                <div class="form-control-focus"> </div>
+                                                <span ng-show="submitted &&  addform.Session_EndDate.$error.required" class="help-block">End Date Required</span>*@
+                                            <input class="form-control" type="text" ng-change="getOrderbydate()" ng-click="p2=true" is-open="p2" uib-datepicker-popup="dd-MM-yyyy" ng-model="session.Session_EndDate" placeholder="End Date" name="Session_EndDate" required />
+                                            <span ng-show="submitted &&  addform.Session_EndDate.$error.required" class="help-block">End Date Required</span>
+                                        </div>
+
+
+                                    </div>
+
+                                    <div class="form-group">
+                                        <div class="col-md-8">
+                                            <div class="mt-radio-inline">
+                                                <label class="mt-radio">
+                                                    <input type="radio" name="optionsRadios" value="1" checked="checked" ng-model="selectschool"> For School
+                                                    <span></span>
+                                                </label>
+                                                <label class="mt-radio">
+                                                    <input type="radio" name="optionsRadios" value="2" ng-model="selectschool"> For College
+                                                    <span></span>
+                                                </label>
+
+                                            </div>
+                                        </div>
+
+                                    </div>
+
+
+
+
+
+
+
+
+
+                                </div>
+
+                            </div>
+
+
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" data-dismiss="modal" class="btn dark btn-outline" ng-click="resetForm();submitted=false">Cancel</button>
+                        <button type="submit" ng-click="submitted=true" class="btn green">Save</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!--Modal Area End-->
+
+</div>
+
+@section Scripts{
+
+
+    <script type="text/javascript">
+        OEMSApp.controller("sessionCLT", ["$scope", "$http", "SweetAlert",
+           function ($scope, $http, SweetAlert) {
+
+               init();
+               function init() {
+                   initialize();
+                   getSession(1);
+
+               }
+               function initialize() {
+                   $scope.aemodalTitle = "Add Session";
+                   $scope.minDate = new Date();
+                   $scope.currentPage = 1;
+                   $scope.pageno = 1;
+                   $scope.pagesize = 10;
+                   $scope.total_count = 12;
+                   $scope.search = '';
+                   $scope.session = {};
+                   $scope.session.SessionId = 0;
+                   $scope.Sessions = [];
+
+                   $scope.Id = '';
+                   $scope.getSession = getSession;
+                   $scope.res = {};
+                   $scope.data = {};
+                   $scope.resetForm = resetForm;
+               }
+               function resetForm() {
+                   $scope.aemodalTitle = "Add Session";
+                   $scope.session = {};
+                   $scope.session.SessionId = 0;
+                   $scope.addform.$setUntouched();
+                   $scope.addform.$setPristine();
+                   $scope.submitted = false;
+                   $scope.Id = '';
+               }
+
+               function getSession(pageno) {
+                   $scope.Sessions = [];
+                   var searchtxt = $scope.search;
+                   if ($scope.search == 'undefined' || $scope.search == '') {
+                       searchtxt = 'null';
+                   }
+                   $scope.pageno = pageno;
+                   $http({
+                       method: 'GET',
+                       url: baseUrl + 'SetupInstitution/GetSessions/' + $scope.pageno + '/' + $scope.pagesize + '/' + searchtxt
+                   }).then(function successCallback(response) {
+                       // this callback will be called asynchronously
+                       // when the response is available
+                       $scope.Sessions = response.data;
+                       // $scope.AspNetRoles = response.data;
+                       $scope.total_count = response.data.totalcount;
+                       //console.log(response.data);
+
+                   }, function errorCallback(response) {
+                       // called asynchronously if an error occurs
+                       // or server returns response with an error status.
+                   });
+
+
+
+                   //$scope.AspNetRoles = $scope.data;
+                   //console.log($scope.data.totalcount);
+                   // $scope.totalcount = 3; //$scope.data.totalcount;
+               }
+               $scope.searchData = function () {
+                   getSession(1);
+                   // $scope.total_count = 88;
+               };
+               $scope.edit = function (n) {
+                   $scope.aemodalTitle = "Update Session";
+                   $scope.session = n;
+
+                   $scope.Id = n.Id;
+               };
+               $scope.save = function save() {
+                   if ($scope.session.SessionId != 0) /// For Update
+                   {
+                       if ($scope.session != '') {
+
+                           if ($scope.selectschool == 1) {
+                               $scope.session.Session_ForSchool = true;
+                           }
+
+                           else {
+                               $scope.session.Session_ForCollege = true;
+                           }
+
+
+                           $http({
+                               method: 'PUT',
+                               url: baseUrl + 'SetupInstitution/UpdateSession/',
+                               data: $scope.session
+                           }).then(function successCallback(response) {
+
+                               $('#addmodal').modal('toggle');
+                               getSession(1);
+                               toastr["info"](response.data.message);
+                               resetForm();
+                           }, function errorCallback(response) {
+                               toastr["info"](response.data.message);
+                           });
+                       }
+                   } else {  //  For Add
+                       if ($scope.session != {}) {
+
+
+                           if ($scope.selectschool == 1) {
+                               $scope.session.Session_ForSchool = true;
+                           }
+
+                           else {
+                               $scope.session.Session_ForCollege = true;
+                           }
+
+
+                           $http({
+                               method: 'POST',
+                               url: baseUrl + 'SetupInstitution/AddSession/',
+                               data: $scope.session
+                           }).then(function successCallback(response) {
+
+                               $('#addmodal').modal('toggle');
+                               getSession(1);
+                               toastr["info"](response.data.message);
+                               resetForm();
+                           }, function errorCallback(response) {
+                               toastr["info"](response.data.message);
+                           });
+                       }
+                   }
+
+               };
+               $scope.deletesession = function deletesession(n) {
+
+                   // SweetAlert.swal("Good job!", "You clicked the button!", "success");
+                   SweetAlert.swal({
+                       title: "Are you sure to delete it ?", type: "warning", showCancelButton: true, confirmButtonColor: "#DD6B55",
+                       confirmButtonText: "Yes, delete it!",
+                       closeOnConfirm: false
+                   },
+                   function (isConfirm) {
+
+
+                       if (isConfirm) {
+                           $http({
+                               method: 'DELETE',
+                               url: baseUrl + 'SetupInstitution/DeleteSession/' + n.SessionId,
+                               data: $scope.session
+                           }).then(function successCallback(response) {
+                               SweetAlert.swal("Deleted!", "Your data has been deleted.", "success");
+                               getSession(1);
+                           }, function errorCallback(response) {
+                               toastr["info"](response.data.message);
+                           });
+
+                       }
+                   });
+
+
+               };
+
+           }]);
+    </script>
+
+
+
+}
+

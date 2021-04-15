@@ -1,0 +1,492 @@
+﻿
+@{
+    ViewBag.Title = "Salary Period";
+}
+
+<div class="kt-container  kt-container--fluid  kt-grid__item kt-grid__item--fluid" ng-controller="ctrlSalaryPeriod">
+    
+    <div class="row">
+        <div class="kt-portlet kt-portlet--mobile">
+            <div class="kt-portlet__head kt-portlet__head--lg">
+                <div class="kt-portlet__head-label">
+                    <h3 class="kt-portlet__head-title">
+                        All Salary Period
+                    </h3>
+                </div>
+                <div class="kt-portlet__head-toolbar">
+                    <div class="kt-portlet__head-wrapper">
+                        <div class="dropdown dropdown-inline">
+                            <button type="button" class="btn btn-brand btn-icon-sm" data-toggle="modal" data-target="#addmodal" aria-haspopup="true" aria-expanded="false">
+                                <i class="flaticon2-plus"></i> Add New Salary Period
+                            </button>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="kt-portlet__body">
+
+                <div class="row">
+                    <div class="col-md-4 col-sm-5 col-xs-6">
+                        <div class="form-group">
+                            <div class="col-lg-3 col-md-5 col-sm-4 col-xs-8" style="padding-left:0px">
+
+                                <select class="form-control kt-font-brand" ng-model="pageSize" ng-options="P.value as P.text for P in pageSizeArray"></select>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="col-md-4 col-sm-3 col-xs-1">
+                    </div>
+                    <div class="col-md-4 col-sm-4 col-xs-5">
+                        <div id="sample_3_filter" class="pull-right">
+                            <input ng-model="q" id="search" class="form-control" placeholder="Filter text">
+                        </div>
+                    </div>
+                </div>
+                <table class="table table-bordered table-hover rounded">
+                    <thead>
+                        <tr class="btn-primary">
+                            <th>SI</th>
+                            <th>Period Name</th>
+                            <th>Salary Year</th>
+                            <th>Salary Tax Year</th>
+                            <th>Year</th>
+                            <th>Month</th>
+                            <th>From</th>
+                            <th>To</th>
+                            <th>Status</th>
+                            <th style="text-align:center">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-show="salaryPeriodList.length <= 0"><td colspan="7" style="text-align:center;"><i class="fa fa-refresh"></i> Loading new data!!</td></tr>
+                        <tr dir-paginate="item in salaryPeriodList| filter:q  | itemsPerPage: pageSize" current-page="currentPage">
+                            <td>{{$index+1}}</td>
+                            <td>{{item.PeriodName}}</td>
+                            <td>{{item.YearName}}</td>
+                            <td>{{item.TaxYear}}</td>
+                            <td>{{item.Year}}</td>
+                            <td>{{item.MonthName}}</td>
+                            <td>{{item.StartDate | date:'dd/MM/yyyy'}}</td>
+                            <td>{{item.EndDate | date:'dd/MM/yyyy'}}</td>
+                            <td>{{item.periodstatus}}</td>
+                            <td align="center">
+                                <a href="javascript:;" class="btn btn-outline-brand btn-elevate btn-icon" ng-click="editSalaryPeriod(item)" data-target="#addmodal" data-toggle="modal">
+                                    <i class="fa fa-edit"></i>
+                                </a>
+                                <a ng-click="deleteSalaryPeriod(item.Id)" href="javascript:;" class="btn btn-outline-danger btn-elevate btn-icon">
+                                    <i class="fa fa-trash"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="row">
+                    <dir-pagination-controls boundary-links="true" template-url="~/assets/angular/lib/dirPagination.tpl.html"></dir-pagination-controls>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--Modal Area Start-->
+    <div id="addmodal" class="modal fade" tabindex="-1" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog  modal-lg">
+            <div class="modal-content">
+                <form name="addBasic" ng-submit="save()" class="form-horizontal" id="form_sample_1" novalidate>
+                    <div class="modal-header">
+                        <h5 class="modal-title">{{modalTitle}}</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                      
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group row" ng-class="{ 'has-error' : submitted && addBasic.PeriodName.$invalid}">
+                                        <label class="col-md-5 control-label text-right">
+                                            Period Name:
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-7">
+                                            <input type="text" ng-model="salaryPeriod.PeriodName" class="form-control" placeholder="Period Name" name="PeriodName" required>
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted &&  addBasic.PeriodName.$error.required" class="help-block">Period Name Required</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group row" ng-class="{ 'has-error' : submitted && addBasic.CategoryID.$invalid}">
+                            
+                                        <label class="col-md-5 control-label text-right">
+                                           Employee Category:
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-7">
+                                            <select class="form-control" ng-model="salaryPeriod.CategoryID" name="CategoryID" ng-change="" ng-options="m.CategoryID as m.CategoryName for m in CommonFeilds.Category">
+                                                <option value="" selected="selected">Select</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="form-group row" ng-class="{ 'has-error' : submitted && addBasic.SalaryYearId.$invalid}">
+                                        <label class="col-md-5 control-label text-right">
+                                            Salary Year:
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-7">
+                                            <select class="form-control" ng-model="salaryPeriod.SalaryYearId" name="SalaryYearId" required ng-options="sp.Id as sp.YearName  for sp in SalaryYearList">
+                                                <option value="" selected="selected">Choose Options</option>
+                                            </select>
+                                            <span ng-show="submitted &&  addBasic.SalaryYearId.$error.required" class="help-block">Salary Year Required</span>
+                                        </div>
+                                    </div> 
+                                    <div class="form-group row" ng-class="{ 'has-error' : submitted && addBasic.SalaryTaxYearId.$invalid}">
+                                        <label class="col-md-5 control-label text-right">
+                                            Salary Tax Year:
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-7">
+                                            <select class="form-control" ng-model="salaryPeriod.SalaryTaxYearId" name="SalaryTaxYearId" required ng-options="sp.Id as sp.YearName  for sp in SalaryTaxYearList">
+                                                <option value="" selected="selected">Choose Options</option>
+                                            </select>
+                                            <span ng-show="submitted &&  addBasic.SalaryTaxYearId.$error.required" class="help-block">Salary Tax Year Required</span>
+                                        </div>
+                                    </div> 
+                                    <div class="form-group row" ng-class="{ 'has-error' : submitted && addBasic.MonthDay.$invalid}">
+                                        <label class="col-md-5 control-label text-right">
+                                            Month and Year:
+                                            <span class="required">*</span>
+
+                                        </label>
+                                        <div class="col-md-7">
+                                            <input class="form-control" ng-model="salaryPeriod.MonthDay" required name="MonthDay" type="datetime" placeholder="Year and Month" readonly ng-click="p1=true" is-open="p1" datepicker-options="{minMode: 'month'}" datepicker-mode="'month'" uib-datepicker-popup="MM/yyyy" />
+                                            <span ng-show="submitted &&  addBasic.MonthDay.$error.required" class="help-block">Month and Year Required</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group row" ng-class="{ 'has-error' : submitted && addBasic.PStartDate.$invalid}">
+                                        <label class="col-md-5 control-label text-right">
+                                            Period Start:
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-7">
+                                            <input class="form-control" type="text" ng-click="p4=true" is-open="p4" readonly placeholder="Start Date" ng-model="salaryPeriod.periodstartDate" uib-datepicker-popup="dd/MM/yyyy" name="PStartDate" required />
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted &&  addBasic.PStartDate.$error.required" class="help-block">Start Date Required</span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group row" ng-class="{ 'has-error' : submitted && addBasic.PEndDate.$invalid}">
+
+                                        <label class="col-md-5 control-label text-right">
+                                            Period End:
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-7">
+                                            <input class="form-control" type="text" ng-click="p5=true" is-open="p5" readonly placeholder="End Date" ng-model="salaryPeriod.periodendDate" uib-datepicker-popup="dd/MM/yyyy" name="PEndDate" required />
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted &&  addBasic.PEndDate.$error.required" class="help-block">End Date Required </span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group row" ng-class="{ 'has-error' : submitted && addBasic.StartDate.$invalid}">
+                                       
+                                        <label class="col-md-5 control-label text-right">
+                                            Attendance Data Range:
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-7">
+                                            <input class="form-control" type="text" ng-click="p2=true" is-open="p2" readonly placeholder="Start Date" ng-model="salaryPeriod.startDate" uib-datepicker-popup="dd/MM/yyyy" name="StartDate" required />
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted &&  addBasic.StartDate.$error.required" class="help-block">Start Date Required</span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group row" ng-class="{ 'has-error' : submitted && addBasic.EndDate.$invalid}">
+
+                                        <label class="col-md-5 control-label text-right">
+
+                                        </label>
+                                        <div class="col-md-7">
+                                            <input class="form-control" type="text" ng-click="p3=true" is-open="p3" readonly placeholder="End Date" ng-model="salaryPeriod.endDate" uib-datepicker-popup="dd/MM/yyyy" name="EndDate" required />
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted &&  addBasic.EndDate.$error.required" class="help-block">
+                                                End Date
+
+                                                Required
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <div class="col-md-5 text-right">
+                                            Month include long holiday
+                                        </div>
+                                        <label class="col-md-1 control-label ">
+                                            <input type="checkbox" name="Long Holiday" ng-model="salaryPeriod.IsLongHoliday" ng-checked="salaryPeriod.IsLongHoliday==true" />
+                                        </label>
+                                        <div class="col-md-5 text-right">
+                                            Deduct Tax
+                                        </div>
+                                        <label class="col-md-1 control-label">
+                                            <input type="checkbox" name="Deduct Tax" ng-model="salaryPeriod.IsDeductTax" ng-checked="salaryPeriod.IsDeductTax==true" />
+                                        </label>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" data-dismiss="modal" class="btn btn-secondary" ng-click="resetForm();submitted=false">Cancel</button>
+                        <button type="submit" ng-click="submitted=true" class="btn btn-success">{{modalbutton}}</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!--Modal Area End-->
+</div>
+<!-- END FORM-->
+@section Scripts{
+    <script src="~/assets/global/plugins/bootstrap-fileinput/bootstrap-fileinput.js" type="text/javascript"></script>
+    <script src="~/assets/pages/scripts/form-repeater.min.js"></script>
+    <script type="text/javascript">
+        for (i = new Date().getFullYear() ; i > 1900; i--) {
+            $('#yearpicker').append($('<option />').val(i).html(i));
+        }
+    </script>
+    <script type="text/javascript">
+        OEMSApp.controller("ctrlSalaryPeriod", ["$scope", "$http", "SweetAlert",
+              function ($scope, $http, SweetAlert) {
+                  init();
+                  function init() {
+                      initialize();
+                      getAllSalaryPeriod();
+                      getAllFiscalYearList();
+                      getAllCommons();
+                      getAllSalaryYear();
+                      getAllSalaryTaxYear();
+                  }
+
+                  function initialize() {
+                      $scope.modalbutton = 'Save';
+                      $scope.modalTitle = 'Add Salary Period';
+                      $scope.brnlist = [];
+                      $scope.fiscalYearlist = [];
+                      $scope.taxYearlist = [];
+                      $scope.salaryPeriod = {};
+                      $scope.salaryPeriod.Id = 0;
+                      $scope.employeeInfos = [];
+                      $scope.salaryPeriodList = [];
+                      $scope.resetForm = resetForm;
+                      $scope.CommonFeilds = [];
+                      $scope.pagesize = 10;
+                      $scope.pageSizeArray = [];
+                      $scope.pageSizeArray.push({ value: 5, text: 5 });
+                      $scope.pageSizeArray.push({ value: 10, text: 10 });
+                      $scope.pageSizeArray.push({ value: 20, text: 20 });
+                      $scope.pageSizeArray.push({ value: 50, text: 50 });
+                      $scope.currentPage = 1;
+                      $scope.pageSize = 10;
+                      $scope.employeelist = [];
+                      $scope.gradelist = [];
+
+                  }
+
+                  function resetForm() {
+                      $scope.modalbutton = 'Save';
+                      $scope.modalTitle = "Add Salary Period";
+                      $scope.salaryPeriod = {};
+                      $scope.salaryPeriod.Id = 0;
+                 
+                      $scope.addBasic.$setUntouched();
+                      $scope.addBasic.$setPristine();
+                      //$scope.submitted = false;
+                  }
+
+                  function getAllFiscalYearList() {
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Accounts/GetAllFiscalYear/',
+                      }).then(function successCallback(response) {
+                          $scope.fiscalYearlist = response.data.results;
+                      }, function errorCallback(response) {
+                      });
+                  }
+                  function getAllSalaryYear() {
+                      $scope.SalaryYearList = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Employee/GetAllSalaryYear/'
+                      }).then(function successCallback(response) {
+                          $scope.SalaryYearList = response.data.results;
+                      }, function errorCallback(response) {
+                          toastr["info"](response.data.Message);
+                      });
+                  }
+
+                  function getAllSalaryTaxYear() {
+                      $scope.SalaryTaxYearList = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Employee/GetAllSalaryTaxYear/'
+                      }).then(function successCallback(response) {
+                          $scope.SalaryTaxYearList = response.data.results;
+                      }, function errorCallback(response) {
+                          toastr["info"](response.data.Message);
+                      });
+                  }
+
+                  $scope.save = function save()
+                  {
+                      if ($scope.addBasic.$invalid)
+                          return;
+                      else {
+                          var result = validation();
+                          if (result) {
+                              getMonthAndYear();
+                              if ($scope.salaryPeriod.Id == 0) {
+                                  $http({
+                                      method: 'POST',
+                                      url: baseUrl + 'Employee/AddSalaryPeriod/',
+                                      data: $scope.salaryPeriod
+                                  }).then(function successCallback(response) {
+                                      $('#addmodal').modal('toggle');
+                                      toastr["info"](response.data.message);
+                                      getAllSalaryPeriod();
+                                      resetForm();
+                                  }, function errorCallback(response) {
+                                      toastr["warning"](response.data.Message);
+                                  });
+                              }
+                              if ($scope.salaryPeriod.Id != 0) {
+                                  if ($scope.addBasic.$invalid)
+                                      return;
+                                  else {
+                                      $http({
+                                          method: 'PUT',
+                                          url: baseUrl + 'Employee/UpdateSalaryPeriod/',
+                                          data: $scope.salaryPeriod
+                                      }).then(function successCallback(response) {
+                                          toastr["info"](response.data.message);
+                                          if (response.data.httpStatusCode != 305) {
+                                              $('#addmodal').modal('toggle');
+                                              resetForm();
+                                          }
+                                          getAllSalaryPeriod();
+                                      }, function errorCallback(response) {
+                                          toastr["warning"](response.data.Message);
+                                      });
+                                  }
+                              }
+                          }
+                      }
+                   
+                  }
+                  function getAllCommons() {
+                      $scope.CommonFeilds = [];
+
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Common/GetCommonItemEmp/'
+                      }).then(function successCallback(response) {
+                          $scope.CommonFeilds = response.data.results;
+                      }, function errorCallback(response) {
+                      });
+                  }
+
+                  function validation() {
+                      var check = 0;
+                      if ($scope.salaryPeriod.DaysWorking > 365) {
+                          toastr["info"]("Working days can not be greater than 365 days..!");
+                          $scope.salaryPeriod.DaysWorking = null;
+                          check = 1;
+                          return false;
+
+                      }
+                      if (check == 0) {
+                          return true;
+                      }
+                  }
+                  function getMonthAndYear() {
+                      $scope.salaryPeriod.Month = $scope.salaryPeriod.MonthDay.getMonth() + 1;
+                      $scope.salaryPeriod.Year = $scope.salaryPeriod.MonthDay.getFullYear();
+                      if ($scope.salaryPeriod.Month == 1) {
+                          $scope.salaryPeriod.MonthName = 'January';
+                      } else if ($scope.salaryPeriod.Month == 2) {
+                          $scope.salaryPeriod.MonthName = 'February';
+                      } else if ($scope.salaryPeriod.Month == 3) {
+                          $scope.salaryPeriod.MonthName = 'March';
+                      } else if ($scope.salaryPeriod.Month == 4) {
+                          $scope.salaryPeriod.MonthName = 'April';
+                      } else if ($scope.salaryPeriod.Month == 5) {
+                          $scope.salaryPeriod.MonthName = 'May';
+                      } else if ($scope.salaryPeriod.Month == 6) {
+                          $scope.salaryPeriod.MonthName = 'June';
+                      } else if ($scope.salaryPeriod.Month == 7) {
+                          $scope.salaryPeriod.MonthName = 'July';
+                      } else if ($scope.salaryPeriod.Month == 8) {
+                          $scope.salaryPeriod.MonthName = 'August';
+                      } else if ($scope.salaryPeriod.Month == 9) {
+                          $scope.salaryPeriod.MonthName = 'September';
+                      } else if ($scope.salaryPeriod.Month == 10) {
+                          $scope.salaryPeriod.MonthName = 'October';
+                      } else if ($scope.salaryPeriod.Month == 11) {
+                          $scope.salaryPeriod.MonthName = 'November';
+                      } else  {
+                          $scope.salaryPeriod.MonthName = 'December';
+                      }
+                  }
+
+                  function getAllSalaryPeriod()
+                  {
+                      $scope.salaryHeadList = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Employee/GetAllSalaryPeriod/'
+                      }).then(function successCallback(response) {
+                          $scope.salaryPeriodList = response.data.results;
+                      }, function errorCallback(response) {
+                          toastr["info"](response.data.Message);
+                      });
+                  }
+
+                  $scope.deleteSalaryPeriod = function deleteSalaryPeriod(salaryId)
+                  {
+                      SweetAlert.swal({
+                          title: "Are you sure to delete it ?", type: "warning", showCancelButton: true, confirmButtonColor: "#DD6B55",
+                          confirmButtonText: "Yes, delete it!",
+                          closeOnConfirm: false
+                      },
+                        function (isConfirm) {
+                            if (isConfirm) {
+                                $http({
+                                    method: 'DELETE',
+                                    url: baseUrl + 'Employee/DeleteSalaryPeriod/' + salaryId,
+                                }).then(function successCallback(response) {
+                                    SweetAlert.swal("Deleted!", "Your data has been deleted.", "success");
+                                    getAllSalaryPeriod();
+                                }, function errorCallback(response) {
+                                    //toastr["info"](response.data.message);
+                                    SweetAlert.swal("", "Period Already processed.!", "warning");
+                                });
+                            }
+                        });
+                  }
+
+                  $scope.editSalaryPeriod = function editSalaryPeriod(item)
+                  {
+                      $scope.modalTitle = 'Update Salary Period';
+                      $scope.modalbutton = 'Update';
+                      $scope.salaryPeriod = item;
+                      $scope.salaryPeriod.Id = item.Id;
+                      $scope.salaryPeriod.startDate = new Date(item.StartDate);
+                      $scope.salaryPeriod.endDate = new Date(item.EndDate);
+                      $scope.salaryPeriod.periodstartDate = new Date(item.PeriodStartDate);
+                      $scope.salaryPeriod.periodendDate = new Date(item.PeriodEndDate);
+                      newdate = item.Month + "/" + item.Year ;
+                      $scope.salaryPeriod.MonthDay = new Date(item.Year + "/" + item.Month);
+                
+                  }
+              }]);
+    </script>
+}
+

@@ -1,0 +1,132 @@
+﻿
+@{
+    ViewBag.Title = "Class routine";
+    Layout = "~/Views/Shared/_adminLayout.cshtml";
+}
+
+<h2>Class routine</h2>
+<div ng-controller="RotinClt">
+    <div class="row main-row pl-0 pr-0">
+        <div class="col-lg-12">
+            <div class="routne-head">
+                <h3>Routine</h3>
+            </div>
+        </div>
+    </div>
+    <div class="row main-row pl-0 pr-0">
+        <div class="col-lg-12">
+            <iframe src="@Url.Action("GetStudentRotinHeader","PortalReport")" scrolling="auto" height="600" width="100%"></iframe>
+        </div>
+    </div>
+
+</div>
+
+@section Scripts{
+    <script type="text/javascript">
+        OEMSApp.controller("RotinClt", ["$scope", "$http", "$window", 'blockUI', "$filter",
+        function ($scope, $http, $window, blockUI, $filter) {
+            init();
+            function init() {
+                $scope.pageSizeArray = [];
+                $scope.pageSizeArray.push({ value: 5, text: 5 });
+                $scope.pageSizeArray.push({ value: 10, text: 10 });
+                $scope.pageSizeArray.push({ value: 20, text: 20 });
+                $scope.pageSizeArray.push({ value: 50, text: 50 });
+                $scope.currentPage = 1;
+                $scope.pageSize = 10;
+                $scope.IsOthers = false;
+                $scope.minDate = $scope.minDate ? null : new Date();
+            }
+
+            $scope.DonateAdd=function DonateAdd()
+            {
+                if ($scope.Donatefrm.$invalid)
+                    return;
+
+               // console.log($scope.DonateModel);
+                if ($scope.DonateModel.DonateItem == 'Others')
+                {
+                    if ($scope.DonateModel.OtherDetails == undefined || $scope.DonateModel.OtherDetails=='')
+                    {
+                        $scope.IsOthers = true;
+                        return;
+                    }
+                    $scope.DonateModel.DonateItem = $scope.DonateModel.OtherDetails;
+                }
+            }
+        //        $scope.DonateModel.CSType = 'Donation';
+        //        $http({
+        //            method: 'POST',
+        //            url: baseUrl + 'CS/AddCS/',
+        //            data: $scope.DonateModel
+        //        }).then(function SuceesCallback(response) {
+        //            //console.log(response);
+        //            $('#donatemodal').modal('toggle');
+        //            toastr.success(response.data.message);
+        //            $scope.DonateModel = {};
+        //            $scope.submitted = false;
+        //        }, function errorCallback() {
+        //            $('#donatemodal').modal('toggle');
+        //            toastr.error(response.data.message);
+        //            $scope.submitted = false;
+        //     });
+        //    }
+
+        //    $scope.CSVisitAdd = function CSVisitAdd() {
+        //        if ($scope.CSVisitfrm.$invalid)
+        //            return;
+        //        $scope.CSVisitModel.CSType = 'CS Visit Request';
+
+        //        $http({
+        //            method: 'POST',
+        //            url: baseUrl + 'CS/AddCS/',
+        //            data: $scope.CSVisitModel
+        //        }).then(function SuceesCallback(response) {
+        //            $('#csvisitmodal').modal('toggle');
+        //            toastr.success(response.data.message);
+        //            $scope.CSVisitModel = {};
+        //            $scope.submitted2 = false;
+        //        }, function errorCallback() {
+        //            $('#csvisitmodal').modal('toggle');
+        //            toastr.error(response.data.message);
+        //            $scope.submitted2 = false;
+        //        });
+        //    }
+
+        //    $scope.volunterrequestadd = function volunterrequestadd() {
+        //        if ($scope.volunterrequestfrm.$invalid)
+        //            return;
+        //        $scope.VRmodel.CSType = 'Volunteer Request';
+        //        $http({
+        //            method: 'POST',
+        //            url: baseUrl + 'CS/AddCS/',
+        //            data: $scope.VRmodel
+        //        }).then(function SuceesCallback(response) {
+        //            $('#volunterreqmodal').modal('toggle');
+        //            toastr.success(response.data.message);
+        //            $scope.CSVisitModel = {};
+        //            $scope.submitted3 = false;
+        //        }, function errorCallback() {
+        //            $('#volunterreqmodal').modal('toggle');
+        //            toastr.error(response.data.message);
+        //            $scope.submitted3 = false;
+        //        });
+        //    }
+
+        //    function num(val) {
+        //        if ($.isNumeric(val)) {
+        //            return parseFloat(val);
+        //        } else {
+        //            return 0;
+        //        }
+        //    }
+                }]);
+    </script>
+    
+}
+
+
+
+
+
+

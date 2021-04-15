@@ -1,0 +1,352 @@
+﻿
+@{
+    ViewBag.Title = "Generate Report";
+}
+
+<div class="kt-container  kt-container--fluid  kt-grid__item kt-grid__item--fluid" ng-controller="AcReports">
+    <!-- Begin: life time stats -->
+    <div class="row">
+        <div class="kt-portlet kt-portlet--mobile">
+            <div class="kt-portlet__head kt-portlet__head--lg">
+                <div class="kt-portlet__head-label">
+                    <h3 class="kt-portlet__head-title">
+                        Generate Report
+                    </h3>
+                </div>
+            </div>
+
+            <div class="kt-portlet__body">
+                <div class="table-container">
+                    <div id="sample_3_wrapper" class="dataTables_wrapper no-footer">
+                        <form name="addform" class="form-horizontal" id="form_sample_1" novalidate autocomplete="off">
+                            <div class="row ">
+                                <div class="col-md-12 col-lg-8">
+                                    <div class="form-group row " ng-class="{ 'has-error' : submitted && addform.reportType.$invalid}">
+                                        <label class="col-md-2" style="text-align:right">
+                                            Reports :
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-4">
+                                            <select ng-model="Reports.ReportType" class="form-control" name="reportType" required>
+                                                <option value="">Select One</option>
+                                                <option value="1">Balance Sheet</option>
+                                                <option value="2">Profit/Loss</option>
+                                                @*<option value="3">Receipt Payment</option>*@
+                                                <option value="4">Trial Balance</option>
+                                                <option value="5">Cash Flow</option>
+                                                <option value="6">Cash Book</option>
+                                                <option value="8">Bank Book</option>
+                                                <option value="7">Sub Ledger</option>
+                                            </select>
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted &&  addform.reportType.$error.required" class="help-block">Report Required</span>
+                                        </div>
+                                    </div>
+                                </div>
+                               
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-4">
+
+                                    <div class="form-group row " ng-class="{ 'has-error' : submitted && addform.reportsType.$invalid}" ng-show="Reports.ReportType==1 || Reports.ReportType==2">
+                                        <label class="col-md-4" style="text-align:right">
+                                            Reports types:
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-8">
+                                            <select ng-model="Reports.ReportTypeId" class="form-control" name="reportsType" required>
+                                                <option value="">Select One</option>
+                                                <option value="1">Summary</option>
+                                                <option value="2">Details</option>
+                                            </select>
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted &&  addform.reportsType.$error.required" class="help-block">Report types Required</span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group row " ng-show="Reports.ReportType==1 || Reports.ReportType==2 || Reports.ReportType==4 || Reports.ReportType==5" ng-class="{ 'has-error' : submitted && addform.FiscalYear.$invalid}">
+                                        <label class="col-md-4" style="text-align:right">
+                                            Fiscal Year:
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-8">
+                                            <select ng-model="Reports.FiscalYear" ng-options="Fiscal.Id as Fiscal.Name for Fiscal in Fiscals" class="form-control" name="FiscalYear" required>
+                                                <option value="">Select One</option>
+                                            </select>
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted &&  addform.FiscalYear.$error.required" class="help-block">Fiscal Year Required</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row " ng-show="Reports.ReportType==6 || Reports.ReportType==8">
+                                <div class="col-lg-4">
+                                    <div class="form-group row " ng-required="Reports.ReportType==6" ng-class="{ 'has-error' : submitted && addform.Year.$invalid}">
+                                        <label class="col-md-4 control-label" style="text-align:right">
+                                            Year :
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-8">
+                                            <select class="form-control" ng-model="Reports.Year" required name="Year">
+                                                <option value="" selected="selected">Choose Option</option>
+                                                <option value="2018">2018</option>
+                                                <option value="2019">2019</option>
+                                                <option value="2020">2020</option>
+                                                <option value="2021">2021</option>
+                                                <option value="2022">2022</option>
+                                                <option value="2023">2023</option>
+                                            </select>
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted && addform.Year.$error.required" class="help-block">Year Required</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group row " ng-class="{ 'has-error' : submitted && addform.Month.$invalid}">
+                                        <label class="col-md-4 control-label" style="text-align:right">
+                                            Month :
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-8">
+                                            <select class="form-control" ng-model="Reports.Month" required name="Month" ng-options="aMonth.Value as aMonth.Text for aMonth in MonthList">
+                                                <option value="" selected="selected">Choose Option</option>
+                                            </select>
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted && addform.Month.$error.required" class="help-block">Month Required</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row" ng-show="Reports.ReportType==7">
+                                <div class="col-lg-4">
+                                    <div class="form-group row ">
+                                        <label class="col-md-4" style="text-align:right">
+                                            Account Branch :
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-8">
+                                            <select class="form-control" ng-model="Reports.AccBranchId" required name="BranchId" ng-options="acpayment.AccBranchId as acpayment.Name for acpayment in AcBranchlist">
+                                                <option value="" selected="selected">Choose Option</option>
+                                            </select>
+
+                                            <div class="form-control-focus"> </div>
+
+                                        </div>
+
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="form-group row " ng-class="{ 'has-error' : submitted && addform.LedgerId.$invalid}">
+                                        <label class="col-md-4" style="text-align:right">
+                                            Account Head :
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-8">
+                                            <select class="form-control" ng-model="Reports.LedgerId" required name="LedgerId" ng-options="acledger.LedgerId as acledger.Name for acledger in AcHeadlist">
+                                                <option value="" selected="selected">Choose Option</option>
+                                            </select>
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted && addform.LedgerId.$error.required" class="help-block">Account Head Required</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+
+
+                            <div class="form-group row" ng-hide="Reports.ReportType==1 ||Reports.ReportType==2 ||Reports.ReportType==6 || Reports.ReportType==7 || Reports.ReportType==8" ng-class="{ 'has-error' : submitted && addform.name.$invalid}">
+                                <div class="col-lg-2"></div>
+                                <div class="col-lg-3">
+                                    <a href="@Url.Action("ViewReport","AccountV")?FiscalYear={{Reports.FiscalYear}}&ReportType={{Reports.ReportType}}&ReportTypeId=0" class="btn btn-success" style="margin-left: 35px;" target="_blank">Show Report</a>
+                                </div>
+                            </div>
+                            <div class="form-group row" ng-show="Reports.ReportType==1 ||Reports.ReportType==2" ng-class="{ 'has-error' : submitted && addform.name.$invalid}">
+                                <div class="col-lg-2"></div>
+                                <div class="col-lg-3">
+                                    <a href="@Url.Action("ViewReport","AccountV")?FiscalYear={{Reports.FiscalYear}}&ReportType={{Reports.ReportType}}&ReportTypeId={{Reports.ReportTypeId}}" class="btn btn-success" style="margin-left: 35px;" target="_blank">Show Report</a>
+                                </div>
+                            </div>
+                            <div class="form-group row" ng-show="Reports.ReportType==6" ng-class="{ 'has-error' : submitted && addform.name.$invalid}">
+                                <div class="col-lg-2"></div>
+                                <div class="col-lg-3">
+                                    <a href="@Url.Action("ViewCashBankBookReport","AccountV")?FiscalYear={{Reports.Year}}&ReportType=6&ReportMonth={{Reports.Month}}" class="btn btn-success" style="margin-left: 35px;" target="_blank">Show Report</a>
+                                </div>
+                            </div>
+                            <div class="form-group row" ng-show="Reports.ReportType==8" ng-class="{ 'has-error' : submitted && addform.name.$invalid}">
+                                <div class="col-lg-2"></div>
+                                <div class="col-lg-3">
+                                    <a href="@Url.Action("ViewCashBankBookReport","AccountV")?FiscalYear={{Reports.Year}}&ReportType=8&ReportMonth={{Reports.Month}}" class="btn btn-success" style="margin-left: 35px;" target="_blank">Show Report</a>
+                                </div>
+                            </div>
+
+
+
+
+
+                            <div class="row" ng-show="Reports.ReportType==7">
+                                <div class="col-md-4 col-lg-4">
+                                    <div class="form-group row " ng-class="{ 'has-error' : submitted && addform.FromDate.$invalid}">
+                                        <label class="col-md-4" style="text-align:right">
+                                            Form Date :
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-8">
+                                            <input class="form-control" type="text" ng-click="p1=true" is-open="p1" readonly ng-model="Reports.FromDate" placeholder="Form Date" uib-datepicker-popup="dd/MM/yyyy" name="FromDate" required />
+                                            <span ng-show="submitted &&  addform.FromDate.$error.required" class="help-block">Form Date Required</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 col-lg-4">
+                                    <div class="form-group row " ng-class="{ 'has-error' : submitted && addform.FromDate.$invalid}">
+                                        <label class="col-md-4 " style="text-align:right">
+                                            To Date :
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-8">
+                                            <input class="form-control" type="text" readonly ng-click="p2=true" is-open="p2" ng-model="Reports.ToDate" placeholder="To Date" min-date="session.FromDate" uib-datepicker-popup="dd/MM/yyyy" name="ToDate" required />
+                                            <span ng-show="submitted &&  addform.ToDate.$error.required" class="help-block">To Date Required</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-3">
+                                    <div class="form-group row " ng-class="{ 'has-error' : submitted && addform.name.$invalid}">
+                                        @* <a href="@Url.Action("ViewSubLedgerReport","AccountV")?FormDate={{Reports.Session_StartDate1}}&ToDate={{Reports.Session_EndDate1}}&BranchId={{Reports.AccBranchId}}&LedgerId={{Reports.LedgerId}}" class="btn green" target="_blank">Show Report</a>*@
+                                        <button type="button" ng-click="SubLedgerReport()" class="btn btn-success">Show Report</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- End: life time stats -->
+
+    </div>
+ </div>
+
+@section Scripts{
+
+    <script type="text/javascript">
+        OEMSApp.controller("AcReports", ["$scope", "$http", "SweetAlert", "$filter",
+              function ($scope, $http, SweetAlert, $filter) {
+
+                  init();
+                  function init() {
+                      initialize();
+                      getAllFiscal();
+                      getAllMonth();
+                      getAcBranchlist();
+                      getAcHeadlist();
+                  }
+                  function initialize() {
+                      $scope.Reports = {};
+                      $scope.Reports.AccBranchId = 0;
+                      $scope.arrNum = 0;
+
+
+                      $scope.Fiscals = [];
+                      $scope.currentPage = 1;
+                      $scope.pageno = 1;
+                      $scope.pagesize = 10;
+                      $scope.total_count = 12;
+                      $scope.search = '';
+                      $scope.Id = '';
+                      $scope.res = {};
+                      $scope.data = {};
+                      $scope.resetForm = resetForm;
+                      $scope.hstep = 1;
+                      $scope.mstep = 15;
+
+                      $scope.pageSizeArray = [];
+                      $scope.pageSizeArray.push({ value: 5, text: 5 });
+                      $scope.pageSizeArray.push({ value: 10, text: 10 });
+                      $scope.pageSizeArray.push({ value: 20, text: 20 });
+                      $scope.pageSizeArray.push({ value: 50, text: 50 });
+                      $scope.currentPage = 1;
+                      $scope.pageSize = 10;
+
+                  }
+
+                  //function getFeesMonthList() {
+                  //    $scope.Dropdowns = [];
+                  //    $http({
+                  //        method: 'GET',
+                  //        url: baseUrl + 'Fees/GetMonth/'
+                  //    }).then(function successCallback(response) {
+                  //        $scope.FeesMonthList = response.data.results;
+                  //    }, function errorCallback(response) {
+                  //        toastr["info"](response.data.Message);
+                  //    });
+                  //}
+                  function getAllMonth() {
+                      $scope.MonthList = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Common/GetAllMonth/'
+                      }).then(function successCallback(response) {
+                          $scope.MonthList = response.data.results.Table;
+                      }, function errorCallback(response) {
+                          toastr["warning"](response.data.Message);
+                      });
+                  }
+
+                  function getAcHeadlist() {
+                      //$scope.CommonFeilds = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Accounts/GetAllLedgers/'
+                      }).then(function successCallback(response) {
+                          $scope.AcHeadlist = response.data.results;
+                          //consol.log($scope.AcBranchlist);
+                      }, function errorCallback(response) {
+                      });
+                  }
+
+                  function getAcBranchlist() {
+                      //$scope.CommonFeilds = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + '/Accounts/GetAllAssignedAccountBranch/'
+                      }).then(function successCallback(response) {
+                          $scope.AcBranchlist = response.data.results;
+                          //consol.log($scope.AcBranchlist);
+                      }, function errorCallback(response) {
+                      });
+                  }
+
+                  function resetForm() {
+
+                      $scope.Reports = {};
+                      $scope.Reports.AccBranchId = 0;
+                      $scope.addform.$setUntouched();
+                      $scope.addform.$setPristine();
+                      $scope.submitted = false;
+                  }
+                  function getAllFiscal() {
+                      $scope.AcTransactions = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Accounts/GetAllFiscalYear/'
+                      }).then(function successCallback(response) {
+                          $scope.Fiscals = response.data.results;
+                      }, function errorCallback(response) {
+                          toastr["warning"](response.data.Message);
+                      });
+                  }
+                  
+                  $scope.SubLedgerReport = function SubLedgerReport() {
+                      //if ($scope.addform.$invalid) {
+                      //    return;
+                      //}
+                  
+                      $scope.Reports.From = $filter('date')($scope.Reports.FromDate, "yyyy/MM/dd");
+                      console.log($scope.Reports.From);
+                      $scope.Reports.To = $filter('date')($scope.Reports.ToDate, "yyyy/MM/dd");
+                      var uri = "@Url.Action("ViewSubLedgerReport","AccountV")?FormDate=" + $scope.Reports.From + "&ToDate=" + $scope.Reports.To + "&BranchId=" + $scope.Reports.AccBranchId + "&LedgerId=" + $scope.Reports.LedgerId;
+                      window.open(uri, '_blank');
+                  };
+
+
+
+              }]);
+    </script>
+}

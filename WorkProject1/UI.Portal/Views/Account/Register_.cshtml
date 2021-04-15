@@ -1,0 +1,66 @@
+﻿@model UI.Portal.Models.RegisterViewModel
+@{
+    ViewBag.Title = "Register";
+    Layout = "~/Views/Shared/_LayoutLogin.cshtml";
+}
+
+<style>
+    input:invalid:focus{
+        border-color:red;
+    }
+
+</style>
+<!-- BEGIN REGISTRATION FORM -->
+@using (Html.BeginForm("Register", "Account", FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+{
+    @Html.AntiForgeryToken()
+
+   
+    <div class="singin-main-body">       
+        <form class="mt-3">
+            <div class="form-group from-group-one">
+                <i class="far fa-user"></i>
+                <input type="text" class="form-control loging-fill" id="StudentInsId" name="StudentInsId" aria-describedby="emailHelp" placeholder="Enter Student ID" required autocomplete="off" oninvalid="this.setCustomValidity('Enter Student ID')"  oninput="this.setCustomValidity('')" >
+            </div>
+            <div class="form-group from-group-one">
+                <i class="fas fa-mobile-alt "></i>
+                <input type="text" class="form-control loging-fill" id="PhoneNumber" name="PhoneNumber" aria-describedby="emailHelp" placeholder="Enter Phone Number" required autocomplete="off" pattern="^(?:\+?88|88)?01[13-9]\d{8}$" oninvalid="this.setCustomValidity('Enter Phone Number')"  oninput="this.setCustomValidity('')" >
+            </div>
+            <div class="form-group from-group-one">
+                <i class="fas fa-lock"></i>
+                <input type="password" class="form-control loging-fill" id="Password" name="Password" placeholder="Enter Password" required autocomplete="off" oninvalid="this.setCustomValidity('Enter Password')"  oninput="this.setCustomValidity('')" >
+            </div>
+            <div class="form-group from-group-one">
+                <i class="fas fa-lock"></i>
+                <input type="password" class="form-control loging-fill" id="ConfirmPassword" name="ConfirmPassword" aria-describedby="emailHelp" placeholder="Enter Confirm Password" required autocomplete="off" >
+            </div>
+        </form>
+        @Html.ValidationSummary("", new { @class = "text-danger" })
+
+        <div class="Signin-button text-center">
+            <button type="submit" class="btn btn-primary btn-lg btn-block mt-5">Sign Up</button>
+
+            <h5>Already have an account?<a href="@Url.Action("Login", "Account")"><span>Sign In</span></a></h5>
+        </div>
+        
+    </div>
+}
+
+@section Scripts{
+<script type="text/javascript">
+        var password = document.getElementById("Password"), confirm_password = document.getElementById("ConfirmPassword");
+
+        function validatePassword() {
+            if (password.value != confirm_password.value) {
+                confirm_password.setCustomValidity("Passwords Don't Match");
+            } else {
+                confirm_password.setCustomValidity('');
+            }
+        }
+
+        password.onchange = validatePassword;
+        confirm_password.onkeyup = validatePassword;
+</script>
+    }
+
+<!-- END REGISTRATION FORM -->

@@ -1,0 +1,466 @@
+﻿@{
+    ViewBag.Title = "Leave List";
+}
+<div class="portlet box blue-hoki"   ng-controller="MEGR">
+    <div class="portlet-title" >
+        <div class="caption">
+            <i class="fa fa-graduation-cap" style="color:white" ></i>Student Leave List
+        </div>
+    </div>
+    <div class="portlet-body form">
+        <!-- BEGIN FORM-->
+        <form class="form-horizontal" name="formCommonFeilds" novalidate>
+            <div class="form-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label class="col-md-3 pull-left control-label">
+                                Search Box :
+                            </label>
+                            <div class="col-md-6">
+                               <input type="text" ng-model="Std" typeahead-on-select='onSelect($item, $model, $label)' placeholder="Search Student By ID or Name or SMS Notification No." uib-typeahead="i  as i.Text for i in Search($viewValue)" typeahead-loading="loadingLocations" typeahead-no-results="noResults" class="form-control">
+                                <i ng-show="loadingLocations" class="glyphicon glyphicon-refresh"></i>
+                                <div ng-show="noResults"><i class="glyphicon glyphicon-remove"></i> No Results Found</div>
+                            </div>
+                        </div>
+                        <span class="col-md-2"></span>
+                    </div>
+                </div>
+                <br />
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group" ng-class="{ 'has-error' : submitted && formCommonFeilds.Branch.$invalid}">
+                            <label class="col-md-5 control-label">
+                                Branch :
+                                <span class="required">*</span>
+                            </label>
+                            <div class="col-md-7">
+                                <select class="form-control" ng-model="LeaveInfobnd.BranchID" required name="Branch" ng-options="GenerateResult.BranchId as GenerateResult.BranchName for GenerateResult in CommonFeilds.Branch">
+                                    <option value="" selected="selected">Choose Option</option>
+                                </select>
+                                <div class="form-control-focus"> </div>
+                                <span ng-show="submitted && formCommonFeilds.Branch.$error.required" class="help-block">Branch Name Required</span>
+                            </div>
+                        </div>
+                   <div class="form-group" ng-class="{ 'has-error' : submitted && formCommonFeilds.Session.$invalid}">
+                            <label class="col-md-5 control-label">
+                                Session :
+                                <span class="required">*</span>
+                            </label>
+                            <div class="col-md-7">
+                                <select class="form-control" ng-model="LeaveInfobnd.SessionId" required name="Session" ng-options="GenerateResult.SessionId as GenerateResult.SessionName for GenerateResult in CommonFeilds.Session">
+                                    <option value="" selected="selected">Choose Option</option>
+                                </select>
+
+                                <div class="form-control-focus"> </div>
+                                <span ng-show="submitted && formCommonFeilds.Session.$error.required" class="help-block">Session Required</span>
+                            </div>
+                        </div>
+                        <div class="form-group" ng-class="{ 'has-error' : submitted && formCommonFeilds.Shift.$invalid}">
+                            <label class="col-md-5 control-label">
+                                Shift :
+                                <span class="required">*</span>
+                            </label>
+                            <div class="col-md-7">
+                                <select class="form-control" ng-model="LeaveInfobnd.ShiftId" required name="Shift" ng-options="GenerateResult.ShiftId as GenerateResult.ShiftName for GenerateResult in CommonFeilds.Shift |filter:{BranchId:LeaveInfobnd.BranchID}:true">
+                                    <option value="" selected="selected">Choose Option</option>
+                                </select>
+                                <div class="form-control-focus"> </div>
+                                <span ng-show="submitted && formCommonFeilds.Shift.$error.required" class="help-block">Shift Name Required</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                  
+                        <div class="form-group" ng-class="{ 'has-error' : submitted && formCommonFeilds.Class.$invalid}">
+                            <label class="col-md-5 control-label">
+                                Class :
+                                @*<span class="required">*</span>*@
+                            </label>
+                            <div class="col-md-7">
+                                <select class="form-control" ng-model="LeaveInfobnd.ClassId" name="Class" ng-change="GetSection()"  ng-options="GenerateResult.ClassId as GenerateResult.ClassName for GenerateResult in CommonFeilds.ClassInfo">
+                                    <option value="" selected="selected">Choose Option</option>
+                                </select>
+                                <div class="form-control-focus"> </div>
+                                <span ng-show="submitted && formCommonFeilds.Class.$error.required" class="help-block">Class Required</span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-5 control-label">
+                                Section:
+                            </label>
+                            <div class="col-md-7">
+                                <select class="form-control" ng-model="LeaveInfobnd.SectionId" name="Section" ng-options="S.SectionId as S.SectionName for S in Sections">
+                                    <option value="" selected="selected">Choose Option</option>
+                                </select>
+                                <div class="form-control-focus"> </div>
+                            </div>
+                        </div>
+                        <div class="form-group" ng-class="{ 'has-error' : submitted && formCommonFeilds.FromDate.$invalid}">
+                            <label class="col-md-5 control-label">
+                                From Date:
+                                <span class="required">*</span>
+                            </label>
+                            <div class="col-md-7">
+                                <input class="form-control" name="FromDate" ng-model="LeaveInfobnd.FromDate" type="datetime" placeholder="From Date" readonly ng-change="getOrderbydate()" ng-click="p1=true" is-open="p1" uib-datepicker-popup="dd-MM-yyyy" required />
+                                <div class="form-control-focus"> </div>
+                                <span ng-show="submitted && formCommonFeilds.FromDate.$error.required" class="help-block">Status Required</span>
+                            </div>
+                        </div>
+                     </div>
+                
+                    <div class="col-md-4">
+                   
+                   
+                        <div class="form-group" ng-class="{ 'has-error' : submitted && formCommonFeilds.ToDate.$invalid}">
+                            <label class="col-md-4 control-label">
+                                To Date:
+                                <span class="required">*</span>
+                            </label>
+                            <div class="col-md-8">
+                                <input class="form-control" name="ToDate" ng-model="LeaveInfobnd.ToDate" type="datetime" placeholder="To Date" readonly ng-change="getOrderbydate()" ng-click="p2=true" is-open="p2" uib-datepicker-popup="dd-MM-yyyy" required />
+                                <div class="form-control-focus"> </div>
+                                <span ng-show="submitted && formCommonFeilds.ToDate.$error.required" class="help-block">Status Required</span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-4 control-label">Status:</label>
+                            <div class="col-md-8">
+                                <select class="form-control" ng-model="LeaveInfobnd.Status" name="status">
+                                    <option value=''>Select</option>
+                                    <option value='Approved'>Approved</option>
+                                    <option value='Pending'>Pending</option>
+                                    <option value='Disapproved'>Disapproved</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="pull-right">
+                            <button ng-click="submitted=true;BySearch(formCommonFeilds.$valid)" class="btn green">Show</button>
+                            <button ng-click="submitted=true;Report(formCommonFeilds.$valid)" class="btn btn-primary">Report</button>
+                            <button ng-click="Reset()" class="btn info">Reset</button>
+                        </div>
+                    </div>
+                </div>
+               
+            </div>
+        </form>
+            <div class="table container">
+                <div class="row">
+                    <div class="col-md-4 col-sm-5 col-xs-6">
+                        <div class="form-group">
+                            <div class="col-lg-3 col-md-5 col-sm-4 col-xs-8" style="padding-left:0px">
+                                <select class="form-control" ng-model="pageSize" ng-options="P.value as P.text for P in pageSizeArray"></select>
+                            </div>
+                            <div class="col-md-7  col-sm-8  col-xs-4">
+                                @*<label for="search" class="control-label" style="padding-top:5px">Items</label>*@
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-sm-3 col-xs-1">
+                    </div>
+                    <div class="col-md-4 col-sm-4 col-xs-5">
+                        <div id="sample_3_filter" class="pull-right">
+                            <input ng-model="q" id="search" class="form-control" placeholder="Filter text">
+                        </div>
+                    </div>
+                </div>
+                <div class="table-scrollable" style="padding-bottom: 14%;">
+                    <table class="table table-bordered">
+                        <thead class="btn-primary">
+                            <tr>
+                                <th> Section </th>
+                                <th>ID</th>
+                                <th> Name </th>
+                                <th> Leave Type</th>
+                                <th>From</th>
+                                <th> To </th>
+                                <th>Duration</th>
+                                <th>Attached</th>
+                                <th> Status </th>
+                                <th> Approved by</th>
+                                <th>Action Date & Time</th>
+                                <th> Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+
+                            <tr ng-show="LeaveInfos.length <= 0"><td colspan="12" style="text-align:center;"><i class="fa fa-refresh"></i> No data found!!</td></tr>
+                            <tr dir-paginate="item in LeaveInfos| filter:q|itemsPerPage:pageSize" current-page="currentPage" style="background-color:{{item.ColorCode}}">
+                                @*<tr ng-repeat="item in LeaveInfos" style="background-color:{{item.ColorCode}}">*@
+                                <td> {{item.SectionName }} </td>
+                                <td>
+                                    {{item.StudentInsID }}
+                                </td>
+                                <td> {{item.FullName }} </td>
+                                <td>
+                                    {{item.LeaveType }}
+                                </td>
+                                <td>
+                                    {{item.FromDate| date:"dd/MM/yyyy"}}
+                                </td>
+                                <td> {{item.ToDate| date:"dd/MM/yyyy"}} </td>
+                                <td>
+                                    {{item.Duration }}
+                                </td>
+                                <td><a ng-hide="item.File==null" class="btn btn-xs grey" href="@Url.Action("DownloadImage","AttendanceV")?LeaveId={{item.LeaveId}}" target="_blank">Download</a><span class="btn btn-xs red" ng-show="item.File==null">No Attached</span> </td>
+                                <td> {{item.Status }} </td>
+                                <td>
+                                    {{item.uFullName }}
+                                </td>
+                                <td>{{item.UpdateDate |date:"dd/MM/yy h:mm a"}}</td>
+                                <td>
+                                    <div class="btn-group">
+                                        <button class="btn btn-xs green dropdown-toggle" type="button" data-toggle="dropdown" aria-expanded="false">
+                                            Actions
+                                            <i class="fa fa-angle-down"></i>
+                                        </button>
+                                        <ul class="dropdown-menu" style="left: -110%;" role="menu">
+                                            <li ng-hide="item.Status=='Delete'">
+                                                <a href="javascript:;" ng-click="DeleteApply(item.LeaveId)">
+                                                    <i class="fa fa-trash"></i> Delete
+                                                </a>
+                                            </li>
+                                            <li ng-hide="item.Status=='Approved'">
+                                                <a href="javascript:;" ng-click="AcceptApply(item.LeaveId)">
+                                                    <i class="fa fa-check"></i>Approved
+                                                </a>
+                                            </li>
+                                            <li ng-hide="item.Status=='Disapproved'">
+                                                <a href="javascript:;" ng-click="DisapprovedApplyr(item.LeaveId)">
+                                                    <i class="fa fa-close"></i> Disapproved
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="row">
+                    <dir-pagination-controls boundary-links="true" template-url="~/assets/angular/lib/dirPagination.tpl.html"></dir-pagination-controls>
+                </div>
+            </div>
+    </div>
+    <!-- END FORM-->
+</div>
+
+
+@section Scripts{
+    <script type="text/javascript">
+        OEMSApp.controller("MEGR", ["$scope", "$http", "SweetAlert", "blockUI", "$window", "$filter",
+          function ($scope, $http, SweetAlert, blockUI, $window, $filter) {
+                  init();
+                  function init() {
+                  initialize();
+                  getAllCommons();
+                  getAllDropdowns();
+
+                  // getMainExam();
+              }
+                  function initialize() {
+                  $scope.LeaveInfos = [];
+                  $scope.Dropdowns = [];
+                  $scope.CommonFeilds = [];
+                  $scope.LeaveInfobnd = {};
+                  //$scope.currentPage = 1;
+                  //$scope.pageno = 1;
+                  //$scope.pagesize = 10;
+                  //$scope.total_count = 12;
+                  //$scope.txtsearch = '';
+                  $scope.format = 'yyyy/MM/dd';
+                  $scope.pageSizeArray = [];
+                  $scope.pageSizeArray.push({ value: 5, text: 5 });
+                  $scope.pageSizeArray.push({ value: 10, text: 10 });
+                  $scope.pageSizeArray.push({ value: 20, text: 20 });
+                  $scope.pageSizeArray.push({ value: 50, text: 50 });
+                  $scope.currentPage = 1;
+                  $scope.pageSize = 10;
+                  GetAllLeaveList();
+              };
+                  $scope.Reset = function Reset() {
+                  $scope.submitted = false;
+                  $scope.selectedAll = false;
+                  $scope.LeaveInfos = [];
+                  $scope.LeaveInfobnd = [];
+                  $scope.Std = {};
+                  $scope.Std.Text =null;
+                  $scope.Std.Value =null;
+              };
+            
+                  $scope.GetSection = function GetSection() {
+                  $scope.Sections = [];
+                  $http({
+                      method: 'GET',
+                      url: baseUrl + 'Common/GetSection/' + $scope.LeaveInfobnd.SessionId + "/" + $scope.LeaveInfobnd.ShiftId + "/" + $scope.LeaveInfobnd.ClassId 
+                  }).then(function successCallback(response) {
+                      $scope.Sections = response.data.results;
+                  }, function errorCallback(response) {
+                      toastr["error"](response.data.message);
+                  });
+
+                  }
+                  function GetAllLeaveList()
+              {
+                  $scope.LeaveInfos = [];
+                  $http({
+                      method: 'POST',
+                      url: baseUrl + 'Attendance/StudenLeaveInfosAll/',
+                      data: $scope.LeaveInfobnd
+                  }).then(function successCallback(response) {
+                      $scope.LeaveInfos = response.data.results;
+                      toastr["success"](response.data.message);
+                  }, function errorCallback(response) {
+                      toastr["error"](response.data.message);
+                  });
+              }
+                  $scope.BySearch = function BySearch(valid) {
+                      if (!valid)
+                          return;
+                      if (angular.isUndefined($scope.LeaveInfobnd.Status))
+                          $scope.LeaveInfobnd.Status = '';
+                  $scope.LeaveInfos = [];
+                  $http({
+                      method: 'POST',
+                      url: baseUrl + 'Attendance/SearchStudenLeaveInfos/',
+                      data: $scope.LeaveInfobnd
+                  }).then(function successCallback(response) {
+                      $scope.LeaveInfos = response.data.results;
+                      toastr["success"](response.data.message);
+                  }, function errorCallback(response) {
+                      toastr["error"](response.data.message);
+                  });
+
+              };
+                  //for Student Search for auto complit text box ......
+                  $scope.Search = function (val) {
+                      if (val.length >= 3)
+                          return $http.get(baseUrl + 'Student/SearchStudent/' + val, {
+                              params: {}
+                          }).then(function (response) {
+                              blockUI.stop();
+                              return response.data.results.map(function (item) {
+                                  //alert(item.Text);
+                                  return item;
+                              });
+                          });
+                  };
+                  // for droupdown select list event....
+                  $scope.onSelect = function onSelect($item, $model, $label) {
+                      $scope.LeaveInfos = [];
+                      $http({
+                          method: 'POST',
+                          url: baseUrl + 'Attendance/StudenLeaveInfosbySIID/' + $item.Value
+                      }).then(function successCallback(response) {
+
+                          $scope.LeaveInfos = response.data.results;
+                          toastr["success"](response.data.message);
+                      }, function errorCallback(response) {
+                          toastr["error"](response.data.message);
+                      });
+
+
+              };
+                  function getAllCommons() {
+                  $scope.CommonFeilds = [];
+
+                  $http({
+                      method: 'GET',
+                      url: baseUrl + 'Common/GetCommonItem/'
+                  }).then(function successCallback(response) {
+                      $scope.CommonFeilds = response.data.results;
+                  }, function errorCallback(response) {
+                      toastr["error"](response.data.message);
+                     
+                  });
+              }
+                  function getAllDropdowns() {
+                  $scope.Dropdowns = [];
+
+                  $http({
+                      method: 'GET',
+                      url: baseUrl + 'Common/GetAllDropDown/'
+                  }).then(function successCallback(response) {
+                      $scope.Dropdowns = response.data.results;
+                  }, function errorCallback(response) {
+                      toastr["info"](response.data.message);
+                     
+                  });
+              }
+                  $scope.DeleteApply = function DeleteApply(id) {
+                      $http({
+                          method: 'POST',
+                          url: baseUrl + 'Attendance/DeleteStudentLeavesbyId/' + id
+                      }).then(function successCallback(response) {
+                          toastr["success"](response.data.message);
+                          $scope.BySearch();
+                      }, function errorCallback(response) {
+                          toastr["error"](response.data.message);
+                      });
+                  }
+                  $scope.CancelApply = function CancelApply(id) {
+                      $http({
+                          method: 'POST',
+                          url: baseUrl + 'Attendance/CancelStudentLeavesbyId/' + id
+                      }).then(function successCallback(response) {
+                          toastr["success"](response.data.message);
+                          $scope.BySearch();
+                      }, function errorCallback(response) {
+                          toastr["error"](response.data.message);
+                      });
+                  }
+                  $scope.AcceptApply = function AcceptApply(id) {
+                      $http({
+                          method: 'POST',
+                          url: baseUrl + 'Attendance/ApprovedStudentLeavesbyId/' + id
+                      }).then(function successCallback(response) {
+
+                          toastr["success"](response.data.message);
+                          $scope.BySearch();
+                      }, function errorCallback(response) {
+                          toastr["error"](response.data.message);
+                      });
+                  }
+                  $scope.DisapprovedApplyr = function DisapprovedApplyr(id) {
+                      $http({
+                          method: 'POST',
+                          url: baseUrl + 'Attendance/DisapprovedStudentLeavesbyId/' + id
+                      }).then(function successCallback(response) {
+                          $scope.BySearch();
+                          toastr["success"](response.data.message);
+                      }, function errorCallback(response) {
+                          toastr["error"](response.data.message);
+                      });
+                  }
+                  // for Lood Table Data....
+                  function LoodTableData(id) {
+                      //$scope.Student = [];
+                      $http({
+                          method: 'POST',
+                          url: baseUrl + 'Attendance/GetStudentLeavesbyId/' + id
+                      }).then(function successCallback(response) {
+                          $scope.LeaveInfos = response.data.results;
+                          if (response.data.message!=null)
+                           toastr["success"](response.data.message);
+                      }, function errorCallback(response) {
+                          toastr["error"](response.data.message);
+                      });
+
+
+                  };
+                  $scope.Report = function Report(valid) {
+                      if (!valid)
+                          return;
+                      if (angular.isUndefined($scope.LeaveInfobnd.Status))
+                          $scope.LeaveInfobnd.Status = '';
+                      var Fromdate = $filter('date')($scope.LeaveInfobnd.FromDate, "MM/dd/yyyy");
+                      var Todate = $filter('date')($scope.LeaveInfobnd.ToDate, "MM/dd/yyyy");
+                      $scope.uri = "@Url.Action("LeaveListReport", "Report")?SessionID=" + $scope.LeaveInfobnd.SessionId + "&BranchId=" + $scope.LeaveInfobnd.BranchID + "&ShiftId=" + $scope.LeaveInfobnd.ShiftId + "&ClassId=" + $scope.LeaveInfobnd.ClassId + "&SectionId=" + $scope.LeaveInfobnd.SectionId + "&Status=" + $scope.LeaveInfobnd.Status + "&Fromdate=" + Fromdate + "&Todate=" + Todate;
+                      $window.open($scope.uri, '_blank');
+                  };
+          }]);
+    </script>
+}
+
+
+

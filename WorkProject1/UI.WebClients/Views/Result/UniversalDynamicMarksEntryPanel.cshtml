@@ -1,0 +1,908 @@
+﻿
+@{
+    ViewBag.Title = "Universal Dynamic Marks Entry Panel";
+    Layout = "~/Views/Shared/_EmpLayout.cshtml";
+} 
+<style type="text/css">
+    input[type=number]::-webkit-inner-spin-button,
+    input[type=number]::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+
+    .AbsentMark {
+        color: rgba(0,0,0,0.3);
+        background-color: rgba(0,0,0,0.3);
+    }
+
+    .ZeroMark {
+        color: black;
+        /*background-color: wheat !important;*/
+        background-color: #ff6a00;
+    }
+    .Zmark{
+        color: black;
+        /*background-color: wheat !important;*/
+        background-color: #5a6cf7;
+    }
+   .Invalid {
+        color: black;
+        background-color: #ff6a00 !important;
+    }
+
+    .input-group-addon {
+        padding: 6px 6px !important;
+    }
+     #Scrollstyle::-webkit-scrollbar-track
+    {
+	    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+	    background-color: #F5F5F5;
+    }
+
+    #Scrollstyle::-webkit-scrollbar
+    {
+	    width: 6px;
+	    background-color: #F5F5F5;
+    }
+
+    #Scrollstyle::-webkit-scrollbar-thumb
+    {
+	    background-color: #69c4be;
+    }
+    .table>tbody>tr>td, .table>tbody>tr>th, .table>tfoot>tr>td, .table>tfoot>tr>th, .table>thead>tr>td, .table>thead>tr>th {
+    padding: 0 !important;
+    line-height: 1.42857;
+    vertical-align: top;
+    border-top: 1px solid #e7ecf1;
+}
+</style>
+<div class="portlet light bordered" ng-controller="UniversalMarksEntryCntrl">
+    <div class="portlet-title">
+        <div class="caption">
+            <i class="icon-settings font-green"></i>
+            <span class="caption-subject font-green sbold uppercase">@ViewBag.Title</span>
+        </div>     
+    </div>
+   
+    <div class="portlet-body form">
+        <!-- BEGIN FORM-->
+        <form class="form-horizontal" ng-submit="Search()" name="frmFilter" method="post" enctype="multipart/form-data" novalidate>
+            <div class="form-body">
+
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label class="col-md-5 control-label">
+                                Branch :
+                            </label>
+                            <div class="col-md-7" ng-class="{ 'has-error' :isSubmitted && frmFilter.BranchID.$invalid }">
+                                <select class="form-control" name="BranchID" ng-model="StudentExamFilter.BranchID" ng-options="studentInfo.BranchId as studentInfo.BranchName for studentInfo in CommonFeilds.Branch" required>
+                                    <option value="" selected="selected">Please Select</option>
+                                </select>
+                                <span ng-show="isSubmitted && frmFilter.BranchID.$error.required" class="help-block">Branch Required</span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-5 control-label">
+                                Session :
+                            </label>
+                            <div class="col-md-7" ng-class="{ 'has-error' :isSubmitted && frmFilter.SessionId.$invalid}">
+                                <select class="form-control" name="SessionId" ng-model="StudentExamFilter.SessionId" required ng-options="studentInfo.SessionId as studentInfo.SessionName for studentInfo in CommonFeilds.Session">
+                                    <option value="" selected="selected">Please Select</option>
+                                </select>
+                                <span ng-show="isSubmitted && frmFilter.SessionId.$error.required" class="help-block">Session Required</span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-5 control-label">
+                                Shift :
+                            </label>
+                            <div class="col-md-7" ng-class="{'has-error' : isSubmitted && frmFilter.Shift.$invalid}">
+                                <select class="form-control" ng-model="StudentExamFilter.ShiftId" name="Shift" ng-options="studentInfo.ShiftId as studentInfo.ShiftName for studentInfo in CommonFeilds.Shift | filter:{BranchId:StudentExamFilter.BranchID}:true" required>
+                                    <option value="" selected="selected">Please Select</option>
+                                </select>
+                                <span ng-show="isSubmitted && frmFilter.Shift.$error.required" class="help-block">Shift Required</span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-md-6">
+                                <button ng-click="StudentMarkEntryReport()" class="btn green">Marks Entry</button>
+                            </div>
+                              <div class="col-md-5">
+                                <button ng-click="BothMarkEntry0AReport()" class="btn green">Marks 0 A </button> 
+                            </div>
+                          
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                       
+                        <div class="form-group">
+                            <label class="col-md-5 control-label">
+                                Class :
+                            </label>
+                            <div class="col-md-7" ng-class="{ 'has-error' :isSubmitted && frmFilter.ClassId.$invalid}">
+                                <select class="form-control" name="ClassId" ng-change="GetSection();LoadTerms(StudentExamFilter.ClassId)" ng-disabled="StudentExamFilter.ShiftId == null" ng-model="StudentExamFilter.ClassId"  ng-options="studentInfo.ClassId as studentInfo.ClassName for studentInfo in CommonFeilds.ClassInfo" required>
+                                    <option value="" selected="selected">Please Select</option>
+                                </select>
+                                <span ng-show="isSubmitted && frmFilter.ClassId.$error.required " class="help-block">Class Required</span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-5 control-label">
+                                Section :
+                            </label>
+                            <div class="col-md-7" ng-class="{ 'has-error' :isSubmitted && frmFilter.SectionId.$invalid }">
+                                <select class="form-control" name="SectionId" ng-model="StudentExamFilter.SectionId" ng-disabled="StudentExamFilter.ClassId==null" ng-options="S.SectionId as S.SectionName for S in Sections" required>
+                                    @*FilterSer by Shahin 17July2017*@
+                                    <option value="" selected="selected">Please Select</option>
+                                </select>
+                                <span ng-show="isSubmitted && frmFilter.SectionId.$error.required" class="help-block">Section Required</span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-5 control-label">
+                                Term :
+                            </label>
+                            <div class="col-md-7" ng-class="{ 'has-error' :isSubmitted && frmFilter.TermId.$invalid }">
+                                <select class="form-control" ng-change="getSubjects()" name="TermId" ng-model="StudentExamFilter.TermId" ng-disabled="StudentExamFilter.ClassId==null" ng-options="term.TermId as term.Name for term in TermList" required>
+                                    <option value="" selected="selected">Please Select</option>
+                                </select>
+                                <span ng-show="isSubmitted && frmFilter.TermId.$error.required" class="help-block">Term Required</span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-md-5">  
+                                <button ng-click="Both0Ainputtedlist()" class="btn green">0 A inputted list</button>                                     
+                            </div>
+                            <div class="col-md-7" style="text-align:right">                                
+                                <a data-target="#infomodal" data-toggle="modal" ng-show="StudentMarks.length" ng-click="marksEntryStatus();"  class="btn green" style="color:white">Entry Status</a>
+                            </div>
+                        </div> 
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label class="col-md-5 control-label">
+                                Subject :
+                            </label>
+                            <div class="col-md-7" ng-class="{ 'has-error' :isSubmitted && frmFilter.SubID.$invalid}">
+                                <select class="form-control" name="SubID" ng-disabled="StudentExamFilter.TermId==null" ng-model="StudentExamFilter.SubjectID" ng-change="getMainExam();" ng-options="item.SubID as item.SubjectName for item in Subjects" required>
+                                    <option value="" selected="selected">Please Select</option>
+                                </select>
+                                <span ng-show="isSubmitted && frmFilter.SubID.$error.required " class="help-block">Subject Required</span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-5 control-label">
+                                Main Exam :
+                            </label>
+                            <div class="col-md-7" ng-class="{'has-error' : isSubmitted && frmFilter.mainExam.$invalid}">
+                                <select class="form-control" ng-model="StudentExamFilter.MainExamId" name="mainExam" ng-options="mainexam.MainExamId as mainexam.MainExamName for mainexam in MainExams" required>
+                                    <option value="" selected="selected">Please Select</option>
+                                </select>
+                                <span ng-show="isSubmitted && frmFilter.mainExam.$error.required" class="help-block">Main Exam Required</span>
+                            </div>
+                        </div>
+                       
+                        <div class="form-group" style="visibility:hidden">
+                            <label class="col-md-5 control-label">
+                                :
+                            </label>
+                        </div>
+                        <div class="form-group">
+                            <div  class="col-md-5" style="text-align:right">
+                                <a ng-click="ResetSource()" class="btn red">Reset</a>
+                            </div>
+                            <div class="col-md-7">
+                                <button ng-click="isSubmitted=true" class="btn green">Search</button>
+                                <button ng-click="UniversalMarksEntryReport();isSubmitted=true" class="btn purple">Report</button>
+                            </div>
+                        </div>                       
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    @*<div class="panel" style="width:930px; overflow-x:scroll">  <div id="Scrollstyle" class="panel-body" style="height:400px; overflow-y:scroll"> class="input-group-addon"*@
+        <div class="panel" style="margin-top: -30px;">
+            <!-- Default panel contents onkeypress="return isNumberKey(event);"   onkeypress="return (event.charCode == 8 || event.charCode == 0) ? null : event.charCode >= 48 && (event.charCode <= 57 || event.charCode !=110) "-->
+            @*<div class="panel-heading bg-green-haze-opacity">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h3 class="panel-title" style="color:#ffffff; font-size:large">Student Mark Entry</h3>
+                    </div>
+                    <div style="text-align:right" class="col-md-6">
+                        <a data-target="#infomodal" data-toggle="modal" ng-show="StudentMarks.length" class="btn info" style="color:white">Marks Entry Status</a>
+                    </div>
+                </div>
+            </div>*@
+            <div class="panel-body">
+                <table class="table table-bordered table-inverse fixed-table-toolbar">
+                    <thead class="btn-primary">
+                        <tr>
+                            <th rowspan="2"> ID </th>
+                            <th rowspan="2"> Roll </th>
+                            <th rowspan="2"> Name </th>
+                            <td colspan="{{item.SubExamCount}}" ng-repeat="item in StudentMarks[0].MarksDetails" style="text-align:center">
+                                {{item.SubExamName}} ({{item.FullMarks}})
+                            </td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-class="{'bg-red-haze' : item.ObtainMarks == 0}" ng-repeat="item in StudentMarks track by $index">
+                            <td width="6%"> {{item.StudentInsID}} </td>
+                            <td width="5%" style="text-align: -webkit-center !important; background-color: #8bb2f5 !important;"> {{item.RollNo}} </td>
+                            <td style="width:160px !important;"> {{item.FullName}} </td>
+                            <td style="width:85px; height:5px;" ng-repeat="item1 in item.MarksDetails track by $index" ng-class="{ 'has-error' : item1.FullMarks < item1.Marks}">
+                                @*<div class="input-group">*@
+                                    <span ng-show="item1.IsAbsent==true">A</span>
+                                    <input type="number" data-index="{{$index+1}}{{$parent.$index+1}}" style="width:70px;" onfocus="if (parseFloat(this.value) == 0) { this.value = ''; }" onblur="if (this.value == '') { this.value = '0'; this.style.backgroundColor = 'wheat'; }" ng-disabled="item1.IsAbsent == 1" ng-minlength="0" ng-maxlength="{{item1.FullMarks}}" ng-blur="SaveSingleMark(item,item1,$event)"
+                                           ng-model="item1.Marks" ng-click="Change(item1)" ng-class="{AbsentMark: (item1.Marks == 0 && item1.IsAbsent==true), ZeroMark: (item1.Marks == 0 && item1.IsAbsent==false), Invalid: (item1.Marks > item1.FullMarks), Zmark: (item1.MarksId > 0 && item1.Marks == 0 && item1.IsAbsent==false)}"
+                                           class="inputs{{$index+1}}" placeholder="Obtain Mark" id="{{$index+1}}_{{$parent.$index+1}}">
+                                    <span><input name="IsAbsent" data-indexs="{{$index+1}}{{$parent.$index+1}}" data-id="{{$index+1}}_{{$parent.$index+1}}" type="checkbox" ng-model="item1.IsAbsent" ng-checked="item1.IsAbsent==true" ng-click="SaveAbsentOnChange(item,item1,$event)" /></span>
+                                    <span class="help-block" ng-show="(item1.FullMarks < item1.Marks)">Invalid!</span>
+                                @*</div>*@
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+              
+                    <div class="col-md-offset-6 pull-right">
+                        <button ng-show="StudentMarks.length > 0" type="button" ng-click="mainExamMarksDelete()" class="btn btn-danger">Clear Main Exam Mark</button>
+                    </div>
+                                
+            </div>
+            <!-- Table -->
+        </div>
+        <!-- END FORM-->
+        <div id="infomodal" class="modal fade" tabindex="-1" data-backdrop="static" data-keyboard="false">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title">Marks entry brief Statistic</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="col-md-8 control-label">
+                                            Total Student :
+                                        </label>
+                                        <div class="col-md-4">
+                                            {{StudentMarksStatus[0].TotalStudent}}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="col-md-8 control-label">
+                                            Total Exam :
+                                        </label>
+                                        <div class="col-md-4">
+                                            {{StudentMarksStatus[0].TotalExam}}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="col-md-8 control-label">
+                                            Total Absent :
+                                        </label>
+                                        <div class="col-md-4">
+                                            {{StudentMarksStatus[0].StudentAbsentMarksEntry}}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="col-md-8 control-label">
+                                            Total Zero Marks:
+                                        </label>
+                                        <div class="col-md-4">
+                                            {{StudentMarksStatus[0].StudentZeroMarksEntry}}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="col-md-8 control-label">
+                                            Total Marks :
+                                        </label>
+                                        <div class="col-md-4">
+                                            {{StudentMarksStatus[0].StudentMarksEntry}}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="col-md-8 control-label">
+                                            Marks Entry Not Yet :
+                                        </label>
+                                        <div class="col-md-4">
+                                            {{StudentMarksStatus[0].StudentMarksNotInputed }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" data-dismiss="modal" name="ColseModal" class="btn dark btn-outline">Close</button>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+ </div>
+@section Scripts{
+    <script type="text/javascript">
+        OEMSApp.controller("UniversalMarksEntryCntrl", ["$scope", "$http", "SweetAlert", "blockUI", "$window","$filter",
+          function ($scope, $http, SweetAlert, blockUI, $window, $filter) {
+              init();
+              function init() {
+                  initialize();
+                  getAllDropdowns();                    
+                  getAllCommons();                   
+              }
+              function initialize() {
+                  $scope.touchList = [];
+                  $scope.indexList = [];
+                  $scope.indexs = {};
+                  $scope.indexs.index = 0;
+                  $scope.index1 =0;
+                  $scope.touch = 0;
+                  $scope.zero = 0;
+                  $scope.notTouch = 0;
+                  $scope.absent = 0;
+                  $scope.mark = 0;
+                  $scope.totalStudent = 0;
+                  $scope.totalExam = 0;
+                  $scope.StudentExamFilter = {};
+                  $scope.studentInfo = {};
+                  $scope.StudentMarks = [];                   
+                  $scope.Dropdowns = [];
+                  $scope.CommonFeilds = [];
+                  $scope.Versions = [];
+                  $scope.MainExams = [];
+                  $scope.SubExams = [];
+                  $scope.DividedExams = [];
+                  $scope.Subjects = [];
+                  $scope.currentPage = 1;
+                  $scope.pageno = 1;
+                  $scope.pagesize = 10;
+                  $scope.total_count = 12;
+                  $scope.txtsearch = '';
+                  $scope.getAllDropdowns = getAllDropdowns;
+                  $scope.Search = Search;
+
+                  $scope.getAllCommons = getAllCommons;
+                  $scope.StudentMarkEntryReport = StudentMarkEntryReport;
+                  $scope.BothMarkEntry0AReport = BothMarkEntry0AReport;
+                  $scope.Both0Ainputtedlist = Both0Ainputtedlist;
+                  $scope.btnDis = false;
+                  $scope.spin = false;
+
+              };
+              $scope.touchClick = function touchClick(item) {
+                  if (item.MarksId == 0) {
+                      var add = true;
+                      angular.forEach($scope.touchList, function (value, key) {
+                          if (value == item.StudentIID) {
+                              add = false;
+                          }
+                      });
+                      if (add) {
+                          $scope.touchList.push(id);
+                      }
+                  }
+              };
+              $scope.LoadTerms = function LoadTerms(ClassId) {
+                  $http({
+                      method: 'GET',
+                      url: baseUrl + 'SetupInstitution/GetTermByClassId' + '/' + ClassId
+                  }).then(function successCallback(response) {
+                      $scope.TermList = response.data.results;
+                  }, function errorCallback(response) {
+                      if (response.data.message != null)
+                          toastr["info"](response.data.message);
+                  });
+              }
+              function setProgress(s) {
+                  $scope.btnDis = s;
+                  $scope.spin = s;
+              }
+              $scope.GetGroup = function GetGroup(classid) {
+                  $scope.Groups = [];
+                  $http({
+                      method: 'GET',
+                      url: baseUrl + 'Common/GetGroup/' + classid
+                  }).then(function successCallback(response) {
+                      $scope.Groups = response.data.results;
+                  }, function errorCallback(response) {
+                      toastr["info"](response.data.message);
+                  });
+              }
+              $scope.GetSection = function GetSection() {
+                  $scope.Sections = [];
+                  $http({
+                      method: 'GET',
+                      url: baseUrl + 'Common/GetSection/' + $scope.StudentExamFilter.SessionId + "/" + $scope.StudentExamFilter.ShiftId + "/" + $scope.StudentExamFilter.ClassId
+                  }).then(function successCallback(response) {
+                      $scope.Sections = response.data.results;
+                  }, function errorCallback(response) {
+                      toastr["error"](response.data.Message);
+                  });
+              }
+              $scope.marksEntryStatus = function marksEntryStatus()
+              {
+                  $scope.StudentMarksStatus = [];
+                  if ($scope.frmFilter.$invalid == true)
+                      return;
+                  blockUI.start();
+                  $http({
+                      method: 'POST',
+                      url: baseUrl + 'Result/MarksEntryStatus/',
+                      headers: { 'Content-Type': undefined },
+                      transformRequest: function (data) {
+                          var formData = new FormData();
+                          formData.append('Fill', JSON.stringify($scope.StudentExamFilter));
+                          return formData;
+                      },
+                      data: { studentBasicInfo: $scope.studentInfo }
+                  }).then(function (response) {
+                      $scope.StudentMarksStatus = response.data.results;
+                      //toastr["success"](response.data.message);
+                      blockUI.stop();
+                  });
+              }
+              function Search() {                          
+                  $scope.indexList = [];
+                  $scope.indexs = {};
+                  $scope.indexs.index = 0;
+                  $scope.index1 = 0;
+                  $scope.touch = 0;
+                  $scope.zero = 0;
+                  $scope.notTouch = 0;
+                  $scope.absent = 0;
+                  $scope.mark = 0;
+                  $scope.StudentMarks = [];
+                  if ($scope.frmFilter.$invalid == true)
+                      return;
+                  blockUI.start();
+                  $http({
+                      method: 'POST',
+                      url: baseUrl + 'Result/GetMarksByMainExam/',
+                      headers: { 'Content-Type': undefined },
+                      transformRequest: function (data) {
+                          var formData = new FormData();
+                          formData.append('Fill', JSON.stringify($scope.StudentExamFilter));
+                          return formData;
+                      },
+                      data: { studentBasicInfo: $scope.studentInfo }
+                  }).then(function (response) {
+                      $scope.StudentMarks = response.data.results;                        
+                      if ($scope.StudentMarks.length > 0)
+                      {
+                          $scope.totalStudent = $scope.StudentMarks.length;
+                          $scope.totalExam = $scope.StudentMarks.length * $scope.StudentMarks[0].MarksDetails.length;
+                      }                     
+                      toastr["success"](response.data.message);
+                      blockUI.stop();
+                  }, function errorCallback(response) {
+                      blockUI.stop();
+                      toastr["error"](response.data.Message);
+                  });
+              };
+
+              $scope.SaveAbsentOnChange = function SaveAbsentOnChange(Studl, Marks, ObtainMark) {
+                  setProgress(true);
+                  $scope.SingleMark = {};
+                  $scope.SingleMark.VersionId = $scope.StudentExamFilter.VersionID;
+                  $scope.SingleMark.SessionId = $scope.StudentExamFilter.SessionId;
+                  $scope.SingleMark.ShiftId = $scope.StudentExamFilter.ShiftId;
+                  $scope.SingleMark.ClassId = $scope.StudentExamFilter.ClassId;
+                  $scope.SingleMark.GroupId = $scope.StudentExamFilter.GroupId;
+                  $scope.SingleMark.SectionId = $scope.StudentExamFilter.SectionId;
+                  $scope.SingleMark.StudentIID = Studl.StudentIID;
+                  $scope.SingleMark.StudentInsID = Studl.StudentInsID;
+                  $scope.SingleMark.FullMarks = Marks.FullMarks;
+                  $scope.SingleMark.PassMark = Marks.PassMarks;
+                  $scope.SingleMark.MainExamID = Marks.MainExamId;
+                  $scope.SingleMark.SubExamID = Marks.SubExamId;
+                  $scope.SingleMark.DividedExamID = Marks.DividedExamId;
+                  $scope.SingleMark.SubjectID = Marks.SubjectId;                
+                  $scope.SingleMark.ObtainMarks = 0;                  
+                  $scope.SingleMark.IsAbsent = Marks.IsAbsent;
+                  $scope.SingleMark.MarksId = Marks.MarksId;
+                  $http({
+                      method: 'POST',
+                      url: baseUrl + 'Result/SaveMarksOnChange/',
+                      data: $scope.SingleMark
+                  }).then(function successCallback(response) {
+                      $scope.spin = false;
+                      setProgress(false);
+                      if (response.data.HasError) {
+                          ObtainMark.target.value = 0;
+                          toastr["warning"](response.data.message);
+                      }
+                      else {
+                          if ($scope.SingleMark.IsAbsent == true) {
+                              var id = ObtainMark.target.attributes['data-id'].value;
+                              document.getElementById(id).value = '0';
+                          }
+                          $scope.indexs = {};
+                          $scope.index1 = ObtainMark.target.attributes['data-indexs'].value;                              
+                          $scope.indexs.index = $scope.index1;
+                          var data = $filter('filter')($scope.indexList, { index: $scope.index1 })[0];
+                          if (data == null || data == 'undefined') {
+                              $scope.indexList.push($scope.indexs);                                
+                              if ($scope.SingleMark.IsAbsent == true)
+                                  $scope.absent = $scope.absent + 1;
+                          }
+                          else
+                          {
+                              if (Marks.Marks == 0)
+                              {
+                                  if ($scope.SingleMark.IsAbsent == false)
+                                      $scope.absent = $scope.absent - 1;
+                                  else
+                                  $scope.absent = $scope.absent + 1;
+                                  $scope.zero = $scope.zero - 1;                                   
+                              }
+                              else
+                              {
+                                  if ($scope.SingleMark.IsAbsent == false)
+                                      $scope.absent = $scope.absent - 1;
+                                      else
+                                      $scope.absent = $scope.absent + 1;
+                                      $scope.mark = $scope.mark - 1;
+                              }
+                          }
+                      }
+
+                  }, function errorCallback(response) {
+                      //HasError = true
+                      toastr["error"](response.data.Message);
+                  });
+              }
+              $scope.SaveSingleMark = function SaveSingleMark(Studl, Marks, ObtainMark) {
+                  if (Marks.Marks > Marks.FullMarks)
+                  {
+                      toastr["warning"]('Obtain marks can not greater than full marks');
+                      return;
+                  }
+                  setProgress(true);
+                  $scope.SingleMark = {};
+                  $scope.SingleMark.SessionId = $scope.StudentExamFilter.SessionId;
+                  $scope.SingleMark.ShiftId = $scope.StudentExamFilter.ShiftId;
+                  $scope.SingleMark.ClassId = $scope.StudentExamFilter.ClassId;
+                  $scope.SingleMark.SectionId = $scope.StudentExamFilter.SectionId;
+                  $scope.SingleMark.StudentIID = Studl.StudentIID;
+                  $scope.SingleMark.StudentInsID = Studl.StudentInsID;
+                  $scope.SingleMark.FullMarks = Marks.FullMarks;
+                  $scope.SingleMark.PassMark = Marks.PassMarks;
+                  $scope.SingleMark.MainExamID = Marks.MainExamId;
+                  $scope.SingleMark.SubExamID = Marks.SubExamId;
+                  $scope.SingleMark.SubjectID = Marks.SubjectId;              
+                  $scope.SingleMark.ObtainMarks = Marks.Marks;   //ObtainMark.target.value;
+                  $scope.SingleMark.IsAbsent = Marks.IsAbsent;
+                  $scope.SingleMark.MarksId = Marks.MarksId;
+                  $http({
+                      method: 'POST',
+                      url: baseUrl + 'Result/SaveMarksOnChange/',
+                      data: $scope.SingleMark
+                  }).then(function successCallback(response) {
+                      $scope.spin = false;
+                      setProgress(false);
+                      $scope.indexs = {};
+                      $scope.index1 = ObtainMark.target.attributes['data-index'].value;
+                      $scope.indexs.index = $scope.index1;
+                      var data = $filter('filter')($scope.indexList, { index: $scope.index1 })[0];
+                      if (data == null || data == 'undefined') {
+                          $scope.indexList.push($scope.indexs);
+                          if ($scope.SingleMark.ObtainMarks == 0) {
+                              $scope.zero = $scope.zero + 1;
+                          }
+                          else {
+                              $scope.mark = $scope.mark + 1;
+                          }
+                      }
+                  }, function errorCallback(response) {
+                      //HasError = true
+                      ObtainMark.target.value = 0;
+                      toastr["error"](response.data.Message);
+                  });
+              }
+              $scope.mainExamMarksDelete = function mainExamMarksDelete() {
+                  // SweetAlert.swal("Good job!", "You clicked the button!", "success");
+                  SweetAlert.swal({
+                      title: "Are you sure to delete it ?", type: "warning", showCancelButton: true, confirmButtonColor: "#DD6B55",
+                      confirmButtonText: "Yes, delete it!",
+                      closeOnConfirm: false
+                  },
+                  function (isConfirm) {
+                      if (isConfirm) {
+                          $http({
+                              method: 'DELETE',
+                              url: baseUrl + 'Result/DeleteAllMarksByMainExamId/' + $scope.StudentExamFilter.ShiftId + '/' + $scope.StudentExamFilter.ClassId + '/' + $scope.StudentExamFilter.SectionId + '/' + $scope.StudentExamFilter.SubjectID + '/' + $scope.StudentExamFilter.MainExamId
+                          }).then(function successCallback(response) {
+                              SweetAlert.swal("Deleted!", "Your data has been deleted.", "success");
+                              Search();
+                          }, function errorCallback(response) {
+                              toastr["error"](response.data.Message);
+                          });
+                      }
+                  });
+              };
+              $scope.Reset = function Reset() {
+                  initialize();
+                  $scope.frmFilter.$setPristine();
+                  $scope.frmFilter.$setUntouched();
+                  getAllDropdowns();
+                  getAllCommons();
+                  $scope.isSubmitted = false;
+              };
+              $scope.ResetSource = function ResetSource() {
+                  $scope.StudentMarks = [];
+              };
+              $scope.UniversalMarksEntryReport = function UniversalMarksEntryReport() {
+                  if ($scope.frmFilter.$invalid == true)
+                      return;
+                  var uri = baseUrl + 'Report/StudentUniversalMarksEntry/?BranchID=' + $scope.StudentExamFilter.BranchID + '&SessionId=' + $scope.StudentExamFilter.SessionId + '&ShiftID=' + $scope.StudentExamFilter.ShiftId + '&ClassId=' + $scope.StudentExamFilter.ClassId + '&SectionId=' + $scope.StudentExamFilter.SectionId + '&TermId=' + $scope.StudentExamFilter.TermId + '&MainExamId=' + $scope.StudentExamFilter.MainExamId + '&SubjectId=' + $scope.StudentExamFilter.SubjectID;
+                  window.open(uri, '_blank');
+              }
+              function getAllDropdowns() {
+                  $scope.Dropdowns = [];
+
+                  $http({
+                      method: 'GET',
+                      url: baseUrl + 'Common/GetAllDropDown/'
+                  }).then(function successCallback(response) {
+                      $scope.Dropdowns = response.data.results;
+                  }, function errorCallback(response) {
+                      toastr["info"](response.data.message);
+                  });
+              }
+
+              function getAllCommons() {
+                  $scope.CommonFeilds = [];
+
+                  $http({
+                      method: 'GET',
+                      url: baseUrl + 'Common/GetCommonItem/'
+                  }).then(function successCallback(response) {
+                      $scope.CommonFeilds = response.data.results;
+
+                  }, function errorCallback(response) {
+                      toastr["info"](response.data.message);
+                  });
+              }
+              function getAllVersions() {
+                  $scope.Versions = [];
+
+                  $http({
+                      method: 'GET',
+                      url: baseUrl + 'Common/GetCommonItem/'
+                  }).then(function successCallback(response) {
+                      $scope.Versions = response.data.results;
+                  }, function errorCallback(response) {
+                      toastr["error"](response.data.message);
+                  });
+              }
+              function getAllSeesion() {
+                  $scope.Sessions = [];
+
+                  $http({
+                      method: 'GET',
+                      url: baseUrl + 'Common/GetCommonItem/'
+                  }).then(function successCallback(response) {
+                      $scope.Sessions = response.data.results;
+                  }, function errorCallback(response) {
+                      toastr["error"](response.data.message);
+                  });
+              }
+
+              function getAllShift() {
+                  $scope.Shifts = [];
+
+                  $http({
+                      method: 'GET',
+                      url: baseUrl + 'Common/GetCommonItem/'
+                  }).then(function successCallback(response) {
+                      $scope.Shifts = response.data.results;
+                  }, function errorCallback(response) {
+                      toastr["error"](response.data.message);
+                  });
+              }
+              function getAllClass() {
+                  $scope.CommonFeilds = [];
+
+                  $http({
+                      method: 'GET',
+                      url: baseUrl + 'Common/GetCommonItem/'
+                  }).then(function successCallback(response) {
+                      $scope.CommonFeilds = response.data.results;
+                  }, function errorCallback(response) {
+                      toastr["error"](response.data.message);
+                  });
+              }
+              function getAllSection() {
+                  $scope.CommonFeilds = [];
+
+                  $http({
+                      method: 'GET',
+                      url: baseUrl + 'Common/GetCommonItem/'
+                  }).then(function successCallback(response) {
+                      $scope.CommonFeilds = response.data.results;
+                      //$scope.CommonFeilds = [];
+                  }, function errorCallback(response) {
+                      toastr["error"](response.data.message);
+                  });
+              }
+
+
+              $scope.getMainExam = function getMainExam() {
+                  $scope.MainExams = [];
+                  $http({
+                      method: 'GET',
+                      url: baseUrl + 'ExamSetup/GetMainExamForMarksEntry/' + $scope.StudentExamFilter.SessionId + "/" + $scope.StudentExamFilter.ClassId + "/" + $scope.StudentExamFilter.SubjectID + "/" + $scope.StudentExamFilter.TermId
+                  }).then(function successCallback(response) {
+
+                      $scope.MainExams = response.data.results;
+                  }, function errorCallback(response) {
+                      toastr["error"](response.data.message);
+                  });
+              }
+   
+
+              $scope.getSubjects = function getSubjects() {
+                  $scope.Subjects = [];
+                  $http({
+                      method: 'GET',
+                      url: baseUrl + 'SubjectSetup/GetAllSubjectForMarksEntryByTeacherId/' + $scope.StudentExamFilter.ClassId + "/" + $scope.StudentExamFilter.SessionId
+                  }).then(function successCallback(response) {
+                      $scope.Subjects = response.data.results;
+                  }, function errorCallback(response) {
+                      toastr["error"](response.data.message);
+                  });
+              }
+
+              function StudentMarkEntryReport() {
+               
+                  $scope.StudentReports = [];
+                 
+                  var form = document.createElement("form");
+                  form.target = "_blank";
+                  form.method = "POST";
+                  form.action = window.location.origin + '/Report/StudentMarkEntryReport/';
+                  form.style.display = "none";
+
+                  for (var key in $scope.StudentExamFilter) {
+                      var input = document.createElement("input");
+                      input.type = "hidden";
+                      input.name = key;
+                      if ($scope.StudentExamFilter[key] != "") {
+                          input.value = $scope.StudentExamFilter[key]
+                      }
+                      else {
+                          input.value = " "
+                      }
+                      form.appendChild(input);
+                  }
+
+                  document.body.appendChild(form);
+                  form.submit();
+                  document.body.removeChild(form);
+                
+              };
+              function BothMarkEntry0AReport() {
+
+                  $scope.StudentReports = [];
+
+                  var form = document.createElement("form");
+                  form.target = "_blank";
+                  form.method = "POST";
+                  form.action = window.location.origin + '/Report/BothMarkEntry0AReport/';
+                  form.style.display = "none";
+
+                  for (var key in $scope.StudentExamFilter) {
+                      var input = document.createElement("input");
+                      input.type = "hidden";
+                      input.name = key;
+                      if ($scope.StudentExamFilter[key] != "") {
+                          input.value = $scope.StudentExamFilter[key]
+                      }
+                      else {
+                          input.value = " "
+                      }
+                      form.appendChild(input);
+                  }
+
+                  document.body.appendChild(form);
+                  form.submit();
+                  document.body.removeChild(form);
+
+              };
+
+              function Both0Ainputtedlist() {
+
+                  $scope.StudentReports = [];
+
+                  var form = document.createElement("form");
+                  form.target = "_blank";
+                  form.method = "POST";
+                  form.action = window.location.origin + '/Report/Both0Ainputtedlist/';
+                  form.style.display = "none";
+
+                  for (var key in $scope.StudentExamFilter) {
+                      var input = document.createElement("input");
+                      input.type = "hidden";
+                      input.name = key;
+                      if ($scope.StudentExamFilter[key] != "") {
+                          input.value = $scope.StudentExamFilter[key]
+                      }
+                      else {
+                          input.value = " "
+                      }
+                      form.appendChild(input);
+                  }
+
+                  document.body.appendChild(form);
+                  form.submit();
+                  document.body.removeChild(form);
+
+              };
+          }]);
+    </script>
+
+    <script type="text/javascript">
+
+        $(document).ready(function ($) {
+
+            // Disable scroll when focused on a number input.
+            $(document).on('focus', 'input[type=number]', function (e) {
+                $(this).on('wheel', function (e) {
+                    e.preventDefault();
+                });
+            });
+
+            // Restore scroll on number inputs.
+            $(document).on('blur', 'input[type=number]', function (e) {
+                $(this).off('wheel');
+            });
+
+            $(document).on('keydown', 'input[type=number]', function (e) {
+                var id = $(this).attr('id');
+                var data = id.split("_");
+                if (e.which == 38 || e.which == 40)
+                    e.preventDefault();
+                //if (e.keyCode == 13) {
+                //    $(this).next('input[type=number]').focus();
+                //}
+                if(e.which === 13 || e.which == 40) {
+                    var num = parseInt(data[1]) + 1;
+                    var ID = "#" + data[0] + "_" + String(num);
+                    $(ID).focus();
+                }
+
+                if (e.which == 38) {
+                    var num = parseInt(data[1]) - 1;
+                    var ID = "#" + data[0] + "_" + String(num);
+                    $(ID).focus();
+                }
+            });
+            //// onkeypress="return (event.charCode == 8 || event.charCode == 0) ? null : event.charCode >= 48 && event.charCode <= 57)
+            // function isNumberKey(evt) {
+            //     var charCode = (evt.which) ? evt.which : evt.keyCode;
+            //     var type = true;
+            //     //if (charCode != 46 && charCode > 31 && (charCode < 48 || charCode > 57))
+            //     //    type = false;
+            //     if (charCode == 107 || charCode == 109)
+            //         type = false;
+
+            //     return type;
+            // }
+        });
+    </script>     
+}

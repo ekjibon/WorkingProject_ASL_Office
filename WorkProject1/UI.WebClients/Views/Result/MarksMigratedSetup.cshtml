@@ -1,0 +1,454 @@
+﻿
+@{
+    ViewBag.Title = "Marks Migration Setup";
+}
+
+<style type="text/css">
+    .table thead tr th {
+        font-size: 12px !important;
+        color: white !important;
+        font-weight: 600 !important;
+    }
+</style>
+<div ng-controller="marksMigratedSetup">
+    <!-- Begin: life time stats -->
+    <div class="portlet light bordered">
+        <div class="portlet-title">
+            <div class="caption">
+                <i class="icon-settings font-green"></i>
+                <span class="caption-subject font-green sbold uppercase">@ViewBag.Title</span>
+            </div>
+            <div class="actions">
+                <div class="btn-group btn-group-solid">
+                    <button ng-click="resetForm()" class="btn green" data-target="#addmodal" data-toggle="modal"> <i class="fa fa-plus"></i> Add Migration Setup</button>
+                </div>
+            </div>
+        </div>
+        <div class="portlet-body">
+
+            <form class="form-horizontal" ng-submit="getMarksMigratedSetup()" id="frmCommon" name="formCommonFeilds" novalidate>
+                <div class="form-body">
+                    <div class="row">
+                 <div class="col-md-4">
+                            <div class="form-group" ng-class="{ 'has-error' : submitted1 && formCommonFeilds.Session.$invalid}">
+                                <label class="col-md-5 control-label">
+                                    Session :
+                                    <span class="required">*</span>
+                                </label>
+                                <div class="col-md-7"> 
+                                    <select class="form-control" ng-model="Filter.SessionID" required name="Session" ng-options="MarksMigrationSetup.SessionId as MarksMigrationSetup.SessionName for MarksMigrationSetup in CommonFeilds.Session">
+                                        <option value="" selected="selected">Select</option>
+                                    </select>
+                                    <div class="form-control-focus"> </div>
+                                    <span ng-show="submitted1 && formCommonFeilds.Session.$error.required" class="help-block">Session Required</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group" ng-class="{ 'has-error' : submitted1 && formCommonFeilds.Class.$invalid}">
+                                <label class="col-md-5 control-label">
+                                    Class :
+                                    <span class="required">*</span>
+                                </label>
+                                <div class="col-md-7">
+                                    <select class="form-control" ng-model="Filter.ClassID" name="Class" required ng-options="MarksMigrationSetup.ClassId as MarksMigrationSetup.ClassName for MarksMigrationSetup in CommonFeilds.ClassInfo">
+                                        <option value="" selected="selected">Select</option>
+                                    </select>
+                                    <div class="form-control-focus"> </div>
+                                    <span ng-show="submitted1 && formCommonFeilds.Class.$error.required" class="help-block">Class Required</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="btn-group btn-group-solid pull-right" style="margin-bottom:5px">
+                                <button ng-click="submitted1=true" class="btn btn-primary btn-large">&nbsp;&nbsp; <i class="fa fa-search"></i> Show &nbsp;&nbsp;&nbsp;&nbsp;</button>
+                                <a style="margin-left:15px" ng-click="generateReport()" class="btn btn-primary">Report</a>
+                             </div>
+                        </div>
+                    </div>
+                   
+
+                </div>
+            </form>
+
+            <div class="table-container">
+                <div id="sample_3_wrapper" class="dataTables_wrapper no-footer">
+                    <div class="table-scrollable"> </div>
+                    <table class="table table-bordered table-hover">
+                        <thead>
+                            <tr class="bg-primary">
+                                <th width="15%">Class Name</th>
+                                <th width="15%">Body Calculation Rule</th>
+                                <th width="15%">Total Calculatuon Rule</th>                             
+                                <th width="10%">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-show="MarksMigratedSetups.results.length ==0"><td colspan="5" style="text-align:center;"><i class="fa fa-refresh"></i> Data not found!</td></tr>
+                            <tr dir-paginate="item in MarksMigratedSetups.results|itemsPerPage:pagesize" total-items="total_count"> 
+                                <td ng-disabled="processStatus==1">
+                                    {{item.ClassName}}
+                                </td>                                
+                                <td ng-disabled="processStatus==1">
+                                <select class="form-control" ng-model="item.BodyCalculationRule" ng-disabled="processStatus==1">
+                                    <option value="" selected="selected">Select</option>
+                                    <option value="R">Round</option>
+                                    <option value="F">Floor</option>
+                                    <option value="C">Celling</option>
+                                    <option value="O">Original</option>
+                                </select>
+                                </td>
+                                <td ng-disabled="processStatus==1">
+                                    <select class="form-control" ng-model="item.TotalCalculatuonRule" ng-disabled="processStatus==1">
+                                        <option value="" selected="selected">Select</option>
+                                        <option value="R">Round</option>
+                                        <option value="F">Floor</option>
+                                        <option value="C">Celling</option>
+                                        <option value="O">Original</option>
+                                    </select>
+                                </td>
+                                <td ng-disabled="processStatus==1">
+                                    <a  ng-disabled="processStatus==1" href="javascript:;" class="btn btn-icon-only green" ng-click="edit(item)" data-target="#addmodal" data-toggle="modal">
+                                        <i class="fa fa-edit"></i>
+                                    </a>
+                                    <a ng-disabled="processStatus==1" ng-click="deleteMarksMigratedSetup(item)" href="javascript:;" class="btn btn-icon-only red">
+                                        <i class="fa fa-trash"></i>
+                                    </a>
+
+
+                                </td>
+
+                            </tr>
+                            <tr ng-disabled="processStatus==1" ng-show="MarksMigratedSetups.results.length > 0">
+                                <td colspan="10">
+                                    <button ng-disabled="processStatus==1" ng-click="bulkUpdate()" class="btn btn-primary pull-right">&nbsp;<i class="fa fa-floppy-o"></i> Save &nbsp;</button>
+                                </td>
+                            </tr>
+                        </tbody>
+
+                    </table>
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- End: life time stats -->
+    <!--Modal Area Start-->
+    <div id="addmodal" class="modal fade" tabindex="-1" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <form name="addform" ng-submit="save()" class="form-horizontal" id="form_sample_1" novalidate>
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">X</button>
+                        <h4 class="modal-title">{{modalTitle}}</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                  <div class="form-group" ng-class="{ 'has-error' : submitted && addform.Session.$invalid}">
+                                        <label class="col-md-4 control-label">
+                                            Session :
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-8">
+                                            <select class="form-control" ng-disabled="MarksMigratedSetup.ID !=0" ng-model="MarksMigratedSetup.SessionID" required name="Session" ng-options="MarksMigrationSetup.SessionId as MarksMigrationSetup.SessionName for MarksMigrationSetup in CommonFeilds.Session">
+                                                <option value="" selected="selected">Select</option>
+                                            </select>
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted && addform.Session.$error.required" class="help-block">Session Required</span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group" ng-class="{ 'has-error' : submitted && addform.Class.$invalid}">
+                                        <label class="col-md-4 control-label">
+                                            Class :
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-8">
+                                            <select class="form-control"  ng-model="MarksMigratedSetup.ClassID"  name="Class" required ng-options="MarksMigrationSetup.ClassId as MarksMigrationSetup.ClassName for MarksMigrationSetup in CommonFeilds.ClassInfo">
+                                                <option value="" selected="selected">Select</option>
+                                            </select>
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted && addform.Class.$error.required" class="help-block">Class Required</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                      <div class="form-group" ng-class="{ 'has-error' : submitted && addform.BodyCalculationRule.$invalid}">
+                                        <label class="col-md-6 control-label">
+                                            Body Calculation Rule :
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-6">
+                                            <select class="form-control" ng-model="MarksMigratedSetup.BodyCalculationRule" name="BodyCalculationRule" required>
+                                                <option value="" selected="selected">Select</option>
+                                                <option value="R">Round</option>
+                                                <option value="F">Floor</option>
+                                                <option value="C">Celling</option>
+                                                <option value="O">Original</option>
+                                            </select>
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted && addform.BodyCalculationRule.$error.required" class="help-block">Body Calculation Rule Required</span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group" ng-class="{ 'has-error' : submitted && addform.TotalCalculatuonRule.$invalid}">
+                                        <label class="col-md-6 control-label">
+                                            Total Calculatuon Rule :
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-6">
+                                            <select class="form-control" ng-model="MarksMigratedSetup.TotalCalculatuonRule" name="TotalCalculatuonRule" required>
+                                                <option value="" selected="selected">Select</option>
+                                                <option value="R">Round</option>
+                                                <option value="F">Floor</option>
+                                                <option value="C">Celling</option>
+                                                <option value="O">Original</option>
+                                            </select>
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted && addform.TotalCalculatuonRule.$error.required" class="help-block">Total Calculatuon Rule Required</span>
+                                        </div>
+                                    </div>
+                                </div>                                    
+                                
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" data-dismiss="modal" class="btn dark btn-outline" ng-click="resetForm();submitted=false">Cancel</button>
+                        <button type="submit" ng-click="submitted=true" class="btn green-haze">Save</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!--Modal Area End-->
+
+</div>
+
+@section Scripts{
+    <script type="text/javascript">
+        OEMSApp.controller("marksMigratedSetup", ["$scope", "$http", "SweetAlert", "blockUI", "$window",
+              function ($scope, $http, SweetAlert, blockUI, $window) {
+
+                  init();
+                  function init() {
+                      initialize();
+                      getAllCommons();
+                      getAllMarksMigratedSetup();
+
+                  }
+                  function initialize() {
+                      $scope.modalTitle = "Add Migration Setup";
+                      $scope.MarksMigratedSetup = {};
+                      $scope.MarksMigratedSetup.ID = 0;
+                      $scope.currentPage = 1;
+                      $scope.pageno = 1;
+                      $scope.pagesize = 20;
+                      $scope.total_count = 12;
+                      $scope.search = '';
+                      $scope.MarksMigratedSetups = [];
+                      $scope.Filter = {};
+
+                      $scope.CommonFeilds = [];
+
+                      $scope.getMarksMigratedSetup = getMarksMigratedSetup;
+                      $scope.res = {};
+                      $scope.data = {};
+                      $scope.resetForm = resetForm;
+                      $scope.getAllCommons = getAllCommons;
+
+                  }
+                  //for class ways report ........ 
+                  $scope.generateReport = function generateReport() {
+                   if ($scope.Filter.SessionID == null) {
+                          toastr["info"]("Select a Session.");
+                      }
+                      else {
+                          $scope.uri = "@Url.Action("RoundingRuleReport", "Report")?SessionID=" + $scope.Filter.SessionID;
+                          $window.open($scope.uri, '_blank');
+                      }
+
+                  }
+                  function resetForm() {
+                      $scope.modalTitle = "Add Migration Setup";              
+                      $scope.MarksMigratedSetup = {};
+                      $scope.MarksMigratedSetup.ID = 0;
+                      $scope.submitted1 = false;
+                      $scope.submitted = false;
+                      $scope.Id = '';
+                  }
+                  function reset() {
+                      $scope.modalTitle = "Add Migration Setup";
+                      $scope.MarksMigratedSetup.BodyCalculationRule = null;
+                      $scope.MarksMigratedSetup.TotalCalculatuonRule = null;
+                      $scope.MarksMigratedSetup.ID = 0;
+                      $scope.submitted1 = false;
+                      $scope.submitted = false;                        
+                  }
+                  $scope.GetGroup = function GetGroup(classid) {
+                      $scope.Groups = [];
+
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Common/GetGroup/' + classid
+                      }).then(function successCallback(response) {
+                          $scope.Groups = response.data.results;
+                      }, function errorCallback(response) {
+                          toastr["error"](response.data.Message);
+                      });
+
+                  }
+                  function getAllCommons() {
+                      //$scope.CommonFeilds = [];
+
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Common/GetCommonItem/'
+                      }).then(function successCallback(response) {
+                          $scope.CommonFeilds = response.data.results;
+                      }, function errorCallback(response) {
+                          toastr["error"](response.data.Message);
+                      });
+                  }
+                  function getAllMarksMigratedSetup() {
+
+                      blockUI.start();
+                      $scope.MarksMigratedSetups = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + '/ExamSetup/GetMarksMigratedSetup/'
+                      }).then(function successCallback(response) {
+                          $scope.MarksMigratedSetups = response.data;
+                          toastr["info"](response.data.message);
+                          $scope.total_count = response.data.totalcount;
+                          if ($scope.pagesize == -1)
+                              $scope.pagesize = 500;
+                          blockUI.stop();
+                      }, function errorCallback(res) {
+                          toastr["error"](res.data.Message);
+                          blockUI.stop();
+                      });
+
+                  }
+
+                  function getMarksMigratedSetup() {
+                      
+                      blockUI.start();
+                      $scope.MarksMigratedSetups = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + '/ExamSetup/GetMarksMigratedSetup/' + $scope.Filter.VersionID + '/' + $scope.Filter.SessionID + '/' + $scope.Filter.ClassID
+                      }).then(function successCallback(response) {
+                          $scope.MarksMigratedSetups = response.data;
+                          $scope.processStatus = response.data.status;
+                          toastr["info"](response.data.message);
+                          $scope.total_count = response.data.totalcount;
+                          if ($scope.pagesize == -1)
+                              $scope.pagesize = 500;
+                         blockUI.stop();
+                      }, function errorCallback(res) {
+                          toastr["error"](res.data.Message);
+                          blockUI.stop();
+                      });
+
+                  }
+                  $scope.searchData = function () {
+                     getMarksMigratedSetup();
+                  };
+
+                  $scope.edit = function (n) {
+                      $scope.modalTitle = "Update Subject";
+                      $scope.MarksMigratedSetup = n;
+                      $scope.SubID = n.SubID;
+                      $scope.NoEffectOnExam;
+
+                  };
+
+                  $scope.save = function save() {
+
+                      if ($scope.addform.$invalid)
+                          return;
+
+                      if ($scope.MarksMigratedSetup.ID != 0) /// For Update
+                      {
+                          if ($scope.MarksMigratedSetup != '') {
+                              $http({
+                                  method: 'PUT',
+                                  url: baseUrl + '/ExamSetup/UpdateMarksMigratedSetup/',
+                                  data: $scope.MarksMigratedSetup
+                              }).then(function successCallback(response) {                                  
+                                  $scope.MarksMigratedSetups = response.data;
+                                  toastr["info"](response.data.message);
+                                  reset();
+                              }, function errorCallback(response) {
+                                  toastr["error"](response.data.Message);
+                              });
+                          }
+                      } else {  //  For Add
+                          if ($scope.MarksMigratedSetup != {}) {
+                              $http({
+                                  method: 'POST',
+                                  url: baseUrl + '/ExamSetup/AddMarksMigratedSetup/',
+                                  data: $scope.MarksMigratedSetup
+                              }).then(function successCallback(response) {
+                                  $scope.MarksMigratedSetups = response.data;
+                                  toastr["info"](response.data.message);                                
+                                  reset();
+                              }, function errorCallback(response) {
+                                  toastr["error"](response.data.Message);
+                              });
+                          }
+                      }
+
+                  };
+
+                  $scope.bulkUpdate = function bulkUpdate() {                      
+                      $http({
+                          method: 'PUT',
+                          url: baseUrl + '/ExamSetup/BulkUpdateMarksMigratedSetup/',
+                          data: $scope.MarksMigratedSetups.results
+                      }).then(function successCallback(response) {
+                          $scope.MarksMigratedSetups = response.data;
+                         toastr["info"](response.data.message);                        
+                      }, function errorCallback(response) {
+                          toastr["error"](response.data.Message);
+                      });
+                    
+
+                  };
+
+                  $scope.deleteMarksMigratedSetup = function deleteMarksMigratedSetup(n) {
+
+                      // SweetAlert.swal("Good job!", "You clicked the button!", "success");
+                      SweetAlert.swal({
+                          title: "Are you sure to delete it ?", type: "warning", showCancelButton: true, confirmButtonColor: "#DD6B55",
+                          confirmButtonText: "Yes, delete it!",
+                          closeOnConfirm: false
+                      },
+                      function (isConfirm) {
+                          if (isConfirm) {
+                              $http({
+                                  method: 'DELETE',
+                                  url: baseUrl + '/ExamSetup/DeleteMarksMigratedSetup/' + n.ID
+                              }).then(function successCallback(response) {
+                                  SweetAlert.swal("Deleted!", "Your data has been deleted.", "success");
+                                  getAllMarksMigratedSetup();
+                              }, function errorCallback(response) {
+                                  toastr["error"](response.data.Message);
+                              });
+
+                          }
+                      });
+
+
+                  };
+
+              }]);
+        $(document).ready(function () {
+            $('[data-toggle="tooltip"]').tooltip();
+        });
+    </script>
+
+}
+

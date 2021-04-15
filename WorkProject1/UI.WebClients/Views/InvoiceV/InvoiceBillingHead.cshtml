@@ -1,0 +1,381 @@
+﻿
+@{
+    ViewBag.Title = "Billing Head";
+}
+
+
+
+<div class="kt-container  kt-container--fluid  kt-grid__item kt-grid__item--fluid" ng-controller="ctrlSalaryHead">
+    <div class="row">
+        <div class="kt-portlet kt-portlet--mobile">
+            <div class="kt-portlet__head kt-portlet__head--lg">
+                <div class="kt-portlet__head-label">
+                    <h3 class="kt-portlet__head-title">
+                        All Billing Head
+                    </h3>
+                </div>
+                <div class="kt-portlet__head-toolbar">
+                    <div class="kt-portlet__head-wrapper">
+                        <div class="dropdown dropdown-inline">
+                            <button type="button" class="btn btn-brand btn-icon-sm" data-toggle="modal" data-target="#addmodal" aria-haspopup="true" aria-expanded="false">
+                                <i class="flaticon2-plus"></i> Add New Billing Head
+                            </button>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="kt-portlet__body">
+
+
+                <div class="row">
+                    <div class="col-md-4 col-sm-5 col-xs-6">
+                        <div class="form-group">
+                            <div class="col-lg-3 col-md-5 col-sm-4 col-xs-8" style="padding-left:0px">
+
+                                <select class="form-control kt-font-brand" ng-model="pageSize" ng-options="P.value as P.text for P in pageSizeArray"></select>
+                            </div>
+
+                        </div>
+
+                    </div>
+                    <div class="col-md-4 col-sm-3 col-xs-1">
+                    </div>
+                    <div class="col-md-4 col-sm-4 col-xs-5">
+                        <div id="sample_3_filter" class="pull-right">
+                            <input ng-model="q" id="search" class="form-control" placeholder="Filter text">
+                        </div>
+                    </div>
+                </div>
+                <table class="table table-bordered table-hover rounded">
+                    <thead>
+                        <tr class="btn-primary">
+                            <th>SL#</th>
+                            <th>Billing Head Name</th>
+                            <th>Billing Head Type</th>
+                            <th style="text-align:center">Active Status</th>
+                            <th style="text-align:center">Discount</th>
+
+                            <th style="text-align:center">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-show="invoiceBillingHeadlist.length <= 0"><td colspan="5" style="text-align:center;"><i class="fa fa-refresh"></i> Loading new data!!</td></tr>
+                        <tr dir-paginate="item in invoiceBillingHeadlist| filter:q  | itemsPerPage: pageSize" current-page="currentPage">
+                            <td>{{$index+1}}</td>
+                            <td>{{item.BillingHeadName}}</td>
+                            <td>{{item.BillingHeadType}}</td>
+                            <td align="center" ng-if="item.Status=='A'">
+                                <a class="label label-md label-primary" value='Active' ng-click="changeStatus(item)">Active</a>
+                            </td>
+
+                            <td align="center" ng-if="item.Status=='I'">
+                                <a class="label label-md label-warning" value='Inactive' ng-click="changeStatus(item)">Inactive</a>
+                            </td>
+                            <td align="center" ng-if="item.IsDiscount==true">
+                                <a class="label label-md label-primary" value='Active'>Yes</a>
+                            </td>
+
+                            <td align="center" ng-if="item.IsDiscount!=true">
+                                <a class="label label-md label-warning" value='Inactive'>No</a>
+                            </td>
+                            <td align="center" @*ng-show="item.IsEdit==0"*@>
+                                <a href="javascript:;" class="btn btn-outline-brand btn-elevate btn-icon" ng-click="editBillingHead(item)" data-target="#addmodal" data-toggle="modal">
+                                    <i class="fa fa-edit"></i>
+                                </a>
+                                <a ng-click="deletBillingHead(item.Id)" href="javascript:;" class="btn btn-outline-danger btn-elevate btn-icon">
+                                    <i class="fa fa-trash"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="row">
+                    <dir-pagination-controls boundary-links="true" template-url="~/assets/angular/lib/dirPagination.tpl.html"></dir-pagination-controls>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!--Modal Area Start-->
+    <div id="addmodal" class="modal fade" tabindex="-1" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form name="addBasic" ng-submit="save()" class="form-horizontal" id="form_sample_1" novalidate>
+                    <div class="modal-header">
+                        <h4 class="modal-title">{{modalTitle}}</h4>
+                        <button type="button" class="close" data-dismiss="modal" ng-click="resetForm();submitted=false" aria-hidden="true"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-body">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group row" ng-class="{ 'has-error' : submitted && addBasic.BillingHeadName.$invalid}">
+                                        <label class="col-md-4 control-label"style="text-align:right">
+                                            Billing Head Name :
+                                            <span class="required">*</span>
+                                            @*<input type="text" ng-model="BillingHeadInfo.Id" class="form-control">*@
+                                        </label>
+                                        <div class="col-md-8">
+                                            <input type="text" ng-model="BillingHeadInfo.BillingHeadName" class="form-control" placeholder="Billing Head Name" name="BillingHeadName" required>
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted &&  addBasic.BillingHeadName.$error.required" class="help-block">Head Name Required</span>
+                                        </div>
+                                      
+                                    </div>
+
+                                    <div class="form-group row" ng-class="{ 'has-error' : submitted && addBasic.BillingHeadType.$invalid}">
+                                        <label class="col-md-4 control-label"style="text-align:right">
+                                            Billing Head Type :
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-8">
+                                            <select ng-model="BillingHeadInfo.BillingHeadType" class="form-control" placeholder="Billing Head Type" name="BillingHeadType" required>
+                                                <option value=''>Choose Option</option>
+                                                <option value='ONETIME'>ONE TIME</option>
+                                                <option value='MONTHLY'>MONTHLY</option>
+                                                <option value='YEARLY'>YEARLY</option>
+                                            </select>
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted &&  addBasic.BillingHeadType.$error.required" class="help-block">Billing Head Type Required</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group row" ng-class="{ 'has-error' : submitted && addBasic.LedgerId.$invalid}">
+                                        <label class="col-md-4 control-label" style="text-align:right">
+                                            Ledger Code :
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-8">
+                                            <select ng-model="BillingHeadInfo.LedgerId" class="form-control" required name="LedgerId" ng-options="ledger.LedgerId as ledger.CodeWithName for ledger in LedgerList">
+                                                <option value="" selected="selected">Choose Option</option>
+                                            </select>
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted &&  addBasic.LedgerId.$error.required" class="help-block">Ledger Code Required</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group row" ng-class="{ 'has-error' : submitted && addBasic.IsDiscount.$invalid}">
+                                        <label class="col-md-12 control-label" style="margin-left:55px">
+                                            IsDiscount :
+                                            <span><input type="checkbox" name="IsDiscount" ng-model="BillingHeadInfo.IsDiscount" ng-true-value="true" ng-false-value="false" /></span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" data-dismiss="modal" class="btn btn-secondary" ng-click="resetForm();submitted=false">Cancel</button>
+                        <button type="submit" ng-click="submitted=true" class="btn btn-success">{{modalbutton}}</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!--Modal Area End-->
+</div>
+<!-- END FORM-->
+@section Scripts{
+    <script src="~/assets/global/plugins/bootstrap-fileinput/bootstrap-fileinput.js" type="text/javascript"></script>
+    <script src="~/assets/pages/scripts/form-repeater.min.js"></script>
+    <script type="text/javascript">
+        for (i = new Date().getFullYear() ; i > 1900; i--) {
+            $('#yearpicker').append($('<option />').val(i).html(i));
+        }
+    </script>
+    <script type="text/javascript">
+        OEMSApp.controller("ctrlSalaryHead", ["$scope", "$http", "SweetAlert",
+              function ($scope, $http, SweetAlert) {
+                  init();
+                  function init() {
+                      initialize();
+                      GetAllInvoiceBillingHead();
+                      GetAllLedgers();
+                  }
+
+                  function initialize() {
+                      $scope.modalbutton = 'Save';
+                      $scope.modalTitle = 'Billing Head';
+                      $scope.brnlist = [];
+                      $scope.BillingHeadInfo = {};
+                      $scope.invoiceBillingHeadlist = [];
+                      $scope.resetForm = resetForm;
+
+                      $scope.pagesize = 10;
+                      $scope.pageSizeArray = [];
+                      $scope.pageSizeArray.push({ value: 5, text: 5 });
+                      $scope.pageSizeArray.push({ value: 10, text: 10 });
+                      $scope.pageSizeArray.push({ value: 20, text: 20 });
+                      $scope.pageSizeArray.push({ value: 50, text: 50 });
+                      $scope.currentPage = 1;
+                      $scope.pageSize = 10;
+                      $scope.BillingHeadInfo.Id = 0;
+                      $scope.BillingHeadInfo.Status = 'A';
+
+                  }
+
+                  function GetAllLedgers() {
+                      //$scope.CommonFeilds = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Accounts/GetAllLedgersForInvoice/'
+                      }).then(function successCallback(response) {
+                          $scope.LedgerList = response.data.results;
+                      }, function errorCallback(response) {
+                      });
+                  }
+
+
+                  $scope.changeStatus = function changeStatus(item) {
+                      $scope.BillingHeadInfo.Id = item.Id;
+                      $scope.BillingHeadInfo.Status = item.Status;
+
+                      SweetAlert.swal({
+                          title: "Are you sure you want to change Activity Status ?", type: "warning", showCancelButton: true, confirmButtonColor: "#DD6B55",
+                          confirmButtonText: "Yes, change it!",
+                          closeOnConfirm: true
+                      },
+                        function (isConfirm) {
+                            if (isConfirm) {
+                                $http({
+                                    method: 'PUT',
+                                    url: baseUrl + 'Invoice/ChangeStatus/',
+                                    data: $scope.BillingHeadInfo
+                                }).then(function successCallback(response) {
+                                    toastr["info"](response.data.message);
+                                    if (response.data.httpStatusCode != 305) {
+                                        GetAllInvoiceBillingHead();
+                                        resetForm();
+                                    }
+
+                                }, function errorCallback(response) {
+                                    toastr["warning"](response.data.Message);
+                                });
+                            }
+                        });
+                  }
+
+                  function GetAllInvoiceBillingHead() {
+                      $scope.invoiceBillingHeadlist = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Invoice/GetAllInvoiceBillingHead'
+                      }).then(function successCallback(response) {
+                          $scope.invoiceBillingHeadlist = response.data.results;
+                      }, function errorCallback(response) {
+                          toastr["info"](response.data.Message);
+                      });
+                  }
+
+                  $scope.deletBillingHead = function deletBillingHead(id) {
+                      SweetAlert.swal({
+                          title: "Are you sure to delete it ?", type: "warning", showCancelButton: true, confirmButtonColor: "#DD6B55",
+                          confirmButtonText: "Yes, delete it!",
+                          closeOnConfirm: false
+                      },
+                        function (isConfirm) {
+                            if (isConfirm) {
+                                $http({
+                                    method: 'DELETE',
+                                    url: baseUrl + 'Invoice/DeleteInvoiceBillingHead/'+id,
+
+                                }).then(function successCallback(response) {
+                                    SweetAlert.swal("Deleted!", "Your data has been deleted.", "success");
+                                    GetAllInvoiceBillingHead();
+                                }, function errorCallback(response) {
+                                    toastr["error"](response.data.Message);
+                                });
+                            }
+                        });
+                  }
+
+                  $scope.editBillingHead = function editBillingHead(item) {
+                      $scope.modalTitle = "Update Billing Head";
+                      $scope.modalbutton = 'Update';
+                      $scope.BillingHeadInfo.Id = item.Id;
+                      $scope.BillingHeadInfo.BillingHeadName = item.BillingHeadName;
+                      $scope.BillingHeadInfo.BillingHeadType = item.BillingHeadType;
+                      $scope.BillingHeadInfo.LedgerId = item.LedgerId;
+                      $scope.BillingHeadInfo.Status = item.Status;
+                  }
+                 
+                  $scope.save = function save() {
+                      if ($scope.addBasic.$invalid)
+                          return;
+                      else {
+                          var result = validation();
+                          if (result) {
+
+                              if ($scope.BillingHeadInfo.Id != 0) /// For Update
+                              {
+                                  if ($scope.BillingHeadInfo != '') {
+                                      $http({
+                                          method: 'PUT',
+                                          url: baseUrl + 'Invoice/UpdateInvoiceBillingHead',
+                                          data: $scope.BillingHeadInfo
+                                      }).then(function successCallback(response) {
+                                          $('#addmodal').modal('toggle');
+                                          toastr["info"](response.data.message);
+                                          GetAllInvoiceBillingHead();
+                                          resetForm();
+                                      }, function errorCallback(response) {
+                                          toastr["warning"](response.data.Message);
+                                      });
+                                  }
+                              }
+                              else {  //  For Add
+                                  console.log('Create')
+                                  console.log($scope.BillingHeadInfo)
+                                  $scope.BillingHeadInfo.Status = 'A';
+                                  $http({
+                                      method: 'POST',
+                                      url: baseUrl + 'Invoice/AddInvoiceBillingHead',
+                                      data: $scope.BillingHeadInfo
+                                  }).then(function successCallback(response) {
+                                      $('#addmodal').modal('toggle');
+                                      toastr["info"](response.data.message);
+                                      GetAllInvoiceBillingHead();
+                                      resetForm();
+                                  }, function errorCallback(response) {
+                                      toastr["warning"](response.data.Message);
+                                  });
+
+                              }
+                          }
+
+                      }
+
+                  }
+
+                  function resetForm() {
+                      $scope.modalTitle = "Add Billing Head";
+                      $scope.BillingHeadInfo = {};
+                      $scope.BillingHeadInfo.Id = 0;
+                      $scope.Id = '';
+                      $scope.addBasic.$setUntouched();
+                      $scope.addBasic.$setPristine();
+                      $scope.modalbutton = 'Save';
+                      $scope.submitted = false;
+                  }
+
+                  function validation() {
+
+                      if ($scope.BillingHeadInfo.Id == undefined) {
+                          return true;
+                      }
+                      else {
+                          if ($scope.BillingHeadInfo.BillingHeadName == null) {
+                              toastr["info"]("Please Select any option..!");
+                              return false;
+                          }
+                          else {
+                              
+                              return true;
+                          }
+                      }
+                  }
+              }]);
+    </script>
+}

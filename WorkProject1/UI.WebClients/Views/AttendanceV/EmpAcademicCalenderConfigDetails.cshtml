@@ -1,0 +1,475 @@
+﻿
+@{
+    ViewBag.Title = "Employee Calendar Config Details";
+}
+<div class="kt-container  kt-container--fluid  kt-grid__item kt-grid__item--fluid" ng-controller="ctrlEmpCalendarConfigDetails">
+    <div class="row">
+        <div class="kt-portlet kt-portlet--mobile">
+            <div class="kt-portlet__head kt-portlet__head--lg">
+                <div class="kt-portlet__head-label">
+                    <h3 class="kt-portlet__head-title">
+                        Employee Calendar Config Details
+                    </h3>
+                </div>
+            </div>
+
+            <div class="kt-portlet__body">
+
+                <form class="form-horizontal" ng-submit="GetEmpCalendarConfigDetails()" name="frmempCalendarConfig" novalidate>
+                    <div class="form-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group row">
+                                    <label class="col-lg-4 col-md-4 control-label pull-left" style="text-align:right">
+                                        Employee :
+                                        <span class="required">*</span>
+                                    </label>
+                                    <div class="col-md-7" ng-class="{ 'has-error' :Submitted  && frmempCalendarConfig.EmpId.$invalid}">
+                                        <input type="text"
+                                               name="EmpId"
+                                               ng-model="Emp"
+                                               typeahead-on-select='onSelect($item, $model, $label)'
+                                               placeholder="Search name/ID"
+                                               uib-typeahead="i  as i.Text for i in Search($viewValue)"
+                                               typeahead-loading="loadingLocations" typeahead-no-results="noResults" class="form-control" required>
+                                        <i ng-show="loadingLocations" class="glyphicon glyphicon-refresh"></i>
+                                        <div ng-show="noResults"><i class="glyphicon glyphicon-remove"></i> No Results Found</div>
+                                        <input type="hidden" name="EmpBasicInfoId" ng-value="Emp.Value" />
+                                        <div class="form-control-focus"> </div>
+                                        <span ng-show="Submitted && frmempCalendarConfig.EmpId.$error.required " class="help-block">Employee Required</span>
+                                    </div>
+                                </div>
+                                <div class="form-group row" ng-class="{ 'has-error' : Submitted && frmempCalendarConfig.Calendar.$invalid}">
+                                    <label class="col-md-4 control-label" style="text-align:right">
+                                        Calendar:
+                                        <span class="required">*</span>
+                                    </label>
+                                    <div class="col-md-7">
+                                        <select class="form-control" name="Calendar" ng-model="empCalendarConfig.CalendarId" required ng-options="aCal.Id as aCal.Title for aCal in EmpCalenderList">
+                                            <option value="" selected="selected">Please Select</option>
+                                        </select>
+                                        <span ng-show="Submitted &&  frmempCalendarConfig.Calendar.$error.required" class="help-block">Calendar is Required</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group row">
+                                    <label class="col-lg-4 col-md-4 control-label pull-left" style="text-align:right">
+                                        Year:
+                                        <span class="required">*</span>
+                                    </label>
+                                    <div class="col-md-7" ng-class="{ 'has-error' :Submitted  && frmempCalendarConfig.Year.$invalid}">
+                                        <select class="form-control" ng-model="empCalendarConfig.Year" name="Year" ng-options="aYear.Value as aYear.Text for aYear in YearList" required>
+                                            <option value="" selected="selected">Select</option>
+                                        </select>
+                                        <div class="form-control-focus"> </div>
+                                        <span ng-show="Submitted && frmempCalendarConfig.Year.$error.required " class="help-block">Year Required</span>
+
+                                    </div>
+                                </div>
+                                <div class="form-group row" ng-class="{ 'has-error' : Submitted && frmempCalendarConfig.Month.$invalid}">
+                                    <label class="col-md-4 control-label" style="text-align:right">
+                                        Month:
+                                        <span class="required">*</span>
+                                    </label>
+                                    <div class="col-md-7">
+                                        <select class="form-control" name="Month" ng-model="empCalendarConfig.Month" required ng-options="aMonth.Value as aMonth.Text for aMonth in MonthList">
+                                            <option value="" selected="selected">Select</option>
+                                        </select>
+                                        <span ng-show="Submitted &&  frmempCalendarConfig.Month.$error.required" class="help-block">Month is Required</span>
+                                    </div>
+                                </div>
+                                <div class="form-group row pull-right" style="padding-right:62px;">
+                                    <button type="submit" ng-click="Submitted=true" class="btn btn-success">Show</button>&nbsp;
+                                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#bulkModal" aria-haspopup="true" aria-expanded="false">Bulk Update</button>
+
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </form>
+                <table class="table table-bordered table-hover rounded">
+                    <thead>
+                        <tr class="bg-primary" style="color:white">
+                            <th>Date</th>
+                            <th>Office Day</th>
+                            <th>Day Type</th>
+                            <th>In Time</th>
+                            <th>Out Time</th>
+                            <th class="text-center">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="item in EmpCalendarConfigDetailsList" @*style="background-color:{{item.ColorCode}}"*@>
+                            <td width="20%">{{item.CalendarDate| date:'MMMM dd, yyyy , (EEEE)' }}</td>
+                            <td width="15%">{{item.OfficeDay}}</td>
+                            <td width="15%">
+                                <select class="form-control" ng-model="item.AttDayType" name="DayType">
+                                    <option value="Regular">Regular</option>
+                                    <option value="Weekend">Weekend</option>
+                                </select>
+                            </td>
+                            <td width="20%">
+                                <div class="row">
+                                    <div class="col-sm-4">
+                                        {{item.OfficeInTime | date: 'shortTime'}}
+                                    </div>
+                                    <div class="col-sm-8">
+                                        <input type="time" ng-model="item.OfficeInTime" class="form-control" name="InTime">
+                                    </div>
+                                </div>
+
+                            </td>
+                            <td width="20%">
+                                <div class="row">
+                                    <div class="col-sm-4">
+                                        {{item.OfficeOutTime | date: 'shortTime'}}
+                                    </div>
+                                    <div class="col-sm-8">
+                                        <input type="time" ng-model="item.OfficeOutTime" class="form-control" name="InTime">
+                                    </div>
+                                </div>
+
+                            </td>
+                            <td width="10%" class="text-center"><button ng-click="SaveConfig(item)" class="btn btn-success">Save</button></td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <!--Modal Area Start-->
+                <div id="bulkModal" class="modal fade" tabindex="-1" data-backdrop="static" data-keyboard="false">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <form name="bulkform" ng-submit="BulkUpdate()" class="form-horizontal" id="form_sample_1" novalidate>
+                                <div class="modal-header">
+                                    <h4 class="modal-title">Bulk Update</h4>
+                                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="form-body">
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <div class="form-group row" ng-class="{ 'has-error' : submitted && bulkform.EmpCalendar.$invalid}">
+                                                    <label class="col-md-4 control-label" style="text-align:right">
+                                                        Calender:
+                                                        <span class="required">*</span>
+                                                    </label>
+                                                    <div class="col-md-8">
+                                                        <select class="form-control" name="EmpCalendar" ng-model="empBulkConfig.CalendarId" required ng-options="aCal.Id as aCal.Title for aCal in EmpCalenderList">
+                                                            <option value="" selected="selected">Please Select</option>
+                                                        </select>
+                                                        <div class="form-control-focus"> </div>
+                                                        <span ng-show="submitted && bulkform.EmpCalendar.$error.required" class="help-block">Calender Title Required</span>
+                                                    </div>
+                                                </div>
+
+                                                <div class="form-group row">
+                                                    <label class="col-md-4 control-label" style="text-align:right">
+
+                                                    </label>
+                                                    <div class="col-md-8">
+                                                        <input type="checkbox" class="" style="margin-top:9px" name="IsOverlap" ng-model="empBulkConfig.IsSingleEmp" ng-checked="empBulkConfig.IsSingleEmp==true" />  Update Single Employee Data
+                                                    </div>
+                                                </div>
+                                                <div class="form-group row" ng-class="{ 'has-error' : submitted && bulkform.EmpId.$invalid}" ng-hide="empBulkConfig.IsSingleEmp==false">
+                                                    <label class="col-md-4 control-label" style="text-align:right">
+                                                        Employee :
+                                                        <span class="required">*</span>
+                                                    </label>
+                                                    <div class="col-md-8">
+                                                        <input type="text"
+                                                               name="EmpId"
+                                                               ng-model="Emp2"
+                                                               typeahead-on-select='onSelect2($item, $model, $label)'
+                                                               placeholder="Search name/ID"
+                                                               uib-typeahead="i  as i.Text for i in Search2($viewValue)"
+                                                               typeahead-loading="loadingLocations" typeahead-no-results="noResults" class="form-control" required>
+                                                        <i ng-show="loadingLocations" class="glyphicon glyphicon-refresh"></i>
+                                                        <div ng-show="noResults"><i class="glyphicon glyphicon-remove"></i> No Results Found</div>
+                                                        <input type="hidden" name="EmpBasicId" ng-value="Emp2.Value" />
+                                                        <div class="form-control-focus"> </div>
+                                                        <span ng-show="Submitted && bulkform.EmpId.$error.required " class="help-block">Employee Required</span>
+                                                    </div>
+                                                </div>
+
+                                                <div class="form-group row" ng-class="{ 'has-error' : submitted && bulkform.Branch.$invalid}" ng-hide="empBulkConfig.IsSingleEmp==true">
+                                                    <label class="col-md-4 control-label" style="text-align:right">
+                                                        Branch :
+                                                        <span class="required">*</span>
+                                                    </label>
+                                                    <div class="col-md-8">
+                                                        <select class="form-control" ng-model="empBulkConfig.EmpBranchId" required name="Branch">
+                                                            <option value="" selected="selected">Choose Option</option>
+                                                            <option value="10">Head Office</option>
+                                                            <option value="11">Outside - Head Office</option>
+                                                        </select>
+                                                        <div class="form-control-focus"> </div>
+                                                        <span ng-show="submitted && bulkform.Branch.$error.required" class="help-block">Branch Required</span>
+                                                    </div>
+                                                </div>
+
+                                                <div class="form-group row" ng-class="{ 'has-error' : submitted && bulkform.InTime.$invalid}">
+                                                    <label class="col-md-4 control-label" style="text-align:right">
+                                                        In Time
+                                                        <span class="required">*</span>
+                                                    </label>
+                                                    <div class="col-md-8">
+                                                        <input type="time" ng-model="empBulkConfig.In" class="form-control" name="InTime" required>
+                                                        <div class="form-control-focus"> </div>
+                                                        <span ng-show="submitted && bulkform.InTime.$error.required" class="help-block">In Time Required</span>
+                                                    </div>
+                                                </div>
+
+                                                <div class="form-group row" ng-class="{ 'has-error' : submitted && bulkform.OutTime.$invalid}">
+                                                    <label class="col-md-4 control-label" style="text-align:right">
+                                                        Out Time
+                                                        <span class="required">*</span>
+                                                    </label>
+                                                    <div class="col-md-8">
+                                                        <input type="time" ng-model="empBulkConfig.Out" class="form-control" name="OutTime" required>
+                                                        <div class="form-control-focus"> </div>
+                                                        <span ng-show="submitted && bulkform.OutTime.$error.required" class="help-block">Out Time Required</span>
+                                                    </div>
+                                                </div>
+
+
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" data-dismiss="modal" class="btn  btn-secondary" ng-click="ResetForm();submitted=false">Cancel</button>
+                                    <button type="submit" ng-click="submitted=true" class="btn btn-success">Update</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <!--Modal Area End-->
+
+                <div class="row">
+                    <dir-pagination-controls boundary-links="true" template-url="~/assets/angular/lib/dirPagination.tpl.html"></dir-pagination-controls>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+
+    <script type="text/javascript">
+
+        OEMSApp.controller("ctrlEmpCalendarConfigDetails", ["$scope", "$http", "SweetAlert", "$window",
+              function ($scope, $http, SweetAlert, $window) {
+                  init();
+                  function init() {
+                      initialize();
+                      getEmpClanderList();
+                  }
+                  function initialize() {
+                      $scope.empCalendarConfig = {};
+                      $scope.Calendar = [];
+                      $scope.EmpCalenderList = [];
+                      $scope.btnDis = false;
+                      $scope.spin = false;
+                      $scope.Submitted = false;
+                      $scope.isChange = false;
+                      $scope.isChange1 = false;
+                      getAllYear();
+                      getAllMonth();
+                      //$scope.getAllMonth = getAllMonth;
+                      $scope.GetEmpCalendarConfigDetails = GetEmpCalendarConfigDetails;
+                      $scope.EmpCalendarConfigDetailsList = [];
+                      $scope.empBulkConfig = {};
+                      $scope.empBulkConfig.IsSingleEmp = false;
+                      $scope.ResetForm = ResetForm;
+                  };
+                  function setProgress(s) {
+                      $scope.btnDis = s;
+                      $scope.spin = s;
+                  }
+                  function getAllYear() {
+                      $scope.YearList = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Common/GetAllYear/'
+                      }).then(function successCallback(response) {
+                          $scope.YearList = response.data.results.Table;
+                      }, function errorCallback(response) {
+                          toastr["warning"](response.data.Message);
+                      });
+                  }
+                  function getAllMonth() {
+                      $scope.MonthList = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Common/GetAllMonth/'
+                      }).then(function successCallback(response) {
+                          $scope.MonthList = response.data.results.Table;
+                      }, function errorCallback(response) {
+                          toastr["warning"](response.data.Message);
+                      });
+                  }
+                  function getEmpClanderList() {
+                      $scope.EmpCalenderList = [];
+
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Attendance/GetEmpCalendarList/'
+                      }).then(function successCallback(response) {
+                          $scope.EmpCalenderList = response.data.results;
+                          //console.log(response.data.results);
+
+                      }, function errorCallback(response) {
+
+                      });
+
+                  }
+
+                  $scope.chkChanged = function () {
+                      $scope.isChange = true;
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Attendance/GetYearRange/' + $scope.empCalendarConfig.CalendarId
+                      }).then(function successCallback(response) {
+                          $scope.EmpCalenderYearList = response.data.results;
+                          //console.log(response.data.results);
+                          //angular.forEach($scope.EmpCalenderList, function (value, key) {
+                          //    if (value.EmpCategory == 1003 && value.Id == $scope.empCalendarConfig.CalendarId) {
+                          //        $scope.show = true;
+                          //    }
+                          //})
+                      }, function errorCallback(response) {
+
+                      });
+                  }
+
+                  $scope.chkChanged1 = function () {
+                      $scope.isChange1 = true;
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Attendance/GetMonthRange/' + $scope.empCalendarConfig.CalendarId + '/' + $scope.empCalendarConfig.year
+                      }).then(function successCallback(response) {
+                          $scope.EmpCalenderMothList = response.data.results;
+                          console.log(response.data.results);
+
+                      }, function errorCallback(response) {
+
+                      });
+                  }
+
+                  $scope.SaveConfig = function SaveConfig(n) {
+                      $scope.CalendarConfig = {};
+                      $scope.CalendarConfig = n;
+                      $http({
+                          method: 'POST',
+                          url: baseUrl + 'Attendance/UpdateEmpCalendarConfig/',
+                          data: $scope.CalendarConfig
+                      }).then(function successCallback(response) {
+                          toastr["success"](response.data.message);
+                          GetEmpCalendarConfigDetails();
+                      }, function errorCallback(response) {
+                          toastr["info"](response.data.Message);
+                      });
+                  };
+
+                  $scope.Reset = function Reset() {
+                      initialize();
+                      $scope.Submitted = false;
+                  };
+                  $scope.ResetSource = function ResetSource() {
+                      $scope.Calendar = [];
+                  };
+                  $scope.DeleteVirtualExam = function DeleteVirtualExam() {
+                      $http({
+                          method: 'POST',
+                          url: baseUrl + 'Result/DeleteVirtualExam/',
+                          data: $scope.VirtualExams
+                      }).then(function successCallback(response) {
+                          toastr["info"](response.data.message);
+                          empCalendarConfig();
+                      }, function errorCallback(response) {
+                          empCalendarConfig.year
+                          toastr["info"](response.data.message);
+                      });
+                  }
+
+                  $scope.Search = function (val) {
+                      if (val.length >= 3) {
+                          return $http.get(baseUrl + 'Employee/SearchEmployee/' + val, {
+                              params: {
+
+                              }
+                          }).then(function (response) {
+                              return response.data.results.map(function (item) {
+                                  return item;
+                              });
+                          });
+                      }
+                  };
+                  $scope.onSelect = function onSelect($item, $model, $label) {
+                      $scope.empCalendarConfig.EmpId = $item.Value;
+                  };
+
+                  $scope.Search2 = function (val) {
+                      if (val.length >= 3) {
+                          return $http.get(baseUrl + 'Employee/SearchEmployee/' + val, {
+                              params: {
+
+                              }
+                          }).then(function (response) {
+                              return response.data.results.map(function (item) {
+                                  return item;
+                              });
+                          });
+                      }
+
+                  };
+                  $scope.onSelect2 = function onSelect2($item, $model, $label) {
+                      $scope.empBulkConfig.EmpId = $item.Value;
+                  };
+
+
+                  function GetEmpCalendarConfigDetails() {
+                      $http({
+                          method: 'POST',
+                          url: baseUrl + 'Attendance/GetEmpAcademicCalendarConfigDetails/',
+                          data: $scope.empCalendarConfig
+                      }).then(function successCallback(response) {
+                          $scope.EmpCalendarConfigDetailsList = response.data.results;
+                      }, function errorCallback(response) {
+                          toastr["warning"](response.data.Message);
+                      });
+                  };
+
+
+                  $scope.BulkUpdate = function BulkUpdate() {
+                      $http({
+                          method: 'POST',
+                          url: baseUrl + 'Attendance/EmpCalendarConfigBulkUpdate/',
+                          data: $scope.empBulkConfig
+                      }).then(function successCallback(response) {
+                          $('#bulkModal').modal('hide');
+                          toastr["success"](response.data.Message);
+                          ResetForm();
+                          GetEmpCalendarConfigDetails();
+                      }, function errorCallback(response) {
+                          toastr["warning"](response.data.Message);
+                      });
+                  };
+
+                  function ResetForm() {
+                      $scope.submitted = false;
+                      $scope.empBulkConfig = {};
+                      $scope.empBulkConfig.IsSingleEmp = false;
+                      //$scope.Emp2 = {};
+                      $scope.bulkform.$setUntouched();
+                      $scope.bulkform.$setPristine();
+                  };
+
+              }]);
+    </script>
+}
+

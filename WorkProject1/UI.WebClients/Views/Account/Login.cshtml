@@ -1,0 +1,52 @@
+﻿@using UI.WebClients.Models
+@model LoginViewModel
+@{
+    //ViewBag.Title = "Log in";
+    Layout = "~/Views/Shared/_LayoutLogin.cshtml";
+}
+
+@using (Html.BeginForm("Login", "Account", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+{
+    @Html.AntiForgeryToken()
+
+    <div class="login-div">
+        <div class="logo text-center">
+            <img src="~/assets/img/logo/AddieSoft-Logo-01.svg" class="img-fulid" alt="">
+        </div>
+        <br />
+        <h3 class="text-center">Sign In</h3>
+        <div class="loginHear">
+            <div class="fields singin">
+                <div class="username">
+                    <img src="~/assets/img/logo/mailicon.svg" alt=""/>
+                    <input name="Email" type="text" class="user-input" placeholder="Email" autocomplete="off" required />
+                </div>
+                @Html.ValidationMessageFor(m => m.Email, "", new { @class = "text-danger" })
+
+                <div class="password">
+                    <img src="~/assets/img/logo/passwordicon.svg" alt=""/>
+                    <input name="Password" type="password" class="pass-input" placeholder="Password" autocomplete="off" required />
+                </div>
+                @Html.ValidationMessageFor(m => m.Password, "", new { @class = "text-danger" })
+                
+                <div class="form-actions text-center">
+                    <div class="pull-left">
+                        <label class="rememberme mt-checkbox mt-checkbox-outline">
+                            @Html.CheckBoxFor(e => e.RememberMe, new { @class = "rememberme" }) Remember me
+                            <span></span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            @Html.ValidationSummary("", new { @class = "text-danger text-center font-weight-bold" })
+            <button class="signin-button">Login</button>
+            <h5 class="text-center" style="margin-bottom: 20px;"><a href="@Url.Action("ForgotPassword", "Account")"> Forget Password</a></h5>
+
+            <a href="https://addiesoft.com/assets/images/app/app-release.apk" style="padding: 15px 40px;background: #1da88a;color: #fff;margin-left: 156px;border-radius: 6px; position:relative; left:410px; top:-784px; font-size:18px"><i class="fa fa-android" aria-hidden="true" style="font-size:30px; margin-left:-20px; margin-right:18px"></i>Download Office APPs </a>
+        </div>
+    </div>
+
+    <script src="https://kit.fontawesome.com/7cc9cfc6fa.js" crossorigin="anonymous"></script>
+}
+

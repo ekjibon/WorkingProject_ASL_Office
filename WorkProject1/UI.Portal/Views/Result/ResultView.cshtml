@@ -1,0 +1,221 @@
+﻿
+@{
+    ViewBag.Title = "ResultView";
+    Layout = "~/Views/Shared/_adminLayout.cshtml";
+}
+<div class="card mt-3" ng-controller="ResultClt">
+    <div class="card-body p-0">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="card">
+                            <div class="card-header summer-view">
+                                Summary View
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="form-group row" ng-class="{ 'has-error' : submitted1 && mform.Term.$invalid}">
+                                <label class="col-lg-4 col-md-6 col-sm-6">
+                                    Term:
+                                    <span class="required">*</span>
+                                </label>
+                                <div class="col-md-7">
+                                    <select class="form-control" ng-model="ResultProcess.TermId" name="Term" ng-options="T.TermId as T.Name for T in Terms" required>
+                                        <option value="" selected="selected">Choose Option</option>
+                                    </select>
+                                    <div class="form-control-focus"> </div>
+                                    <span ng-show="submitted1 && mform.Term.$error.required" class="help-block">Term Required</span>
+                                </div>
+                            </div>
+
+                            <div class="form-group row" ng-class="{ 'has-error' : submitted1 && mform.Subject.$invalid}">
+                                <label class="col-lg-4 col-md-6 col-sm-6 control-label">
+                                    Subject :
+                                    <span class="required">*</span>
+                                </label>
+                                <div class="col-md-7">
+                                    <select class="form-control" ng-disabled="ResultProcess.TermId==null" ng-change="GetSubExamList();ResultDetails()" ng-model="ResultProcess.SubjectId" name="Subject" ng-options="S.SubID as S.SubjectName for S in SubjectSetups" required>
+                                        <option value="" selected="selected">Choose Option</option>
+                                    </select>
+                                    <div class="form-control-focus"> </div>
+                                    <span ng-show="submitted1 && mform.Subject.$error.required" class="help-block">Subject Required</span>
+                                </div>
+                            </div>
+
+                            @*<div class="form-group" ng-class="{ 'has-error' : submitted1 && mform.Subject.$invalid}">
+                        <label class="col-md-5 control-label">
+                            Exams :
+                            <span class="required">*</span>
+                        </label>
+                        <div class="col-md-7">
+                            <select class="form-control" ng-disabled="ResultProcess.TermId==null" ng-model="ResultProcess.SubExamId" name="Subject" ng-options="S.SubExamId as S.SubExamName for S in SubExamList" required>
+                                <option value="" selected="selected">Choose Option</option>
+                            </select>
+                            <div class="form-control-focus"> </div>
+                            <span ng-show="submitted1 && mform.Subject.$error.required" class="help-block">Subject Required</span>
+                        </div>
+                    </div>*@
+                            <div class="pull-right">
+                                @*<button ng-click="ShowResult();submitted1=true" class="btn btn-primary">Show Result</button>*@
+                                <button ng-click="TermResult();submitted1=true" class="btn btn-primary">Term Result</button>
+                            </div>
+                            @*<div class="pull-right">
+                                <button ng-click="TermResult();submitted1=true" class="btn btn-primary">Term Result</button>
+                            </div>*@
+                        </div>
+                        <div class="col-md-8 col-sm-8 col-lg-8 col-xs-8">
+                            <h4 class="text-center card-header summer-view"> Result</h4>
+                            <span ng-bind-html="htmlAdText"></span>
+                        </div>
+                    </div>
+                    </div>
+                </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    <script type="text/javascript">
+        OEMSApp.controller("ResultClt", ["$scope", "$http", "$window", 'blockUI','$sce',
+        function ($scope, $http, $window, blockUI,$sce) {
+            init();
+            function init() {
+                $scope.reslen = '';
+                getTerms();
+                getSubject();
+                StuDetail();
+            }
+            function getTerms() {
+                $scope.Terms = [];
+                $http({
+                    method: 'GET',
+                    url: baseUrl + 'SubjectSetup/GetAllTerms/'
+                }).then(function successCallback(response) {
+                    // this callback will be called asynchronously
+                    // when the response is available
+                    $scope.Terms = response.data.results;
+                    $scope.total_count = response.data.totalcount;
+                    //console.log(response.data);
+                }, function errorCallback(response) {
+                    toastr["warning"](response.data.Message);
+                });
+            }
+
+            function StuDetail() {
+
+                $scope.StuDetails = {};
+                $http({
+                    method: 'GET',
+                    url: baseUrl + 'PortalStudent/GetStudentDetailbyID/'
+                }).then(function successCallback(response) {
+                    //console.log(response.data.results);
+                    $scope.StuDetail = response.data.results;
+                    if ($scope.StuDetail.StudentGuardianInfo == null)
+                        $scope.StuDetail.StudentGuardianInfo = {};
+
+                    $scope.StuDetail.StudentGuardianInfo.FatherName = $scope.StuDetail.StudentBasicInfo.FatherName;
+                    $scope.StuDetail.StudentGuardianInfo.MotherName = $scope.StuDetail.StudentBasicInfo.MotherName;
+                    //$scope.StuDetail.StudentGuardianInfo = $scope.StuDetail.StudentGuardianInfo;
+                    $scope.StuDetail.StudentBasicInfo.AdmissionDate = $scope.StuDetail.StudentBasicInfo.AdmissionDate != null ? new Date($scope.StuDetail.StudentBasicInfo.AdmissionDate) : null;
+                    $scope.StuDetail.StudentBasicInfo.DateOfBirth = $scope.StuDetail.StudentBasicInfo.DateOfBirth != null ? new Date($scope.StuDetail.StudentBasicInfo.DateOfBirth) : null;
+                    $scope.StuDetail.StudentBasicInfo.FirstAdmittedDate = $scope.StuDetail.StudentBasicInfo.FirstAdmittedDate != null ? new Date($scope.StuDetail.StudentBasicInfo.FirstAdmittedDate) : null;
+                    $scope.StuDetail.StudentBasicInfo.PreInsInfoDate = $scope.StuDetail.StudentBasicInfo.PreInsInfoDate != null ? new Date($scope.StuDetail.StudentBasicInfo.PreInsInfoDate) : null;
+                    $scope.StuDetail.StudentBasicInfo.Height = $scope.StuDetail.StudentBasicInfo.Height != null ? parseInt($scope.StuDetail.StudentBasicInfo.Height) : 0;
+                    console.log($scope.StuDetail.StudentBasicInfo);
+                    //$.unblockUI();
+                    //blockUI.stop();
+                    if ($scope.StuDetail.StudentContactInfo != null) {
+                        if ($scope.StuDetail.StudentContactInfo.Pre_DisId != null || $scope.StuDetail.StudentContactInfo.Pre_DisId != 0) {
+                            //getPStations1($scope.StuDetail.StudentContactInfo.Pre_DisId)
+                        }
+                        if ($scope.StuDetail.StudentContactInfo.Par_DisId != null || $scope.StuDetail.StudentContactInfo.Par_DisId != 0) {
+                            //getPStations2($scope.StuDetail.StudentContactInfo.Par_DisId);
+                        }
+                    }
+
+                }, function errorCallback(response) {
+                    toastr["warning"](response.data.Message);
+                });
+
+
+            }
+            function getSubject() { // Get Subject List By VSCG
+                //blockUI.start(); // spinning Start
+                $scope.SubjectSetups = [];
+                $http({
+                    method: 'GET',
+                    url: baseUrl + 'SubjectSetup/GetSubjectStudentId/'
+                }).then(function successCallback(response) {
+                    $scope.SubjectSetups = response.data.results;
+                    //blockUI.stop();  // spinning Finished
+                }, function errorCallback(response) {
+                    toastr["warning"](response.data.Message);
+                });
+            }
+            $scope.GetSubExamList = function GetSubExamList() {
+                $scope.SubExamList = [];
+                $http({
+                    method: 'GET',
+                    url: baseUrl + 'SubjectSetup/GetSubExamList/' + $scope.ResultProcess.SubjectId + '/' + $scope.ResultProcess.TermId
+                }).then(function SuceesCallback(response) {
+                    $scope.SubExamList = response.data.results;
+                }, function errorCallback() {
+                    toastr["warning"](response.data.message);
+                });
+            }
+            $scope.ShowResult = function () {
+
+                $scope.url = '@Url.Action("SubjectWiseResult", "PortalReport")?TermId=' + $scope.ResultProcess.TermId + '&SubjectId=' + $scope.ResultProcess.SubjectId + '&BranchID=' + $scope.StuDetail.StudentBasicInfo.BranchID
+                $scope.ad = { 'text': "<iframe  src=" + $scope.url + "  width='100%' height='500'></iframe>" };
+                $scope.htmlAdText = $sce.trustAsHtml($scope.ad.text);
+
+            }
+            $scope.TermResult = function () {
+                var url = baseUrl + 'PortalReport/ReportCardTermWise?TermId=' + $scope.ResultProcess.TermId + '&SessionId=' + $scope.StuDetail.StudentBasicInfo.SessionId + '&ClassId=' + $scope.StuDetail.StudentBasicInfo.ClassId + '&StuId=' + $scope.StuDetail.StudentBasicInfo.StudentIID + '&BranchID=' + $scope.StuDetail.StudentBasicInfo.BranchID
+               //window.location.open(url, 'target=_blank');
+                 $window.open(url, "_blank");
+                //$scope.ad = { 'text': "<iframe  src=" + $scope.url + "  width='100%' height='500'></iframe>" };
+                //$scope.htmlAdText = $sce.trustAsHtml($scope.ad.text);
+
+            }
+            function GetTotalResult() {
+               $scope.ResultList = [];
+                $scope.oddColor = '#f4dbe1';
+                $http({
+                        method: 'GET',
+                    url: baseUrl + 'PortalResult/GetTotalResult/'
+                }).then(function SuceesCallback(response) {
+                    //console.log(response.data.results);
+                    $scope.ResultList = response.data.results;
+                            toastr["warning"](response.data.message);
+                        }, function errorCallback() {
+                            toastr["warning"](response.data.Message);
+                        });
+                    }
+
+            $scope.ResultDetails = function ResultDetails(n) {
+                $scope.SubjectWiseResultlist = [];
+                $http({
+                        method: 'GET',
+                    url: baseUrl + 'SubjectSetup/GetSubjectWiseResult/' + $scope.ResultProcess.TermId + '/' + $scope.ResultProcess.SubjectId
+                }).then(function SuceesCallback(response) {
+                    $scope.SubjectWiseResultlist = response.data.results;
+                        }, function errorCallback() {
+                            toastr["warning"](response.data.Message);
+                        });
+                    }
+                    function num(val) {
+                        if ($.isNumeric(val)) {
+                            return parseFloat(val);
+                        } else {
+                            return 0;
+                        }
+                    }
+                }]);
+    </script>
+}

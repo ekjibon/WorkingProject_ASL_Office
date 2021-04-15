@@ -1,0 +1,259 @@
+﻿@{
+    ViewBag.Title = "TaskInfo";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@using UI.Admin.Models
+<style>
+    .dropdown-submenu {
+        position: relative;
+    }
+
+        .dropdown-submenu .dropdown-menu {
+            top: 0;
+            left: 100%;
+            margin-top: -1px;
+        }
+
+    .high {
+        color: red;
+    }
+
+    .medium {
+        color: green;
+    }
+</style>
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('ul.dropdown-menu li.dropdown-submenu').hover(function () {
+            $(this).find('.dropdown-menu').stop(true, true).delay(200).fadeIn(500);
+        }, function () {
+            $(this).find('.dropdown-menu').stop(true, true).delay(200).fadeOut(500);
+        });
+    });
+</script>
+<link href="http://cdn.addiesoft.com/admin/assets/global/plugins/bootstrap-daterangepicker/daterangepicker.min.css" rel="stylesheet" type="text/css" />
+<link href="http://cdn.addiesoft.com/admin/assets/global/plugins/bootstrap-datepicker/css/bootstrap-datepicker3.min.css" rel="stylesheet" type="text/css" />
+<link href="http://cdn.addiesoft.com/admin/assets/global/plugins/bootstrap-timepicker/css/bootstrap-timepicker.min.css" rel="stylesheet" type="text/css" />
+<link href="http://cdn.addiesoft.com/admin/assets/global/plugins/bootstrap-datetimepicker/css/bootstrap-datetimepicker.min.css" rel="stylesheet" type="text/css" />
+<script src="http://cdn.addiesoft.com/admin/assets/global/plugins/bootstrap-daterangepicker/daterangepicker.min.js" type="text/javascript"></script>
+<script src="http://cdn.addiesoft.com/admin/assets/global/plugins/bootstrap-datepicker/js/bootstrap-datepicker.min.js" type="text/javascript"></script>
+<script src="http://cdn.addiesoft.com/admin/assets/global/plugins/bootstrap-timepicker/js/bootstrap-timepicker.min.js" type="text/javascript"></script>
+<script src="http://cdn.addiesoft.com/admin/assets/global/plugins/bootstrap-datetimepicker/js/bootstrap-datetimepicker.min.js" type="text/javascript"></script>
+<script src="http://cdn.addiesoft.com/admin/assets/pages/scripts/components-date-time-pickers.min.js" type="text/javascript"></script>
+
+<h3 style="text-align: left;
+        background: #ddd;
+        margin-right: 1.5%;
+        margin-left: 0.5px;
+        margin-top: -5px;
+        padding-left: 2%;padding: 4px;">
+    Task List
+</h3>
+<div ng-controller="resolcetaskInfoClt">
+    <div class="panel-body" style="margin-top: -3%;">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="portlet light bordered">
+                    <div class="row">
+                        <div class="portlet-body">
+                           
+                            <div class="row" style="margin-top: 1%;">
+
+                                <div class="col-md-2 pull-right" style="width: 10%;">
+                                    <select class="form-control" ng-model="pageSize" ng-options="P.value as P.text for P in pageSizeArray"></select>
+                                </div>
+                            </div>
+                            <div class="tab-content">
+                                <div class="tab-pane fade active in" id="tab_1_1">
+                                    <table class="table table-checkable table-inverse table-hover">
+                                        <thead class="">
+                                            <tr class="text-center">
+                                                <th><input type="checkbox" ng-model="selectedAll" ng-click="selectAll()" />  All</th>
+                                                <th>Task#</th>
+                                                <th class="text-center">Title</th>
+                                                <th class="text-center">Status</th>
+                                                <th class="text-center">Assinged To</th>
+                                                <th class="text-center">Resolved Date</th>
+                                                <th class="text-center">Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr ng-show="TaskList.length <= 0"><td colspan="7" style="text-align:center;"><i class="fa fa-refresh"></i> No Data Exist!!</td></tr>
+                                            <tr dir-paginate="item in TaskList| filter:q | itemsPerPage: pageSize" current-page="currentPage">
+                                                <td> <input type="checkbox" ng-model="item.Selected" value="false" ng-click="checkIfAllSelected()" /> </td>
+                                                <td class="text-center" style="vertical-align:middle"> {{item.Id}} </td>
+                                                <!--action menu-->
+                                                <td class="text-left">
+                                                    <a target="_blank" style="font-size:15px;text-decoration: none;font-weight:bold" href="@Url.Action("TaskDetails","Home")?TaskId={{item.Id}}">{{item.TaskName | capitalize}}</a>
+                                                    <p style="color:darkgray;font-size:12px;">Updated by {{item.AddBy | capitalize}} at {{item.AddDate.replace('/Date(','').replace(')/','') |   date:'dd-MM-yyyy HH:mm a'}}.</p>
+                                                </td>
+                                                <!--task status-->
+                                                <td class="text-center"><span class="label label-success" style="padding-left: 18%;padding-right: 18%;">{{item.Status}}</span></td>
+                                               
+                                                <td>
+                                                    {{item.AssignUserName | capitalize}}
+                                                </td>
+                                                <td class="text-center">{{item.DueDate.replace('/Date(','').replace(')/','') |   date:'dd-MM-yyyy'}}</td>
+                                            <td>
+                                                <a href="#" class="btn btn-danger" ng-click="SingleItemCLosed(item.Id)">Close</a>
+                                            </td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    <a href="#" class="btn btn-danger" ng-click="SelectedItemList()">Selected List Colsed</a>
+                                                </td>
+                                                
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <div class="row" ng-show="TaskList.length>1">
+                                        <dir-pagination-controls boundary-links="true" template-url="~/assets/dirPagination.tpl.html"></dir-pagination-controls>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="clearfix margin-bottom-20"> </div>
+
+
+                        </div>
+                    </div>
+
+
+                </div>
+            </div>
+
+        </div>
+        <!-- Table -->
+    </div>
+</div>
+
+
+
+
+
+<script type="text/javascript">
+    AddieApp.filter('capitalize', function () {
+        return function (input) {
+            return (!!input) ? input.charAt(0).toUpperCase() + input.substr(1).toLowerCase() : '';
+        }
+    });
+    AddieApp.controller("resolcetaskInfoClt", ["$scope", "$http", "SweetAlert", "$filter",
+      function ($scope, $http, SweetAlert, $filter) {
+          init();
+          function init() {
+              initialize();
+          }
+          function initialize() {
+              $scope.pageSizeArray = [];
+              $scope.pageSizeArray.push({ value: 5, text: 5 });
+              $scope.pageSizeArray.push({ value: 10, text: 10 });
+              $scope.pageSizeArray.push({ value: 20, text: 20 });
+              $scope.pageSizeArray.push({ value: 50, text: 50 });
+              $scope.currentPage = 1;
+              $scope.pageSize = 10;
+              $scope.IsEdit = 0;
+              $scope.btnTitle = 'Save';
+              LoadTaskList();
+              $scope.checkItem = false;
+          };
+
+          $scope.TaskStatusClose = function TaskStatusClose(TaskId) {
+              $http.get(baseUrl + 'Task/UpdateTaskStatus?TaskId=' + TaskId + '&Status=Closed').
+                then(function (response) {
+                    if (response.data == 2) {
+                        toastr.error('Task is already closed.');
+                    }
+                    else if (response.data == 3) {
+                        toastr.error('Task already started.');
+                    }
+                    else if (response.data == 4) {
+                        toastr.error('Task has not started yet.');
+                    }
+                    else if (response.data == 5) {
+                        toastr.error('Task is not assign to you. Only assign user can start the task.');
+                    }
+                    else if (response.data == 6) {
+                        toastr.error('Task resolved already.');
+                    }
+                    else if (response.data == 7) {
+                        toastr.error('Task has not resolved yet.');
+                    }
+                    else {
+                        toastr.success('Task Resolved successfully.');
+                        LoadTaskList();
+                        LoadMyTaskList();
+                    }
+                });
+          }
+
+      
+          function Dateconvert(str) {
+              var re = /\/Date\(([0-9]*)\)\//;
+              var m = str.match(re);
+              var datestring = new Date(parseInt(m[1]));
+              var date = new Date(datestring),
+                  mnth = ("0" + (date.getMonth() + 1)).slice(-2),
+                  day = ("0" + date.getDate()).slice(-2);
+              return new Date([date.getFullYear(), mnth, day].join("-"));
+          }
+          $scope.selectAll = function () {
+              angular.forEach($scope.TaskList, function (item) {
+                  item.Selected = $scope.selectedAll;
+              });
+          };
+          $scope.checkIfAllSelected = function () {
+              $scope.selectedAll = $scope.TaskList.every(function (item) {
+                  return item.Selected == true
+              })
+          };
+          $scope.selectAll = function () {
+              angular.forEach($scope.TaskList, function (item) {
+                  item.Selected = $scope.selectedAll;
+              });
+          };
+
+          $scope.SelectedItemList = function SelectedItemList() {
+              $scope.ClosedTaskList = [];
+              //console.log($scope.ClosedTaskList);
+              angular.forEach($scope.TaskList, function (item) {
+                  if (item.Selected==true) {
+                      $scope.ClosedTaskList.push(item);
+                  }
+                  
+              });
+              if ($scope.ClosedTaskList.length == 0) {
+                  toastr.success('Please Select Item.');
+                  return;
+              }
+              $http.post(baseUrl + 'Task/TaskClosedList', $scope.ClosedTaskList).
+               then(function (response) {
+                   if (response.data == 1) {
+                       toastr.success('Task Closed successfully.');
+                       LoadTaskList();
+                   }
+               });
+
+              //console.log($scope.ClosedTaskList);
+
+          }
+          $scope.SingleItemCLosed = function (n) {
+              $http.post(baseUrl + 'Task/TaskClosed?Id=' + n).
+                then(function (response) {
+                    if (response.data==1) {
+                        toastr.success('Task Closed successfully.');
+                        LoadTaskList();
+                    }
+                });
+          }
+          function LoadTaskList() {
+              $http.get(baseUrl + 'Task/TaskApprovalList').
+                then(function (response) {
+                    // = response.data;
+                    $scope.TaskList = $filter('filter')(response.data, function (i) {
+                        return (i.Status == 'Resolved');
+                    });
+                    //console.log($scope.TaskList);
+                });
+          }
+
+      }]);
+</script>

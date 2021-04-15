@@ -1,0 +1,139 @@
+﻿
+@{
+    ViewBag.Title = "Inventory Report";
+}
+
+<div class="kt-container  kt-container--fluid  kt-grid__item kt-grid__item--fluid" ng-controller="requisitionEntryCrlt">
+    <div class="row">
+        <div class="kt-portlet kt-portlet--mobile">
+            <div class="kt-portlet__head kt-portlet__head--lg">
+                <div class="kt-portlet__head-label">
+                    <h3 class="kt-portlet__head-title">
+                        <!----Titel Text-->
+                       @ViewBag.Title
+                        <!----Titel Text -->
+                    </h3>
+                </div>
+            </div>
+
+            <div class="kt-portlet__body">
+                <form name="addform" novalidate class="form-horizontal">
+                    <div class="form-body">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group row" ng-class="{ 'has-error' : submitted && addform.From.$invalid}">
+                                    <label class="col-md-4 control-label text-right">
+                                        From:
+                                        <span class="required">*</span>
+                                    </label>
+                                    <div class="col-md-8">
+                                        <input class="form-control" type="text" ng-click="p1=true" is-open="p1" readonly ng-model="Rpt.From" placeholder="dd/MM/yyyy" uib-datepicker-popup="dd/MM/yyyy" name="From" required />
+                                        <div class="form-control-focus"> </div>
+                                        <span ng-show="submitted && addform.From.$error.required" class="help-block">From Date Required</span>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <div class="col-md-7">
+
+                                    </div>
+                                </div>
+                            </div>
+                            @*<div class="col-md-4">
+
+                    </div>*@
+
+                            <div class="col-lg-4">
+                                <div class="form-group row" ng-class="{ 'has-error' : submitted && addform.Date.$invalid}">
+                                    <label class="col-md-4 control-label text-right">
+                                        To:
+                                        <span class="required">*</span>
+                                    </label>
+                                    <div class="col-md-8">
+                                        <input class="form-control" type="text" ng-click="p2=true" is-open="p2" readonly ng-model="Rpt.ToDate" placeholder="dd/MM/yyyy" uib-datepicker-popup="dd/MM/yyyy" name="Date" required />
+                                        <div class="form-control-focus"> </div>
+                                        <span ng-show="submitted && addform.Date.$error.required" class="help-block">To Date Required</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-4">
+                                <div class="form-group row" ng-class="{ 'has-error' : submitted && addform.TypeId.$invalid}">
+                                    <label class="col-md-4 control-label text-right">Type</label>
+                                    <div class="col-lg-8">
+                                        <select class="form-control" ng-model="Rpt.TypeId" name="TypeId" required>
+                                            <option value="">Choose Options</option>
+                                            <option value="1">Selling Product</option>
+                                            <option value="2">Fixed Product</option>
+                                            <option value="3">Distributed Product</option>
+                                            <option value="4">Stock Status</option>
+                                            @*<option value="5">Sale Status</option>*@
+                                        </select>
+                                        <span ng-show="submitted && addform.TypeId.$error.required" class="help-block">Type Required</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4 text-right"></div>
+                            <div class="col-md-8 text-right">
+                                <a class="btn btn-success" ng-click="save();submitted=true">Report</a>
+                                <a class="btn btn-danger" ng-click="Reset();">Reset</a>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    <script type="text/javascript">
+        OEMSApp.controller("requisitionEntryCrlt", ["$scope", "$http", "SweetAlert", "filterFilter", "$filter",
+          function ($scope, $http, SweetAlert, filterFilter, $filter) {
+              init();
+              function init() {
+                  initialize();
+             
+              }
+              function initialize() {
+         
+                  $scope.Reset = Reset;
+                  /////
+                  $scope.pageSizeArray = [];
+                  $scope.pageSizeArray.push({ value: 5, text: 5 });
+                  $scope.pageSizeArray.push({ value: 10, text: 10 });
+                  $scope.pageSizeArray.push({ value: 20, text: 20 });
+                  $scope.pageSizeArray.push({ value: 50, text: 50 });
+      
+            
+                  $scope.currentPage = 1;
+                  $scope.pageno = 1;
+                  $scope.pagesize = 10;
+                  $scope.total_count = 12;
+              };
+             function Reset() {
+                 $scope.Rpt = {};
+                  $scope.submitted = false;
+              };
+              //Active Inactive student
+              $scope.save = function () {
+                  if ($scope.addform.$invalid) {
+                      return;
+                  }
+                  $scope.From = $filter('date')($scope.Rpt.From, "yyyy-MM-dd");
+                  $scope.ToDate = $filter('date')($scope.Rpt.ToDate, "yyyy-MM-dd");
+                  var uri = '/Report/ReportInventory?FromDate=' + $scope.From + '&ToDate=' + $scope.ToDate + '&Type=' + $scope.Rpt.TypeId;
+                  //Reset();
+                  window.open(uri, '_blank');
+              }
+              //This method is calling from dropDown
+              $scope.changePageSize = function () {
+                  $scope.studentSearch.pageIndex = 1;
+                  Search();
+              };
+
+          }]);
+    </script>
+}
+

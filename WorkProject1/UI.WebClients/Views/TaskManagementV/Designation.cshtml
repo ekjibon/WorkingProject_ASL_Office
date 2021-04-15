@@ -1,0 +1,230 @@
+﻿
+@{
+    ViewBag.Title = "Designation";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2 class="SetUpHead">Designation List</h2>
+
+<div ng-controller="designationClt">
+    <div class="text-right">
+        <a data-toggle="modal" title="Add Designation" href="#draggable" class="btn btn-primary fa-item" style="margin-right: 1.5%;margin-top: -75px;">
+            <i class="fa fa-plus-square"></i>  Add Designation
+        </a>
+    </div>
+
+    <div class="panel-body">
+        <div class="row" style="margin-bottom:10px;margin-top: -3%;">
+            <div class="col-md-4 col-sm-5 col-xs-6">
+                <div class="form-group">
+                    <div class="col-lg-3 col-md-5 col-sm-4 col-xs-8" style="padding-left:0px;width:35%">
+                        <select class="form-control" ng-model="pageSize" ng-options="P.value as P.text for P in pageSizeArray"></select>
+                    </div>
+                    <div class="col-md-7  col-sm-8  col-xs-4">
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 col-sm-3 col-xs-1">
+            </div>
+            <div class="col-md-4 col-sm-4 col-xs-5">
+                <div id="sample_3_filter" class="pull-right">
+                    <input ng-model="q" id="search" class="form-control" placeholder="Filter text">
+                </div>
+            </div>
+        </div>
+
+
+        <table class="table table-bordered table-inverse">
+            <thead class="btn-primary">
+                <tr>
+                    @*<th><input type="checkbox" ng-model="selectedAll" ng-click="selectAll()" />  All</th>*@
+                    <th class="text-center">Designation Name </th>
+                    <th class="text-center">Designation Code</th>
+                    <th class="text-center">Status</th>
+                    <th class="text-center">Action</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                <tr ng-show="DesignationList.length <= 0"><td colspan="7" style="text-align:center;"><i class="fa fa-refresh"></i> Loading new data!!</td></tr>
+                <tr dir-paginate="item in DesignationList| filter:q | itemsPerPage: pageSize" current-page="currentPage">
+                    @*<tr ng-repeat="item in ApplicantList track by $index">*@
+                    @*<td> <input type="checkbox" ng-model="item.Selected" value="false" ng-click="checkIfAllSelected()" /> </td>*@
+                    <td class="text-left"> {{item.DesignationName}} </td>
+                    <td class="text-center">{{item.DesignationCode}}</td>
+                    <td class="text-center statusG" ng-show="item.Status=='A'"> Active </td>
+                    <td class="text-center statusR" ng-show="item.Status=='I'"> Inactive </td>
+                    <td class="text-center">
+                        <button type="button" data-toggle="modal" class="btn btn-success fa-item" title="Edit"  ng-click="EditDesignation(item)" data-target="#draggable"><i class="fa fa-edit"></i> Edit</button>
+                        <button type="button" title="Delete" ng-click="Delete(item)" class="btn btn-danger fa-item"><i class="fa fa-trash-o"></i></button>
+                    </td>
+                </tr>
+            </tbody>
+        
+        </table>
+        <div class="row" ng-show="DesignationList.length>1">
+            <dir-pagination-controls boundary-links="true" template-url="~/assets/dirPagination.tpl.html"></dir-pagination-controls>
+        </div>
+    </div>
+    <!-- Table -->
+
+
+    <div class="modal fade draggable-modal" id="draggable" tabindex="-1" role="basic" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content" style="margin-left: -3%;">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                    <h4 class="modal-title">Add Designation</h4>
+                </div>
+
+                <form class="form-horizontal" name="frmDesg" novalidate ng-submit="Submit()" role="form">
+
+                    <div class="portlet-body form" style="display: block; margin-left: 1%;">
+                        <div class="form-body" style="margin-right: 2.5%;">
+
+                            <div class="form-group" ng-class="{ 'has-error' : submitted && frmDesg.DesignationName.$invalid}">
+                                <label class="col-md-3 control-label">Designation Name</label>
+                                <div class="col-md-9">
+                                <input type="text" name="DesignationName" required ng-model="Designation.DesignationName" class="form-control input-lg" placeholder="Designation Name">
+                                    <span ng-show="submitted &&  frmDesg.DesignationName.$error.required" class="text-danger">Designation Name is Required</span>
+                                </div>
+                            </div>
+                            <div class="form-group" ng-class="{ 'has-error' : submitted && frmDesg.DesignationCode.$invalid}">
+                                <label class="col-md-3 control-label">Designation Code</label>
+                                <div class="col-md-9">
+                                    <input type="text" name="DesignationCode"ng-model="Designation.DesignationCode" class="form-control input-lg" placeholder="Designation Code" required>
+                                    <span ng-show="submitted &&  frmDesg.DesignationCode.$error.required" class="text-danger">Designation Code is Required</span>
+                                </div>
+                            </div>
+                            <div class="form-group" ng-class="{ 'has-error' : submitted && frmDesg.Status.$invalid}">
+                                <label class="col-md-3 control-label">Status</label>        
+                                <div class="col-md-9">
+                                    <select class="form-control input-lg" name="Status" required ng-model="Designation.Status">
+                                        <option value="">Select Please</option>
+                                        <option value="A">Active</option>
+                                        <option value="I">Inactive</option>
+                                    </select>
+                                    <span ng-show="submitted &&  frmDesg.Status.$error.required" class="text-danger">Status is Required</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-danger" ng-click="reSetForm()" data-dismiss="modal">Close</button>
+                        <input type="submit" class="btn btn-success" ng-click="submitted=true" value="{{btnTitle}}" />
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    AddieApp.controller("designationClt", ["$scope", "$http", "SweetAlert",
+          function ($scope, $http, SweetAlert) {
+              init();
+              function init() {
+                  initialize();
+              }
+              function initialize() {
+                  $scope.pageSizeArray = [];
+                  $scope.pageSizeArray.push({ value: 5, text: 5 });
+                  $scope.pageSizeArray.push({ value: 10, text: 10 });
+                  $scope.pageSizeArray.push({ value: 20, text: 20 });
+                  $scope.pageSizeArray.push({ value: 50, text: 50 });
+                  $scope.currentPage = 1;
+                  $scope.pageSize = 10;
+                  $scope.IsEdit = 0;
+                  LoadDesignationList();
+                  $scope.btnTitle = 'Save';
+              };
+              $scope.reSetForm = function () {
+                  $scope.Designation = {};
+                  $scope.btnTitle = 'Save';
+                  $scope.submitted = false;
+                  $scope.IsEdit = 0;
+              }
+
+              $scope.Submit = function () {
+                  if ($scope.frmDesg.$invalid)
+                      return;
+                  if ($scope.IsEdit == 0) {
+                      $scope.AddDesignation();
+                  } else {
+                      $scope.UpdateDesignation();
+                  }
+              }
+              $scope.AddDesignation = function () {
+                  $http.post(baseUrl + 'Setup/AddDesignation', $scope.Designation).
+                    then(function (response) {
+                        //console.log(response.data);
+                        if (response.data!=0) {
+                            toastr.success('Saved Successfully');
+                            LoadDesignationList();
+                            $scope.reSetForm();
+                        } else {
+                            toastr.error('Not Saved.');
+                        }
+                    });
+                  $('#draggable').modal('hide');
+              }
+
+              $scope.UpdateDesignation = function () {
+                  $http.post(baseUrl + 'Setup/UpdateDesignation', $scope.Designation)
+                      .then(function (response) {
+                          //console.log(response);
+                          $scope.reSetForm();
+                          toastr.success('Updated Successfully');
+
+                          LoadDesignationList();
+
+                      });
+                  $('#draggable').modal('hide');
+
+              }
+              $scope.Delete = function (designation) {
+                  swal({
+                      title: "Are you sure?",
+                      text: "Once deleted, you will not be able to recover this data!",
+                      icon: "warning",
+                      buttons: true,
+                      dangerMode: true,
+                  })
+                    .then((willDelete) => {
+                        if (willDelete) {
+                            $http.post(baseUrl + 'Setup/DeleteDesignation', designation)
+                          .then(function (response) {
+                              if (response.data == '0') {
+                                  toastr.warning('Not found');
+                                  LoadProjectList();
+                                  return;
+                              }
+                              toastr.success('Deleted Successfully');
+                              LoadDesignationList();
+                          });
+                        } else {
+
+                        }
+                    });
+              }
+
+              function LoadDesignationList() {
+                  $http.post(baseUrl + 'Setup/LoadDesignationList').
+                    then(function (response) {
+                        $scope.DesignationList = response.data;
+                        //console.log($scope.DesignationList);
+                        toastr.success($scope.DesignationList.length + ' Designation found');
+                    });
+              }
+              $scope.EditDesignation = function (item) {
+                  $scope.Designation = item;
+                  $scope.btnTitle = 'Update';
+                  $scope.IsEdit = 1;
+
+              }
+
+
+
+
+          }]);
+</script>

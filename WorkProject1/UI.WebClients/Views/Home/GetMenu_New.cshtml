@@ -1,0 +1,97 @@
+﻿@model IEnumerable<OEMS.Models.Model.AspNetPage>
+@{
+    Layout = null;
+    var g = string.Empty;
+    var DashClass = string.Empty;
+    var RouteAction = this.Request.RequestContext.RouteData.Values["Action"].ToString();
+    var Controller = this.Request.RequestContext.RouteData.Values["Controller"].ToString();
+    #region Chack Parent
+    var parentId = 0;
+    var Cls = string.Empty;
+    var data = Model.Where(e => e.ParentID == 1);
+    #endregion
+}
+<style>
+    .nvv {
+        background: rgba(252, 122, 82, 0.11) !important;
+        border-left: 3px solid #FC7B52 !important;
+    }
+</style>
+@if (Model.Any())
+{
+    <ul class="side-nav-menu scrollable">
+        <li class="nav-item dropdown open">
+            <a href="@Url.Action(Model.First().Action, Model.First().Controller)" class="dropdown-toggle">
+                <span class="icon-holder">
+                    <img src="assets/images/sidebaricon/dashboard.svg" alt="">
+                </span>
+                <span class="title">Dashboard</span>
+            </a>
+        </li>
+        @foreach (var item in Model.Where(e => e.ParentID == 0 && e.IsModule == false).OrderBy(e => e.Displayorder))
+        {
+            var UrlAction = "#";
+            var clas = string.Empty;
+            var clas1 = string.Empty;
+            if (Model.Any(e => e.ParentID == item.PageID && (e.PageID == parentId)))
+            {
+                clas = "open-active nvv";
+                clas1 = "start active nvv";
+            }
+            <li class="nav-item dropdown  @clas1 @item.IconClass">
+
+                @if (item.Controller != null)
+                {
+                    UrlAction = Url.Action(item.Action, item.Controller);
+                }
+                <a href="@UrlAction" class="dropdown-toggle">
+                    <span class="icon-holder">
+                        <img src="assets/images/sidebaricon/StudentSide.svg" alt="">
+                    </span>
+                    <span class="title">@item.NameOption_En</span>
+
+
+                    @*<span class="selected"></span>*@
+                    @if (Model.Any(e => e.ParentID == item.PageID))
+                    {
+                        <span class="arrow">
+                            <i class="arrow-icon"></i>
+                        </span>
+                    }
+                </a>
+
+                @if (Model.Any(e => e.ParentID == item.PageID))
+                {
+                    <ul class="dropdown-menu">
+                        @foreach (var Submenu in Model.Where(e => e.ParentID == item.PageID))
+                        {
+                            var class1 = string.Empty;
+                            if (Submenu.ParentID == item.PageID && Submenu.Action == RouteAction)
+                            {
+                                class1 = "active";
+                            }
+                            <li class="nav-item nav-link nav-toggle toggle-main">
+                                @if (Submenu.Controller != null)
+                                {
+                                    UrlAction = Url.Action(Submenu.Action, Submenu.Controller);
+                                }
+                                <span class="icon-holderSav">
+                                <img src="assets/images/Icon/studentprofile.svg" alt="">
+                                </span>
+                                <span class="submenuname"><a href="@UrlAction">@Submenu.NameOption_En</a></span>
+                                @*<a href="@UrlAction"><span class="title ">@Submenu.NameOption_En</span>
+
+                                        @if (Model.Any(e => e.ParentID == Submenu.PageID))
+                                        {
+                                            <i class="fa fa-chevron-down"></i>
+                                        }
+                                    </a>*@
+
+                            </li>
+                        }
+                    </ul>
+                }
+            </li>
+        }
+    </ul>
+}

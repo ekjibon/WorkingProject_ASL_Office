@@ -1,0 +1,255 @@
+﻿@{
+    ViewBag.Title = "Leave Type";
+}
+
+@*<style type="text/css">
+    .table thead tr th {
+        font-size: 12px !important;
+        color: white !important;
+        font-weight: 600 !important;
+    }
+</style>*@
+<div class="kt-container  kt-container--fluid  kt-grid__item kt-grid__item--fluid" ng-controller="ctrlLeaveType">
+
+    <div class="row">
+        <div class="kt-portlet kt-portlet--mobile">
+            <div class="kt-portlet__head kt-portlet__head--lg">
+                <div class="kt-portlet__head-label">
+                    <h3 class="kt-portlet__head-title">
+                        Leave Type
+                    </h3>
+                </div>
+                <div class="kt-portlet__head-toolbar">
+                    <div class="kt-portlet__head-wrapper">
+                        <div class="dropdown dropdown-inline">
+                            <button type="button" ng-click="resetForm()" class="btn btn-brand btn-icon-sm" data-toggle="modal" data-target="#addmodal" aria-haspopup="true" aria-expanded="false">
+                                <i class="flaticon2-plus"></i> Add Leave Type
+                            </button>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="kt-portlet__body">
+
+
+                <div class="row">
+                    <div class="col-md-4 col-sm-5 col-xs-6">
+                        <div class="form-group">
+                            <div class="col-lg-3 col-md-5 col-sm-4 col-xs-8" style="padding-left:0px">
+
+                                <select class="form-control kt-font-brand" ng-model="pageSize" ng-options="P.value as P.text for P in pageSizeArray"></select>
+                            </div>
+
+                        </div>
+
+                    </div>
+                    <div class="col-md-4 col-sm-3 col-xs-1">
+                    </div>
+                    <div class="col-md-4 col-sm-4 col-xs-5">
+                        <div id="sample_3_filter" class="pull-right">
+                            <input ng-model="q" id="search" class="form-control" placeholder="Filter text">
+                        </div>
+                    </div>
+                </div>
+                <table class="table table-bordered table-hover rounded">
+                    <thead>
+                        <tr class="bg-primary">
+                            <th width="40%">TypeName</th> 
+                            <th width="30%">Type</th>
+                            <th width="12%">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-show="GetLeaveType.length <= 0"><td colspan="5" style="text-align:center;"><i class="fa fa-refresh"></i> Data not found!</td></tr>
+
+                        <tr dir-paginate="item in GetLeaveType| filter:q | itemsPerPage:pageSize" current-page="currentPage">
+                            <td>{{item.TypeName}}</td>
+                            <td>{{item.Type}}</td>
+                            <td>
+                                <a href="javascript:;" class="btn btn-outline-brand btn-elevate btn-icon" ng-click="edit(item)" data-target="#addmodal" data-toggle="modal">
+                                    <i class="fa fa-edit"></i>
+                                </a>
+                                <a ng-click="deleteLeaveType(item)" href="javascript:;" class="btn btn-outline-danger btn-elevate btn-icon" id="kt_sweetalert_demo_9">
+                                    <i class="fa fa-trash"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="row">
+                    <dir-pagination-controls boundary-links="true" template-url="~/assets/angular/lib/dirPagination.tpl.html"></dir-pagination-controls>
+                </div>
+            </div>
+        </div>
+    </div>
+ <!--Modal Area Start-->
+    <div id="addmodal" class="modal fade" tabindex="-1" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog">
+            <div class="modal-content modal-md">
+                <form name="frmLeaveType" ng-submit="SaveLeaveType()" class="form-horizontal" novalidate>
+                    <div class="modal-header">
+                        <h5 class="modal-title">{{modalTitle}}</h5>
+                        <a class="close" ng-click="resetForm()" data-dismiss="modal" aria-hidden="true"></a>
+                        
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-body">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group row" ng-class="{ 'has-error' : submitted1 && frmLeaveType.Type.$invalid}">
+                                        <label class="col-md-4 control-label" style="text-align:right">
+                                            Type :
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-8">
+                                            <select class="form-control" ng-model="LeaveType.Type" name="Type" required>
+                                                <option value="" selected="selected">Choose Option</option>
+                                                <option value="Student">Student</option>
+                                                <option value="Teacher">Teacher</option>
+                                            </select>
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted1 && frmLeaveType.Type.$error.required" class="help-block">Type Required</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group row" ng-class="{ 'has-error' : submitted1 && frmLeaveType.TypeName.$invalid}">
+                                        <label class="col-md-4 control-label" style="text-align:right">
+                                            Type Name:
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-8">
+                                            <input type="text" ng-model="LeaveType.TypeName" class="form-control" name="TypeName" required />
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted1 && frmLeaveType.TypeName.$error.required" class="help-block">TypeName Required</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" ng-click="submitted1=true" class="btn btn-success" ng-disabled="btnDis">{{BTNValue}} <i ng-show="spin" class="fa fa-spinner fa-spin" style="font-size:20px"></i></button>
+                        <button type="reset" data-dismiss="modal" class="btn btn-secondary" ng-click="resetForm();submitted1=false">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!--Modal Area End-->
+
+
+</div>
+@section Scripts{
+    <script type="text/javascript">
+        OEMSApp.controller("ctrlLeaveType", ["$scope", "$http", "SweetAlert", "$window", "blockUI", '$filter',
+              function ($scope, $http, SweetAlert, $window, blockUI, $filter) {
+                  init();
+                  function init() {
+                      initialize();
+                      GetAllLeaveType();
+                  };
+                  function initialize() {
+                      $scope.LeaveType = {};
+                      $scope.GetLeaveType = [];
+                      $scope.resetForm = resetForm;
+                      $scope.modalTitle = "Add Leave Type";
+                      $scope.BTNValue = "Save";
+                      $scope.currentPage = 1;
+                      $scope.pagesize = 10;
+                      $scope.pageSizeArray = [];
+                      $scope.pageSizeArray.push({ value: 5, text: 5 });
+                      $scope.pageSizeArray.push({ value: 10, text: 10 });
+                      $scope.pageSizeArray.push({ value: 20, text: 20 });
+                      $scope.pageSizeArray.push({ value: 50, text: 50 });
+                      $scope.pageSize = 10;
+                  };
+                  $scope.filter = function filter(status) {
+                      if (status == 'All')
+                          $scope.GetLeaveType = $scope.GetLeaveTypeBackup
+                      else
+                          $scope.GetLeaveType = $filter('filter')($scope.GetLeaveTypeBackup, { 'Type': status });
+                  };
+                  function resetForm() {
+                      $scope.submited1 = false;
+                      $scope.submited = false;
+                      $scope.LeaveType = {};
+                      $scope.modalTitle = "Add Leave Type";
+                      $scope.BTNValue = "Save";
+                  };
+                  function GetAllLeaveType() {
+                      $scope.GetLeaveType = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Attendance/GetAllLeaveType'
+                      }).then(function successCallback(response) {
+                          $scope.GetLeaveType = response.data.results;
+                          $scope.GetLeaveTypeBackup = response.data.results;
+                      }, function errorCallback(response) {
+                          toastr["warning"](response.data.message);
+                      });
+                  };
+                  $scope.SaveLeaveType = function SaveLeaveType() {
+                      if ($scope.frmLeaveType.$invalid)
+                          return;
+                      var url = '';
+                      if (angular.isUndefined($scope.LeaveType.LeaveId)) {
+                          url = baseUrl + 'Attendance/AddLeaveType'
+                      }
+                      else {
+                          url = baseUrl + 'Attendance/UpdateLeaveType'
+                      }
+                      $http({
+                          method: 'POST',
+                          url: url,
+                          data: $scope.LeaveType
+                      }).then(function successCallback(response) {
+                          $scope.GetLeaveType = response.data.results;
+                          $scope.GetLeaveTypeBackup = response.data.results;
+                          $scope.modalTitle = "Save Class Period";
+                          $scope.BTNValue = "Save";
+                          blockUI.stop();
+                          var a = response.data.message;
+                          toastr["info"](response.data.message)
+                          $('#addmodal').modal('toggle');
+                          GetAllLeaveType();
+                      }, function errorCallback(response) {
+                          blockUI.stop();
+                          if (response.data.message != null)
+                              toastr["warning"](response.data.message);
+                      });
+                  };
+                  $scope.edit = function Edit(n) {
+                      $scope.LeaveType = n;
+                      $scope.modalTitle = "Update Leave Type";
+                      $scope.BTNValue = "Update";
+                  };
+                  $scope.deleteLeaveType = function (LeaveType) {
+                      $scope.LeaveType = LeaveType;
+                      SweetAlert.swal({
+                          title: "Are you sure to delete it ?", type: "warning", showCancelButton: true, confirmButtonColor: "#DD6B55",
+                          confirmButtonText: "Yes, delete it!",
+                          closeOnConfirm: false
+                      },
+                      function (isConfirm) {
+                          if (isConfirm) {
+                              $http({
+                                  method: 'POST',
+                                  url: baseUrl + '/Attendance/DeleteLeaveType/' + LeaveType.LeaveId, // + dividedExam
+                                  data: LeaveType
+                              }).then(function successCallback(response) {
+                                  SweetAlert.swal("Deleted!", "Your data has been deleted.", "success");
+                                  $scope.GetLeaveType = response.data.results;
+                              }, function errorCallback(response) {
+                                  toastr["warning"](response.data.message);
+                              });
+                          }
+                      });
+                  };
+              }]);
+    </script>
+}
+
+

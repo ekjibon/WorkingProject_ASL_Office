@@ -1,0 +1,48 @@
+﻿@using System.Configuration;
+@using UI.WebClients.Models
+@{
+    string SchoolName = ConfigurationManager.AppSettings["SchoolName"].ToString();
+}
+ 
+<nav class="navbar navbar-expand navbar-dark bg-dark static-top" id="ronitschool">
+  
+      <div class="col-lg-2">
+          <a href="https://addiesoft.com/" target="_blank">
+            @*<img src="//cdn.odhyyon.com/oms/img/cgsdlogo.png" class="img-fulid" alt="">*@
+              <img src="~/assets/img/logo/AddieSoft-Logo-01.svg" class="img-fulid" alt=""/>
+          </a>
+          <button class="btn btn-link btn-sm text-white order-1 order-sm-0" id="sidebarToggle" href="#">
+              <i class="fas fa-bars"></i>
+          </button>
+      </div>
+      <div class="col-lg-5">
+          <div class="sch">
+              <h4>@SchoolName</h4>
+          </div>
+      </div>
+      <div class="col-lg-5 text-right">
+          <div class="name mt-3">
+              @*<a href="javascript:document.getElementById('logoutForm').submit()">
+                  <i class="fas fa-sign-out-alt"></i>
+              </a>*@
+             <span>@User.Identity.GetUserFullname()</span>
+              <i class="fas fa-sign-in-alt" id="userDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></i>
+
+              <div class="dropdown-menu dropdown-menu-right emp-logout" aria-labelledby="userDropdown">
+                 @*<a class="dropdown-item" href="#">Settings</a>
+                    <a class="dropdown-item" href="#">Activity Log</a>
+               <div class="dropdown-divider"></div>*@
+                  <a href="javascript:document.getElementById('logoutForm').submit()" class="dropdown-item">Logout</a>
+              </div>
+          </div>
+          <div class="login-part">
+              <div class="image dropdown-toggle">
+                  <img src="@Url.Action("GetImage","Account")" class="img-fulid w-100" alt="">
+              </div>
+          </div>
+          <div class="header-icon ">
+              <i class="fas fa-bell"><span>12</span> </i>
+          </div>
+      </div>
+
+</nav>

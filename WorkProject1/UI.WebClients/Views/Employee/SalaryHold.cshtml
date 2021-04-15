@@ -1,0 +1,441 @@
+﻿
+@{
+    ViewBag.Title = "Salary Hold";
+}
+
+<div class="kt-container  kt-container--fluid  kt-grid__item kt-grid__item--fluid" ng-controller="ctrlSalaryHold">
+    <div class="row">
+        <div class="kt-portlet kt-portlet--mobile">
+            <div class="kt-portlet__head kt-portlet__head--lg">
+                <div class="kt-portlet__head-label">
+                    <h3 class="kt-portlet__head-title">
+                        All Salary Hold
+                    </h3>
+                </div>
+                <div class="kt-portlet__head-toolbar">
+                    <div class="kt-portlet__head-wrapper">
+                        <div class="dropdown dropdown-inline">
+                            <button type="button" class="btn btn-brand btn-icon-sm" data-toggle="modal" data-target="#addmodal" aria-haspopup="true" aria-expanded="false">
+                                <i class="flaticon2-plus"></i> Add New Hold Salary
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="kt-portlet__body">
+
+                <div class="row">
+                    <div class="col-md-4 col-sm-5 col-xs-6">
+                        <div class="form-group">
+                            <div class="col-lg-3 col-md-5 col-sm-4 col-xs-8" style="padding-left:0px">
+                                <select class="form-control kt-font-brand" ng-model="pageSize" ng-options="P.value as P.text for P in pageSizeArray"></select>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="col-md-4 col-sm-3 col-xs-1">
+                    </div>
+                    <div class="col-md-4 col-sm-4 col-xs-5">
+                        <div id="sample_3_filter" class="pull-right">
+                            <input ng-model="q" id="search" class="form-control" placeholder="Filter text">
+                        </div>
+                    </div>
+                </div>
+                <table class="table table-bordered table-hover rounded">
+                    <thead>
+                        <tr class="btn-primary">
+                            <th>SI</th>
+                            <th>Employee Name</th>
+                            <th>ID</th>
+                            <th>Gross Salary</th>
+                            <th>No. of Installments</th>
+                            <th>Hold Per Month</th>
+                            <th>Status</th>
+                            <th style="text-align:center">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-show="SalaryHoldList.length <= 0"><td colspan="8" style="text-align:center;"><i class="fa fa-refresh"></i> Loading new data!!</td></tr>
+                        <tr dir-paginate="item in SalaryHoldList| filter:q  | itemsPerPage: pageSize" current-page="currentPage">
+                            <td>{{$index+1}}</td>
+                            <td>{{item.FullName}}</td>
+                            <td>{{item.EmpoyeeId}}</td>
+                            <td>{{item.GrossSalary}}</td>
+                            <td>{{item.NoOfInstallment}}</td>
+                            <td>{{item.HoldPerMonthAmount}}</td>
+                            <td>{{item.HoldStatus}}</td>
+                            <td align="center">
+                                <a href="javascript:;" class="btn btn-outline-brand btn-elevate btn-icon" ng-click="editSalaryHold(item)" data-target="#addmodal" data-toggle="modal">
+                                    <i class="fa fa-edit"></i>
+                                </a>
+                                <a ng-click="deleteSalaryHold(item.Id)" href="javascript:;" class="btn btn-outline-danger btn-elevate btn-icon">
+                                    <i class="fa fa-trash"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="row">
+                    <dir-pagination-controls boundary-links="true" template-url="~/assets/angular/lib/dirPagination.tpl.html"></dir-pagination-controls>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--Modal Area Start-->
+    <div id="addmodal" class="modal fade" tabindex="-1" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form name="addBasic" ng-submit="save()" class="form-horizontal" id="form_sample_1" novalidate>
+                    <div class="modal-header">
+                        <h4 class="modal-title">{{modalTitle}}</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                        
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-body">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group row">
+                                        <label class="col-md-5 control-label text-right ">Emp.</label>
+                                        <div class="col-md-7">
+                                            <input type="text" name="EmployeeId" ng-model="Std" typeahead-on-select='onSelect($item, $model, $label)'
+                                                   placeholder="Search name/ID"
+                                                   uib-typeahead="i  as i.Text for i in Search($viewValue)"
+                                                   typeahead-loading="loadingLocations" typeahead-no-results="noResults" class="form-control">
+                                            <i ng-show="loadingLocations" class="glyphicon glyphicon-refresh"></i>
+                                            <div ng-show="noResults"><i class="glyphicon glyphicon-remove"></i> No Results Found</div>
+                                            <input type="hidden" name="EmployeeId" ng-value="Std.Value" />
+                                            <div class="form-control-focus"> </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label class="col-md-5 control-label text-right">
+                                            Employee Name :
+                                        </label>
+                                        <div class="col-md-7">
+                                            <input type="text" ng-model="SalaryHold.FullName" class="form-control" placeholder="Employee Name" name="FullName" readonly>
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label class="col-md-5 control-label text-right">
+                                            Joining Date :
+                                        </label>
+                                        <div class="col-md-7">
+                                            <input type="text" ng-model="SalaryHold.JoiningDate" class="form-control" placeholder="Joining Date" name="JoiningDate" readonly>
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label class="col-md-5 control-label text-right">
+                                            Probation End Date :
+                                        </label>
+                                        <div class="col-md-7">
+                                            <input type="text" ng-model="SalaryHold.ProbationPeriodEndDate" class="form-control" placeholder="Probation End Date" name="ProbationPeriodEndDate" readonly>
+                                        </div>
+                                    </div>
+                                  
+                                    <div class="form-group row" ng-class="{ 'has-error' : submitted && addBasic.GrossSalary.$invalid}">
+                                        <label class="col-md-5 control-label text-right">
+                                            Gross Salary :
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-7">
+                                            <input type="text" ng-model="SalaryHold.GrossSalary" class="form-control" placeholder="Gross Salary" name="GrossSalary" required readonly>
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted &&  addBasic.GrossSalary.$error.required" class="help-block">Gross Salary Required</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group row" ng-class="{ 'has-error' : submitted && addBasic.NoOfInstallment.$invalid}">
+                                        <label class="col-md-5 control-label text-right">
+                                            Number of Installment :
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-7">
+                                            <input type="number" ng-model="SalaryHold.NoOfInstallment" class="form-control" placeholder="Number of Installment" name="NoOfInstallment" required>
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted &&  addBasic.NoOfInstallment.$error.required" class="help-block">Number of Installment Required</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group row" ng-class="{ 'has-error' : submitted && addBasic.MonthDay.$invalid}">
+                                        <label class="col-md-5 control-label text-right">
+                                            Calculate From:
+                                            <span class="required">*</span>
+
+                                        </label>
+                                        <div class="col-md-7">
+                                            <input class="form-control" ng-model="SalaryHold.MonthDay" required name="MonthDay" type="datetime" placeholder="Year and Month" readonly ng-click="p1=true" is-open="p1" datepicker-options="{minMode: 'month'}" datepicker-mode="'month'" uib-datepicker-popup="MM/yyyy" />
+                                            <span ng-show="submitted &&  addBasic.MonthDay.$error.required" class="help-block">Month and Year Required</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" data-dismiss="modal" class="btn btn-secondary" ng-click="resetForm();submitted=false">Cancel</button>
+                        <button type="submit" ng-click="submitted=true" class="btn btn-success">{{modalbutton}}</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!--Modal Area End-->
+</div>
+<!-- END FORM-->
+@section Scripts{
+    <script src="~/assets/global/plugins/bootstrap-fileinput/bootstrap-fileinput.js" type="text/javascript"></script>
+    <script src="~/assets/pages/scripts/form-repeater.min.js"></script>
+    <script type="text/javascript">
+        for (i = new Date().getFullYear() ; i > 1900; i--) {
+            $('#yearpicker').append($('<option />').val(i).html(i));
+        }
+    </script>
+    <script type="text/javascript">
+        OEMSApp.controller("ctrlSalaryHold", ["$scope", "$http", "SweetAlert",
+              function ($scope, $http, SweetAlert) {
+                  init();
+                  function init() {
+                      initialize();
+                      getAllSalaryHold();
+
+                       getAllCommons();
+                  }
+
+                  function initialize() {
+                      $scope.modalbutton = 'Save';
+                      $scope.modalTitle = 'Add Hold Salary';
+                      $scope.brnlist = [];
+                      $scope.fiscalYearlist = [];
+                      $scope.taxYearlist = [];
+                      $scope.SalaryHold = {};
+                      $scope.SalaryHold.Id = 0;
+                      $scope.employeeInfos = [];
+                      $scope.SalaryHoldList = [];
+                      $scope.resetForm = resetForm;
+                      $scope.CommonFeilds = [];
+                      $scope.pagesize = 10;
+                      $scope.pageSizeArray = [];
+                      $scope.pageSizeArray.push({ value: 5, text: 5 });
+                      $scope.pageSizeArray.push({ value: 10, text: 10 });
+                      $scope.pageSizeArray.push({ value: 20, text: 20 });
+                      $scope.pageSizeArray.push({ value: 50, text: 50 });
+                      $scope.currentPage = 1;
+                      $scope.pageSize = 10;
+                      $scope.employeelist = [];
+                      $scope.gradelist = [];
+
+                  }
+
+                  function resetForm() {
+                      $scope.modalbutton = 'Save';
+                      $scope.modalTitle = "Add Hold Salary";
+                      $scope.SalaryHold = {};
+                      $scope.SalaryHold.Id = 0;
+
+                      $scope.addBasic.$setUntouched();
+                      $scope.addBasic.$setPristine();
+                      $scope.Std = "";
+                  }
+
+                  $scope.Search = function (val) {
+                      return $http.get(baseUrl + 'Employee/SearchEmployee/' + val, {
+                          params: {
+
+                          }
+                      }).then(function (response) {
+                          return response.data.results.map(function (item) {
+                              return item;
+                          });
+                      });
+                  };
+
+                  $scope.onSelect = function onSelect($item, $model, $label) {
+                      $scope.SalaryHold.EmpID = $item.Value;
+
+                      SearchEmployeeId($item.Value);
+                  };
+
+                  function SearchEmployeeId(EmpID) {
+                      $scope.employeeInfos = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Employee/GetEmpInfoByEmpBasicInfoID/' + EmpID
+                      }).then(function successCallback(response) {
+                          $scope.employeeInfos = response.data.results[0];
+                          $scope.SalaryHold.FullName = $scope.employeeInfos.FullName;
+                          $scope.SalaryHold.JoiningDate = $scope.employeeInfos.JoiningDate;
+                          $scope.SalaryHold.ProbationPeriodEndDate = $scope.employeeInfos.ProbationPeriodEndDate;
+                          $scope.SalaryHold.GrossSalary = $scope.employeeInfos.CurrentSalary;
+
+                      }, function errorCallback(response) {
+                          toastr["error"](response.data.Message);
+                      });
+                  }
+
+
+
+
+                  $scope.save = function save()
+                  {
+                      if ($scope.addBasic.$invalid)
+                          return;
+                      else {
+                          var result = validation();
+                          if (result) {
+                              getMonthAndYear();
+                              if ($scope.SalaryHold.Id == 0) {
+                                  $http({
+                                      method: 'POST',
+                                      url: baseUrl + 'Employee/AddSalaryHold/',
+                                      data: $scope.SalaryHold
+                                  }).then(function successCallback(response) {
+                                      $('#addmodal').modal('toggle');
+                                      toastr["info"](response.data.message);
+                                      getAllSalaryHold();
+                                      resetForm();
+                                  }, function errorCallback(response) {
+                                      toastr["warning"](response.data.Message);
+                                  });
+                              }
+                              if ($scope.SalaryHold.Id != 0) {
+                                  if ($scope.addBasic.$invalid)
+                                      return;
+                                  else {
+                                      $http({
+                                          method: 'PUT',
+                                          url: baseUrl + 'Employee/UpdateSalaryHold/',
+                                          data: $scope.SalaryHold
+                                      }).then(function successCallback(response) {
+                                          toastr["info"](response.data.message);
+                                          if (response.data.httpStatusCode != 305) {
+                                              $('#addmodal').modal('toggle');
+                                              resetForm();
+                                          }
+                                          getAllSalaryHold();
+                                      }, function errorCallback(response) {
+                                          toastr["warning"](response.data.Message);
+                                      });
+                                  }
+                              }
+                          }
+                      }
+
+                  }
+                  function getAllCommons() {
+                      $scope.CommonFeilds = [];
+
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Common/GetCommonItemEmp/'
+                      }).then(function successCallback(response) {
+                          $scope.CommonFeilds = response.data.results;
+                      }, function errorCallback(response) {
+                      });
+                  }
+
+                  function validation() {
+                      var check = 0;
+                      if ($scope.SalaryHold.DaysWorking > 365) {
+                          toastr["info"]("Working days can not be greater than 365 days..!");
+                          $scope.SalaryHold.DaysWorking = null;
+                          check = 1;
+                          return false;
+
+                      }
+                      if (check == 0) {
+                          return true;
+                      }
+                  }
+                  function getMonthAndYear() {
+                      $scope.SalaryHold.Month = $scope.SalaryHold.MonthDay.getMonth() + 1;
+                      $scope.SalaryHold.Year = $scope.SalaryHold.MonthDay.getFullYear();
+                      if ($scope.SalaryHold.Month == 1) {
+                          $scope.SalaryHold.MonthName = 'January';
+                      } else if ($scope.SalaryHold.Month == 2) {
+                          $scope.SalaryHold.MonthName = 'February';
+                      } else if ($scope.SalaryHold.Month == 3) {
+                          $scope.SalaryHold.MonthName = 'March';
+                      } else if ($scope.SalaryHold.Month == 4) {
+                          $scope.SalaryHold.MonthName = 'April';
+                      } else if ($scope.SalaryHold.Month == 5) {
+                          $scope.SalaryHold.MonthName = 'May';
+                      } else if ($scope.SalaryHold.Month == 6) {
+                          $scope.SalaryHold.MonthName = 'June';
+                      } else if ($scope.SalaryHold.Month == 7) {
+                          $scope.SalaryHold.MonthName = 'July';
+                      } else if ($scope.SalaryHold.Month == 8) {
+                          $scope.SalaryHold.MonthName = 'August';
+                      } else if ($scope.SalaryHold.Month == 9) {
+                          $scope.SalaryHold.MonthName = 'September';
+                      } else if ($scope.SalaryHold.Month == 10) {
+                          $scope.SalaryHold.MonthName = 'October';
+                      } else if ($scope.SalaryHold.Month == 11) {
+                          $scope.SalaryHold.MonthName = 'November';
+                      } else  {
+                          $scope.SalaryHold.MonthName = 'December';
+                      }
+                  }
+
+                  function getAllSalaryHold()
+                  {
+                      $scope.salaryHeadList = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Employee/GetAllSalaryHold/'
+                      }).then(function successCallback(response) {
+                          $scope.SalaryHoldList = response.data.results;
+                      }, function errorCallback(response) {
+                          toastr["info"](response.data.Message);
+                      });
+                  }
+
+                  $scope.deleteSalaryHold = function deleteSalaryHold(Id)
+                  {
+                      SweetAlert.swal({
+                          title: "Are you sure to delete it ?", type: "warning", showCancelButton: true, confirmButtonColor: "#DD6B55",
+                          confirmButtonText: "Yes, delete it!",
+                          closeOnConfirm: false
+                      },
+                        function (isConfirm) {
+                            if (isConfirm) {
+                                $http({
+                                    method: 'DELETE',
+                                    url: baseUrl + 'Employee/DeleteSalaryHold/' + Id,
+                                }).then(function successCallback(response) {
+                                    SweetAlert.swal("Deleted!", "Your data has been deleted.", "success");
+                                    getAllSalaryHold();
+                                }, function errorCallback(response) {
+                                    SweetAlert.swal("", "Aleardy Exist in Salary Processed", "warning");
+                                    //toastr["info"](response.data.message);
+                                });
+                            }
+                        });
+                  }
+
+                  $scope.editSalaryHold = function editSalaryHold(item)
+                  {
+                      $scope.modalTitle = 'Update Hold Salary';
+                      $scope.modalbutton = 'Update';
+                      $scope.SalaryHold = item;
+                      $scope.SalaryHold.Id = item.Id;
+                      $scope.SalaryHold.HoldDate = new Date(item.HoldDate);
+
+                      newdate = item.Month + "/" + item.Year ;
+                      $scope.SalaryHold.MonthDay = new Date(item.Year + "/" + item.Month);
+
+                  }
+              }]);
+    </script>
+}
+
+
+
+
+
+
+
+
+

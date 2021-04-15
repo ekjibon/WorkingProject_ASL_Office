@@ -1,0 +1,111 @@
+﻿
+@{
+    ViewBag.Title = "Role Permission";
+}
+
+@section Styles{
+<link href="~/assets/global/plugins/jstree/dist/themes/default/style.min.css" rel="stylesheet" type="text/css" />
+}
+
+<div class="kt-container  kt-container--fluid  kt-grid__item kt-grid__item--fluid">
+    <!-- Begin: life time stats -->
+    <div class="portlet light bordered">
+        <div class="kt-portlet kt-portlet--mobile">
+            <div class="kt-portlet__head kt-portlet__head--lg">
+                <div class="kt-portlet__head-label">
+                    <h3 class="kt-portlet__head-title">
+                        Role Permission
+                    </h3>
+                </div>
+                <div class="kt-portlet__head-toolbar">
+                    <div class="kt-portlet__head-wrapper">
+                        <div class="dropdown dropdown-inline">
+                            <button type="button" ng-click="resetForm()" class="btn btn-brand btn-icon-sm" data-toggle="modal" data-target="#addmodal" aria-haspopup="true" aria-expanded="false">
+                                <i class="flaticon2-plus"></i> Add New Roles
+                            </button>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="kt-portlet__body">
+            <h3>Permission For @ViewBag.RoleName</h3>
+            <div class="clearfix"></div>
+            <div id="tree_2" class="tree-demo"> </div>
+           
+            <br />
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <button id="btnSaveRole" class="btn btn-success">Save</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- End: life time stats -->
+</div>
+
+@section Scripts{
+
+<script src="//cdn.odhyyon.com/oms/assets/global/plugins/jstree/dist/jstree.min.js" type="text/javascript"></script>
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            var selarray = [];
+            var marray = [];
+            $.ajax({
+                method: "GET",
+                url: baseUrl + "user/GetRolePermission/@ViewBag.id",
+                data: {}
+            })
+          .done(function (res) {
+              marray = res;    
+              $('#tree_2').jstree({
+                  'plugins': ["wholerow", "checkbox", "types"],
+                  'core': {
+                      "themes": {
+                          "responsive": false
+                      },
+                      'data': res 
+                  },
+                  "types": {
+                      "default": {
+                          "icon": "fa fa-folder icon-state-warning icon-lg"
+                      },
+                      "file": {
+                          "icon": "fa fa-file icon-state-warning icon-lg"
+                      }
+                  }
+              }).on('changed.jstree', function (e, data) {
+                 // console.log(data);
+                  
+                  var i, j, r = [];
+                  for (i = 0, j = data.selected.length; i < j; i++) {
+                      r.push(data.instance.get_node(data.selected[i]).id);
+                      //console.log(r);
+                      //r.push(data.node.parent);
+                  }
+                  selarray = r;
+              });
+          });
+
+            $(document).on("click", "#btnSaveRole", function () {
+                //console.log(selarray.length);
+                $.ajax({
+                    method: "POST",
+                    dataType: 'json',
+                    traditional: true,
+                    contentType: 'application/json',
+                    url: baseUrl + "user/AddRolePermission/@ViewBag.id",
+                    data:  JSON.stringify(selarray) 
+                })
+                  .done(function (res) {
+                      toastr["info"]("Save Successfully.");
+                  });
+            });
+        });
+    </script>
+}
+

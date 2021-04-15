@@ -1,0 +1,255 @@
+﻿
+@{
+    ViewBag.Title = "Student Report (Daily)";
+}
+<div class="portlet box" ng-controller="CtrlAccdemicUseVairousType" style="background:#18979b">
+    <div class="portlet-title">
+        <div class="caption">
+            <i class="fa fa-user-plus" style="color:white"></i>Attendance Summary Report (Daily)
+        </div>
+    </div>
+    <div class="portlet-body form">
+        <!-- BEGIN FORM-->
+        <form class="form-horizontal" id="formCommonFeilds" name="formCommonFeilds" novalidate>
+            <div class="form-body">
+                <div class="row">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group" ng-class="{ 'has-error' : submitted && formCommonFeilds.SessionId.$invalid}">
+                                <label class="col-md-4 control-label">
+                                    Session :
+                                    <span class="required">*</span>
+                                </label>
+                                <div class="col-md-7">
+                                    <select class="form-control" required ng-model="studentFilter.SessionId" name="SessionId" ng-options="studentInfo.SessionId as studentInfo.SessionName for studentInfo in CommonFeilds.Session">
+                                        <option value="" selected="selected">Choose Option</option>
+                                    </select>
+                                    <div class="form-control-focus"> </div>
+                                    <span ng-show="submitted && formCommonFeilds.SessionId.$error.required" class="help-block">Session Required</span>
+                                </div>
+                            </div>
+                            <div class="form-group" ng-class="{ 'has-error' : submitted && formCommonFeilds.ShiftID.$invalid}">
+                                <label class="col-md-4 control-label">
+                                    Shift :
+                                    <span class="required">*</span>
+                                </label>
+                                <div class="col-md-7">
+                                    <select class="form-control" required ng-model="studentFilter.ShiftID" name="ShiftID" ng-options="studentInfo.ShiftId as studentInfo.ShiftName for studentInfo in CommonFeilds.Shift">
+                                        <option value="" selected="selected">Choose Option</option>
+                                    </select>
+                                    <div class="form-control-focus"> </div>
+                                    <span ng-show="submitted && formCommonFeilds.ShiftID.$error.required" class="help-block">Shift Required</span>
+                                </div>
+                            </div>
+                        </div>
+                        @*<div class="col-md-3">
+
+                            </div>*@
+                        <div class="col-md-6">
+                         
+                            <div class="form-group" ng-class="{ 'has-error' : submitted && formCommonFeilds.FromDate.$invalid}">
+                                <label class="col-md-3 control-label">
+                                   From Date :
+                                </label>
+                                <div class="col-md-8">
+                                    <input class="form-control" id="FromDate" name="FromDate" type="datetime" placeholder="From Date" readonly ng-click="p1=true" is-open="p1" uib-datepicker-popup="dd/MM/yyyy" ng-model="studentFilter.FromDate" />
+                                    <div class="form-control-focus"> </div>
+                                    <span ng-show="submitted && formCommonFeilds.FromDate.$error.required" class="help-block">Date Required</span>
+                                </div>
+                            </div>
+                            @*<div class="form-group">
+                                <label class="col-md-3 control-label btn-primary" style="padding-bottom: 1%;">
+                                   Report :
+                                </label>
+                                <div class="col-md-8">
+                                    <input ng-change="submitted=true;Report()" class="form-control" name="ToDate" type="datetime" placeholder="Report on date" readonly ng-click="p2=true" is-open="p2" uib-datepicker-popup="dd/MM/yyyy" ng-model="studentFilter.ToDate" />
+                                    <div class="form-control-focus"> </div>
+                                </div>
+                            </div>*@
+                        </div>
+                        @*<div class="col-md-3">
+
+                            </div>*@
+                    </div>
+                    <div class="row">
+                        <div class="col-md-3 pull-right">
+                            <div class="pull-right">
+                                <button ng-click="submitted=true;Search(formCommonFeilds.$valid)" class="btn green">Show</button>
+                                <button type="button" ng-click="submitted=true;Report()" class="btn btn-primary">Report</button>
+                                <button type="button" ng-click="submitted=false;Reset()" class="btn btn-default">Reset</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <hr />
+        </form>
+    </div>
+    <!-- BEGIN TABLE-->
+    <div class="portlet-body">
+        <div class="table-container">
+            <div id="sample_3_wrapper" class="dataTables_wrapper no-footer">
+                <table class="table table-bordered table-hover">
+                    <thead style="background-color:#18979b">
+                        <tr>
+                            <th>Class</th>
+                            <th>Section</th>
+                            <th>Teacher Name</th>
+                            <th>Total Student</th>
+                            <th>Present</th>
+                            <th>Absent</th>
+                            <th>Leave</th>
+                            <th>Persentage(%)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-show="AspNetusers.results.length <= 0"><td colspan="9" style="text-align:center;"><i class="fa fa-refresh"></i> Loading new data!!</td></tr>
+                        <tr ng-repeat="item in StudentAttendentInfos">
+                            <td>{{item.ClassName}}</td>
+                            <td>{{item.SectionName}}</td>
+                            <td>{{item.FullName}}</td>
+                            <td>{{item.totalStd}}</td>
+                            <td>{{item.present}}</td>
+                            <td>{{item.Absent}}</td>
+                            <td>{{item.totalStd-(item.present+item.Absent)}}</td>
+                            <td>{{(item.totalStd*item.present)/100}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <!-- END TALE-->
+</div>
+
+@section Scripts{
+    <script type="text/javascript">
+        OEMSApp.controller("CtrlAccdemicUseVairousType", ["$scope", "$http", "SweetAlert", "$filter", "$window",
+          function ($scope, $http, SweetAlert, $filter, $window) {
+
+              init();
+              function init() {
+                  initialize();
+                  getAllDropdowns();
+                  getAllCommons();
+                  $scope.StudentAttendentInfos = [];
+              }
+              function initialize() {
+                  $scope.studentFilter = {};
+                  //$scope.studentFilter.VersionID = 0;
+                  //$scope.studentFilter.SessionId = 0;
+                  //$scope.studentFilter.BranchID = 0;
+                  //$scope.studentFilter.ShiftID = 0;
+                  //$scope.studentFilter.ClassId = 0;
+                  //$scope.studentFilter.GroupId = 0;
+                  //$scope.studentFilter.SectionId = 0;
+                  //$scope.studentFilter.HouseId = 0;
+                  //$scope.studentFilter.StudentType = 0;
+
+                  $scope.studentInfo = {};
+
+                  $scope.StudentInfos = [];
+                  $scope.Dropdowns = [];
+                  $scope.CommonFeilds = [];
+                  $scope.currentPage = 1;
+                  $scope.pageno = 1;
+                  $scope.pagesize = 10;
+                  $scope.total_count = 12;
+                  $scope.txtsearch = '';
+                  $scope.getAllDropdowns = getAllDropdowns;
+
+                  $scope.SearchList = [];
+                  //    $scope.GetSearchVairousType = GetSearchVairousType;
+                  //    $scope.ReportShow = ReportShow;
+
+              };
+              $scope.Reset = function Reset() {
+                  $scope.studentFilter = {};
+              };
+              $scope.GetGroup = function GetGroup(classid) {
+                  $scope.Groups = [];
+
+                  $http({
+                      method: 'GET',
+                      url: baseUrl + 'Common/GetGroup/' + classid
+                  }).then(function successCallback(response) {
+                      $scope.Groups = response.data.results;
+                      $scope.studentFilter.GroupId = null;
+
+                  }, function errorCallback(response) {
+
+                  });
+
+              }
+              $scope.GetSection = function GetSection() {
+                  $scope.Sections = [];
+                  if ($scope.studentFilter.GroupId == null)
+                      return;
+                  $http({
+                      method: 'GET',
+                      url: baseUrl + 'Common/GetSection/' + $scope.studentFilter.SessionId + "/" + $scope.studentFilter.ShiftID + "/" + $scope.studentFilter.ClassId 
+                  }).then(function successCallback(response) {
+                      $scope.Sections = response.data.results;
+                  }, function errorCallback(response) {
+                      toastr["info"](response.data.message);
+                  });
+              }
+              function getAllDropdowns() {
+                  $scope.Dropdowns = [];
+
+                  $http({
+                      method: 'GET',
+                      url: baseUrl + 'Common/GetAllDropDown/'
+                  }).then(function successCallback(response) {
+                      $scope.Dropdowns = response.data.results;
+
+
+                  }, function errorCallback(response) {
+                  });
+              };
+              function getAllCommons() {
+                  $scope.CommonFeilds = [];
+
+                  $http({
+                      method: 'GET',
+                      url: baseUrl + 'Common/GetCommonItem/'
+                  }).then(function successCallback(response) {
+                      $scope.CommonFeilds = response.data.results;
+                  }, function errorCallback(response) {
+                  });
+              };
+              $scope.Search = function Search(formCommonFeilds) {
+                  if (formCommonFeilds) {
+                      $scope.StudentAttendentInfos = [];
+                      var date = $filter('date')($scope.studentFilter.FromDate, "MM/dd/yyyy");
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Attendance/AttndSummaryDay?SessionId=' + $scope.studentFilter.SessionId + '&ShiftId=' + $scope.studentFilter.ShiftID + '&date=' + date
+                      }).then(function successCallback(response) {
+                          $scope.StudentAttendentInfos = response.data.results;
+                          if (response.data.message!=null)
+                            toastr["success"](response.data.message);
+                      }, function errorCallback(response) {
+                          if (response.data.message != null)
+                            toastr["error"](response.data.message);
+                      });
+                  }
+              };
+
+              $scope.Report = function Report() {
+                  if ($scope.formCommonFeilds.$invalid) {
+                      return;
+                  }
+                  else {
+                      var FromDate = $filter('date')($scope.studentFilter.FromDate, "MM/dd/yyyy");
+                      var ToDate = $filter('date')($scope.studentFilter.ToDate, "MM/dd/yyyy");
+                      $scope.uri = "@Url.Action("AttndSummaryDay", "Report")?SessionID=" + $scope.studentFilter.SessionId + "&ShiftID=" + $scope.studentFilter.ShiftID + '&FromDate=' + FromDate;
+                      $window.open($scope.uri, '_blank');
+                  }
+              };
+
+          }]);
+    </script>
+
+
+}

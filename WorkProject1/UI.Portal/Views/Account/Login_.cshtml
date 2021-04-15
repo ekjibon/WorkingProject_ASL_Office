@@ -1,0 +1,265 @@
+﻿@using UI.Portal.Models
+@model LoginViewModel
+@{
+    ViewBag.Title = "Login";
+    Layout = "~/Views/Shared/_LayoutLogin.cshtml";
+}
+
+@using (Html.BeginForm("Login", "Account", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+{
+    @Html.AntiForgeryToken()
+
+
+    <div class="singin-main-body">
+        <div class="mt-3">
+            <div class="form-group from-group-one">
+                <i class="far fa-user"></i>
+                <input type="text" class="form-control loging-fill" id="StudentInsId" name="StudentInsId" aria-describedby="emailHelp" placeholder="Enter Student ID" required autocomplete="off">
+            </div>
+
+            <div class="form-group from-group-one">
+                <i class="fas fa-lock"></i>
+                <input type="password" class="form-control loging-fill" id="Password" name="Password" placeholder="Enter Password" required autocomplete="off">
+
+            </div>
+
+        </div>
+        @Html.ValidationSummary("", new { @class = "text-danger" })
+        <div class="Signin-button text-center">
+            <button type="submit" class="btn btn-primary btn-lg btn-block mt-5">Sign In</button>
+            <a href="" data-toggle="modal" data-target="#resetPass"><h4>FORGOT PASSWORD</h4></a>
+            <h5>Don’t have an account ?<a href="@Url.Action("Register", "Account")"><span>Sign Up here</span></a></h5>
+
+        </div>
+    </div>
+
+}
+<div class="modal fade" id="resetPass" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header singup-mpdal">
+                <h5 class="modal-title" id="exampleModalLabel">FORGOT PASSWORD</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form id="rest_form" autocomplete="off">
+                <div class="modal-body singup-mpdal-body text-center">
+
+                    <div class="form-group from-group-one ">
+                        <i class="far fa-user"></i>
+                        <input type="text" class="form-control loging-fill" id="R_StudentInsId" name="StudentInsId" aria-describedby="emailHelp" placeholder="Enter Student ID" required>
+                    </div>
+                    <div class="form-group from-group-one ">
+                        <i class="fas fa-mobile-alt"></i>
+                        <input type="text" class="form-control loging-fill" id="R_PhoneNumber" name="PhoneNumber" aria-describedby="emailHelp" placeholder="Enter Mobile Number" required>
+                    </div>
+
+                      <p>
+                        Select which contact details
+                        should we use to reset
+                        your password.
+                    </p>
+
+                </div>
+                <div class="singup-modal-footer">
+                    <button type="button" id="ViaSMS" class="btn btn-primary btn-lg btn-block">Via SMS</button>
+                    <button type="button" id="ViaEmail" class="btn btn-primary btn-lg btn-block">Via Email</button>
+                </div>
+            </form>
+ </div>
+    </div>
+</div>
+<div class="modal fade sms-modal" id="inpOtp" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content sms-modal-contant">
+            <div class="modal-header singup-mpdal">
+                <h5 class="modal-title" id="exampleModalLabel">SMS TEXT</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body sms-modal-body text-center">
+                <p>
+                    The recovery code was sent
+                    to you mobile number. Please
+                    enter the code:
+                </p>
+              <form id="smsText_form" autocomplete="off">
+                  <div class="code-main text-center">
+                      <div class="code text-center">
+                          <div class="form-group code-form">
+                              <input type="text" class="form-control" id="First" aria-describedby="emailHelp" placeholder="0" required>
+                          </div>
+                      </div>
+                      <div class="code text-center">
+                          <div class="form-group code-form">
+                              <input type="text" class="form-control" id="Second" aria-describedby="emailHelp" placeholder="0" required>
+                          </div>
+                      </div>
+                      <div class="code text-center">
+                          <div class="form-group code-form">
+                              <input type="text" class="form-control" id="Third" aria-describedby="emailHelp" placeholder="0" required>
+                          </div>
+                      </div>
+                      <div class="code text-center">
+                          <div class="form-group code-form">
+                              <input type="text" class="form-control" id="Fourth" aria-describedby="emailHelp" placeholder="0" required>
+                          </div>
+                      </div>
+                  </div>
+                
+              </form>
+            
+            </div>
+            <div class="sms-modal-footer">
+                <button type="button" id="SMSTEXT" class="btn btn-primary btn-lg btn-block"><i class="fas fa-arrow-right"></i></button>
+            </div>
+            
+       </div>
+    </div>
+</div>
+      <!-- Modal -->
+<div class="modal fade new-pass" id="Newpassword" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content pass-modal-content">
+            <div class="modal-header singup-mpdal">
+                <h5 class="modal-title" id="exampleModalLabel">New Password</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+         <form id="newPass_Form" autocomplete="off">
+             <div class="modal-body pass-modal">
+                 <div class="form-group">
+                     <input type="password" class="form-control" id="NewPassword" aria-describedby="emailHelp" placeholder="Enter New Password" required>
+
+                 </div>
+                 <div class="form-group">
+                     <input type="password" class="form-control" id="Confirmpassword" aria-describedby="emailHelp" placeholder="Enter Confirm New password" required>
+
+                 </div>
+             </div>
+             <div class="pass-modal-footer">
+                 <button type="button" data-toggle="modal"  id="NewpasswordBtn" class="btn btn-primary btn-lg btn-block"><i class="fas fa-arrow-right"></i></button>
+             </div>
+         </form>
+            <!-- Modal -->
+        </div>
+    </div>
+</div>
+<div class="modal fade Successful-modal " id="reset_success" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content Successful-content">
+            <div class="modal-body Successful-modal-body m-auto">
+                <div class="successful-icon text-center">
+                    <i class="fas fa-check"></i>
+                </div>
+
+            </div>
+            <div class="successful-modal-footer">
+                <div class="successful-text text-center">
+                    <h3>
+                        Password reset
+                        Successful
+                    </h3>
+                    <p>
+                        You have successfully reset your
+                        password. Please use your new
+                        password when logging in.
+                    </p>
+                </div>
+
+            </div>
+            <div class="success-footer">
+                <a href="@Url.Action("Login", "Account")" class="btn btn-secondary btn-lg btn-block"><i class="fas fa-arrow-right"></i></a>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+@section Scripts{
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+            $(document).on("click", "#ViaSMS", function () {
+
+                if (document.getElementById("rest_form").checkValidity()) {
+
+                    var SId = $("#R_StudentInsId").val();
+                    var Phone = $("#R_PhoneNumber").val();
+
+                    $.post("@Url.Action("ForgotPassword", "Account")", { StudentInsId: SId, PhoneNumber: Phone, Type: 'SMS' }, function (data) {
+                        console.log(data);
+                        if (data.error == true) {
+                            $('#resetPass').modal('toggle');
+                            alert("SMS Notification No Not Match!");
+                        }
+                        else {
+                            $('#inpOtp').modal('toggle');
+                        }
+                            
+                    });
+                } else {
+                    alert('Please enter all info.');
+                }
+
+            });
+
+            $(document).on("click", "#ViaEmail", function () {
+
+                if (document.getElementById("rest_form").checkValidity()) {
+
+                    var SId = $("#R_StudentInsId").val();
+                    var Phone = $("#R_PhoneNumber").val();
+
+                    $.post("@Url.Action("ForgotPassword", "Account")", { StudentInsId: SId, PhoneNumber: Phone, Type: 'EMAIL' }, function (data) {
+                        if (data.error == false)
+                            $('#resetPass').modal('toggle');
+                            $('#reset_success').modal('toggle');
+                    });
+                } else {
+                    alert('Please enter all info.');
+                }
+
+            });
+
+            $(document).on("click", "#SMSTEXT", function () {
+                if (document.getElementById("smsText_form").checkValidity()) {
+                    var Code = $("#First").val() + $("#Second").val() + $("#Third").val() + $("#Fourth").val();
+                    $('#Newpassword').modal('toggle');
+                   $(document).on("click", "#NewpasswordBtn", function () {
+                        if (document.getElementById("newPass_Form").checkValidity()) {
+                         var Password = $("#NewPassword").val();
+                            var ConfirmPassword = $("#Confirmpassword").val();
+                            if (Password != ConfirmPassword) {
+                                alert("Passwords Don't Match");
+                                //Confirmpassword.setCustomValidity("Passwords Don't Match");
+                            } else {
+                                $.post("@Url.Action("ResetPassword", "Account")", {Password: Password,ConfirmPassword:ConfirmPassword,Code:Code }, function (data) {
+                                    if (data.error == false)
+                                        $('#resetPass').modal('toggle');
+                                    $('#reset_success').modal('toggle');
+                                });
+                                alert(SId);
+                        
+                            }
+                         
+                        } else {
+                            alert('Please enter all info.');
+
+                        }
+                           
+                       })
+                   }
+                else
+                {
+                    alert('Please enter all info.');
+                }
+               
+            })
+        });
+    </script>
+}

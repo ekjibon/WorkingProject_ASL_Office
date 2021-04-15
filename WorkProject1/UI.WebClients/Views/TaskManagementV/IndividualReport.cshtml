@@ -1,0 +1,96 @@
+﻿
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2 class="SetUpHead">Individual User List</h2>
+
+<div ng-controller="IndividualReportClt">
+    <form name="frm" novalidate ng-submit="Submit()" role="form">
+        <div class="row">
+            <div class="col-md-1">
+            </div>
+            <div class="col-md-10">
+                <div class="form-group" ng-class="{ 'has-error' : submitted && frm.TypeId.$invalid}">
+                    <label class="col-md-3 control-label">Type </label>
+                    <div class="col-md-9" ng-class="{ 'has-error' : submitted && frm.TypeId.$invalid}">
+                        <select class="form-control input-lg" required name="TypeId" ng-model="TypeId">
+                            <option value="">Select Please</option>
+                            <option value="1">Task</option>
+                            <option value="2">Ticket</option>
+                        </select>
+                        <span ng-show="submitted &&  frm.TypeId.$error.required" class="text-danger">Selection is Required</span>
+                    </div>
+                </div>
+                <div class="form-group" ng-class="{ 'has-error' : submitted && frm.RptUserName.$invalid}">
+                    <label class="col-md-3 control-label">User List</label>
+                    <div class="col-md-9" style="margin-bottom: 1%;margin-top: 1%;" ng-class="{ 'has-error' : submitted && frm.RptUserName.$invalid}">
+                        <select class="form-control input-lg" required name="RptUserName" ng-model="RptUserName" ng-options="item.UserName as item.FullName for item in AllUserList">
+                            <option value="">Select Please</option>
+                        </select>
+                        <span ng-show="submitted &&  frm.DeptId.$error.required" class="text-danger">Selection is Required</span>
+                    </div>
+                </div>
+                <div class="form-group" ng-class="{ 'has-error' : submitted && frm.Month.$invalid}">
+                    <label class="col-md-3 control-label">Month</label>
+                    <div class="col-md-9" ng-class="{ 'has-error' : submitted && frm.Month.$invalid}">
+                        <select class="form-control input-lg" required name="Month" ng-model="Month">
+                            <option value="">Select Please</option>
+                            <option value="1">January</option>
+                            <option value="2">February</option>
+                            <option value="3">March</option>
+                            <option value="4">April</option>
+                            <option value="5">May</option>
+                            <option value="6">June</option>
+                            <option value="7">July</option>
+                            <option value="8">August</option>
+                            <option value="9">September</option>
+                            <option value="10">October</option>
+                            <option value="11">November</option>
+                            <option value="12">December</option>
+                        </select>
+                        <span ng-show="submitted &&  frm.Month.$error.required" class="text-danger">Selection is Required</span>
+                    </div>
+                </div>
+                <div class="row pull-right" style="margin-top: 1%;margin-right: 2%;">
+                    <input type="submit" ng-click="submitted=true" class="btn btn-success" value="View Report" />
+                </div>
+             </div>
+            <div class="col-md-1">
+            </div>
+        </div>
+    </form>
+</div>
+<script type="text/javascript">
+ AddieApp.controller("IndividualReportClt", ["$scope", "$http", "SweetAlert",
+          function ($scope, $http,  SweetAlert) {
+                  init();
+                  function init() {
+                      initialize();
+                  }
+                  function initialize() {
+                      LoadAllUserList();
+                      $scope.RptUserName = '';
+                  };
+
+                  function LoadAllUserList() {
+
+                      $http.get(baseUrl + 'Setup/LoadAllUserList').
+                        then(function (response) {
+                            $scope.AllUserList = response.data;
+                        });
+                  }
+
+                  $scope.Submit = function Submit()
+                  {
+                      if ($scope.frm.$invalid)
+                          return;
+                      if ($scope.RptUserName!='') {
+                          var win = window.open('/Report/IndividualReport?UserName=' + $scope.RptUserName+'&TypeId='+$scope.TypeId+'&Month='+$scope.Month, '_blank');
+                          win.focus();
+                      }
+                    }
+
+              }]);
+</script>
+

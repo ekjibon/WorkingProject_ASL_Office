@@ -1,0 +1,623 @@
+﻿@{
+    ViewBag.Title = "Document Upload";
+}
+
+<style>
+    .btn-set {
+        float: right !important;
+        margin-left: 5px;
+    }
+</style>
+<div ng-controller="DocumentUploadCtrl">
+    <!-- Begin: life time stats -->
+    <div class="portlet light bordered">
+        <div class="portlet-title">
+            <div class="caption">
+                <i class="icon-settings font-green"></i>
+                <span class="caption-subject font-green sbold uppercase">@ViewBag.Title</span>
+            </div>
+            <div class="actions">
+                <div class="btn-group btn-group-solid">
+                    <button ng-click="resetForm()" class="btn green" data-target="#addmodal" data-toggle="modal"> <i class="fa fa-plus"></i> Add Document</button>
+                </div>
+            </div>
+        </div>
+        <div class="portlet-body">
+            <div class="table-container">
+                <div id="sample_3_wrapper" class="dataTables_wrapper no-footer">
+                    <div class="row">
+                        <div class="col-md-4 col-sm-5 col-xs-6">
+                            <div class="form-group">
+                                <div class="col-lg-3 col-md-5 col-sm-4 col-xs-8" style="padding-left:0px">
+                                    <select class="form-control" ng-model="pageSize" ng-options="P.value as P.text for P in pageSizeArray"></select>
+                                </div>
+                                <div class="col-md-7  col-sm-8  col-xs-4">
+                                    @*<label for="search" class="control-label" style="padding-top:5px">Items</label>*@
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 col-sm-3 col-xs-1">
+                        </div>
+                        <div class="col-md-4 col-sm-4 col-xs-5">
+                            <div id="sample_3_filter" class="pull-right">
+                                <input ng-model="q" id="search" class="form-control" placeholder="Filter text">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="table-scrollable"> </div>
+                    <table class="table table-bordered table-hover">
+                        <thead>
+                            <tr class="btn-primary">
+                                <th>Title</th>
+                                <th class="text-center">Type Name</th>
+                                <th class="text-center">Branch</th>
+                                <th class="text-center">Session Name</th>
+                                <th class="text-center">Class</th>
+                                <th class="text-center">Shift</th>
+                                <th class="text-center">File View</th>
+                                <th style="text-align:center">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-show="PortalDocumentList.results.length <= 0"><td colspan="13" style="text-align:center;"><i class="fa fa-refresh"></i> Loading new data!!</td></tr>
+                            <tr dir-paginate="item in PortalDocumentList.results | filter:q |itemsPerPage:pageSize" current-page="currentPage">
+                                <td>{{item.Title}}</td>
+                                <td class="text-center">{{item.TypeName}}</td>
+                                <td class="text-center" ng-hide="item.BranchName==null">{{item.BranchName}}</td>
+                                <td class="text-center" ng-hide="item.SessionName==null">{{item.SessionName}}</td>
+                                <td class="text-center" ng-hide="item.ClassName==null" >{{item.ClassName}}</td>
+                                <td class="text-center" ng-hide="item.ShiftName==null">{{item.ShiftName}}</td>
+                                
+                                <td class="text-center"ng-show="item.BranchName==null">N/A</td>
+                                <td class="text-center"ng-show="item.SessionName==null">N/A</td>
+                                <td class="text-center"ng-show="item.ClassName==null">N/A</td>
+                                <td class="text-center" ng-show="item.ShiftName==null"> N/A</td>
+                                <td class="text-center"><a target="_blank" href="@Url.Action("Download","Request")?DocumentId={{item.DocumentId}}">View</a></td>
+                                <td align="center">
+                                    <a ng-click="deletedocument(item)" href="" class="btn btn-icon-only red">
+                                        <i class="fa fa-trash"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="row">
+                        <dir-pagination-controls boundary-links="true" template-url="~/assets/angular/lib/dirPagination.tpl.html"></dir-pagination-controls>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- End: life time stats -->
+    <!--Modal Area Start-->
+    <div id="addmodal" class="modal fade" tabindex="-1" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <form class="form-horizontal" ng-submit="Upload()" name="addBasic" novalidate>
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">X</button>
+                        <h4 class="modal-title">Add Document</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group" ng-class="{ 'has-error' : submitted && addBasic.TypeId.$invalid}">
+                                        <label class="col-lg-4 col-md-6 col-sm-6 control-label">
+                                            Type :
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-lg-8 col-md-6 col-sm-6">
+                                            <select class="form-control" ng-model="document.TypeId" ng-change="TypeSelected()" required name="TypeId" ng-options="m.Id as m.TypeName for m in TypeList">
+                                                <option value="">Select</option>
+                                            </select>
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted && addBasic.TypeId.$error.required" class="help-block">Type Required</span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group"  ng-class="{ 'has-error' : submitted && addBasic.DocType.$invalid}">
+                                        <label class="col-lg-4 col-md-6 col-sm-6 control-label">
+                                            Doc Type:
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-lg-8 col-md-6 col-sm-6">
+                                            <select id="DocType" class="form-control" ng-model="document.DocType" required name="DocType"  ng-options="m.Value as m.Text for m in DocTypeList">
+                                                <option value="">Select</option>
+                                              
+                                            </select>
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted && addBasic.DocType.$error.required" class="help-block">Document Type Required</span>
+                                        </div>
+                                    </div>
+                                   
+                                    <div class="form-group" ng-show="document.TypeId==7 && document.DocType=='2'" ng-class="{ 'has-error' : submitted && addBasic.TeacherId.$invalid}">
+                                        <label class="col-lg-4 col-md-6 col-sm-6 control-label">
+                                            Teacher:
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-lg-8 col-md-6 col-sm-6">
+                                            <input type="text" required name="teacher" ng-model="Emp" placeholder="Search Teacher By ID or Name or SMS Notification No." uib-typeahead="emp  as emp.Text for emp in SearchTeacher($viewValue)" typeahead-loading="loadingLocations" typeahead-no-results="noResults" class="form-control">
+                                            <i ng-show="loadingLocations" class="glyphicon glyphicon-refresh"></i>
+                                            <div ng-show="noResults"><i class="glyphicon glyphicon-remove"></i> No Results Found</div>
+                                            <input type="hidden" name="EmpId" ng-value="Emp.id" />{{Emp.id}}
+
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted && addBasic.TeacherId.$error.required" class="help-block"> Required</span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group"  ng-class="{ 'has-error' : submitted && addBasic.Title.$invalid}">
+                                        <label class="col-lg-4 col-md-6 col-sm-6 control-label">
+                                            Title:
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-lg-8 col-md-6 col-sm-6">
+                                            <input class="form-control" placeholder="Title" ng-model="document.Title" name="Title" required />
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted && addBasic.Title.$error.required" class="help-block">Title Required</span>
+                                        </div>
+                                    </div>
+                                    @*<div class="form-group" ng-hide="document.TypeId==7 && document.DocType=='2' || document.TypeId==4 && document.DocType=='2' || document.TypeId==6 && document.DocType=='2'"  ng-class="{ 'has-error' : submitted && addBasic.Session.$invalid}">
+                                        <label class="col-lg-4 col-md-6 col-sm-6 control-label">
+                                            Session :
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-lg-8 col-md-6 col-sm-6">
+                                            <select class="form-control" ng-model="document.SessionId" name="Session" ng-options="studentInfo.SessionId as studentInfo.SessionName for studentInfo in CommonFeilds.Session" required>
+                                                <option value="" selected="selected">Choose Option</option>
+                                            </select>
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted && addBasic.Session.$error.required" class="help-block">Session Required</span>
+
+                                        </div>
+                                    </div>*@
+                                    <div ng-hide="document.TypeId==7 && document.DocType=='2' || document.TypeId==4 && document.DocType=='2'|| document.TypeId==6 && document.DocType=='2'" ng-show="document.TypeId==2 || document.TypeId==4 ||document.TypeId==5 ||document.TypeId==6">
+                                    @*<div class="form-group" ng-class="{ 'has-error' : submitted && addBasic.Branch.$invalid}">
+                                            <label class="col-lg-4 col-md-6 col-sm-6 control-label">
+                                                Branch :
+                                                <span class="required">*</span>
+                                            </label>
+                                            <div class="col-lg-8 col-md-6 col-sm-6">
+                                                <select class="form-control" ng-model="document.BranchId" name="Branch" ng-options="studentInfo.BranchId as studentInfo.BranchName for studentInfo in CommonFeilds.Branch" required>
+                                                    <option value="" selected="selected">Choose Option</option>
+                                                </select>
+                                                <div class="form-control-focus"> </div>
+                                                <span ng-show="submitted && addBasic.Branch.$error.required" class="help-block">Branch Required</span>
+                                            </div>
+                                        </div>*@
+
+                                        @*<div class="form-group" ng-class="{ 'has-error' : submitted && addBasic.Class.$invalid}">
+                                            <label class="col-lg-4 col-md-6 col-sm-6 control-label">
+                                                Class :
+                                                <span class="required">*</span>
+                                            </label>
+                                            <div class="col-lg-8 col-md-6 col-sm-6">
+                                                <select class="form-control" name="Class" multiple multi-select ng-model="document.ClassIdList" required>
+                                                    <option ng-repeat="Class in CommonFeilds.ClassInfo" value="{{Class.ClassId}}">
+                                                        {{Class.ClassName}}
+                                                    </option>
+                                                </select>
+                                                <div class="form-control-focus"> </div>
+                                                <span ng-show="submitted && addBasic.Class.$error.required" class="help-block">Class Required</span>
+                                            </div>
+                                        </div>*@
+
+                                        @*<div class="form-group" ng-class="{ 'has-error' : submitted && addBasic.Shift.$invalid}">
+                                            <label class="col-lg-4 col-md-6 col-sm-6 control-label">
+                                                Shift :
+                                                <span class="required">*</span>
+                                            </label>
+                                            <div class="col-lg-8 col-md-6 col-sm-6">
+                                                <select  class="form-control" name="Shift" ng-disabled="document.BranchId==null || document.ClassIdList==null" multiple multi-select ng-model="document.ShiftIdList">
+                                                    <option ng-repeat="Shift in CommonFeilds.Shift | filter:{BranchId:document.BranchId}:true" value="{{Shift.ShiftId}}">
+                                                        {{Shift.ShiftName}}
+                                                    </option>
+
+                                                </select>
+                                             
+                                                <div class="form-control-focus"> </div>
+                                                <span ng-show="submitted && addBasic.Shift.$error.required" class="help-block">Shift Required</span>
+                                            </div>
+                                        </div>*@
+                                       
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group" ng-show="document.TypeId==2" ng-class="{ 'has-error' : submitted && addBasic.Month.$invalid}">
+                                        <label class="col-lg-4 col-md-6 col-sm-6 control-label">
+                                            Month :
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-lg-8 col-md-6 col-sm-6">
+                                            <select class="form-control" ng-model="document.Month" name="Month" required>
+                                                <option value="" selected="selected">Choose Option</option>
+                                                <option value="January">January</option>
+                                                <option value="February">February</option>
+                                                <option value="March">March</option>
+                                                <option value="April">April</option>
+                                                <option value="May">May</option>
+                                                <option value="June">June</option>
+                                                <option value="July">July</option>
+                                                <option value="August">August</option>
+                                                <option value="September">September</option>
+                                                <option value="October">October</option>
+                                                <option value="November">November</option>
+                                                <option value="December">December</option>
+                                            </select>
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted && addBasic.Month.$error.required" class="help-block">Month Required</span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group" ng-show="document.TypeId==2" ng-class="{ 'has-error' : submitted && addBasic.Year.$invalid}">
+                                        <label class="col-lg-4 col-md-6 col-sm-6 control-label">
+                                            Year :
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-lg-8 col-md-6 col-sm-6">
+                                            <select class="form-control" ng-model="document.Year" name="Year" required>
+                                                <option value="" selected="selected">Choose Option</option>
+                                                <option value="2019">2019</option>
+                                            </select>
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted && addBasic.Year.$error.required" class="help-block">Year Required</span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group" ng-class="{ 'has-error' : submitted && addBasic.FilePath.$invalid}">
+                                        <label class="col-lg-4 col-md-6 col-sm-6 control-label" style="padding-right:0px">
+                                            PDF File(2MB)
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-lg-8 col-md-6 col-sm-6">
+                                            <input style="padding:6px 12px" type="file" ng-model="document.SessionId"  name="FilePath" id="pdf" accept="application/pdf" />
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted && addBasic.FilePath.$error.required" class="help-block">PDF Required</span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group" ng-show="document.TypeId==5" ng-class="{ 'has-error' : submitted && addBasic.UpdateDate.$invalid}">
+                                        <label class="col-lg-4 col-md-6 col-sm-6 control-label" style="padding-right:0px">
+                                            Deadline
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-lg-8 col-md-6 col-sm-6">
+                                            <input class="form-control" style="padding:6px 12px" type="date" ng-model="document.UpdateDate" required name="UpdateDate"  />
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted && addBasic.UpdateDate.$error.required" class="help-block">Deadline Required</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn blue btn-set" ng-click="submitted=true">Upload</button>
+                        <button type="reset" class="btn red btn-set" ng-click="Reset()">Reset</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts{
+    <script type="text/javascript">
+    OEMSApp.controller("DocumentUploadCtrl", ["$scope", "$http", "SweetAlert", "$window",
+      function ($scope, $http, SweetAlert, $window) {
+          init();
+          function init() {
+              initialize();
+              getAllDropdowns();
+              getAllCommons();
+              GetPortalDocumentList();
+            
+          }
+          function initialize() {
+              $scope.StudentInfos = [];
+              $scope.Dropdowns = [];
+              $scope.CommonFeilds = [];
+              $scope.document = {};
+              $scope.TeacherRoutine = true;
+
+              var Type = [
+                               { Id: 1, TypeName: "Academic Calendar" },
+                               { Id: 2, TypeName: "Newsletter" },
+                               { Id: 3, TypeName: "ECA Notice" },
+                               { Id: 4, TypeName: "General Notice" },
+                               { Id: 5, TypeName: "Homework" },
+                               { Id: 6, TypeName: "CS Header" },
+                               { Id: 7, TypeName: "Routine" },
+                               { Id: 8, TypeName: "Working Calender" }
+
+              ];
+              $scope.TypeList = Type;
+              $scope.currentPage = 1;
+              $scope.pageno = 1;
+              $scope.pagesize = 10;
+              $scope.total_count = 12;
+              $scope.txtsearch = '';
+              $scope.getAllDropdowns = getAllDropdowns;
+              $scope.submitted = false;
+
+              $scope.pageSizeArray = [];
+              $scope.pageSizeArray.push({ value: 5, text: 5 });
+              $scope.pageSizeArray.push({ value: 10, text: 10 });
+              $scope.pageSizeArray.push({ value: 20, text: 20 });
+              $scope.pageSizeArray.push({ value: 50, text: 50 });
+              $scope.currentPage = 1;
+              $scope.pageSize = 10;
+          };
+
+          $scope.TypeSelected=function TypeSelected()
+          {
+              if ( $scope.document.TypeId == 5) //hw/general notice header only for student
+              {
+                  var DocType = [
+                              { Value: 1, Text: "Student" }
+                  ];
+                  $scope.DocTypeList = DocType;
+              }
+
+              else if ($scope.document.TypeId == 7 || $scope.document.TypeId == 8) //routine for only employee
+              {
+                  var DocType = [
+                              { Value: 1, Text: "Student" },
+                                { Value: 2, Text: "Employee" }
+                  ];
+                  $scope.DocTypeList = DocType;
+              }
+              else if ($scope.document.TypeId == 8) //routine for only employee
+              {
+                  var DocType = [
+                        
+                                { Value: 2, Text: "Employee" }
+                  ];
+                  $scope.DocTypeList = DocType;
+              }
+              else
+              {
+                  var DocType = [
+                                { Value: 1, Text: "Student" },
+                                { Value: 2, Text: "Employee" }
+                  ];
+                  $scope.DocTypeList = DocType;
+              }
+              
+
+          }
+          $scope.SearchTeacher = function (val) {
+              if (val.length >= 3)
+                  return $http.get(baseUrl + 'Employee/SearchTeacher/' + val, {
+                      params: {
+
+                      }
+                  }).then(function (response) {
+                      return response.data.results.map(function (item) {
+                          return item;
+                      });
+                  });
+          };
+
+          $scope.Reset = function Reset() {
+              initialize();
+              getAllDropdowns();
+              getAllCommons();
+              $("#pdf").val('');
+          };
+       function getAllDropdowns() {
+              $scope.Dropdowns = [];
+              $http({
+                  method: 'GET',
+                  url: baseUrl + 'Common/GetAllDropDown/'
+              }).then(function successCallback(response) {
+                  $scope.Dropdowns = response.data.results;
+              }, function errorCallback(response) {
+                  toastr["error"](response.data.Message);
+              });
+       };
+       function GetPortalDocumentList() {
+           $scope.PortalDocumentList = [];
+           $http({
+               method: 'GET',
+               url: baseUrl + 'SetupInstitution/GetPortalDocumentList/'
+           }).then(function successCallback(response) {
+               $scope.PortalDocumentList = response.data;
+           }, function errorCallback(response) {
+               toastr["error"](response.data.Message);
+           });
+       };
+          function getAllCommons() {
+              $scope.CommonFeilds = [];
+              $http({
+                  method: 'GET',
+                  url: baseUrl + 'Common/GetCommonItem/'
+              }).then(function successCallback(response) {
+                  $scope.CommonFeilds = response.data.results;
+              }, function errorCallback(response) {
+                  toastr["error"](response.data.Message);
+              });
+          };
+
+          $scope.Upload = function Upload() {
+              var files = $("#pdf").get(0).files;
+              if (files.length == 0) {
+                  toastr["warning"]("File is Required.");
+                  return;
+              }
+
+              if (validation()) {
+                  $http({
+                      method: 'POST',
+                      url: baseUrl + 'SetupInstitution/DocumentUpload/',
+                      headers: { 'Content-Type': undefined },
+                      transformRequest: function (data) {
+                          var formData = new FormData();
+                          formData.append('documentAll', JSON.stringify($scope.document));
+                          if (files.length > 0)
+                              formData.append("pdf", files[0]);
+                          return formData;
+                      },
+                      data: { documentALL: $scope.document }
+                  }).then(function successCallback(response) {
+                      resetForm();
+                      $('#addmodal').modal('toggle');
+
+                      GetPortalDocumentList();
+                      toastr["success"](response.data.message);
+                  }, function errorCallback(response) {
+                      resetForm();
+                      toastr["warning"](response.data.Message);
+                      GetPortalDocumentList();
+                  });
+              }
+
+          };
+          function validation() {
+              var res = true;
+
+              var file_size = $('#pdf')[0].files[0].size;
+              if (file_size > 2097152) {
+                  toastr["warning"]("File Size Only 2MB.");
+                  res = false;
+                  return res;
+              }
+              if ($scope.addBasic.$invalid) {
+                  res = false;
+                  return res;
+              }
+              else if ($scope.document.TypeId == 1) // AcademicCalendar
+              {
+                  if ($scope.addBasic.Session.$invalid == true || $scope.addBasic.Title.$invalid == true) {
+                      if ($scope.document.DocType == 1) {
+                          if ($scope.document.ClassIdList == undefined || $scope.document.ClassIdList.length == 0) {
+                              toastr.warning("Please select class.");
+                              res = false;
+                              return res;
+                          }
+                          if ($scope.document.ShiftIdList == undefined || $scope.document.ShiftIdList.length == 0) {
+                              toastr.warning("Please select shift.");
+                              res = false;
+                              return res;
+                          }
+                          $scope.document.ShiftId = $scope.document.ShiftIdList.join(', ');
+                          $scope.document.ClassId = $scope.document.ClassIdList.join(', ');
+                      }
+                      res = false;
+                      return res;
+                  }
+              }
+              else if ($scope.document.TypeId == 2) // Newsletter
+              {
+                  if ($scope.addBasic.Session.$invalid == true || $scope.addBasic.Title.$invalid == true || $scope.addBasic.Branch.$invalid == true || $scope.addBasic.Shift.$invalid == true ||
+                      $scope.addBasic.Year.$invalid == true || $scope.addBasic.Month.$invalid == true || $scope.addBasic.Class.$invalid == true) {
+                      if ($scope.document.DocType == 1) {
+                          if ($scope.document.ClassIdList == undefined || $scope.document.ClassIdList.length == 0) {
+                              toastr.warning("Please select class.");
+                              res = false;
+                              return res;
+                          }
+                          if ($scope.document.ShiftIdList == undefined || $scope.document.ShiftIdList.length == 0) {
+                              toastr.warning("Please select shift.");
+                              res = false;
+                              return res;
+                          }
+                          $scope.document.ShiftId = $scope.document.ShiftIdList.join(', ');
+                          $scope.document.ClassId = $scope.document.ClassIdList.join(', ');
+                      }
+                      res = false;
+                      return res;
+
+                  }
+
+              }
+              else if ($scope.document.TypeId == 6) // CS HEader
+              {
+                  if ($scope.addBasic.DocType.$invalid == true || $scope.addBasic.Title.$invalid == true) {
+                      if ($scope.document.DocType == 1) {
+                          if ($scope.document.ClassIdList == undefined || $scope.document.ClassIdList.length == 0) {
+                              toastr.warning("Please select class.");
+                              res = false
+                              return res;
+                          }
+                          if ($scope.document.ShiftIdList == undefined || $scope.document.ShiftIdList.length == 0) {
+                              toastr.warning("Please select shift.");
+                              res = false
+                              return res;
+                          }
+                          $scope.document.ShiftId = $scope.document.ShiftIdList.join(', ');
+                          $scope.document.ClassId = $scope.document.ClassIdList.join(', ');
+                      }
+                      res = false
+                      return res;
+                  }
+
+              }
+              else if ($scope.document.TypeId == 7) // Routine
+              {
+                  $scope.document.ShiftId = $scope.Emp.Value;
+              } else if ($scope.document.TypeId == 3 || $scope.document.TypeId == 4 || $scope.document.TypeId == 5) {
+
+                  if ($scope.document.DocType == 1) {
+                      if ($scope.document.ClassIdList == undefined || $scope.document.ClassIdList.length == 0) {
+                          toastr.warning("Please select class.");
+                          res = false
+                          return res;
+                      }
+                      if ($scope.document.ShiftIdList == undefined || $scope.document.ShiftIdList.length == 0) {
+                          toastr.warning("Please select shift.");
+                          res = false
+                          return res;
+                      }
+                      $scope.document.ShiftId = $scope.document.ShiftIdList.join(', ');
+                      $scope.document.ClassId = $scope.document.ClassIdList.join(', ');
+                  }
+
+                  return res;
+
+              }
+              else if ($scope.document.TypeId == 4) {
+                  if ($scope.document.DocType == 2) {
+                      if ($scope.addBasic.teacher.$invalid = true || $scope.addBasic.Session.$invalid == true || $scope.addBasic.Branch.$invalid == true ||
+                          $scope.addBasic.Shift.$invalid == true || $scope.addBasic.Class.$invalid == true || $scope.addBasic.Month.$invalid == true ||
+                          $scope.addBasic.Year.$invalid == false || $scope.addBasic.FilePath.$invalid == true || $scope.addBasic.UpdateDate.$invalid == true) {
+                          res = false;
+                          return res;
+                      }
+                  }
+              }
+
+              else {
+                  if ($scope.addBasic.Session.$invalid == true || $scope.addBasic.Title.$invalid == true)
+                      res = false;
+                  return res;
+              }
+
+              return res;
+
+          }
+          $scope.deletedocument = function deletedocument(n) {
+              SweetAlert.swal({
+                  title: "Are you sure to delete it ?", type: "warning", showCancelButton: true, confirmButtonColor: "#DD6B55",
+                  confirmButtonText: "Yes, delete it!",
+                  closeOnConfirm: false
+              },
+              function (isConfirm) {
+                  if (isConfirm) {
+                      $http({
+                          method: 'DELETE',
+                          url: baseUrl + 'SetupInstitution/DeleteDocument/' + n.DocumentId,
+                          data: $scope.document
+                      }).then(function successCallback(response) {
+                          SweetAlert.swal("Deleted!", "Your data has been deleted.", "success");
+                          GetPortalDocumentList();
+                      }, function errorCallback(response) {
+                          toastr["warning"](response.data.Message);
+                      });
+                  }
+              });
+          };
+          function resetForm() {
+              
+            
+              $("#pdf").val('');
+          };
+
+      }]);
+    </script>
+}

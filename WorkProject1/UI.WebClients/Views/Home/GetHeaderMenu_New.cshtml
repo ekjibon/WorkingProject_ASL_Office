@@ -1,0 +1,45 @@
+﻿
+@model IEnumerable<OEMS.Models.Model.AspNetPage>
+@{
+    Layout = null;
+}
+<div class="row mb-3">
+    <div class="col-lg-12 mobilpadding">
+        <div class="stickyNav">
+            <nav class="navbar navbar-expand-lg navbar-light" id="MobileToggle">
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav ModuleNav">
+                        @{
+                            var widthclass = string.Empty;
+                            if (Model.Any())
+                            {
+                                widthclass = (100 / Model.Count()).ToString() + "%";
+                            }
+                            foreach (var item in Model)
+                            {
+                                var clas = string.Empty;
+                                var moduleId = Session["ModuleId"] == null ? 0 : Convert.ToInt32(Session["ModuleId"]);
+                                if (moduleId == item.ModuleId)
+                                {
+                                    clas = "active";
+                                }
+                                <li class="nav-item  @clas " style="width:@widthclass">
+                                    <a class="nav-link @item.IconClass  @clas" href="@Url.Action(item.Action,item.Controller)" >
+                                        <img src="assets/images/Icon/dashboardicon.svg" alt="">
+                                        <p>@item.NameOption_En</p>
+                                    </a>
+                                </li>
+                            }
+                        }
+                    </ul>
+                </div>
+            </nav>
+            <div class="hideshow text-center">
+                <!-- <img id="menuToggle" src="assets/images/Icon/down-chevron.svg" alt=""> -->
+                <button type="button" id="menuToggle" class="Hidemybtn">Hide</button>
+
+                <button type="button" id="menuToggle2" class="Hidemybtn" style="display: none;">Show</button>
+            </div>
+        </div>
+    </div>
+</div>

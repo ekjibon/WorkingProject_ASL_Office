@@ -1,0 +1,1343 @@
+﻿
+@{
+    ViewBag.Title = "TicketList";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@using UI.Admin.Models
+
+<style>
+    .dropdown-submenu {
+        position: relative;
+    }
+
+        .dropdown-submenu .dropdown-menu {
+            top: 0;
+            left: 100%;
+            margin-top: -1px;
+        }
+</style>
+<style>
+    .kyc_card_header {
+        padding: 0px 9px;
+        background: #f0f8ff;
+        border-bottom: 0;
+    }
+
+        .kyc_card_header h3 {
+            font-size: 22px;
+            font-family: 'Ubuntu', sans-serif;
+            font-weight: 500;
+            color: #222;
+        }
+
+        .kyc_card_header p {
+            font-size: 13px;
+            font-family: 'Ubuntu', sans-serif;
+            font-weight: 800;
+            color: #666666;
+        }
+
+        .kyc_card_header span {
+            font-size: 18px;
+            font-family: 'Ubuntu', sans-serif;
+            font-weight: 800;
+            color: #666666;
+        }
+
+    .kyc_card_header {
+        padding: 0px 9px;
+        background: #f0f8ff;
+        border-bottom: 0;
+    }
+
+        .kyc_card_header h3 {
+            font-size: 22px;
+            font-family: 'Ubuntu', sans-serif;
+            font-weight: 500;
+            color: #222;
+        }
+
+        .kyc_card_header p {
+            font-size: 13px;
+            font-family: 'Ubuntu', sans-serif;
+            font-weight: 800;
+            color: #666666;
+        }
+
+        .kyc_card_header span {
+            font-size: 18px;
+            font-family: 'Ubuntu', sans-serif;
+            font-weight: 800;
+            color: #666666;
+        }
+
+    .orange_icon {
+        margin-top: 55px;
+    }
+
+        .orange_icon i {
+            width: 37px;
+            height: 37px;
+            border: 2px solid #777;
+            color: #222;
+            line-height: 35px;
+            font-size: 20px;
+            border-radius: 6px;
+            transition: all linear .3s;
+            cursor: pointer;
+        }
+
+            .orange_icon i:hover {
+                background: #999;
+                color: #fff;
+            }
+
+    .Description_text input {
+        width: 100%;
+        height: 100%;
+    }
+
+    .description_list {
+        border: 0px solid #ddd;
+    }
+
+    .Description_text {
+        width: 100%;
+        height: 50px;
+        border: 2px solid #ddd;
+        margin-bottom: 12px;
+    }
+
+    .description_main p {
+        font-size: 13px;
+        font-weight: 700;
+    }
+
+    .development p {
+        font-size: 11px;
+        font-family: 'Ubuntu', sans-serif;
+        font-weight: 400;
+        color: #444;
+        margin-bottom: 5px;
+    }
+
+    .development span {
+        font-size: 10px;
+        color: #444;
+        margin-bottom: 5px;
+    }
+
+    .man {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        background: #c00;
+        overflow: hidden;
+    }
+
+    .assain p {
+        font-size: 14px;
+        margin-bottom: 1px;
+    }
+
+    .assain h4 {
+        font-size: 13px;
+    }
+
+    .assain h5 {
+        font-size: 10px;
+    }
+
+    #comments_created {
+        height: 60px;
+        margin-bottom: 12px;
+    }
+
+    .comments {
+        border: 2px solid #ddd;
+        padding-left: 10px;
+        height: 90px;
+    }
+
+    .comment_main {
+        width: 28%;
+        float: left;
+    }
+
+    .Progress {
+        width: 72%;
+        display: flex;
+    }
+
+        .Progress td {
+            font-size: 14px;
+        }
+
+    .progress_table {
+        margin-top: 25px;
+    }
+
+    .comments p {
+        font-size: 18px;
+        margin-bottom: 0;
+    }
+
+    .comments span {
+        font-size: 18px;
+        font-family: 'Ubuntu', sans-serif;
+        font-weight: 800;
+    }
+
+    .comments h5 {
+        font-size: 12px;
+        ;
+    }
+
+    .comments_text textarea {
+        height: 100%;
+        width: 100%;
+        resize: none;
+    }
+
+    .comments_text {
+        margin-top: -22px;
+    }
+
+    .date p {
+        font-size: 16px;
+        margin-bottom: 2px;
+    }
+
+    .date i {
+        font-size: 20px;
+        color: #444;
+    }
+
+    .date span {
+        font-size: 18px;
+    }
+
+    .file {
+        margin-top: -10px;
+        background: #faebd7;
+        padding: 5px 0;
+    }
+
+        .file i {
+            font-size: 20px;
+            color: #444;
+        }
+
+        .file span {
+            font-size: 15px;
+        }
+
+    .Activities span {
+        margin-left: 12px;
+        font-size: 16px;
+    }
+
+    .Activities {
+        margin-top: 15px;
+    }
+
+        .Activities i {
+            font-size: 20px;
+        }
+
+        .Activities p {
+            font-size: 12px;
+            margin-bottom: 3px;
+        }
+
+            .Activities p span {
+                font-size: 12px;
+                font-weight: 700;
+            }
+
+    .comments_area {
+        margin-top: -20px;
+    }
+
+        .comments_area textarea {
+            width: 100%;
+            font-size: 18px;
+            height: 60px;
+        }
+
+    .people i {
+        font-size: 20px;
+    }
+
+    .people span {
+        font-size: 16px;
+        padding-left: 0px;
+    }
+
+    .thumbnail {
+        padding: 0px;
+    }
+
+    .panel {
+        position: relative;
+    }
+
+        .panel > .panel-heading:after, .panel > .panel-heading:before {
+            position: absolute;
+            top: 11px;
+            left: -16px;
+            right: 100%;
+            width: 0;
+            height: 0;
+            display: block;
+            content: " ";
+            border-color: transparent;
+            border-style: solid solid outset;
+            pointer-events: none;
+        }
+
+        .panel > .panel-heading:after {
+            border-width: 7px;
+            border-right-color: #f7f7f7;
+            margin-top: 1px;
+            margin-left: 2px;
+        }
+
+        .panel > .panel-heading:before {
+            border-right-color: #ddd;
+            border-width: 8px;
+        }
+
+        .top{
+            margin-top: -4%;
+        }
+</style>
+<!--date picker-->
+<link href="http://cdn.addiesoft.com/admin/assets/global/plugins/bootstrap-daterangepicker/daterangepicker.min.css" rel="stylesheet" type="text/css" />
+<link href="http://cdn.addiesoft.com/admin/assets/global/plugins/bootstrap-datepicker/css/bootstrap-datepicker3.min.css" rel="stylesheet" type="text/css" />
+<link href="http://cdn.addiesoft.com/admin/assets/global/plugins/bootstrap-timepicker/css/bootstrap-timepicker.min.css" rel="stylesheet" type="text/css" />
+<link href="http://cdn.addiesoft.com/admin/assets/global/plugins/bootstrap-datetimepicker/css/bootstrap-datetimepicker.min.css" rel="stylesheet" type="text/css" />
+<script src="http://cdn.addiesoft.com/admin/assets/global/plugins/bootstrap-daterangepicker/daterangepicker.min.js" type="text/javascript"></script>
+<script src="http://cdn.addiesoft.com/admin/assets/global/plugins/bootstrap-datepicker/js/bootstrap-datepicker.min.js" type="text/javascript"></script>
+<script src="http://cdn.addiesoft.com/admin/assets/global/plugins/bootstrap-timepicker/js/bootstrap-timepicker.min.js" type="text/javascript"></script>
+<script src="http://cdn.addiesoft.com/admin/assets/global/plugins/bootstrap-datetimepicker/js/bootstrap-datetimepicker.min.js" type="text/javascript"></script>
+<script src="http://cdn.addiesoft.com/admin/assets/pages/scripts/components-date-time-pickers.min.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+$(document).ready(function(){
+    $('ul.dropdown-menu li.dropdown-submenu').hover(function () {
+        $(this).find('.dropdown-menu').stop(true, true).delay(200).fadeIn(500);
+    }, function () {
+        $(this).find('.dropdown-menu').stop(true, true).delay(200).fadeOut(500);
+    });
+
+
+    $('ul.dropdown-menu li.dropdown').hover(function () {
+        $(this).find('.dropdown-menu').stop(true, true).delay(200).fadeIn(500);
+    }, function () {
+        $(this).find('.dropdown-menu').stop(true, true).delay(200).fadeOut(500);
+    });
+});
+</script>
+
+@try
+{
+    string msg = Session["ticketsuccess"].ToString();
+    <p style="color: white;text-align: center;background-color: green;padding-top: 1%;font-size: x-large;margin-bottom: 2%;margin-top: -2%;padding-bottom: 1%;">@msg</p>
+    Session.Abandon();
+}
+catch
+{
+
+}
+
+<div class="text-right">
+    <h3 style="text-align: left;background: #ddd;margin-right: 10.5%;margin-left: 0.5px;margin-top: -5px;padding-left: 2%;padding: 4px;">Ticket List</h3>
+<a title="Add Ticket" class="btn btn-primary fa-item" style="margin-top: -77px;" href="@Url.Action("AddTicket","Home")">
+        <i class="fa fa-plus-square"></i> Add Ticket
+    </a>
+</div>
+
+<div ng-controller="ticketListClt">
+
+    <div class="panel-body" style="margin-top: -3%;">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="portlet light bordered">
+                    <div class="row">
+                        <div class="portlet-body">
+                            <ul class="nav nav-tabs" style="margin-top: 32px;" >
+                                <li class="active">
+                                    <a href="#tab_1_1" data-toggle="tab"> All Ticket ({{TickettList.length}}) </a>
+                                </li>
+                                <li>
+                                    <a href="#tab_1_2" data-toggle="tab"> My Ticket ({{MyTickettList.length}})</a>
+                                </li>
+                                
+                               </ul>
+                         
+                            <div class="row" style="margin-top: 1%;">
+                                <div class="col-md-2 pull-right" style="width:10%">
+                                    <select class="form-control" ng-model="pageSize" ng-options="P.value as P.text for P in pageSizeArray"></select>
+                                </div>
+                                <div class="col-lg-2 pull-right" style="width:13%;">
+                                    <input ng-model="q" id="search" class="form-control" placeholder="Filter text">
+                                </div>
+                                <div class="col-lg-2  pull-right">
+                                    <table style="margin-left: -426%;">
+                                        <tr>
+                                            <td style="padding: 1px;">
+                                                <div class="dropdown">
+                                                    <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">
+                                                        Create
+                                                        <span class="caret"></span>
+                                                    </button>
+                                                    <ul class="dropdown-menu">
+                                                        <li><a tabindex="-1" href="#" ng-click="TimeFilter('Anytime')">Anytime</a></li>
+                                                        <li><a tabindex="-1" href="#" ng-click="TimeFilter('Today')">Today</a></li>
+                                                        <li><a tabindex="-1" href="#" ng-click="TimeFilter('Yesterday')">Yesterday</a></li>
+                                                        <li><a tabindex="-1" href="#" ng-click="TimeFilter('This Month')">This Month</a></li>
+                                                        <li><a tabindex="-1" href="#" ng-click="TimeFilter('Past Month')">Past Month</a></li>
+                                                        <li><a tabindex="-1" href="#" ng-click="TimeFilter('This Year')">This Year</a></li>
+                                                        <li><a tabindex="-1" href="#" ng-click="TimeFilter('Past Year')">Past Year</a></li>
+                                                    </ul>
+                                                </div>
+                                            </td>
+                                            <td style="padding: 1px;">
+                                                <div class="dropdown" >
+                                                    <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">
+                                                        Close
+                                                        <span class="caret"></span>
+                                                    </button>
+                                                    <ul class="dropdown-menu">
+                                                        <li><a tabindex="-1" href="#" ng-click="CloseDateFilter('Anytime')">Anytime</a></li>
+                                                        <li><a tabindex="-1" href="#" ng-click="CloseDateFilter('Yesterday')">Tomorrow</a></li>
+                                                        <li><a tabindex="-1" href="#" ng-click="CloseDateFilter('Today')">Today</a></li>
+                                                        <li><a tabindex="-1" href="#" ng-click="CloseDateFilter('Yesterday')">Yesterday</a></li>
+                                                        <li><a tabindex="-1" href="#" ng-click="CloseDateFilter('This Month')">This Month</a></li>
+                                                        <li><a tabindex="-1" href="#" ng-click="CloseDateFilter('Past Month')">Past Month</a></li>
+                                                        <li><a tabindex="-1" href="#" ng-click="CloseDateFilter('This Year')">This Year</a></li>
+                                                        <li><a tabindex="-1" href="#" ng-click="CloseDateFilter('Past Year')">Past Year</a></li>
+                                                    </ul>
+                                                </div>
+                                            </td>
+                                            <td style="padding: 1px;">
+                                                <div class="dropdown" >
+                                                    <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">
+                                                        Category
+                                                        <span class="caret"></span>
+                                                    </button>
+                                                    <ul class="dropdown-menu">
+                                                        <li><a tabindex="-1" href="#" ng-click="CategoryFilter('All')">All</a></li>
+                                                        <li><a tabindex="-1" href="#" ng-click="CategoryFilter('Admin')">Admin</a></li>
+                                                        <li><a tabindex="-1" href="#" ng-click="CategoryFilter('Technical')">Technical</a></li>
+                                                        <li><a tabindex="-1" href="#" ng-click="CategoryFilter('Service')">Service</a></li>
+                                                        <li><a tabindex="-1" href="#" ng-click="CategoryFilter('Accounts')">Accounts</a></li>
+                                                        <li><a tabindex="-1" href="#" ng-click="CategoryFilter('Marketing')">Marketing</a></li>
+                                                        <li><a tabindex="-1" href="#" ng-click="CategoryFilter('Bug')">Bug</a></li>
+                                                    </ul>
+                                                </div>
+                                            </td>
+                                            <td style="padding: 1px;">
+                                                <div class="dropdown" >
+                                                    <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">
+                                                        Dept.
+                                                        <span class="caret"></span>
+                                                    </button>
+                                                    <ul class="dropdown-menu">
+                                                        <li><a tabindex="-1" href="#" ng-click="DeptFilter('Support & Service')">Support & Service</a></li>
+                                                        <li><a tabindex="-1" href="#" ng-click="DeptFilter('Product Development')">Product Development</a></li>
+                                                        <li><a tabindex="-1" href="#" ng-click="DeptFilter('Sales & Marketing')">Sales & Marketing</a></li>
+                                                        <li><a tabindex="-1" href="#" ng-click="DeptFilter('HR & Admin')">HR & Admin</a></li>
+                                                        <li><a tabindex="-1" href="#" ng-click="DeptFilter('Accounts')">Accounts</a></li>
+                                                    </ul>
+                                                </div>
+                                            </td>
+                                     
+                                            <td style="padding: 1px;">
+                                                <div class="dropdown">
+                                                    <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">
+                                                        Add By
+                                                        <span class="caret"></span>
+                                                    </button>
+                                                    <ul class="dropdown-menu">
+                                                        <li ng-repeat="item in AllUserList">
+                                                            <a tabindex="-1" href="#" ng-click="AddByFilter(item.UserName)">{{item.FullName}}</a>
+                                                        </li>
+
+                                                    </ul>
+                                                </div>
+                                            </td>
+                                            <td style="padding: 1px;">
+                                                <div class="dropdown">
+                                                    <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">
+                                                        T-Status
+                                                        <span class="caret"></span>
+                                                    </button>
+                                                    <ul class="dropdown-menu">
+                                                        <li><a tabindex="-1" href="#" ng-click="TicketStatusFilter('Open')">Open</a></li>
+                                                        <li><a tabindex="-1" href="#" ng-click="TicketStatusFilter('Closed')">Closed</a></li>
+                                                        <li><a tabindex="-1" href="#" ng-click="TicketStatusFilter('Feedback')">Feedback</a></li>
+                                                    </ul>
+                                                </div>
+                                            </td>
+                                            <td style="padding: 1px;">
+                                                <div class="dropdown">
+                                                    <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">
+                                                        Task Status
+                                                        <span class="caret"></span>
+                                                    </button>
+                                                    <ul class="dropdown-menu">
+                                                        <li><a tabindex="-1" href="#" ng-click="TaskStatusFilter('Pending')">Pending</a></li>
+                                                        <li><a tabindex="-1" href="#" ng-click="TaskStatusFilter('In Progress')">In Progress</a></li>
+                                                        <li><a tabindex="-1" href="#" ng-click="TaskStatusFilter('Paused')">Paused</a></li>
+                                                        <li><a tabindex="-1" href="#" ng-click="TaskStatusFilter('Resolved')">Resolved</a></li>
+
+                                                    </ul>
+                                                </div>
+                                            </td>
+                                            <td style="padding: 1px;">
+                                                <div class="dropdown">
+                                                    <button class="btn btn-default dropdown-toggle" type="button" data-toggle="dropdown">
+                                                        Priority
+                                                        <span class="caret"></span>
+                                                    </button>
+                                                    <ul class="dropdown-menu">
+                                                        <li><a tabindex="-1" href="#" ng-click="PriorityFilter('High')">High</a></li>
+                                                        <li><a tabindex="-1" href="#" ng-click="PriorityFilter('Medium')">Medium</a></li>
+                                                        <li><a tabindex="-1" href="#" ng-click="PriorityFilter('Low')">Low</a></li>
+                                                    </ul>
+                                                </div>
+                                            </td>
+                                            <td style="padding: 1px;">
+                                                <div class="dropdown">
+                                                    <button class="btn btn-danger dropdown-toggle" title="Clear" ng-click="TicketList()" type="button" data-toggle="dropdown">
+                                                        <i class="far fa-times-circle"></i>
+                                                 </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                 </table>
+                                </div>
+                            </div>
+
+                            <div class="tab-content">
+                                <div class="tab-pane fade active in" id="tab_1_1">
+                                    <table class="table table-checkable table-inverse table-hover">
+                                        <thead class="">
+                                            <tr class="text-center">
+                                                <th>ID#</th>
+                                                <th>Action</th>
+                                                <th class="text-center">Title</th>
+                                                <th class="text-center">FWD</th>
+                                                <th class="text-center">Ticket Status</th>
+                                                <th class="text-center">Task Status</th>
+                                              
+                                               
+                                                <th class="text-center">Priority</th>
+                                                <th class="text-center">Close Date</th>
+                                               
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr ng-show="TickettList.length <= 0"><td colspan="7" style="text-align:center;"><i class="fa fa-refresh"></i> No Data Exist!!</td></tr>
+                                            <tr dir-paginate="item in TickettList| filter:q | itemsPerPage: pageSize" current-page="currentPage"  ng-style="item.ForwardToName !=null && {'background-color':'antiquewhite'}">
+                                                <td style="min-width:64px">{{item.TicketId}}</td>
+                                                @if (User.IsInRole(Role.Admin) || User.IsInRole(Role.Manager))
+                                                {
+                                                    <td >
+                                                        <div class="dropdown">
+                                                            <!--for dropdown options-->
+                                                            <a class="dropdown-toggle" data-toggle="dropdown" href="#"><i class="fas fa-ellipsis-v"></i></a>
+                                                         <ul ng-show="item.TicketStatus!='Closed'" class="dropdown-menu">
+                                                                <li><a tabindex="-1" href="#" ng-show="item.TicketStatus=='Open'" ng-click="CloseTicket(item)">Close</a></li>
+                                                             <li>
+                                                                 <a data-toggle="modal" ng-show="item.TaskId==0" ng-click="ConvertToTask(item)" href="#ConvertToTask">Convert To Task</a>
+                                                             </li>
+                                                              <li>
+                                                                 <a data-toggle="modal" ng-show="item.TaskId==0 && item.ForwardToName==null" ng-click="ForwardToManager(item)" href="#ForwardToManager">Forward To Manager</a>
+                                                             </li>
+                                                               <li>
+                                                                    <a data-toggle="modal" ng-show="item.TaskId==0" ng-click="Delete(item)" href="#">Delete</a>
+                                                                </li>
+                                                            </ul>
+                                                        </div>
+                                                    </td>
+                                                    @*<td ng-show="item.TicketStatus=='Closed'"></td>*@
+                                                }
+                                                else
+                                                {
+                                                    <td>
+                                                        <div class="dropdown">
+                                                            <a class="dropdown-toggle" data-toggle="dropdown" href="#"><i class="fas fa-ellipsis-v"></i></a>
+                                                            <ul class="dropdown-menu" style="">
+                                                                <li><a tabindex="-1" href="#" ng-click="CloseTicket(item)">Close</a></li>
+                                                            </ul>
+                                                        </div>
+
+                                                    </td>
+                                                }
+                                               
+                                                <td class="text-left">
+                                                    <a  target="_blank" style="font-size:15px;text-decoration: none;font-weight:bold" href="@Url.Action("TicketDetails", "Home")?TicketId={{item.TicketId}}"  >{{item.Title | capitalize}}</a>
+                                                    <p style="color:darkgray;font-size:12px">Added by {{item.AddBy | capitalize}} at {{item.AddDate.replace('/Date(','').replace(')/','') |  date:'dd-MM-yyyy HH:mm a'}}</p>
+                                                </td>
+                                                <td class="text-left">
+                                                    <p ng-show="item.ForwardToName!=null">{{item.ForwardToName}}</p>
+                                                </td>
+                                                <!--ticket status-->
+                                                <td class="text-center" ng-show="item.TaskStatus!='Resolved' && item.TaskStatus!='Closed' && item.TicketStatus!='Closed'"><span class="label label-success" style="padding-left: 31%;padding-right: 31%;">Open</span></td>
+                                                <td class="text-center" ng-show="item.TicketStatus=='Closed'"><span class="label label-default" style="padding-left: 29%;padding-right: 29%;">Closed</span></td>
+                                                <td class="text-center" ng-show="item.TaskStatus=='Closed' &&item.TicketStatus!='Closed'"><span class="label label-default" style="padding-left: 29%;padding-right: 29%;">Closed</span></td>
+                                                <td class="text-center" ng-show="item.TaskStatus=='Resolved'"><span class="label label-primary" style="padding-left: 22%;padding-right: 22%;">Feedback</span></td>
+
+                                                <!--task status-->
+                                                <td class="text-center" ng-show="item.TaskStatus=='N/A'"><span class="label label-warning" style="padding-left: 40%;padding-right: 40%;">{{item.TaskStatus}}</span></td>
+                                                <td class="text-center" ng-show="item.TaskStatus=='Pending'"><span class="label label-primary" style="padding-left: 13%;padding-right: 13%;">{{item.TaskStatus}}</span></td>
+                                                <td class="text-center" ng-show="item.TaskStatus=='Paused'"><span class="label label-warning" style="padding-left: 26%;padding-right: 26%;">{{item.TaskStatus}}</span></td>
+                                                <td class="text-center" ng-show="item.TaskStatus=='In Progress'"><span class="label label-info" style="padding-left: 13%;padding-right: 13%;">{{item.TaskStatus}}</span></td>
+                                                <td class="text-center" ng-show="item.TaskStatus=='Resolved'"><span class="label label-success" style="padding-left: 24%;padding-right: 24%;">{{item.TaskStatus}}</span></td>
+                                                <td class="text-center" ng-show="item.TaskStatus=='Closed'"><span class="label label-default" style="padding-left: 24%;padding-right: 24%;">Closed</span></td>
+
+                                             
+                                                <!--Priority status-->
+                                                <td class="text-center" ng-show="item.Priority=='High'"> <span class="text-center label label-danger" style="padding-left: 30%;padding-right: 30%;">{{item.Priority}}</span> </td>
+                                                <td class="text-center" ng-show="item.Priority=='Medium'"> <span class="text-center label label-default">{{item.Priority}}</span> </td>
+                                                <td class="text-center" ng-show="item.Priority=='Low'"> <span class="text-center label label-warning" style="padding-left: 30%;padding-right: 30%;">{{item.Priority}}</span> </td>
+
+                                                <td class="text-center">{{item.TicketDueDate.replace('/Date(','').replace(')/','') |  date:"dd-MM-yyyy"}}</td>
+
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <div class="row" ng-show="TickettList.length>1">
+                                        <dir-pagination-controls boundary-links="true" template-url="~/assets/dirPagination.tpl.html"></dir-pagination-controls>
+                                    </div>
+                                </div>
+                                <div class="tab-pane fade" id="tab_1_2">
+                                    <div class="tab-pane fade active in" id="tab_1_1">
+                                        <table class="table table-checkable table-inverse table-hover">
+                                            <thead class="">
+                                                <tr class="text-center">
+                                                    <th>ID#</th>
+                                                    <th>Menu</th>
+                                                    <th class="text-center">Title</th>
+                                                    <th class="text-center">FWD</th>
+                                                    <th class="text-center">Ticket Status</th>
+                                                    <th class="text-center">Task Status</th>
+                                                   
+                                                    
+                                                    <th class="text-center">Priority</th>
+                                                    <th class="text-center">Close Date</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr ng-show="MyTickettList.length <= 0"><td colspan="7" style="text-align:center;"><i class="fa fa-refresh"></i>No Data Exist!!</td></tr>
+                                                <tr dir-paginate="item in MyTickettList| filter:q | itemsPerPage: pageSize" current-page="currentPage" ng-style="item.ForwardToName !=null && {'background-color':'antiquewhite'}">
+                                                    <td style="min-width:64px">{{item.TicketId}}</td>
+                                                    @if (User.IsInRole(Role.Admin) || User.IsInRole(Role.Manager))
+                                                    {
+                                                        <td >
+                                                            <div class="dropdown">
+                                                                <!--for dropdown options-->
+                                                                <a data-toggle="dropdown" href="#"><i class="fas fa-ellipsis-v"></i></a>
+
+                                                                <ul ng-show="item.TicketStatus!='Closed'" class="dropdown-menu" style="">
+                                                                    <li><a tabindex="-1" href="#" ng-show="item.TicketStatus=='Open'" ng-click="CloseTicket(item)">Close</a></li>
+                                                                    <li>
+                                                                        <a data-toggle="modal" ng-show="item.TaskId==0" ng-click="ConvertToTask(item)" href="#ConvertToTask">Convert To Task</a>
+                                                                    </li>
+                                                                    <li>
+                                                                        <a data-toggle="modal" ng-show="item.TaskId==0 && item.ForwardToName==null" ng-click="ForwardToManager(item)" href="#ForwardToManager">Forward To Manager</a>
+                                                                    </li>
+                                                                    <li>
+                                                                        <a data-toggle="modal" ng-show="item.TaskId==0" ng-click="Delete(item)" href="#">Delete</a>
+                                                                    </li>
+                                                                </ul>
+                                                            </div>
+                                                        </td>
+                                                        @*<td ng-show="item.TicketStatus=='Closed'"></td>*@
+                                                    }
+                                                    else
+                                                    {
+                                                        <td>
+                                                            <div class="dropdown">
+                                                              <a data-toggle="dropdown" href="#"><i class="fas fa-ellipsis-v"></i></a>
+                                                                <ul class="dropdown-menu" style="">
+                                                                    <li><a tabindex="-1" href="#" ng-click="CloseTicket(item)">Close</a></li>
+                                                                </ul>
+                                                            </div>
+                                                        </td>
+                                                    }
+                                                    <td class="text-left">
+                                                        <a target="_blank" style="font-size:15px;text-decoration: none;font-weight:bold" href="@Url.Action("TicketDetails", "Home")?TicketId={{item.TicketId}}">{{item.Title | capitalize}}</a>
+                                                        <p ng-show="item.ForwardToName!=null">( Forwarded to {{item.ForwardToName}})</p>
+                                                        <p style="color:darkgray;font-size:12px">Added by {{item.AddBy | capitalize}} at {{item.AddDate.replace('/Date(','').replace(')/','') |  date:'dd-MM-yyyy HH:mm a'}}</p>
+                                                    </td>
+                                                    <td class="text-left">
+                                                        <p ng-show="item.ForwardToName!=null">{{item.ForwardToName}}</p>
+                                                    </td>
+                                                    <!--ticket status-->
+                                                    <td class="text-center" ng-show="item.TaskStatus!='Resolved' && item.TaskStatus!='Closed' && item.TicketStatus!='Closed'"><span class="label label-success" style="padding-left: 31%;padding-right: 31%;">Open</span></td>
+                                                    <td class="text-center" ng-show="item.TicketStatus=='Closed'"><span class="label label-default" style="padding-left: 29%;padding-right: 29%;">Closed</span></td>
+                                                    <td class="text-center" ng-show="item.TaskStatus=='Closed' &&item.TicketStatus!='Closed'"><span class="label label-default" style="padding-left: 29%;padding-right: 29%;">Closed</span></td>
+                                                    <td class="text-center" ng-show="item.TaskStatus=='Resolved'"><span class="label label-primary" style="padding-left: 22%;padding-right: 22%;">Feedback</span></td>
+
+                                                    <!--task status-->
+                                                    <td class="text-center" ng-show="item.TaskStatus=='N/A'"><span class="label label-warning" style="padding-left: 40%;padding-right: 40%;">{{item.TaskStatus}}</span></td>
+                                                    <td class="text-center" ng-show="item.TaskStatus=='Pending'"><span class="label label-primary" style="padding-left: 13%;padding-right: 13%;">{{item.TaskStatus}}</span></td>
+                                                    <td class="text-center" ng-show="item.TaskStatus=='Paused'"><span class="label label-warning" style="padding-left: 26%;padding-right: 26%;">{{item.TaskStatus}}</span></td>
+                                                    <td class="text-center" ng-show="item.TaskStatus=='In Progress'"><span class="label label-info" style="padding-left: 13%;padding-right: 13%;">{{item.TaskStatus}}</span></td>
+                                                    <td class="text-center" ng-show="item.TaskStatus=='Resolved'"><span class="label label-success" style="padding-left: 24%;padding-right: 24%;">{{item.TaskStatus}}</span></td>
+
+                                                    
+                                                    
+                                                    <!--Priority status-->
+                                                    <td class="text-center" ng-show="item.Priority=='High'"> <span class="text-center label label-danger" style="padding-left: 30%;padding-right: 30%;">{{item.Priority}}</span> </td>
+                                                    <td class="text-center" ng-show="item.Priority=='Medium'"> <span class="text-center label label-default">{{item.Priority}}</span> </td>
+                                                    <td class="text-center" ng-show="item.Priority=='Low'"> <span class="text-center label label-warning" style="padding-left: 30%;padding-right: 30%;">{{item.Priority}}</span> </td>
+
+                                                      <td class="text-center">{{item.TicketDueDate.replace('/Date(','').replace(')/','') |  date:"dd-MM-yyyy"}}</td>
+
+                                                </tr>
+                                            </tbody>
+                                        </table>                                      
+                                    </div>
+                                </div>               
+                            </div>
+                            <div class="clearfix margin-bottom-20"> </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade draggable-modal" id="ForwardToManager" tabindex="-1" role="basic" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content" style="width:150%;margin-left: -23%;">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                    <h4 class="modal-title">Forward to Manager</h4>
+                </div>
+                <div class="row" style="margin-top: -1%;">
+                    <div class="col-lg-12 card-header kyc_card_header" style="margin-left: 2%;width: 96%;">
+                        <h3>#{{Task.TicketId}} ( {{Task.TaskName}} )</h3>
+                        <p><span>Project :</span> {{ProjectName}}</p>
+                        <p><span>Describtion :</span> {{Task.Description}}</p>
+                        <p><span>Department :</span> {{Task.Department}}</p>
+                    </div>
+                    <div class="col-lg-3  orange_card">
+                    </div>
+                </div>
+                <form name="frmM" class="form-horizontal" ng-submit="ForwardToManagerSubmit()" role="form" novalidate>
+                    <div class="portlet-body form" style="display: block;">
+                        <div class="form-body TopLeftMargin3">
+                            <div class="row">
+                                <div class="col-lg-6">
+                                    <div class="form-group" ng-class="{ 'has-error' : submitted && frmM.TicketId.$invalid}" hidden>
+                                        <label class="col-md-3 control-label">Ticket ID</label>
+                                        <div class="col-md-9">
+                                            <input type="text" disabled name="TicketId" ng-model="Ticket.Id" class="form-control input-lg" placeholder="" required>
+                                            <span ng-show="submitted &&  frmM.TicketId.$error.required" class="text-danger">Ticket Is is Required</span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group" hidden>
+                                        <label class="col-md-3 control-label">Project  </label>
+                                        <div class="col-md-9">
+                                            <input type="text" disabled name="ProjectId" ng-model="ProjectName" class="form-control input-lg" placeholder="">
+                                            <input type="text" style="display:none" name="ProjectId" ng-model="Task.ProjectId" class="form-control input-lg" placeholder="">
+                                        </div>
+                                    </div>
+                                    <div class="form-group" hidden>
+                                        <label class="col-md-3 control-label">Due Date</label>
+                                        <div class="col-md-9">
+                                            <input class="form-control input-lg" type="text" id="DueDatePicker2" name="DueDate" ng-model="Ticket.DueDate"
+                                                   placeholder="dd-mm-yyyy" />
+                                        </div>
+                                    </div>
+                                    <div class="form-group" ng-class="{ 'has-error' : submitted && frmM.AddBy.$invalid}">
+                                        <label class="col-md-3 control-label">Manager to</label>
+                                        <div class="col-md-9">
+                                            <select class="form-control input-lg" name="AddBy" ng-model="Ticket.AddBy">
+                                                <option value="">Select Manager</option>
+                                                <option ng-repeat="item in ManagerList" value="{{item.UserName}}">
+                                                    {{item.FullName}}
+                                                </option>
+                                            </select>
+                                            <span ng-show="submitted &&  frmM.AddBy.$error.required" class="text-danger">Ticket Is is Required</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6">
+                                    <div hidden class="form-group" ng-class="{ 'has-error' : submitted && frmM.TaskName.$invalid}">
+                                        <label class="col-md-3 control-label">Task Name</label>
+                                        <div class="col-md-9">
+                                            <input type="text" readonly name="TaskName" ng-model="Task.TaskName" class="form-control input-lg" placeholder="Task Name" required>
+                                            <span ng-show="submitted &&  frmM.TaskName.$error.required" class="text-danger">Task Name is Required</span>
+                                        </div>
+                                    </div>
+                                    <div hidden class="form-group" ng-class="{ 'has-error' : submitted && frmM.DepartmentId.$invalid}">
+                                        <label class="col-md-3 control-label">Department </label>
+                                        <div class="col-md-9">
+                                            <select class="form-control input-lg" name="DepartmentId" ng-model="Ticket.DepartmentId">
+                                                <option value="">Select Please</option>
+                                                <option ng-repeat="item in DepartmentList" ng-if='item.Status=="A"' value="{{item.Id}}">
+                                                    {{item.DeptName}}
+                                                </option>
+                                            </select>
+                                            <span ng-show="submitted &&  frmM.DepartmentId.$error.required" class="text-danger">Task Name is Required</span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group" hidden>
+                                        <label class="col-md-3 control-label">Priority</label>
+                                        <div class="mt-radio-inline col-md-9" style="border-radius: 17px; background: #ddd;cursor: pointer;height: 25px;width: 310px;margin-left: 14px;">
+                                            <label class="mt-radio" style="color:red;padding-right: 8%;">
+                                                <input type="radio" ng-checked="Ticket.Priority==1" ng-model="Ticket.Priority" name="optionsRadios" id="optionsRadios4" value="1">High
+                                                <span></span>
+                                            </label>
+                                            <label class="mt-radio" style="color:green;padding-right: 8%;">
+                                                <input type="radio" ng-checked="Ticket.Priority==2" ng-model="Ticket.Priority" name="optionsRadios" id="optionsRadios5" value="2"> Medium
+                                                <span></span>
+                                            </label>
+                                            <label class="mt-radio mt-radio" style="color:#27a4b0;padding-right: 8%;">
+                                                <input type="radio" ng-checked="Ticket.Priority==3" ng-model="Ticket.Priority" name="optionsRadios" id="optionsRadios6" value="3"> Low
+                                                <span></span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="form-group" hidden>
+                                        <label class="col-md-3 control-label">Comment </label>
+                                        <div class="col-md-9">
+                                            <textarea class="form-control input-lg" name="Comments" ng-model="Task.Comments"></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <table hidden style="margin-bottom: 2%;">
+                                <tr>
+                                    <td style="padding-left: 0%;padding-right: 5%;">
+                                        <label class="control-label" style="margin-left: 14%;">Description</label>
+                                    </td>
+                                    <td>
+                                        <textarea ng-model="Task.Description" style="margin-left: 14%;width: 329%;" class="form-control input-lg" disabled></textarea>
+                                    </td>
+                                </tr>
+                            </table>
+
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="reset" class="btn btn-danger" data-dismiss="modal">Close</button>
+                        <input type="submit" class="btn btn-success" ng-click="submitted=true" value="{{btnTitle}}" />
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade draggable-modal" id="ConvertToTask" tabindex="-1" role="basic" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content" style="width:150%;margin-left: -23%;">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                    <h4 class="modal-title">Ticket to Task Convert</h4>
+                </div>
+                <div class="row" style="margin-top: -1%;">
+                    <div class="col-lg-12 card-header kyc_card_header" style="margin-left: 2%;width: 96%;">
+                        <h3>#{{Task.TicketId}} ( {{Task.TaskName}} )</h3>
+                        <p><span>Project :</span> {{ProjectName}}</p>
+                        <p><span>Describtion :</span> {{Task.Description}}</p>
+                    </div>
+                    <div class="col-lg-3  orange_card">
+                    </div>
+                </div>
+                <form name="frm" class="form-horizontal" ng-submit="Submit()" role="form" novalidate>
+                    <div class="portlet-body form" style="display: block;">
+                        <div class="form-body TopLeftMargin3">
+                            <div class="row">
+                                <div class="col-lg-6">
+                                    <div class="form-group" ng-class="{ 'has-error' : submitted && frm.TicketId.$invalid}" hidden>
+                                        <label class="col-md-3 control-label">Ticket ID</label>
+                                        <div class="col-md-9">
+                                            <input type="text" disabled name="TicketId" ng-model="Task.TicketId" class="form-control input-lg" placeholder="" required>
+                                            <span ng-show="submitted &&  frm.TicketId.$error.required" class="text-danger">Ticket Is is Required</span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group" hidden>
+                                        <label class="col-md-3 control-label">Project  </label>
+                                        <div class="col-md-9">
+                                                <input type="text" disabled name="ProjectId" ng-model="ProjectName" class="form-control input-lg" placeholder="">
+                                            <input type="text" style="display:none" name="ProjectId" ng-model="Task.ProjectId" class="form-control input-lg" placeholder="">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-3 control-label">Due Date</label>
+                                        <div class="col-md-9">
+                                            <input class="form-control input-lg" type="text" id="DueDatePicker" autocomplete="off" name="DueDate" ng-model="Task.DueDate"
+                                                   placeholder="dd-mm-yyyy"  />
+                                        </div>
+                                    </div>
+                                    @if (User.IsInRole("Admin"))
+                                    {
+                                        <div class="form-group">
+                                            <label class="col-md-3 control-label">Assign to</label>
+                                            <div class="col-md-9">
+                                                <select class="form-control input-lg" name="AddBy" ng-model="Task.AddBy">
+                                                    <option value="">Select User</option>
+                                                    <option ng-repeat="item in AllUserList" value="{{item.UserName}}">
+                                                        {{item.FullName}}
+                                                    </option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <div class="form-group">
+                                            <label class="col-md-3 control-label">Assign to</label>
+                                            <div class="col-md-9">
+                                                <select class="form-control input-lg" name="AddBy" ng-model="Task.AddBy">
+                                                    <option value="">Select User</option>
+                                                    <option ng-repeat="item in AllUserList | filter: { DepartmentId:MyDeptId}" value="{{item.UserName}}">
+                                                        {{item.FullName}}
+                                                    </option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    }
+
+                                </div>
+                                <div class="col-lg-6">
+                                    <div hidden class="form-group" ng-class="{ 'has-error' : submitted && frm.TaskName.$invalid}">
+                                        <label class="col-md-3 control-label">Task Name</label>
+                                        <div class="col-md-9">
+                                            <input type="text" readonly name="TaskName" ng-model="Task.TaskName" class="form-control input-lg" placeholder="Task Name" required>
+                                            <span ng-show="submitted &&  frm.TaskName.$error.required" class="text-danger">Task Name is Required</span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-3 control-label">Sprint </label>
+                                        <div class="col-md-9">
+                                            <select class="form-control input-lg" name="SprintId" ng-model="Task.SprintId">
+                                                <option value="">Select Please</option>
+                                                <option ng-repeat="item in SprintList" ng-if='item.Status=="A"' value="{{item.Id}}">
+                                                    {{item.SprintTitle}}
+                                                </option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-3 control-label">Priority</label>
+                                        <div class="mt-radio-inline col-md-9" style="border-radius: 17px; background: #ddd;cursor: pointer;height: 25px;width: 310px;margin-left: 14px;">
+                                            <label class="mt-radio" style="color:red;padding-right: 8%;">
+                                                <input type="radio" ng-checked="Task.Priority==1" ng-model="Task.Priority" name="optionsRadios" id="optionsRadios4" value="1">High
+                                                <span></span>
+                                            </label>
+                                            <label class="mt-radio" style="color:green;padding-right: 8%;">
+                                                <input type="radio"ng-checked="Task.Priority==2" ng-model="Task.Priority" name="optionsRadios" id="optionsRadios5" value="2"> Medium
+                                                <span></span>
+                                            </label>
+                                            <label class="mt-radio mt-radio" style="color:#27a4b0;padding-right: 8%;">
+                                                <input type="radio" ng-checked="Task.Priority==3" ng-model="Task.Priority" name="optionsRadios" id="optionsRadios6" value="3"> Low
+                                                <span></span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-3 control-label">Comment </label>
+                                        <div class="col-md-9">
+                                            <textarea class="form-control input-lg" name="Comments" ng-model="Task.Comments"></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <table hidden style="margin-bottom: 2%;">
+                                <tr>
+                                    <td style="padding-left: 0%;padding-right: 5%;">
+                                        <label class="control-label" style="margin-left: 14%;">Description</label>
+                                    </td>
+                                    <td>
+                                        <textarea ng-model="Task.Description" style="margin-left: 14%;width: 329%;" class="form-control input-lg" disabled></textarea>
+                                    </td>
+                                </tr>
+                            </table>
+                         </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="reset" class="btn btn-danger" data-dismiss="modal">Close</button>
+                        <input type="submit" class="btn btn-success"  ng-click="submitted=true" value="{{btnTitle}}" />
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+</div>
+
+<script>
+    $(document).ready(function () {
+        $("#DueDatePicker").datepicker({
+            autoclose: true,
+            startDate: '0d'
+        });
+
+        $("#DueDatePicker2").datepicker({
+            autoclose: true,
+            startDate: '0d'
+        });
+
+    });
+</script>
+<script type="text/javascript">
+    AddieApp.filter('capitalize', function () {
+        return function (token) {
+            return token.charAt(0).toUpperCase() + token.slice(1);
+        }
+    });
+    AddieApp.controller("ticketListClt", ["$scope", "$http", "SweetAlert",
+          function ($scope, $http, SweetAlert) {
+                  init();
+                  function init() {
+                      initialize();
+                      $scope.TempTickettList = [];
+                  }
+                  function initialize() {
+                      $scope.pageSizeArray = [];
+                      $scope.pageSizeArray.push({ value: 5, text: 5 });
+                      $scope.pageSizeArray.push({ value: 10, text: 10 });
+                      $scope.pageSizeArray.push({ value: 20, text: 20 });
+                      $scope.pageSizeArray.push({ value: 50, text: 50 });
+                      $scope.currentPage = 1;
+                      $scope.currentPage1 = 1;
+                      $scope.pageSize = 10;
+                      $scope.pageSize1 = 10;
+                      LoadTicketList();
+                      LoadMyTicketList();
+                      $scope.IsEdit = 0;
+                      $scope.btnTitle = 'Save';
+                      LoadProjectList();
+                      LoadSprintList();
+                      $scope.Task = {};
+                      $scope.PriorityList  = [
+                                            { name: "High", value: "1" },
+                                            { name: "Medium", value: "2" },
+                                            { name: "Low", value: "3" }
+                      ];
+                      LoadManagerList();
+                      LoadAllUserList();
+                      $scope.ForwardTickettList = [];
+                  };
+
+
+                  function LoadAllUserList() {
+                      $http.get(baseUrl + 'Setup/LoadAllUserList').
+                        then(function (response) {
+                            $scope.AllUserList = response.data;
+                            angular.forEach($scope.AllUserList, function (item) {
+                                if (item.UserName === '@User.Identity.Name') {
+                                    $scope.MyDeptId = item.DepartmentId;
+                                }
+                            });
+                        });
+                  }
+
+              //start filtering function here
+
+                  $scope.TimeFilter =function(item)
+                  {
+                        $http.get(baseUrl + 'Ticket/FilterTicket?FilterType=TimeFilter' + '&FilterId=' + item).
+                       then(function (response) {
+                           $scope.TickettList = response.data;
+                       });
+                  }
+                  $scope.AddByFilter = function (item) {
+                      $http.get(baseUrl + 'Ticket/FilterTicket?FilterType=AddByFilter' + '&FilterId=' + item).
+                     then(function (response) {
+                         $scope.TickettList = response.data;
+                     });
+                  }
+                  $scope.CategoryFilter = function (item) {
+                      $http.get(baseUrl + 'Ticket/FilterTicket?FilterType=CategoryFilter' + '&FilterId=' + item).
+                     then(function (response) {
+                         $scope.TickettList = response.data;
+                     });
+                  }
+                  $scope.CloseDateFilter = function (item)
+                  {
+                      $http.get(baseUrl + 'Ticket/FilterTicket?FilterType=CloseDateFilter' + '&FilterId=' + item).
+                       then(function (response) {
+                           $scope.TickettList = response.data;
+                       });
+                  }
+                  $scope.DeptFilter = function (item) {
+                      $http.get(baseUrl + 'Ticket/FilterTicket?FilterType=DeptFilter' + '&FilterId=' + item).
+                       then(function (response) {
+                           $scope.TickettList = response.data;
+                       });
+                  }
+                  $scope.PriorityFilter = function (item) {
+                      $http.get(baseUrl + 'Ticket/FilterTicket?FilterType=PriorityFilter' + '&FilterId=' + item).
+                       then(function (response) {
+                           $scope.TickettList = response.data;
+                       });
+                  }
+                  $scope.TaskStatusFilter = function (item) {
+                      $http.get(baseUrl + 'Ticket/FilterTicket?FilterType=TaskStatusFilter' + '&FilterId=' + item).
+                   then(function (response) {
+                       $scope.TickettList = response.data;
+                       //console.log(response.data);
+                   });
+                  }
+
+                  $scope.TicketStatusFilter = function (item) {
+                      $http.get(baseUrl + 'Ticket/FilterTicket?FilterType=TicketStatusFilter' + '&FilterId=' + item).
+                   then(function (response) {
+                       $scope.TickettList = response.data;
+                       console.log(response.data);
+                   });
+                  }
+                  
+              //filter end
+                  $scope.PriorityColor = function PriorityColor(n) {
+                      if (n.Priority == "High")
+                          return ' label-danger';
+                      if (n.Priority == "Medium")
+                          return ' btn-success';
+                      if (n.Priority == "Low")
+                          return ' label-warning'
+
+                  }
+                  $scope.CloseTicket = function CloseTicket(ticket) {
+                      if (ticket.TaskStatus != 'N/A' && ticket.TaskStatus != 'Closed' && ticket.TaskStatus != 'Resolved')
+                      {
+                          toastr.error('Corresponding task is not resolved yet.');
+                          return;
+                      }
+                      swal({
+                          title: "Confirm to close the ticket?",
+                          text: 'Before close please check the corresponding task status.',
+                          icon: "warning",
+                          buttons: true,
+                          dangerMode: true,
+                      })
+                       .then((willDelete) => {
+                           if (willDelete) {
+                               $http.post(baseUrl + 'Ticket/UpdateTicketStatus?Id=' + ticket.TicketId + '&Status=Closed').
+                                  then(function (response) {
+                                      if (response.data == '1') {
+                                          swal("Your ticket has been closed successfully!", {
+                                              icon: "success",
+                                          });
+                                          LoadMyTicketList();
+                                          LoadTicketList();
+                                          return;
+                                      }
+                                      else if (response.data = 2)
+                                      {
+                                          toastr.error('You do not have the permission to close the ticket.');
+                                      }
+                                      else
+                                      {
+                                          toastr.error('Unfortunately ticket not closed.');
+                                      }
+                                  });
+                           }
+                       });
+                  }
+                  $scope.ForwardToManager = function (ticket) {
+                      $scope.Task.TicketId = ticket.TicketId;
+                      $scope.Task.TaskName = ticket.Title;
+                      if (ticket.Priority == 'High') {
+                          $scope.Task.Priority = 1;
+                      }
+                      else if (ticket.Priority == 'Medium') {
+                          $scope.Task.Priority = 2;
+                      }
+                      else {
+                          $scope.Task.Priority = 0;
+                      }
+                      $scope.Task.Description = ticket.TicketDescription;
+                      $scope.Task.ProjectId = ticket.ProjectId;
+                      $scope.ProjectName = ticket.ProjectName;
+                      $scope.Task.Department = ticket.DeptName;
+                      $scope.Ticket = {};
+                      $scope.Ticket.Id = ticket.TicketId;
+                      LoadManagerList();
+                      LoadDepartmentist();
+                  }
+                  $scope.ForwardToManagerSubmit = function () {
+                      if ($scope.frmM.$invalid)
+                          return;
+                      $http.post(baseUrl + 'Ticket/ForwardedTicket', $scope.Ticket).then(function (response) {
+                          if (response.data != 1) {
+                              $('#ForwardToManager').modal('hide');
+                              toastr.error("Don't Forwarded.");
+                              LoadTicketList();
+                              LoadMyTicketList();
+                          } else {
+                              $('#ForwardToManager').modal('hide');
+                              toastr.success("Forwarded To manager.");
+                              LoadTicketList();
+                              LoadMyTicketList();
+                          }
+                      });
+                  }
+                  $scope.TicketList = function () {
+                      LoadTicketList();
+                      LoadMyTicketList();
+                  }
+                  function LoadManagerList() {
+                      $http.get(baseUrl + 'Setup/LoadManagerListWithoutDeptId').
+                        then(function (response) {
+                            //console.log(response.data);
+                            $scope.ManagerList = response.data;
+                        });
+                  };
+                  $scope.ConvertToTask=function(ticket)
+                  {
+                      $scope.Task.TicketId = ticket.TicketId;
+                      $scope.Task.TaskName = ticket.Title;
+                      if (ticket.Priority == 'High')
+                      {
+                          $scope.Task.Priority = 1;
+                      }
+                      else if (ticket.Priority == 'Medium')
+                      {
+                          $scope.Task.Priority = 2;
+                      }
+                      else
+                      {
+                          $scope.Task.Priority = 0;
+                      }
+                      $scope.Task.Description = ticket.TicketDescription;
+                      $scope.Task.ProjectId = ticket.ProjectId;
+                      $scope.ProjectName = ticket.ProjectName;
+                  }
+                  $scope.Submit = function () {
+                      if ($scope.frm.$invalid)
+                          return;
+                      //console.log($scope.Task);
+                      $http.post(baseUrl + 'Task/ConvertToTask', $scope.Task).then(function (response) {
+                          if (response.data != 1) {
+                              toastr.error(response.data);
+                              return;
+                          }
+                          else {
+                              $('#ConvertToTask').modal('hide');
+                              swal({
+                                  title: "Congratulations!",
+                                  text: "Ticket has been converted successfully.",
+                                  icon: "success",
+                                  showConfirmButton: true,
+                                  showCancelButton: false,
+                                  dangerMode: false,
+                              });
+                              LoadTicketList();
+                              LoadMyTicketList();
+                          }
+                      });
+                  }
+                  function LoadSprintList() {
+                      $http.post(baseUrl + 'Setup/LoadSprintList').
+                        then(function (response) {
+                            $scope.SprintList = response.data;
+                        });
+                  };
+                  $scope.Delete= function(tickets)
+                  {
+                      swal({
+                          title: "Are you sure?",
+                          text: "Once deleted, you will not be able to recover this data!",
+                          icon: "warning",
+                          buttons: true,
+                          dangerMode: true,
+                      })
+                        .then((willDelete) => {
+                            if (willDelete) {
+                                $http.post(baseUrl + 'Ticket/DeleteTicket', tickets).
+                                  then(function (response) {
+                                      if (response.data == '0') {
+                                          toastr.warning('Not found');
+                                          LoadProjectList();
+                                          return;
+                                      }
+                                      toastr.success('Deleted Successfully');
+                                      LoadTicketList();
+                                      LoadMyTicketList();
+                                  });
+
+                            } else {
+
+                            }
+                        });
+
+                  }
+                  $scope.ResetFrm=function()
+                  {
+                      $scope.Project = [];
+                      $scope.btnTitle = 'Save';
+                      $scope.IsEdit = 0;
+                  }
+                  $scope.EditProject = function (item) {
+                      $scope.Project = item;
+                      var itemdate = item.ExpireDate;
+                      $scope.IsEdit = 1;
+                      $scope.Project.ExpireDate = Dateconvert(itemdate);
+                      $scope.btnTitle = 'Update';
+                      LoadProjectList();
+                  }
+                  function Dateconvert(str) {
+                      var re = /\/Date\(([0-9]*)\)\//;
+                      var m = str.match(re);
+                      var datestring= new Date(parseInt(m[1]));
+                      var date = new Date(datestring),
+                          mnth = ("0" + (date.getMonth() + 1)).slice(-2),
+                          day = ("0" + date.getDate()).slice(-2);
+                      return new Date([date.getFullYear(), mnth, day].join("-"));
+                  }
+                  $scope.selectAll = function () {
+                      angular.forEach($scope.TickettList, function (item) {
+                          item.Selected = $scope.selectedAll;
+                      });
+                  };
+                  
+                  function LoadMyTicketList() {
+                      $http.get(baseUrl + 'Ticket/LoadMyTicketList').
+                        then(function (response) {
+                            $scope.MyTickettList = response.data;
+                            //console.log($scope.MyTickettList);
+                        });
+                  }
+                  function LoadTicketList()
+                  {
+                      $http.get(baseUrl + 'Ticket/LoadTicketList').
+                        then(function (response) {
+                            $scope.TickettList = response.data;
+                            $scope.ForwardTickettList = [];
+                            @*angular.forEach($scope.TickettList, function (item) {
+                                if (item.ForwardedTo == '@User.Identity.Name')
+                                {
+                                    $scope.ForwardTickettList.push(item);
+                                }
+                            });*@
+                            
+                            //console.log($scope.TickettList);
+                        });
+                  }
+                  function LoadProjectList() {
+                      $http.post(baseUrl + 'Setup/LoadProjectList').
+                        then(function (response) {
+                            $scope.ProjectList = response.data;
+                            //console.log($scope.ProjectList);
+                            //toastr.success( $scope.ProjectList.length + ' Project found');
+                        });
+                  };
+                  function LoadDepartmentist() {
+                      $http.post(baseUrl + 'Setup/LoadDepartmentList').
+                        then(function (response) {
+                            $scope.DepartmentList = response.data;
+                            //console.log($scope.ProjectList);
+                            //toastr.success( $scope.ProjectList.length + ' Project found');
+                        });
+                  };
+              }]);
+</script>

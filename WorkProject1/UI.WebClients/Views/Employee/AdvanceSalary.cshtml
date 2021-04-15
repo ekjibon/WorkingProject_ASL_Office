@@ -1,0 +1,453 @@
+﻿
+@{
+    ViewBag.Title = "Salary Setup";
+}
+
+<div class="kt-container  kt-container--fluid  kt-grid__item kt-grid__item--fluid" ng-controller="ctrlAdvanceSalary">
+    <div class="row">
+        <div class="kt-portlet kt-portlet--mobile">
+            <div class="kt-portlet__head kt-portlet__head--lg">
+                <div class="kt-portlet__head-label">
+                    <h3 class="kt-portlet__head-title">
+                        Advance Salary Setup
+                    </h3>
+                </div>
+                <div class="kt-portlet__head-toolbar">
+                    <div class="kt-portlet__head-wrapper">
+                        <div class="dropdown dropdown-inline">
+                            <button type="button" class="btn btn-brand btn-icon-sm" data-toggle="modal" data-target="#addmodal" aria-haspopup="true" aria-expanded="false">
+                                <i class="flaticon2-plus"></i> Add New
+                            </button>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="kt-portlet__body">
+
+                <div class="row">
+                    <div class="col-md-4 col-sm-5 col-xs-6">
+                        <div class="form-group">
+                            <div class="col-lg-3 col-md-5 col-sm-4 col-xs-8" style="padding-left:0px">
+
+                                <select class="form-control kt-font-brand" ng-model="pageSize" ng-options="P.value as P.text for P in pageSizeArray"></select>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="col-md-4 col-sm-3 col-xs-1">
+                    </div>
+                    <div class="col-md-4 col-sm-4 col-xs-5">
+                        <div id="sample_3_filter" class="pull-right">
+                            <input ng-model="q" id="search" class="form-control" placeholder="Filter text">
+                        </div>
+                    </div>
+                </div>
+                <table class="table table-bordered table-hover rounded">
+                    <thead>
+                        <tr class="btn-primary">
+                            <th>SI</th>
+                            <th>Invoice No.</th>
+                            <th>Employee Name</th>
+                            <th>ID</th>
+                            <th>Sanctioned Amount</th>
+                            <th>No. of Installments</th>
+                            <th>Per Installment Amount</th>
+                            <th style="text-align:center">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-show="AdvanceSalaryList.length <= 0"><td colspan="8" style="text-align:center;"><i class="fa fa-refresh"></i> Loading new data!!</td></tr>
+                        <tr dir-paginate="item in AdvanceSalaryList| filter:q  | itemsPerPage: pageSize" current-page="currentPage">
+                            <td>{{$index+1}}</td>
+                            <td>{{item.InvoiceNumber}}</td>
+                            <td>{{item.FullName}}</td>
+                            <td>{{item.EmpoyeeId}}</td>
+                            <td>{{item.AdvanceAmount}}</td>
+                            <td>{{item.NoOfInstallment}}</td>
+                            <td>{{item.InstallmentAmount}}</td>
+                            <td align="center">
+                                <a href="javascript:;" class="btn btn-outline-brand btn-elevate btn-icon" ng-click="editAdvanceSalary(item)" data-target="#addmodal" data-toggle="modal">
+                                    <i class="fa fa-edit"></i>
+                                </a>
+                                <a ng-click="deleteAdvanceSalary(item.Id)" href="javascript:;" class="btn btn-outline-danger btn-elevate btn-icon">
+                                    <i class="fa fa-trash"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="row">
+                    <dir-pagination-controls boundary-links="true" template-url="~/assets/angular/lib/dirPagination.tpl.html"></dir-pagination-controls>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--Modal Area Start-->
+    <div id="addmodal" class="modal fade" tabindex="-1" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <form name="addBasic" ng-submit="save()" class="form-horizontal" id="form_sample_1" novalidate>
+                    <div class="modal-header">
+                        <h4 class="modal-title">{{modalTitle}}</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group row">
+                                        <label class="col-md-6 control-label text-right ">Employee:</label>
+                                        <div class="col-md-6">
+                                            <input type="text" name="EmployeeId" ng-model="Std" typeahead-on-select='onSelect($item, $model, $label)'
+                                                   placeholder="Search name/ID"
+                                                   uib-typeahead="i  as i.Text for i in Search($viewValue)"
+                                                   typeahead-loading="loadingLocations" typeahead-no-results="noResults" class="form-control">
+                                            <i ng-show="loadingLocations" class="glyphicon glyphicon-refresh"></i>
+                                            <div ng-show="noResults"><i class="glyphicon glyphicon-remove"></i> No Results Found</div>
+                                            <input type="hidden" name="EmployeeId" ng-value="Std.Value" />
+                                            <div class="form-control-focus"> </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label class="col-md-6 control-label text-right">
+                                            Employee Name :
+                                        </label>
+                                        <div class="col-md-6">
+                                            <input type="text" ng-model="AdvanceSalary.FullName" class="form-control" placeholder="Employee Name" name="FullName" readonly>
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label class="col-md-6 control-label text-right">
+                                            Employee ID :
+                                        </label>
+                                        <div class="col-md-6">
+                                            <input type="text" ng-model="AdvanceSalary.EmpoyeeId" class="form-control" placeholder="Employee ID" name="EmpoyeeId" readonly>
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label class="col-md-6 control-label text-right">
+                                            Designation :
+                                        </label>
+                                        <div class="col-md-6">
+                                            <input type="text" ng-model="AdvanceSalary.DesignationName" class="form-control" placeholder="Designation" name="DesignationName" readonly>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group row" ng-class="{ 'has-error' : submitted && addBasic.PeriodName.$invalid}">
+                                        <label class="col-md-6 control-label text-right">
+                                            Advance Amount :
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-6">
+                                            <input type="number" ng-model="AdvanceSalary.AdvanceAmount" class="form-control" placeholder="Advance Amount" name="AdvanceAmount" required>
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted &&  addBasic.AdvanceAmount.$error.required" class="help-block">Advance Amount Required</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group row" ng-class="{ 'has-error' : submitted && addBasic.SanctionDate.$invalid}">
+
+                                        <label class="col-md-6 control-label text-right">
+                                            Sanction Date:
+                                        </label>
+                                        <div class="col-md-6">
+                                            <input class="form-control" type="text" ng-click="p2=true" is-open="p2" readonly placeholder="Sanction Date" ng-model="AdvanceSalary.SanctionDate" uib-datepicker-popup="dd/MM/yyyy" name="SanctionDate" required />
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted &&  addBasic.SanctionDate.$error.required" class="help-block">Sanction Date Required</span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label class="col-md-6 control-label text-right">
+                                            Remarks :
+                                        </label>
+                                        <div class="col-md-6">
+                                            <input type="text" ng-model="AdvanceSalary.Remarks" class="form-control" placeholder="Remarks" name="Remarks">
+                                        </div>
+                                    </div>
+                                    <div class="form-group row" ng-class="{ 'has-error' : submitted && addBasic.NoOfInstallment.$invalid}">
+                                        <label class="col-md-6 control-label text-right">
+                                            Number of Installment :
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-6">
+                                            <input type="number" ng-model="AdvanceSalary.NoOfInstallment" class="form-control" placeholder="Number of Installment" name="NoOfInstallment" required>
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted &&  addBasic.NoOfInstallment.$error.required" class="help-block">Number of Installment Required</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group row" ng-class="{ 'has-error' : submitted && addBasic.MonthDay.$invalid}">
+                                        <label class="col-md-6 control-label text-right">
+                                            Refund start Month:
+                                            <span class="required">*</span>
+
+                                        </label>
+                                        <div class="col-md-6">
+                                            <input class="form-control" ng-model="AdvanceSalary.MonthDay" required name="MonthDay" type="datetime" placeholder="Year and Month" readonly ng-click="p1=true" is-open="p1" datepicker-options="{minMode: 'month'}" datepicker-mode="'month'" uib-datepicker-popup="MM/yyyy" />
+                                            <span ng-show="submitted &&  addBasic.MonthDay.$error.required" class="help-block">Month and Year Required</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" data-dismiss="modal" class="btn btn-secondary" ng-click="resetForm();submitted=false">Cancel</button>
+                        <button type="submit" ng-click="submitted=true" class="btn btn-success">{{modalbutton}}</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!--Modal Area End-->
+</div>
+<!-- END FORM-->
+@section Scripts{
+    <script src="~/assets/global/plugins/bootstrap-fileinput/bootstrap-fileinput.js" type="text/javascript"></script>
+    <script src="~/assets/pages/scripts/form-repeater.min.js"></script>
+    <script type="text/javascript">
+        for (i = new Date().getFullYear() ; i > 1900; i--) {
+            $('#yearpicker').append($('<option />').val(i).html(i));
+        }
+    </script>
+    <script type="text/javascript">
+        OEMSApp.controller("ctrlAdvanceSalary", ["$scope", "$http", "SweetAlert",
+              function ($scope, $http, SweetAlert) {
+                  init();
+                  function init() {
+                      initialize();
+                      getAllAdvanceSalary();
+
+                      getAllCommons();
+                  }
+
+                  function initialize() {
+                      $scope.modalbutton = 'Save';
+                      $scope.modalTitle = 'Add Advance Salary';
+                      $scope.brnlist = [];
+                      $scope.fiscalYearlist = [];
+                      $scope.taxYearlist = [];
+                      $scope.AdvanceSalary = {};
+                      $scope.AdvanceSalary.Id = 0;
+                      $scope.employeeInfos = [];
+                      $scope.AdvanceSalaryList = [];
+                      $scope.resetForm = resetForm;
+                      $scope.CommonFeilds = [];
+                      $scope.pagesize = 10;
+                      $scope.pageSizeArray = [];
+                      $scope.pageSizeArray.push({ value: 5, text: 5 });
+                      $scope.pageSizeArray.push({ value: 10, text: 10 });
+                      $scope.pageSizeArray.push({ value: 20, text: 20 });
+                      $scope.pageSizeArray.push({ value: 50, text: 50 });
+                      $scope.currentPage = 1;
+                      $scope.pageSize = 10;
+                      $scope.employeelist = [];
+                      $scope.gradelist = [];
+
+                  }
+
+                  function resetForm() {
+                      $scope.modalbutton = 'Save';
+                      $scope.modalTitle = "Add Advance Salary";
+                      $scope.AdvanceSalary = {};
+                      $scope.AdvanceSalary.Id = 0;
+
+                      $scope.addBasic.$setUntouched();
+                      $scope.addBasic.$setPristine();
+                      $scope.Std = "";
+                  }
+
+                  $scope.Search = function (val) {
+                      return $http.get(baseUrl + 'Employee/SearchEmployee/' + val, {
+                          params: {
+
+                          }
+                      }).then(function (response) {
+                          return response.data.results.map(function (item) {
+                              return item;
+                          });
+                      });
+                  };
+
+                  $scope.onSelect = function onSelect($item, $model, $label) {
+                      $scope.AdvanceSalary.EmpID = $item.Value;
+
+                      SearchEmployeeId($item.Value);
+                  };
+
+                  function SearchEmployeeId(EmpID) {
+                      $scope.employeeInfos = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Employee/GetEmpInfoByEmpBasicInfoID/' + EmpID
+                      }).then(function successCallback(response) {
+                          $scope.employeeInfos = response.data.results[0];
+                          $scope.AdvanceSalary.FullName = $scope.employeeInfos.FullName;
+                          $scope.AdvanceSalary.EmpoyeeId = $scope.employeeInfos.EmpID;
+                          $scope.AdvanceSalary.DesignationName = $scope.employeeInfos.DesignationName;
+
+
+                      }, function errorCallback(response) {
+                          toastr["error"](response.data.Message);
+                      });
+                  }
+
+
+
+
+                  $scope.save = function save() {
+                      if ($scope.addBasic.$invalid)
+                          return;
+                      else {
+                          var result = validation();
+                          if (result) {
+                              getMonthAndYear();
+                              if ($scope.AdvanceSalary.Id == 0) {
+                                  $http({
+                                      method: 'POST',
+                                      url: baseUrl + 'Employee/AddAdvanceSalary/',
+                                      data: $scope.AdvanceSalary
+                                  }).then(function successCallback(response) {
+                                      $('#addmodal').modal('toggle');
+                                      toastr["info"](response.data.message);
+                                      getAllAdvanceSalary();
+                                      resetForm();
+                                  }, function errorCallback(response) {
+                                      toastr["warning"](response.data.Message);
+                                  });
+                              }
+                              if ($scope.AdvanceSalary.Id != 0) {
+                                  if ($scope.addBasic.$invalid)
+                                      return;
+                                  else {
+                                      $http({
+                                          method: 'PUT',
+                                          url: baseUrl + 'Employee/UpdateAdvanceSalary/',
+                                          data: $scope.AdvanceSalary
+                                      }).then(function successCallback(response) {
+                                          toastr["info"](response.data.message);
+                                          if (response.data.httpStatusCode != 305) {
+                                              $('#addmodal').modal('toggle');
+                                              resetForm();
+                                          }
+                                          getAllAdvanceSalary();
+                                      }, function errorCallback(response) {
+                                          toastr["warning"](response.data.Message);
+                                      });
+                                  }
+                              }
+                          }
+                      }
+
+                  }
+                  function getAllCommons() {
+                      $scope.CommonFeilds = [];
+
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Common/GetCommonItemEmp/'
+                      }).then(function successCallback(response) {
+                          $scope.CommonFeilds = response.data.results;
+                      }, function errorCallback(response) {
+                      });
+                  }
+
+                  function validation() {
+                      var check = 0;
+                      if ($scope.AdvanceSalary.DaysWorking > 365) {
+                          toastr["info"]("Working days can not be greater than 365 days..!");
+                          $scope.AdvanceSalary.DaysWorking = null;
+                          check = 1;
+                          return false;
+
+                      }
+                      if (check == 0) {
+                          return true;
+                      }
+                  }
+                  function getMonthAndYear() {
+                      $scope.AdvanceSalary.Month = $scope.AdvanceSalary.MonthDay.getMonth() + 1;
+                      $scope.AdvanceSalary.Year = $scope.AdvanceSalary.MonthDay.getFullYear();
+                      if ($scope.AdvanceSalary.Month == 1) {
+                          $scope.AdvanceSalary.MonthName = 'January';
+                      } else if ($scope.AdvanceSalary.Month == 2) {
+                          $scope.AdvanceSalary.MonthName = 'February';
+                      } else if ($scope.AdvanceSalary.Month == 3) {
+                          $scope.AdvanceSalary.MonthName = 'March';
+                      } else if ($scope.AdvanceSalary.Month == 4) {
+                          $scope.AdvanceSalary.MonthName = 'April';
+                      } else if ($scope.AdvanceSalary.Month == 5) {
+                          $scope.AdvanceSalary.MonthName = 'May';
+                      } else if ($scope.AdvanceSalary.Month == 6) {
+                          $scope.AdvanceSalary.MonthName = 'June';
+                      } else if ($scope.AdvanceSalary.Month == 7) {
+                          $scope.AdvanceSalary.MonthName = 'July';
+                      } else if ($scope.AdvanceSalary.Month == 8) {
+                          $scope.AdvanceSalary.MonthName = 'August';
+                      } else if ($scope.AdvanceSalary.Month == 9) {
+                          $scope.AdvanceSalary.MonthName = 'September';
+                      } else if ($scope.AdvanceSalary.Month == 10) {
+                          $scope.AdvanceSalary.MonthName = 'October';
+                      } else if ($scope.AdvanceSalary.Month == 11) {
+                          $scope.AdvanceSalary.MonthName = 'November';
+                      } else {
+                          $scope.AdvanceSalary.MonthName = 'December';
+                      }
+                  }
+
+                  function getAllAdvanceSalary() {
+                      $scope.salaryHeadList = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Employee/GetAllAdvanceSalary/'
+                      }).then(function successCallback(response) {
+                          $scope.AdvanceSalaryList = response.data.results;
+                      }, function errorCallback(response) {
+                          toastr["info"](response.data.Message);
+                      });
+                  }
+
+                  $scope.deleteAdvanceSalary = function deleteAdvanceSalary(Id) {
+                      SweetAlert.swal({
+                          title: "Are you sure to delete it ?", type: "warning", showCancelButton: true, confirmButtonColor: "#DD6B55",
+                          confirmButtonText: "Yes, delete it!",
+                          closeOnConfirm: false
+                      },
+                        function (isConfirm) {
+                            if (isConfirm) {
+                                $http({
+                                    method: 'DELETE',
+                                    url: baseUrl + 'Employee/DeleteAdvanceSalary/' + Id,
+                                }).then(function successCallback(response) {
+                                    SweetAlert.swal("Deleted!", "Your data has been deleted.", "success");
+                                    getAllAdvanceSalary();
+                                }, function errorCallback(response) {
+                                    SweetAlert.swal("", "Aleardy Exist in Salary Processed", "warning");
+                                    //toastr["info"](response.data.message);
+                                });
+                            }
+                        });
+                  }
+
+                  $scope.editAdvanceSalary = function editAdvanceSalary(item) {
+                      $scope.modalTitle = 'Update Advance Salary';
+                      $scope.modalbutton = 'Update';
+                      $scope.AdvanceSalary = item;
+                      $scope.AdvanceSalary.Id = item.Id;
+                      $scope.AdvanceSalary.SanctionDate = new Date(item.SanctionDate);
+
+                      newdate = item.Month + "/" + item.Year;
+                      $scope.AdvanceSalary.MonthDay = new Date(item.Year + "/" + item.Month);
+                  }
+              }]);
+    </script>
+}
+
+
+
+
+

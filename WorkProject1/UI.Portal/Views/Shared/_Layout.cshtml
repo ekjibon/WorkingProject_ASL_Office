@@ -1,0 +1,54 @@
+﻿<!DOCTYPE html>
+<html ng-app="OEMS">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title </title>
+    @Styles.Render("~/Content/css")
+    @Scripts.Render("~/bundles/modernizr")
+    @Html.Partial("_css")
+    @RenderSection("Styles", false)
+    <link runat="server" rel="icon" href="@Url.Content("~/Content/faviconv.ico")" type="image/x-icon" />
+</head>
+<body class="page-header-fixed page-sidebar-closed-hide-logo page-content-white">
+    @using (Html.BeginForm("LogOff", "Account", FormMethod.Post, new { id = "logoutForm", @class = "navbar-right" }))
+    {
+        @Html.AntiForgeryToken()
+    }
+
+    <div class="page-wrapper">
+        <!-- BEGIN HEADER -->
+        @Html.Partial("_nav")
+        <!-- END HEADER -->
+        <!-- BEGIN HEADER & CONTENT DIVIDER -->
+        <div class="clearfix"> </div>
+        <!-- END HEADER & CONTENT DIVIDER -->
+        <!-- BEGIN CONTAINER --> 
+        <div class="page-container">
+            <!-- BEGIN SIDEBAR -->
+            @Html.Partial("_sidebar")
+            <!-- END SIDEBAR -->
+            <!-- BEGIN CONTENT -->
+            <div class="page-content-wrapper">
+                <!-- BEGIN CONTENT BODY -->
+                <div class="page-content">
+                    @RenderBody()
+                </div>
+                <!-- END CONTENT BODY -->
+            </div>
+            <!-- END CONTENT -->
+        </div>
+        <!-- END CONTAINER -->
+        <div class="page-footer">
+            @Html.Partial("_footer")
+        </div>
+    </div>
+
+
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/bootstrap")
+    @Html.Partial("_script")
+    @RenderSection("scripts", required: false)
+</body>
+
+</html>

@@ -1,0 +1,147 @@
+﻿@using System;
+@using System.Text.RegularExpressions;
+
+@model IEnumerable<OEMS.Models.Model.AspNetPage>
+@{
+    ViewBag.Title = "GetMenu";
+    Layout = null;
+    var g = string.Empty;
+    var RouteAction = this.Request.RequestContext.RouteData.Values["Action"].ToString();
+
+    #region Chack Parent  
+    //saparat action string by capital Letter
+    //string outputString = "";
+
+    //foreach (char letter in RouteAction)
+    //{
+    //    if (Char.IsUpper(letter) && outputString.Length > 0)
+    //    {
+    //        outputString += " " + letter;
+    //    }
+
+    //    else{
+    //        outputString += letter;
+    //    }
+
+
+    //}
+    int clickedRootParentId=0;
+    var clickedSubManu = Model.FirstOrDefault(e => e.Action == RouteAction);
+    if (clickedSubManu != null)
+    {
+        bool parenIsnotFinalRootParent = false;
+        int parentId = clickedSubManu.ParentID;
+        do
+        {
+            parenIsnotFinalRootParent = false;
+            var immParent = Model.FirstOrDefault(e => e.PageID == parentId);
+            if (immParent != null)//immParent null means Parent is Root Parent becose root parent have't any Parent Id
+            {
+                clickedRootParentId = immParent.PageID;
+                if (immParent.ParentID != 0)
+                {
+                    parenIsnotFinalRootParent = true;
+                    parentId = immParent.ParentID;
+                }
+                else
+                {
+                    break;
+                }
+            }
+        } while (parenIsnotFinalRootParent);
+    }
+    #endregion
+}
+<div class="page-sidebar-wrapper">
+    <!-- BEGIN SIDEBAR -->
+    <!-- DOC: Set data-auto-scroll="false" to disable the sidebar from auto scrolling/focusing -->
+    <!-- DOC: Change data-auto-speed="200" to adjust the sub menu slide up/down speed -->
+    <div class="page-sidebar navbar-collapse collapse">
+        <!-- BEGIN SIDEBAR MENU -->
+        <!-- DOC: Apply "page-sidebar-menu-light" class right after "page-sidebar-menu" to enable light sidebar menu style(without borders) -->
+        <!-- DOC: Apply "page-sidebar-menu-hover-submenu" class right after "page-sidebar-menu" to enable hoverable(hover vs accordion) sub menu mode -->
+        <!-- DOC: Apply "page-sidebar-menu-closed" class right after "page-sidebar-menu" to collapse("page-sidebar-closed" class must be applied to the body element) the sidebar sub menu mode -->
+        <!-- DOC: Set data-auto-scroll="false" to disable the sidebar from auto scrolling/focusing -->
+        <!-- DOC: Set data-keep-expand="true" to keep the submenues expanded -->
+        <!-- DOC: Set data-auto-speed="200" to adjust the sub menu slide up/down speed -->
+        <ul class="page-sidebar-menu   " data-keep-expanded="false" data-auto-scroll="true" data-slide-speed="200">
+            <li class="nav-item start active open">
+                <a href="javascript:;" class="nav-link nav-toggle">
+                    <i class="icon-home"></i>
+                    <span class="title">Dashboard</span>
+                    <span class="selected"></span>
+                </a>
+            </li>
+            @foreach (var item in Model.Where(e => Convert.ToBoolean(e.IsParent) && e.ParentID == 0).OrderBy(e=>e.Displayorder))
+            {
+                //do
+                //{
+                //} while()
+                //
+                var cls = string.Empty;
+                // var ss = Model.Where(e => e.ParentID == item.PageID);
+                //if (ss.Where(e => e.Action == RouteAction).Count() > 0)
+                if(item.PageID==clickedRootParentId)
+                {
+                    cls = "active open";
+                }
+                <li class="nav-item @cls">
+                @*<li class="nav-item active ">*@
+                    <a href="@Url.Action("Index","Home")" class="nav-link nav-toggle">
+                        <i class="@item.IconClass"></i>
+                        <span class="title">@item.NameOption_En</span>
+                        <span class="arrow "></span>
+                    </a>
+                    <ul class="sub-menu">
+                        @foreach (var SubMenu1 in Model.Where(e => e.ParentID == item.PageID).OrderBy(e => e.Displayorder))
+                        {
+                            var class1 = string.Empty;
+                            if (Model.Where(e => e.ParentID == SubMenu1.PageID && e.Action == RouteAction).Count() > 0)
+                            {
+                                class1 = "active open";
+                            }
+                            <li class=" @((RouteAction == SubMenu1.Action) ? "nav-item active" : "nav-item ") @class1">
+                                <a href="@Url.Action(SubMenu1.Action, SubMenu1.Controller)" class="nav-link">
+                                    <i class="@SubMenu1.IconClass"></i> @SubMenu1.NameOption_En
+                                    @if (Model.Where(e => e.ParentID == SubMenu1.PageID).OrderBy(e => e.Displayorder).Count() > 0)
+                                    {<span class="arrow nav-toggle"></span>}
+                                </a>
+                                @if (Model.Where(e => e.ParentID == SubMenu1.PageID).OrderBy(e => e.Displayorder).Count() > 0)
+                                {
+                                    <ul class="sub-menu">
+                                        @foreach (var SubMenu2 in Model.Where(e => e.ParentID == SubMenu1.PageID).OrderBy(e => e.Displayorder))
+                                        {
+                                            <li class="@((RouteAction == SubMenu2.Action) ? "nav-item active" : "nav-item ")  secondmenu">
+                                                <a href="@Url.Action(SubMenu2.Action, SubMenu2.Controller)" class="nav-link ">
+                                                    <i class="@SubMenu2.IconClass"></i> @SubMenu2.NameOption_En
+                                                    @if (Model.Where(e => e.ParentID == SubMenu2.PageID).OrderBy(e => e.Displayorder).Count() > 0)
+                                                    {<span class="arrow nav-toggle"></span>}
+                                                </a>
+                                                @if (Model.Where(e => e.ParentID == SubMenu2.PageID).OrderBy(e => e.Displayorder).Count() > 0)
+                                                {
+                                                    <ul class="sub-menu">
+                                                        @foreach (var SubMenu3 in Model.Where(e => e.ParentID == SubMenu2.PageID).OrderBy(e => e.Displayorder))
+                                                        {
+                                                            <li class="nav-item">
+                                                                <a href="@Url.Action(SubMenu3.Action, SubMenu3.Controller)" class="nav-link">
+                                                                    <i class="@SubMenu3.IconClass"></i> @SubMenu3.NameOption_En
+                                                                </a>
+                                                            </li>
+                                                        }
+                                                    </ul>
+                                                }
+                                            </li>
+                                        }
+                                    </ul>}
+                            </li>
+                        }
+                    </ul>
+                </li>
+            }
+        </ul>
+        <!-- END SIDEBAR MENU -->
+    </div>
+    <!-- END SIDEBAR -->
+</div>
+@section scripts{
+}

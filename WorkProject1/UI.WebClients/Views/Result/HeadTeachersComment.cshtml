@@ -1,0 +1,597 @@
+﻿
+@{
+    ViewBag.Title = "Head Teacher Comment's Setup";
+}
+
+<style>
+    .sweet-alert {
+    background-color: #ffffff;
+    width: 478px;
+    padding: 17px;
+    border-radius: 5px;
+    text-align: center;
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    margin-left: -256px;
+    margin-top: -200px;
+    overflow: hidden;
+    display: none;
+    z-index: 999999;
+}
+</style>
+
+<div ng-controller="HeadTeachersComment">
+    <!-- Begin: life time stats -->
+    <div class="portlet light bordered">
+        <div class="portlet-title">
+            <div class="caption">
+                <i class="icon-settings font-green"></i>
+                <span class="caption-subject font-green sbold uppercase">@ViewBag.Title</span>
+            </div>
+            <div class="actions">
+                <div class="btn-group btn-group-solid">
+                    <button ng-click="resetForm1()" class="btn green" data-target="#addmodal" data-toggle="modal"> <i class="fa fa-plus"></i> Add Head Teacher Comment's </button>
+                </div>
+            </div>
+        </div>
+        <div class="portlet-body">
+            <div class="form-horizontal">
+                <div class="form-body">
+                    <form ng-submit="Search()" name="frmFilter" method="post" enctype="multipart/form-data" novalidate>
+
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label class="col-md-5 control-label">
+                                        Branch :
+                                    </label>
+                                    <div class="col-md-7" ng-class="{ 'has-error' :isSubmitted && frmFilter.BranchID.$invalid }">
+                                        <select class="form-control" name="BranchID" ng-model="HeadTeachersComments.BranchID" ng-options="studentInfo.BranchId as studentInfo.BranchName for studentInfo in CommonFeilds.Branch" required>
+                                            <option value="" selected="selected">Please Select</option>
+                                        </select>
+                                        <span ng-show="isSubmitted && frmFilter.BranchID.$error.required" class="help-block">Branch Required</span>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-md-5 control-label">
+                                        Session :
+                                    </label>
+                                    <div class="col-md-7" ng-class="{ 'has-error' :isSubmitted && frmFilter.SessionId.$invalid}">
+                                        <select class="form-control" name="SessionId" ng-model="HeadTeachersComments.SessionId" required ng-options="studentInfo.SessionId as studentInfo.SessionName for studentInfo in CommonFeilds.Session | filter:{VersionId:StudentExamFilter.VersionId}:true">
+                                            <option value="" selected="selected">Please Select</option>
+                                        </select>
+                                        <span ng-show="isSubmitted && frmFilter.SessionId.$error.required" class="help-block">Session Required</span>
+                                    </div>
+                                </div>
+
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label class="col-md-5 control-label">
+                                        Shift :
+                                    </label>
+                                    <div class="col-md-7" ng-class="{'has-error' : isSubmitted && frmFilter.Shift.$invalid}">
+                                        <select class="form-control" ng-model="HeadTeachersComments.ShiftID" name="Shift" ng-options="studentInfo.ShiftId as studentInfo.ShiftName for studentInfo in CommonFeilds.Shift | filter:{BranchId:StudentExamFilter.BranchID}:true" required>
+                                            <option value="" selected="selected">Please Select</option>
+                                        </select>
+                                        <span ng-show="isSubmitted && frmFilter.Shift.$error.required" class="help-block">Shift Required</span>
+                                    </div>
+                                </div>
+                                
+                            </div>
+                            <div class="col-md-4">
+
+                                <div class="form-group">
+                                    <label class="col-md-5 control-label">
+                                        Class :
+                                    </label>
+                                    <div class="col-md-7" ng-class="{ 'has-error' :isSubmitted && frmFilter.ClassId.$invalid}">
+                                        <select class="form-control" name="ClassId" ng-model="HeadTeachersComments.ClassId" @*ng-change="GetSection();LoadTerms(HeadTeachersComment.ClassId)"*@ ng-options="studentInfo.ClassId as studentInfo.ClassName for studentInfo in CommonFeilds.ClassInfo" required>
+                                            <option value="" selected="selected">Please Select</option>
+                                        </select>
+                                        <span ng-show="isSubmitted && frmFilter.ClassId.$error.required " class="help-block">Class Required</span>
+                                    </div>
+                                </div>
+                                @*<div class="form-group">
+                                    <label class="col-md-5 control-label">
+                                        Section :
+                                    </label>
+                                    <div class="col-md-7" ng-class="{ 'has-error' :isSubmitted && frmFilter.SectionId.$invalid }">
+                                        <select class="form-control" name="SectionId" ng-model="HeadTeachersComment.SectionId" ng-disabled="HeadTeachersComment.ClassId==null" ng-options="S.SectionId as S.SectionName for S in Sections" required>
+                                          
+                                            <option value="" selected="selected">Please Select</option>
+                                        </select>
+                                        <span ng-show="isSubmitted && frmFilter.SectionId.$error.required" class="help-block">Section Required</span>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-md-5 control-label">
+                                        Term :
+                                    </label>
+                                    <div class="col-md-7" ng-class="{ 'has-error' :isSubmitted && frmFilter.TermId.$invalid }">
+                                        <select class="form-control" name="TermId" ng-model="StudentExamFilter.HouseId" ng-disabled="StudentExamFilter.ClassId==null" ng-options="term.TermId as term.Name for term in TermList" required>
+                                           
+                                            <option value="" selected="selected">Please Select</option>
+                                        </select>
+                                        <span ng-show="isSubmitted && frmFilter.TermId.$error.required" class="help-block">Term Required</span>
+                                    </div>
+                                </div>*@
+                                <div class="form-group">
+                                    <div class="col-md-8" style="text-align:right">
+                                        <button type="reset" class="btn red">Reset</button>
+
+                                    </div>
+                                    <div class="col-md-3">
+                                        <button ng-click="isSubmitted=true" class="btn green">Search</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="table-container">
+                <div id="sample_3_wrapper" class="dataTables_wrapper no-footer">
+
+                    <div class="table-scrollable"> </div>
+                    <table class="table table-bordered table-hover">
+                        <thead>
+                            <tr class="btn-primary">
+                                <th>Class</th>
+                                <th>Section</th>
+                                <th  style="text-align:center">Details</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-show="SectionsList.length <= 0"><td colspan="5" style="text-align:center;"><i class="fa fa-refresh"></i> Loading new data!!</td></tr>
+                            <tr dir-paginate="item in SectionsList | filter:q  | itemsPerPage: pageSize " current-page="currentPage">
+                                <td>{{item.ClassName}}</td>
+                                <td>{{item.SectionName}}</td>
+                                <td align="center">
+                                    <a class="btn btn-icon-only green" ng-click="GetComments(item)" data-target="#detailsmodal" data-toggle="modal">
+                                        <i class="fa fa-edit"></i>
+                                    </a>
+                                    <a ng-click="DeleteClassWiseComments(item)" href="javascript:;" class="btn btn-icon-only red">
+                                        <i class="fa fa-trash"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="row">
+                        <dir-pagination-controls boundary-links="true" template-url="~/assets/angular/lib/dirPagination.tpl.html"></dir-pagination-controls>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- End: life time stats -->
+    <!--Modal Area Start-->
+    <div id="addmodal" class="modal fade bd-example-modal-lg" tabindex="-1" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <form name="addform" ng-submit="save()" class="form-horizontal" id="form_sample_1" novalidate>
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">X</button>
+                        <h4 class="modal-title">{{modalTitle}}</h4>
+                    </div>
+                    <div class="modal-body">
+                                        <div class="row">
+                                            <div class="col-md-4">
+                                                <div class="form-group">
+                                                    <label class="col-md-5 control-label">
+                                                        Branch :
+                                                    </label>
+                                                    <div class="col-md-7" ng-class="{ 'has-error' :submitted && frmFilter.BranchID.$invalid }">
+                                                        <select class="form-control" name="BranchID" ng-model="HeadTeachersComment.BranchID" ng-options="studentInfo.BranchId as studentInfo.BranchName for studentInfo in CommonFeilds.Branch" required>
+                                                            <option value="" selected="selected">Please Select</option>
+                                                        </select>
+                                                        <span ng-show="isSubmitted && frmFilter.BranchID.$error.required" class="help-block">Branch Required</span>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label class="col-md-5 control-label">
+                                                        Session :
+                                                    </label>
+                                                    <div class="col-md-7" ng-class="{ 'has-error' :submitted && frmFilter.SessionId.$invalid}">
+                                                        <select class="form-control" name="SessionId" ng-model="HeadTeachersComment.SessionId" required ng-options="studentInfo.SessionId as studentInfo.SessionName for studentInfo in CommonFeilds.Session | filter:{VersionId:StudentExamFilter.VersionId}:true">
+                                                            <option value="" selected="selected">Please Select</option>
+                                                        </select>
+                                                        <span ng-show="submitted && frmFilter.SessionId.$error.required" class="help-block">Session Required</span>
+                                                    </div>
+                                                </div>
+
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="form-group">
+                                                    <label class="col-md-5 control-label">
+                                                        Shift :
+                                                    </label>
+                                                    <div class="col-md-7" ng-class="{'has-error' : submitted && frmFilter.Shift.$invalid}">
+                                                        <select class="form-control" ng-model="HeadTeachersComment.ShiftID" name="Shift" ng-options="studentInfo.ShiftId as studentInfo.ShiftName for studentInfo in CommonFeilds.Shift | filter:{BranchId:StudentExamFilter.BranchID}:true" required>
+                                                            <option value="" selected="selected">Please Select</option>
+                                                        </select>
+                                                        <span ng-show="submitted && frmFilter.Shift.$error.required" class="help-block">Shift Required</span>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label class="col-md-5 control-label">
+                                                        Class :
+                                                    </label>
+                                                    <div class="col-md-7" ng-class="{ 'has-error' :submitted && frmFilter.ClassId.$invalid}">
+                                                        <select class="form-control" name="ClassId" ng-model="HeadTeachersComment.ClassId" ng-change="GetSection();LoadTerms(HeadTeachersComment.ClassId)" ng-options="studentInfo.ClassId as studentInfo.ClassName for studentInfo in CommonFeilds.ClassInfo" required>
+                                                            <option value="" selected="selected">Please Select</option>
+                                                        </select>
+                                                        <span ng-show="submitted && frmFilter.ClassId.$error.required " class="help-block">Class Required</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="form-group">
+                                                    <label class="col-md-5 control-label">
+                                                        Section :
+                                                    </label>
+                                                    <div class="col-md-7" ng-class="{ 'has-error' :submitted && frmFilter.SectionId.$invalid }">
+                                                        <select class="form-control" name="SectionId" ng-model="HeadTeachersComment.SectionId" ng-disabled="HeadTeachersComment.ClassId==null" ng-options="S.SectionId as S.SectionName for S in Sections" required>
+                                                           
+                                                            <option value="" selected="selected">Please Select</option>
+                                                        </select>
+                                                        <span ng-show="submitted && frmFilter.SectionId.$error.required" class="help-block">Section Required</span>
+                                                    </div>
+                                                </div>
+
+                                            </div>     
+                         </div>
+                        <div class="row">
+                            <div class="col-md-10">
+                                <div class="form-group">
+                                    <label class="col-md-2" style="margin-left: 7px;">
+                                        Comment's :
+                                    </label>
+                                    <div class="col-md-7" ng-class="{ 'has-error' :submitted && frmFilter.Comment.$invalid }">
+                                        <textarea type="text" ng-model="HeadTeachersComment.Comments" class="form-control" placeholder="Comment's'" name="Comment"></textarea>
+                                        <span ng-show="submitted && frmFilter.Comment.$error.required" class="help-block">Section Required</span>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <a class="btn btn-success" ng-disabled="HeadTeachersComment.Comments==null || HeadTeachersComment.SectionId==null" ng-click="addComment()">Add Comment</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <table class="table table-bordered table-inverse">
+                            <thead class="btn-primary">
+                                <tr>
+                                    <th> SL</th>
+                                    <th> Comment's</th>
+                                    <th> Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td colspan="6" style="text-align:center" ng-hide="CommentList.length > 0">No Data Found</td></tr>
+                                <tr ng-show="CommentList.length > 0" ng-repeat="item in CommentList">
+                                    <td>{{$index + 1}}</td>
+                                    <td>{{item.Comments}}</td>
+                                    <td><a class="btn btn-danger" ng-click="deleteComment($index)"><i class="fa fa-trash" aria-hidden="true"></i> </a></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                  </div>
+                    <div class="modal-footer">
+                        <button type="button" data-dismiss="modal" class="btn dark btn-outline" ng-click="resetForm();">Cancel</button>
+                        <button type="submit" ng-click="submitted=true;" class="btn green-haze">Save </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!--Modal Area End-->
+    <!--Modal Area Start-->
+    <div id="detailsmodal" class="modal fade bd-example-modal-lg" tabindex="-1" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <form name="addform" ng-submit="update()" class="form-horizontal" id="form_sample_1" novalidate>
+                    <div class="modal-header">
+                        
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">X</button>
+                        <h4 class="modal-title">Comment's</h4>
+                    </div>
+                    <div class="row">
+                        @*<div class="col-md-6">
+                            <input type="text" ng-model="item.Comments" class="form-control" />
+                        </div>*@
+                        <div class="col-md-6">
+                            <a class="btn btn-success" ng-click="UpdateComment()">Add Comment</a>
+                        </div>
+                    </div>
+
+                    <div class="modal-body">
+                        <div class="row">
+                        
+                        </div>
+                        
+                        <table class="table table-bordered table-inverse">
+                            <thead class="btn-primary">
+                                <tr>
+                                    <th> SL</th>
+                                    <th> Comment's</th>
+                                    <th> Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td colspan="6" style="text-align:center" ng-hide="NewCommentList.length > 0">No Data Found</td></tr>
+                                <tr ng-show="NewCommentList.length > 0" ng-repeat="item in CommentLists">
+                                    <td>{{$index + 1}}</td>
+                                    <td><input type="text" ng-model="item.Comments" class="form-control" /></td>
+                                    <td><a class="btn btn-danger" ng-click="deleteSingelComments(item,$index)"><i class="fa fa-trash" aria-hidden="true"></i> </a></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" data-dismiss="modal" class="btn dark btn-outline" @*ng-click="resetForm();"*@>Cancel</button>
+                        <button type="submit" @*ng-click="submitted=true;"*@ class="btn green-haze">Update </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!--Modal Area End-->
+</div>
+
+@section Scripts{
+
+    <script type="text/javascript">
+
+        OEMSApp.controller("HeadTeachersComment", ["$scope", "$http", "SweetAlert",
+              function ($scope, $http, SweetAlert) {
+
+                  init();
+                  function init() {
+                      initialize();
+
+                      getAllCommons();
+
+                  }
+                  function initialize() {
+                      $scope.modalTitle = "Add Head Teacher Comment's";
+                      //object Create
+                      $scope.HeadTeachersComment = {};
+                      $scope.HeadTeachersComments = {};
+                       ///Array Create
+                      $scope.CommentList = [];
+                      $scope.pageSizeArray = [];
+                      $scope.CommonFeilds = [];
+           
+                      $scope.resetForm = resetForm;
+
+                      $scope.pageSizeArray.push({ value: 5, text: 5 });
+                      $scope.pageSizeArray.push({ value: 10, text: 10 });
+                      $scope.pageSizeArray.push({ value: 20, text: 20 });
+                      $scope.pageSizeArray.push({ value: 50, text: 50 });
+                      $scope.currentPage = 1;
+                      $scope.pageSize = 10;
+                      $scope.pageno = 1;
+                      $scope.total_count = 12;
+
+
+
+                  }
+
+
+                  function getAllCommons() { // Get VSC
+                      //$scope.CommonFeilds = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Common/GetCommonItem/'
+                      }).then(function successCallback(response) {
+                          $scope.CommonFeilds = response.data.results;
+                      }, function errorCallback(response) {
+                      });
+                  }
+
+                  function resetForm() {
+                      $scope.modalTitle = "Add Head Teacher Comment's";
+                      $scope.HeadTeachersComment = {};
+                      
+                      $scope.CommentList = [];
+                      $scope.NewCommentList = [];
+
+                      $scope.addform.$setUntouched();
+                      $scope.addform.$setPristine();
+                      $scope.submitted = false;
+                     // getProductSubCategorys(1);
+                  }
+
+                  function resetForm1() {
+              
+                      $scope.HeadTeachersComments = {};
+
+                    
+                      $scope.addform.$setUntouched();
+                      $scope.addform.$setPristine();
+                      $scope.isSubmitted = false;
+                      // getProductSubCategorys(1);
+                  }
+
+
+
+                  $scope.save = function () {
+            
+                      if (Validation()) {
+                          if ($scope.CommentList.length == 0) {
+                              toastr["warning"]('Please Write a Comment.');
+                              return;
+                          }
+                          $scope.HeadTeachersComment.CommentDetails = $scope.CommentList;
+                          $http({
+                              method: 'POST',
+                              url: baseUrl + '/Result/AddComment/',
+                              data: $scope.HeadTeachersComment
+                             
+                          }).then(function successCallback(response) {
+                            
+                              toastr["info"](response.data.message);
+                          }, function errorCallback(response) {
+                              toastr["warning"](response.data.Message);
+                          });
+                      }
+
+                      //console.log($scope.Req);
+                  }
+
+                  $scope.update = function () {
+       
+                      $http({
+                          method: 'POST',
+                          url: baseUrl + 'Result/UpdateComment/',
+                          data: $scope.NewCommentList
+                      }).then(function successCallback(response) {
+                          toastr["success"](response.data.message);
+                          blockUI.stop();
+                      }, function errorCallback(response) {
+                          toastr["error"](response.data.Message);
+                          blockUI.stop();
+                      });
+                  };
+
+                  $scope.DeleteClassWiseComments = function DeleteClassWiseComments(n) {
+                      // SweetAlert.swal("Good job!", "You clicked the button!", "success");
+                      SweetAlert.swal({
+                          title: "Are you sure to delete it ?", type: "warning", showCancelButton: true, confirmButtonColor: "#DD6B55",
+                          confirmButtonText: "Yes, delete it!",
+                          closeOnConfirm: false
+                      },
+                      function (isConfirm) {
+                          if (isConfirm) {
+                              $http({
+                                  method: 'POST',
+                                  url: baseUrl + 'Result/DeleteClassWiseComments/',
+                                  data: n
+                              }).then(function successCallback(response) {
+                                  SweetAlert.swal("Deleted!", "Your data has been deleted.", "success"); 
+                              }, function errorCallback(response) {
+                                  toastr["warning"](response.data.Message);
+                              });
+                          }
+                      });
+                  };
+
+                  $scope.deleteSingelComments = function deleteSingelComments(e, index) {
+                      // SweetAlert.swal("Good job!", "You clicked the button!", "success");
+                      if (e.ID == 0) {
+                          $scope.NewCommentList.splice(index, 1);
+                      }
+                      else{
+                      SweetAlert.swal({
+                          title: "Are you sure to delete it ?", type: "warning", showCancelButton: true, confirmButtonColor: "#DD6B55",
+                          confirmButtonText: "Yes, delete it!",
+                          closeOnConfirm: false
+                      },
+                      function (isConfirm) {
+                          if (isConfirm) {
+                              //$scope.NewCommentList.splice(index, 1);
+
+                              $http({
+                                  method: 'POST',
+                                  url: baseUrl + 'Result/deleteSingelComments/',
+                                  data: e
+                              }).then(function successCallback(response) {
+                                  SweetAlert.swal("Deleted!", "Your data has been deleted.", "success");
+                              }, function errorCallback(response) {
+                                  toastr["warning"](response.data.Message);
+                              });
+                          }
+                      });
+                      }
+                  };
+                  $scope.addComment = function () {
+
+                      if ($scope.CommentList.length > 0) {
+                         
+                          $scope.CommentList.push({
+
+                              'Comments': $scope.HeadTeachersComment.Comments
+                                     , 'done': false
+                              });
+
+
+                      } else {
+                          $scope.CommentList.push({
+                              'Comments': $scope.HeadTeachersComment.Comments
+                                , 'done': false
+                          });
+                      }
+
+                      $scope.HeadTeachersComment.Comments = null;
+
+                  }
+
+                  $scope.UpdateComment = function (n) {
+                      if ($scope.NewCommentList.length > 0) {
+                          $scope.NewCommentList.push({ ID: 0,HeadsCommentID: $scope.HeadId,Comments: '' });
+                      }
+                  }
+
+                  $scope.deleteComment = function (index) {
+                      $scope.CommentList.splice(index, 1);
+                  }
+
+
+                  //$scope.DeleteComment = function (index) {
+                  //    $scope.NewCommentList.splice(index, 1);
+                  //}
+
+
+                  $scope.Search = function Search() {
+                      $scope.SectionsList = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Result/GetSection/' + $scope.HeadTeachersComments.SessionId + "/" + $scope.HeadTeachersComments.ShiftID + "/" + $scope.HeadTeachersComments.ClassId
+                      }).then(function successCallback(response) {
+                          $scope.SectionsList = response.data.results;
+                      }, function errorCallback(response) {
+                          toastr["error"](response.data.Message);
+                      });
+                  }
+
+                  $scope.GetSection = function GetSection() {
+                      $scope.Sections = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Common/GetSection/' + $scope.HeadTeachersComment.SessionId + "/" + $scope.HeadTeachersComment.ShiftID + "/" + $scope.HeadTeachersComment.ClassId
+                      }).then(function successCallback(response) {
+                          $scope.Sections = response.data.results;
+                      }, function errorCallback(response) {
+                          toastr["error"](response.data.Message);
+                      });
+                  }
+
+                  $scope.GetComments = function GetComments(n) {
+                      $scope.CommentLists = [];
+                      $http({
+                          method: 'PUT',
+                          url: baseUrl + 'Result/GetComments/',
+                          data: n
+                      }).then(function successCallback(response) {
+                          $scope.CommentLists = response.data.results;
+                          $scope.HeadId=$scope.CommentLists[0].HeadsCommentID;
+                          $scope.NewCommentList = $scope.CommentLists
+                      }, function errorCallback(response) {
+                          toastr["error"](response.data.Message);
+                      });
+                  }
+
+                  function Validation() {
+                      if ($scope.addform.$invalid) {
+                          return false;
+                      }
+                      if ($scope.addform.$valid) {
+                          return true;
+                      }
+                  }
+
+              }]);
+    </script>
+
+}

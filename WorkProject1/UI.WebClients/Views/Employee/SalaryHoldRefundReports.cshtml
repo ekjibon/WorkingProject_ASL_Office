@@ -1,0 +1,174 @@
+﻿
+@{
+    ViewBag.Title = "Salary Hold Refund Reports";
+}
+
+<div class="kt-container  kt-container--fluid  kt-grid__item kt-grid__item--fluid" ng-controller="SHRReports">
+    <div class="row">
+        <div class="kt-portlet kt-portlet--mobile">
+            <div class="kt-portlet__head kt-portlet__head--lg">
+                <div class="kt-portlet__head-label">
+                    <h3 class="kt-portlet__head-title">
+                        <!----Title Text-->
+                        @ViewBag.Title
+                        <!----Title Text -->
+                    </h3>
+                </div>
+            </div>
+
+            <div class="kt-portlet__body">
+                <form name="addform" class="form-horizontal" id="form_sample_1" novalidate autocomplete="off">
+                    <div class="row">
+
+                        <div class="form-group row col-lg-3" ng-class="{ 'has-error' : submitted && addform.reportType.$invalid}">
+                            <label class="col-md-4 control-label">
+                                Reports:
+                                <span class="required">*</span>
+                            </label>
+                            <div class="col-md-8">
+                                <select ng-model="Reports.ReportType" class="form-control" name="reportType" required>
+                                    <option value="">Select One</option>
+                                    <option value="1">Individual</option>
+                                    <option value="2">Combined</option>
+                                    <option value="3">Refund Due</option>
+
+                                </select>
+                                <div class="form-control-focus"> </div>
+                                <span ng-show="submitted &&  addform.reportType.$error.required" class="help-block">Report Required</span>
+                            </div>
+                        </div>
+                        <div class="form-group row col-lg-3" ng-show="Reports.ReportType==2 || Reports.ReportType==3" ng-class="{ 'has-error' : submitted && addform.Branch.$invalid}">
+                            <label class="col-md-5 control-label" style="text-align:right">
+                                Branch :
+                                <span class="required">*</span>
+                            </label>
+                            <div class="col-md-7">
+                                <select class="form-control" ng-model="Reports.BranchId" required name="Branch" ng-options="U.BranchId as U.Name for U in AcademicBranch">
+                                    <option value="" selected="selected">Choose Option</option>
+                                </select>
+                                <div class="form-control-focus"> </div>
+                                <span ng-show="submitted && addform.Branch.$error.required" class="help-block">Branch Name Required</span>
+                            </div>
+                        </div>
+
+
+                        <div class="form-group row col-lg-3" ng-show="Reports.ReportType==1" ng-class="{ 'has-error' : submitted && addform.StudentInsID.$invalid}">
+
+                            <label class="col-md-5 control-label" style="text-align:right">
+                                Empolyee ID :
+                            </label>
+                            <div class="col-md-7">
+                                <input type="text" name="EmpId" ng-model="sid" typeahead-on-select='onSelect($item, $model, $label)'
+                                       placeholder="Search name/ID SMS Notification"
+                                       uib-typeahead="i  as i.Text for i in Search($viewValue)"
+                                       typeahead-loading="loadingLocations" typeahead-no-results="noResults" class="form-control">
+                                <i ng-show="loadingLocations" class="glyphicon glyphicon-refresh"></i>
+                                <div ng-show="noResults"><i class="glyphicon glyphicon-remove"></i> No Results Found</div>
+
+                                <div class="form-control-focus"> </div>
+                                <span ng-show="sid && submitted && addform.EmpId.$error.required" class="help-block">Employee ID Required</span>
+                            </div>
+
+                        </div>
+
+
+                        <div class="form-group row col-lg-2" ng-show="Reports.ReportType==2 || Reports.ReportType==3" ng-class="{ 'has-error' : submitted && addform.name.$invalid}">
+                            <a href="@Url.Action("ReportSalaryHoldRefund","Report")?BranchId={{Reports.BranchId}}&ReportType={{Reports.ReportType}}" class="btn btn-primary" target="_blank">Show Report</a>
+                        </div>
+                        <div ng-show="Reports.ReportType==1" class="form-group row col-lg-2" ng-class="{ 'has-error' : submitted && addform.name.$invalid}">
+                            <button type="button" ng-click="IndividualHoldReport()" class="btn btn-primary">Show Report</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+
+    <script type="text/javascript">
+        OEMSApp.controller("SHRReports", ["$scope", "$http", "SweetAlert", "$filter",
+              function ($scope, $http, SweetAlert, $filter) {
+
+                  init();
+                  function init() {
+                      initialize();
+                      getAllCommons()
+                  }
+                  function initialize() {
+                      $scope.Reports = {};
+                      $scope.arrNum = 0;
+
+
+                      $scope.Fiscals = [];
+                      $scope.currentPage = 1;
+                      $scope.pageno = 1;
+                      $scope.pagesize = 10;
+                      $scope.total_count = 12;
+                      $scope.search = '';
+                      $scope.Id = '';
+                      $scope.res = {};
+                      $scope.data = {};
+                      $scope.resetForm = resetForm;
+                      $scope.hstep = 1;
+                      $scope.mstep = 15;
+
+                      $scope.pageSizeArray = [];
+                      $scope.pageSizeArray.push({ value: 5, text: 5 });
+                      $scope.pageSizeArray.push({ value: 10, text: 10 });
+                      $scope.pageSizeArray.push({ value: 20, text: 20 });
+                      $scope.pageSizeArray.push({ value: 50, text: 50 });
+                      $scope.currentPage = 1;
+                      $scope.pageSize = 10;
+
+                  }
+
+                  function getAllCommons() {//for First form
+                      $scope.AcademicBranch = [];
+
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Common/GetAcademicBranchListWithAll/'
+                      }).then(function successCallback(response) {
+                          $scope.AcademicBranch = response.data.results;
+
+                      }, function errorCallback(response) {
+                          toastr["error"](response.data.message);
+                      });
+                  }
+
+                  $scope.Search = function (val) {
+                      return $http.get(baseUrl + 'Employee/SearchAllEmployee/' + val, {
+                          params: {
+
+                          }
+                      }).then(function (response) {
+                          return response.data.results.map(function (item) {
+                              return item;
+                          });
+                      });
+                  };
+
+                  $scope.onSelect = function onSelect($item, $model, $label) {
+                      $scope.Reports.EmpId = $item.Value;
+
+                  };
+
+                  function resetForm() {
+
+                      $scope.Reports = {};
+                      //$scope.Reports.LedgerId = 0;
+                      $scope.addform.$setUntouched();
+                      $scope.addform.$setPristine();
+                      $scope.submitted = false;
+                  }
+                  $scope.IndividualHoldReport = function IndividualHoldReport() {
+                      var uri = "@Url.Action("ReportSalaryHoldRefundIndividual", "Report")?EmpId=" + $scope.Reports.EmpId;
+                      window.open(uri, '_blank');
+                  };
+
+              }]);
+    </script>
+}
+

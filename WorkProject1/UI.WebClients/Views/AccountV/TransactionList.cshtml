@@ -1,0 +1,558 @@
+﻿
+@{
+    ViewBag.Title = "Transaction List";
+}
+
+
+<div class="kt-container  kt-container--fluid  kt-grid__item kt-grid__item--fluid" ng-controller="AcLedgerCtrl">
+    <!-- Begin: life time stats -->
+
+    <div class="row">
+        <div class="kt-portlet kt-portlet--mobile">
+            <div class="kt-portlet__head kt-portlet__head--lg">
+                <div class="kt-portlet__head-label">
+                    <span class="kt-portlet__head-icon">
+                        @*<i class="kt-font-brand flaticon2-line-chart"></i>*@
+                    </span>
+                    <h3 class="kt-portlet__head-title">
+                        <!----Titel Text-->
+                        <span class="caption-subject font-green sbold uppercase">@ViewBag.Title</span>
+                        <!----Titel Text -->
+                    </h3>
+                </div>
+                <div class="kt-portlet__head-toolbar">
+                    <div class="kt-portlet__head-wrapper">
+                        <div class="dropdown dropdown-inline">
+                            @*<button type="button" class="btn btn-brand btn-icon-sm" data-toggle="modal" data-target="#addmodal" aria-haspopup="true" aria-expanded="false">
+                                
+                                <i class="flaticon2-plus"></i> Add New
+                                
+                            </button>*@
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="kt-portlet__body">
+                <div class="row">
+                    <form  name="filterform" id="form_sample_1" novalidate  style="width:100%">
+                        
+                            <div class="form-group row" ng-class="{ 'has-error' : submitted && filterform.TypeName.$invalid}">
+                                <label class="col-md-4 control-label" style="text-align:right">
+                                    Transaction Type:
+                                </label>
+                                <div class="col-md-5">
+                                    <select class="form-control" required name="TypeName" ng-model="TransactionType">
+                                        <option selected value="">Choose Options</option>
+                                        <option value="Receive">Receive</option>
+                                        <option value="Payment">Payment</option>
+                                        <option value="Contra">Contra</option>
+                                        <option value="Journal">Journal</option>
+                                    </select>
+                                    <div class="form-control-focus"> </div>
+                                    <span ng-show="submitted && filterform.TypeName.$error.required" class="help-block">Transaction Type Required</span>
+                                </div>
+                            </div>                        
+                    </form>
+                </div>
+                <div class="row">
+                    <div class="col-md-4 col-sm-5 col-xs-6">
+                        <div class="form-group row">
+                            <div class="col-lg-3 col-md-5 col-sm-4 col-xs-8" style="padding-left:0px">
+                                <select class="form-control" ng-model="pageSize" ng-options="P.value as P.text for P in pageSizeArray"></select>
+                            </div>
+                            <div class="col-md-7  col-sm-8  col-xs-4">
+                                @*<label for="search" class="control-label" style="padding-top:5px">Items</label>*@
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-sm-3 col-xs-1">
+                    </div>
+                    <div class="col-md-4 col-sm-4 col-xs-5">
+                        <div id="sample_3_filter">
+                            <input ng-model="q" id="search" class="form-control" placeholder="Filter text">
+                        </div>
+                    </div>
+
+                    <table class="table table-bordered table-hover rounded">
+                        <thead>
+                            <tr class="btn-primary">
+                                <th> Fiscal Year</th>
+                                <th>Date</th>
+                                <th>Voucher Number</th>
+                                <th>Type</th>
+                                <th class="text-center"> Debit</th>
+                                <th class="text-center">Credit</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-show="AcTransactions.length <= 0"><td colspan="5" style="text-align:center;"><i class="fa fa-refresh"></i> Loading new data!!</td></tr>
+                            <tr dir-paginate="item in AcTransactions| filter:(q || TransactionType)  | itemsPerPage: pageSize" current-page="currentPage">
+                                <td>{{item.Name}}</td>
+                                <td>{{item.Date | date:'dd/MM/yyyy'}}</td>
+                                <td>{{item.TransNo}}</td>
+                                <td>{{item.TypeName}}</td>
+                                <td class="text-center">{{item.DrTotal | number:2}}</td>
+                                <td class="text-center">{{item.CrTotal | number:2}}</td>
+
+                                <td style="text-align:center;"><span class="label" ng-class="status=item.Status">{{item.Status}}</span></td>
+                                <td>
+                                    @*<a href="@Url.Action("ReportDebitCreditByFiscalYear","Report")?Id={{item.Id}}" class="btn btn-info btn-sm pull-right" target="_blank">Print</a>*@
+                                    <div class="btn-group ">
+                                        <button class="btn btn-label-success" type="button" data-toggle="dropdown" aria-expanded="false">
+                                            Options
+                                            <i class="fa fa-angle-down"></i>
+                                        </button>
+                                        <ul class="dropdown-menu" role="menu" style="left: -10%;">
+                                            <li ng-hide="item.Status=='Rejected'">
+                                                <a ng-click="ApproveTransaction(item)" ng-show="item.Status=='Pending'">
+                                                    <i aria-hidden="true"></i> Apporve
+                                                </a>
+                                            </li>
+                                            <li ng-hide="item.IsApproved==true || item.InvoiceTransType==3">
+                                                <a ng-hide="item.IsReject" ng-click="rejectStatus(item.Id,Status='Rejected')">
+                                                    <i aria-hidden="true"></i> Reject
+                                                </a>
+                                                @*<a ng-hide="item.Status=='Rejected'" ng-click="rejectStatus(item.Id,Status='Rejected')">
+                                            <i aria-hidden="true"></i> Reject
+                                        </a>*@
+                                            </li>
+                                            <li ng-show="item.IsApproved==true && item.PayMode==2 && (item.TransType==1 || item.TransType ==2)">
+                                                <a href="@Url.Action("GetAllTransactionList","Report")?TransactionId={{item.Id}}&TypeId=1" target="_blank" ng-hide="item.Status=='Rejected'">
+                                                    <i class="fa fa-book" aria-hidden="true"></i> Print cheque
+                                                </a>
+                                            </li>
+                                            <li ng-show="item.IsApproved==true && item.TransType==2 && (item.PayMode==1 || item.PayMode==3)">
+                                                <a href="@Url.Action("GetAllTransactionList","Report")?TransactionId={{item.Id}}&TypeId=2" target="_blank" ng-hide="item.Status=='Rejected'">
+                                                    <i class="fa fa-book" aria-hidden="true"></i> Print vouchar
+                                                </a>
+                                            </li>
+                                            <li ng-show="item.IsApproved==true && item.TransType==1 && (item.PayMode==2 || item.PayMode==1)">
+                                                <a href="@Url.Action("GetAllTransactionList","Report")?TransactionId={{item.Id}}&TypeId=3" target="_blank" ng-hide="item.Status=='Rejected'">
+                                                    <i class="fa fa-book" aria-hidden="true"></i> Print vouchar
+                                                </a>
+                                            </li>
+                                            <li ng-show="item.IsApproved==true && item.TransType==2 && item.PayMode==2">
+                                                <a href="@Url.Action("GetAllTransactionList","Report")?TransactionId={{item.Id}}&TypeId=4" target="_blank" ng-hide="item.Status=='Rejected'">
+                                                    <i class="fa fa-book" aria-hidden="true"></i> Print vouchar
+                                                </a>
+                                            </li>
+                                            <li ng-show="item.IsApproved==true && item.TransType==4">
+                                                <a href="@Url.Action("GetAllTransactionList","Report")?TransactionId={{item.Id}}&TypeId=5" target="_blank" ng-hide="item.Status=='Rejected'">
+                                                    <i class="fa fa-book" aria-hidden="true"></i> Print vouchar
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a ng-click="detailsTransaction(item.Id)" @*ng-hide="item.IsApporved"*@ data-toggle="modal" data-target="#detailsTransaction">
+                                                    <i aria-hidden="true"></i> Details
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a ng-click="UpdateTransactionledger(item)"  ng-show="item.IsApproved==false && item.InvoiceTransType==3" data-toggle="modal" data-target="#updateCollection">
+                                                    <i aria-hidden="true"></i> Edit
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="row">
+                    <dir-pagination-controls boundary-links="true" template-url="~/assets/angular/lib/dirPagination.tpl.html"></dir-pagination-controls>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+        <div id="detailsTransaction" class="modal fade" tabindex="-1" data-backdrop="static" data-keyboard="false">
+            <div class="modal-dialog">
+                <div class="modal-content" style="width:960px;">
+                    <div class="modal-header">
+                        @*<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>*@
+                        <h4 class="modal-title">Details Transaction Info @*of Id : {{detailsList[0].Id}}*@ <span class="pull-right">Date : {{detailsList[0].Date | date : format : 'yyyy-MM-dd'}}</span></h4>
+                    </div>
+
+                    <div class="modal-body">
+                        <div class="form-body">
+                            <div class="container" style="width:960px">
+                                <table style="width:100%">
+                                    <thead></thead>
+                                    <tbody>
+                                        <tr>
+                                            <td style="width:50%;text-align:left">
+                                                <table>
+                                                    <tr>
+                                                        <td style="width:50%"><strong>Acc Branch</strong></td>
+                                                        <td><strong> :</strong>{{detailsList[0].AccountBranch}}</td>
+                                                    </tr>
+                                                    <tr ng-hide="detailsList[0].PayMode==0">
+                                                        <td style="width:50%">
+                                                            <strong ng-hide="detailsTypeName == 'Payment';">Receive Mode</strong>
+                                                            <strong ng-show="detailsTypeName =='Payment';">Pay Mode</strong>
+                                                        </td>
+                                                        <td><strong> :</strong>{{detailsList[0].PayModeName}}</td>
+                                                    </tr>
+                                                    <tr ng-show="detailsPayModeName=='Cheque'">
+                                                        <td style="width:50%"><strong>Cheque No</strong></td>
+                                                        <td><strong> :</strong>{{detailsList[0].ChequeNo}}</td>
+                                                    </tr>
+                                                </table>
+                                            </td>
+                                            <td style="width:50%;text-align:left">
+                                                <table>
+                                                    <tr>
+                                                        <td style="width:50%"><strong>Transaction Type</strong></td>
+                                                        <td><strong> : </strong>{{detailsList[0].TypeName}}</td>
+                                                    </tr>
+                                                    <tr ng-hide="detailsList[0].TransType==3 || detailsList[0].TransType==4;">
+                                                        <td style="width:50%">
+                                                            <strong ng-show="detailsTypeName =='Payment'">Pay To</strong>
+                                                            <strong ng-hide="detailsTypeName =='Payment'">Receive by</strong>
+                                                        </td>
+                                                        <td><strong> : </strong>{{detailsList[0].PayTo}}{{detailsList[0].RecivedBy}}</td>
+                                                    </tr>
+                                                    <tr ng-show="detailsPayModeName=='Cheque'">
+                                                        <td style="width:50%"><strong>Cheque Date</strong></td>
+                                                        <td><strong> : </strong>{{detailsList[0].ChequeDate | date : format : 'yyyy-MM-dd'}}</td>
+                                                    </tr>
+                                                </table>
+                                            </td>
+                                        </tr>
+                                        <tr></tr>
+                                        <tr style="text-align:left">
+                                            <td colspan="2" style="width:25%"><strong>Description:</strong><span> {{detailsList[0].Description}}</span></td>
+                                        </tr>
+                                    </tbody>
+
+                                </table>
+                            </div>
+                            <div class="container" style="width:940px">
+                                <br />
+                                <table style="width:100%">
+                                    <thead>
+                                        <tr><th style="width:49%;text-align:center">Debit Ledger</th><th style="width:2%"> </th><th style="width:49%;text-align:center">Credit Ledger</th></tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td style="width:49%">
+                                                <table class="table table-bordered">
+                                                    <thead>
+                                                        <tr style="background-color:#FCA88D !important;color:#fff;"><th>Name</th><th>Amount</th></tr>
+
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr ng-repeat="i in detailsList">
+                                                            <td ng-hide="i.DrAmount==0">{{i.LedgerName}}</td>
+                                                            <td class="text-right" ng-hide="i.DrAmount==0">{{i.DrAmount}}</td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </td>
+                                            <td style="width:2%">&nbsp;</td>
+                                            <td style="width:49%">
+                                                <table class="table table-bordered">
+                                                    <thead>
+                                                        <tr style="background-color:#FCA88D !important;color:#fff;"><th>Name</th><th>Amount</th></tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr ng-repeat="p in detailsList">
+                                                            <td ng-hide="p.CrAmount==0">{{p.LedgerName}}</td>
+                                                            <td class="text-right" ng-hide="p.CrAmount==0">{{p.CrAmount}}</td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" data-dismiss="modal" class="btn  btn-secondary">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    @*Update Collection date and cash and bank ledger modal*@
+    <div id="updateCollection" class="modal fade" tabindex="-1" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form name="addform" ng-submit="updateCollection()" class="form-horizontal" id="form_sample_1" novalidate>
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">X</button>
+                        <h4 class="modal-title">Update transaction</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-body">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group row" ng-class="{ 'has-error' : submitted && addform.LedgerId.$invalid}">
+                                        <label class="col-md-4 control-label">
+                                            Ledger Name :
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-8">
+                                            <select ng-model="chkObj.LedgerId" class="form-control"  name="LedgerId" ng-options="ledger.LedgerId as ledger.Name for ledger in LedgerList">
+                                                <option value="" selected="selected">Choose Option</option>
+                                            </select>
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted &&  addform.LedgerId.$error.required" class="help-block">Ledger  Required</span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group row" ng-class="{ 'has-error' : isSubmitted && addform.Date.$invalid}">
+                                        <label class="col-md-4 control-label">
+                                            Collection Date:
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-8">
+                                            <input class="form-control" type="text" ng-click="p4=true" is-open="p4" readonly placeholder="Date" ng-model="chkObj.Date" uib-datepicker-popup="dd/MM/yyyy" name="Date" required />
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="isSubmitted &&  addform.Date.$error.required" class="help-block">Date Required</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" data-dismiss="modal" class="btn dark btn-outline" ng-click="resetUpdateForm();">Close</button>
+                        <button type="submit" ng-click="isSubmitted=true" class="btn btn-success">Update </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    </div>
+
+<!-- End: life time stats -->
+
+
+
+@section Scripts{
+
+    <script type="text/javascript">
+        OEMSApp.controller("AcLedgerCtrl", ["$scope", "$http", "SweetAlert", "$filter",
+              function ($scope, $http, SweetAlert, $filter) {
+
+                  init();
+                  function init() {
+                      initialize();
+                      getTransactions();
+                      GetAllLedgers();
+                  }
+                  function initialize() {
+                      $scope.modalTitle = "Add Account Ledger";
+                      $scope.AcTransaction = {};
+                      $scope.detailsTransaction = detailsTransaction;
+                      $scope.detailsList = [];
+                      $scope.detailsTypeName = null;
+                      $scope.detailsPayModeName = null;
+                      $scope.status = {
+                          Pending:null,
+                          Approved: null,
+                          Rejected: null
+                      };
+                      $scope.payment = false;
+                      $scope.cheque = false;
+                      $scope.AcTransactions = [];
+                      $scope.arrNum = 0;
+                      
+                      $scope.submitted = false;
+                      $scope.AcTransactions = [];
+                      $scope.currentPage = 1;
+                      $scope.pageno = 1;
+                      $scope.pagesize = 10;
+                      $scope.total_count = 12;
+                      $scope.search = '';
+                      $scope.Id = '';
+                      //$scope.getAcLedger = getAcLedger;
+                      //$scope.getAcRootGroups = getAcRootGroups;
+                      $scope.res = {};
+                      $scope.data = {};
+                      
+                      $scope.hstep = 1;
+                      $scope.mstep = 15;
+                      $scope.GroupP = {};
+                      $scope.isGroup = false;
+
+                      //$scope.AcLedger.OpenningBalanceDc = 1;
+                      $scope.pageSizeArray = [];
+                      $scope.pageSizeArray.push({ value: 5, text: 5 });
+                      $scope.pageSizeArray.push({ value: 10, text: 10 });
+                      $scope.pageSizeArray.push({ value: 20, text: 20 });
+                      $scope.pageSizeArray.push({ value: 50, text: 50 });
+                      $scope.currentPage = 1;
+                      $scope.pageSize = 10;
+                      $scope.resetForm = resetForm;
+                      $scope.getTransactions = getTransactions;
+                      $scope.updateCollection = updateCollection;
+                      $scope.chkObj = {};
+                      $scope.chkObj.LedgerId == 0;
+                  }
+
+                  $scope.FilterTransaction = function () {
+                      //getProducts(1);
+                      if ($scope.filterform.$invalid) {
+                          return;
+                      }
+                      $scope.TransactionList = [];
+                      angular.forEach($scope.AcTransactions, function (item) {
+                          if (item.TransType == $scope.TransactionType) {
+                              $scope.TransactionList.push(item);
+                          }
+                      });
+                      $scope.AcTransactions = $scope.TransactionList;
+                  }
+
+                  function resetForm() {
+                      $scope.modalTitle = "Add Account Ledger";
+
+                      $scope.AcLedger = {};
+                      $scope.AcLedger.LedgerId = 0;
+                      //  $scope.addform.$setUntouched();
+                      //  $scope.addform.$setPristine();
+                      $scope.submitted = false;
+                      $scope.TransactionType = null;
+                      
+                  }
+
+                  $scope.ApproveTransaction = function ApproveTransaction(n) {
+                      
+                      SweetAlert.swal({
+                          title: "Are you sure to Approve it ?", type: "info", showCancelButton: true, confirmButtonColor: "#DD6B55",
+                          confirmButtonText: "Yes, save it!",
+                          closeOnConfirm: false
+                      },
+                    function (isConfirm) {
+                        if (isConfirm) {
+                            $http({
+                                method: 'POST',
+                                url: baseUrl + 'Accounts/ApproveTransaction/' + n.Id
+
+                            }).then(function successCallback(response) {
+                                resetForm();
+                                getTransactions();
+                                SweetAlert.swal("Saved!", response.data.message, "success");
+                                //toastr["info"]('Saved Successfully!');
+                            }, function errorCallback(response) {
+                                //toastr["warning"](response.data.Message);
+                            });
+                        }
+                    });
+
+                  }
+
+                  $scope.rejectStatus = function rejectStatus(Id, Status) {
+
+                      SweetAlert.swal({
+                          title: "Are you sure to reject it ?", type: "info", showCancelButton: true, confirmButtonColor: "#f1c82c",
+                          confirmButtonText: "Yes, reject it!",
+                          closeOnConfirm: false
+                      },
+                    function (isConfirm) {
+                        if (isConfirm) {
+                            $http({
+                                method: 'POST',
+                                url: baseUrl + 'Accounts/RejectStatus/' + Id + '/' + Status
+                            }).then(function successCallback(response) {
+
+                                getTransactions();
+                                SweetAlert.swal("Reject!", response.data.message, "success");
+                            }, function errorCallback(response) {
+                                getTransactions();
+                                // toastr["error"](response.data.message);
+                            });
+                        }
+                    });
+
+                  }
+
+                  function detailsTransaction(Id) {
+                          
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Accounts/DetailsTransaction/' + Id
+                      }).then(function successCallback(response) {
+
+                          $scope.detailsList = response.data.results;
+
+                          $scope.detailsTypeName = response.data.results[0].TypeName;
+                          $scope.detailsPayModeName = response.data.results[0].PayModeName;
+
+                      }, function errorCallback(response) {
+
+                          // toastr["error"](response.data.message);
+                      });
+                      
+                  }
+
+                  function getTransactions() {
+
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Accounts/GetAllTransaction/'
+                      }).then(function successCallback(response) {
+                          $scope.AcTransactions = response.data.results;
+                          resetForm();
+                      }, function errorCallback(response) {
+                          toastr["warning"](response.data.Message);
+                      });
+                  }
+                  $scope.UpdateTransactionledger = function UpdateTransactionledger(n) {
+                      var ChkDate = new Date(n.Date);
+                      n.Date = ChkDate;
+                      $scope.chkObj = n;
+                  }
+                  function updateCollection() {
+                      //var ChkDate = $filter('date')($scope.chkObj.ChequeDate, "dd/MM/yyyy");
+                      //$scope.chkObj.ChequeDate = ChkDate;
+                      if ($scope.chkObj.LedgerId == 0 || $scope.chkObj.LedgerId == null) {
+                          toastr["info"]("Please select Ledger!!");
+                         
+                          return;
+                      }
+                      if ($scope.addform.$invalid)
+                          return;
+                      else {
+                          $http({
+                              method: 'PUT',
+                              url: baseUrl + 'Accounts/updateCollection',
+                              data: $scope.chkObj
+                          }).then(function successCallback(response) {
+                              $('#updateCollection').modal('toggle');
+                              toastr["info"]("Update Successfully!");
+                              resetUpdateForm();
+                              getTransactions();
+                          }, function errorCallback(response) {
+                              toastr["warning"](response.data.Message);
+                          });
+                      }
+                  }
+                  function resetUpdateForm() {
+                      $scope.isSubmitted = false;
+                  }
+                  function GetAllLedgers() {
+                      
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Accounts/GetAllLedgersForUpdateCollection/'
+                      }).then(function successCallback(response) {
+                          $scope.LedgerList = response.data.results;
+                      }, function errorCallback(response) {
+                      });
+                  }
+
+              }]);
+    </script>
+}
+

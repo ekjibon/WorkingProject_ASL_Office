@@ -1,0 +1,1277 @@
+﻿@{
+    ViewBag.Title = "Filtered SMS";
+}
+<style>
+    .panel-title > a:before {
+        float: right !important;
+        font-family: FontAwesome;
+        content: "\f056";
+        padding-right: 5px;
+    }
+
+    .panel-title > a.collapsed:before {
+        float: right !important;
+        content: "\f055";
+    }
+
+    .panel-title > a:hover,
+    .panel-title > a:active,
+    .panel-title > a:focus {
+        text-decoration: none;
+    }
+
+    .slider {
+        position: relative;
+        text-align: left;
+        border: 1px solid gray;
+        height: 0.6em;
+    }
+
+        .slider .handle {
+            position: absolute;
+            z-index: 2;
+            width: 1.2em;
+            height: 1.2em;
+            background-color: gray;
+        }
+
+    .handle {
+        top: -0.3em;
+        margin-left: -0.6em;
+    }
+
+    .slider .range {
+        position: absolute;
+        z-index: 1;
+        display: block;
+        font-size: .7em;
+        background-color: #e6975f;
+        top: 0;
+        height: 100%;
+    }
+
+    .switch {
+        position: relative;
+        display: inline-block;
+        width: 60px;
+        height: 34px;
+    }
+
+    .radio-group label {
+        overflow: hidden;
+    }
+
+    .radio-group input {
+        /* This is on purpose for accessibility. Using display: hidden is evil.
+    This makes things keyboard friendly right out tha box! */
+        height: 1px;
+        width: 1px;
+        position: absolute;
+        top: -20px;
+    }
+
+    .radio-group .not-active {
+        color: #3276b1;
+        background-color: #fff;
+    }
+
+    .nopadding {
+        padding: 0px !important;
+    }
+</style>
+
+<div class="portlet box blue-hoki" ng-controller="studentSearchrdCrlt">
+    <div class="portlet-title">
+        <div class="caption">
+            <i class="fa fa-user-plus"></i>Advance Search
+        </div>
+    </div>
+    <div class="portlet-body form">
+        <!-- BEGIN FORM-->
+        <form class="form-horizontal">
+            <div class="form-body">
+                <div class="row">
+                    <div class="panel-group " id="accordion" role="tablist" aria-multiselectable="true">
+                        <div class="panel panel-default panel-info">
+                            <!--Academic Informatin--><div class="panel-heading" role="tab" id="headingOne">
+                                <h4 class="panel-title">
+                                    <a data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+                                        Academic Infomation
+                                    </a>
+                                </h4>
+                            </div>
+                            <div id="collapseOne" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingOne">
+                                <div class="panel-body">
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label class="col-md-5 control-label">
+                                                    Branch :
+                                                </label>
+                                                <div class="col-md-7">
+                                                    <select multiple multi-select ng-model="studentSearch.Branch1" ng-options="Branch.BranchId as Branch.BranchName for Branch in CommonFeilds.Branch"></select>
+                                                    <div class="form-control-focus"> </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                       
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label class="col-md-5 control-label">
+                                                    Class :
+                                                </label>
+                                                <div class="col-md-7">
+                                                    <select multiple multi-select ng-model="studentSearch.Class1" ng-change="GetSection()" ng-options="Class.ClassId as Class.ClassName for Class in CommonFeilds.ClassInfo"></select>
+                                                    <div class="form-control-focus"> </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                      
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label class="col-md-5 control-label">
+                                                    Status:
+                                                </label>
+                                                <div class="col-md-7">
+                                                    <select multiple multi-select ng-model="studentSearch.Statuses1" ng-options="StudentType.Value as StudentType.Text for StudentType in StudentTypeArr"></select>
+                                                    <div class="form-control-focus"> </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label class="col-md-5 control-label">
+                                                    Session :
+                                                </label>
+                                                <div class="col-md-7">
+                                                    <select multiple multi-select ng-model="studentSearch.Session1" ng-options="Session.SessionId as Session.SessionName for Session in CommonFeilds.Session"></select>
+                                                    <div class="form-control-focus"> </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label class="col-md-5 control-label">
+                                                    Section :
+                                                </label>
+                                                <div class="col-md-7">
+                                                    <select multiple multi-select ng-model="studentSearch.Section1" ng-disabled="Sections.length > 1" ng-options="Section.SectionId as Section.SectionName for Section in Sections"></select>
+                                                    <div class="form-control-focus"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label class="col-md-5 control-label">
+                                                    Stu. Type:
+                                                </label>
+                                                <div class="col-md-7">
+                                                    <select multiple multi-select ng-model="studentSearch.StuType1" ng-options="StuType.StudentTypeId  as StuType.StudentTypeName for StuType in CommonFeilds.StuType"></select>
+                                                    <div class="form-control-focus"> </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label class="col-md-5 control-label">
+                                                    Shift :
+                                                </label>
+                                                <div class="col-md-7">
+                                                    <select multiple multi-select ng-model="studentSearch.Shift1">
+                                                        <optgroup ng-show="!Shift.length" ng-repeat="op in CommonFeilds.Branch" label="{{op.BranchName}}">
+                                                            <option ng-repeat="Shift in CommonFeilds.Shift | filter:{BranchId:op.BranchId}:true" value="{{Shift.ShiftId}}">
+                                                                {{Shift.ShiftName}}
+                                                            </option>
+                                                        </optgroup>
+                                                    </select>
+                                                    <div class="form-control-focus"> </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label class="col-md-5 control-label">
+                                                    House :
+                                                </label>
+                                                <div class="col-md-7">
+                                                    <select multiple multi-select ng-model="studentSearch.House1" ng-options="House.HouseId as House.HouseName for House in CommonFeilds.House"></select>
+                                                    <div class="form-control-focus"> </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="panel panel-default panel-info">
+                                <div class="panel-heading" role="tab" id="headingTwo">
+                                    <h4 class="panel-title">
+                                        <a class="collapsed" data-toggle="collapse" data-parent="#accordion" href="#collapseTwo" aria-expanded="true" aria-controls="collapseTwo">
+                                            Student Information
+                                        </a>
+                                    </h4>
+                                </div>
+                                <div id="collapseTwo" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingTwo">
+                                    <div class="panel-body">
+                                        <div class="row">
+                                            <div class="col-md-5">
+                                                <div class="form-group">
+                                                    <div class="row">
+                                                        <label class="col-md-4 control-label">
+                                                            DOB Range :
+                                                        </label>
+                                                        <div class="col-md-4">
+                                                            <input type="text" class="form-control" uib-datepicker-popup="{{Dateformat}}" placeholder="Start Date" uib-datepicker-popup="{{format}}" ng-model="studentSearch.startDate" is-open="popup1.opened" ng-click="popup1.opened=true" ng-required="true" close-text="Close" alt-input-formats="altInputFormats" readonly="readonly" />
+                                                            <span class="form-control-focus"> </span>
+                                                        </div>
+                                                        <div class="col-md-4">
+                                                            <input type="text" class="form-control" uib-datepicker-popup="{{Dateformat}}" placeholder="End Date" uib-datepicker-popup="{{format}}" ng-model="studentSearch.endDate" min-date="studentSearch.startDate" is-open="popup2.opened" ng-click="popup2.opened=true" datepicker-options="dateOptionsDOB" ng-required="true" close-text="Close" alt-input-formats="altInputFormats" readonly="readonly" />
+                                                            <span class="form-control-focus"> </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-5">
+                                                <div class="form-group">
+                                                    <div class="row">
+                                                        <label class="col-md-4 control-label">
+                                                            Admission Date:
+                                                        </label>
+                                                        <div class="col-md-4">
+                                                            <input type="text" class="form-control" uib-datepicker-popup="{{Dateformat}}" placeholder="Start Date" uib-datepicker-popup="{{format}}" ng-model="studentSearch.AdstartDate" is-open="popup3.opened" ng-click="popup3.opened=true" datepicker-options="dateOptionsAd" ng-required="true" close-text="Close" alt-input-formats="altInputFormats" readonly="readonly" />
+                                                            <div class="form-control-focus"> </div>
+                                                        </div>
+                                                        <div class="col-md-4">
+                                                            <input type="text" class="form-control" uib-datepicker-popup="{{Dateformat}}" placeholder="Start Date" uib-datepicker-popup="{{format}}" ng-model="studentSearch.AdendDate" is-open="popup4.opened" min-date="studentSearch.AdstartDate" ng-click="popup4.opened=true" datepicker-options="dateOptionsAd" ng-required="true" close-text="Close" alt-input-formats="altInputFormats" readonly="readonly" />
+                                                            <div class="form-control-focus"> </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-3">
+                                                <div class="form-group">
+                                                    <label class="col-md-5 control-label">
+                                                        Gender :
+                                                    </label>
+                                                    <div class="col-md-7">
+                                                        <select class="form-control" multiple multi-select ng-model="studentSearch.Gender1" name="Gender" ng-options="studentSearch.Text as studentSearch.Text for studentSearch in Dropdowns | filter:Type='Gender'"></select>
+                                                        <div class="form-control-focus"> </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="form-group">
+                                                    <label class="col-md-5 control-label">
+                                                        Religion :
+                                                    </label>
+                                                    <div class="col-md-7">
+                                                        <select class="form-control" multiple multi-select ng-model="studentSearch.Religion1" name="Gender" ng-options="studentSearch.Value as studentSearch.Text for studentSearch in Dropdowns | filter:Type='Religion'"></select>
+                                                        <div class="form-control-focus"> </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="form-group">
+                                                    <label class="col-md-5 control-label">
+                                                        BloodGroup :
+                                                    </label>
+                                                    <div class="col-md-7">
+                                                        <select class="form-control" multiple multi-select ng-model="studentSearch.BloodGroup1" name="Gender" ng-options="studentSearch.Value as studentSearch.Text for studentSearch in Dropdowns | filter:Type='Blood Group'"></select>
+                                                        <div class="form-control-focus"> </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="form-group">
+                                                    <label class="col-md-5 control-label">
+                                                        Quota :
+                                                    </label>
+                                                    <div class="col-md-7">
+                                                        <select class="form-control" multiple multi-select ng-model="studentSearch.Quota1" name="Gender" ng-options="StudentReport.Value as StudentReport.Text for StudentReport in Dropdowns | filter:Type='Quota'"></select>
+                                                        <div class="form-control-focus"> </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-4">
+                                                <div class="form-group">
+                                                    <div class="row">
+                                                        <label class="col-md-4 control-label">
+                                                            Age Range :
+                                                        </label>
+                                                        <div class="col-md-4">
+                                                            <input type="number" class="form-control" min="0" placeholder="Min" ng-model="studentSearch.minAge" />
+                                                            <div class="form-control-focus"> </div>
+                                                        </div>
+                                                        <div class="col-md-4">
+                                                            <input type="number" class="form-control" ng-blur="compare(studentSearch.minAge,$event.target,'Age Range')" min="{{studentSearch.minAge}}" ng-disabled="studentSearch.minAge == null" placeholder="Max" ng-model="studentSearch.maxAge" />
+                                                            <div class="form-control-focus"> </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="form-group">
+                                                    <div class="row">
+                                                        <label class="col-md-4 control-label">
+                                                            Height(FT):
+                                                        </label>
+                                                        <div class="col-md-4">
+                                                            <input type="number" min="0" class="form-control" placeholder="Min" ng-model="studentSearch.startHeight" />
+                                                            <div class="form-control-focus"> </div>
+                                                        </div>
+                                                        <div class="col-md-4">
+                                                            <input type="number" class="form-control" min="0" ng-blur="compare(studentSearch.startHeight,$event.target,'Height')" placeholder="Max" ng-disabled="studentSearch.startHeight == null" ng-model="studentSearch.endHeight" />
+                                                            <div class="form-control-focus"> </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="form-group">
+                                                    <div class="row">
+                                                        <label class="col-md-4 control-label">
+                                                            Weight(KG):
+                                                        </label>
+
+                                                        <div class="col-md-4">
+                                                            <input type="number" class="form-control" min="0" placeholder="Min" ng-model="studentSearch.startWeight" />
+                                                            <div class="form-control-focus"> </div>
+                                                        </div>
+                                                        <div class="col-md-4">
+                                                            <input type="number" class="form-control" min="0" ng-blur="compare(studentSearch.startWeight,$event.target,'Weight')" placeholder="Max" ng-disabled="studentSearch.startWeight == null" ng-model="studentSearch.endWeight" />
+                                                            <div class="form-control-focus"> </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-3">
+                                                <div class="form-group">
+                                                    <div class="row">
+                                                        <label class="col-md-4 control-label">
+                                                            PSC GPA :
+                                                        </label>
+                                                        <div class="col-md-4">
+                                                            <input type="number" class="form-control" min="0" max="5" limitToMax placeholder="Min" ng-model="studentSearch.minPSCGPA" />
+                                                            <div class="form-control-focus"> </div>
+                                                        </div>
+                                                        <div class="col-md-4">
+                                                            <input type="number" class="form-control" min="0" max="5" preventTypingGreater ng-blur="compare(studentSearch.minPSCGPA,$event.target,'PSC GPA')" min="0" placeholder="Max" ng-disabled="studentSearch.minPSCGPA == null" ng-model="studentSearch.maxPSCGPA" />
+                                                            <div class="form-control-focus"> </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="form-group">
+                                                    <div class="row">
+                                                        <label class="col-md-4 control-label">
+                                                            JSC GPA :
+                                                        </label>
+                                                        <div class="col-md-4">
+                                                            <input type="number" class="form-control" min="0" placeholder="Min" ng-model="studentSearch.minJSCGPA" />
+                                                            <div class="form-control-focus"> </div>
+                                                        </div>
+                                                        <div class="col-md-4">
+                                                            <input type="number" class="form-control" ng-blur="compare(studentSearch.minJSCGPA,$event.target,'JSC GPA')" min="0" placeholder="Max" ng-disabled="studentSearch.minJSCGPA == null" ng-model="studentSearch.maxJSCGPA" />
+                                                            <div class="form-control-focus"> </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="form-group">
+                                                    <div class="row">
+                                                        <label class="col-md-4 control-label">
+                                                            SSC GPA :
+                                                        </label>
+                                                        <div class="col-md-4">
+                                                            <input type="number" min="0" class="form-control" placeholder="Min" ng-model="studentSearch.minSSCGPA" />
+                                                            <div class="form-control-focus"> </div>
+                                                        </div>
+                                                        <div class="col-md-4">
+                                                            <input type="number" class="form-control" ng-blur="compare(studentSearch.minSSCGPA,$event.target,'SSC GPA')" min="0" ng-disabled="studentSearch.minSSCGPA == null" placeholder="Max" ng-model="studentSearch.maxSSCGPA" />
+                                                            <div class="form-control-focus"> </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="form-group">
+                                                    <div class="row">
+                                                        <label class="col-md-4 control-label">
+                                                            HSC GPA :
+                                                        </label>
+                                                        <div class="col-md-4">
+                                                            <input type="number" class="form-control" min="0" placeholder="Min" ng-model="studentSearch.minHSCGPA" />
+                                                            <div class="form-control-focus"> </div>
+                                                        </div>
+                                                        <div class="col-md-4">
+                                                            <input type="number" class="form-control" ng-blur="compare(studentSearch.minHSCGPA,$event.target,'SSC GPA')" min="0" placeholder="Max" ng-disabled="studentSearch.minHSCGPA == null" ng-model="studentSearch.maxHSCGPA" />
+                                                            <div class="form-control-focus"> </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-3">
+                                                <div class="form-group">
+                                                    <label class="col-md-5 control-label">
+                                                        Siblings :
+                                                    </label>
+                                                    <div class="col-md-7">
+                                                        <div class="btn-group btn-group-sm">
+                                                            <label class="btn btn-xs red" ng-model="studentSearch.Sibling" uib-btn-radio="'True'">Yes</label>
+                                                            <label class="btn btn-xs red" ng-model="studentSearch.Sibling" uib-btn-radio="'False'">No</label>
+                                                            <label class="btn btn-xs red" ng-click="studentSearch.Sibling=null"><span class="fa fa-times-circle"></span></label>
+                                                        </div>
+                                                        <div class="form-control-focus"> </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="form-group">
+                                                    <label class="col-md-5 control-label">
+                                                        Image :
+                                                    </label>
+                                                    <div class="col-md-7">
+                                                        <div class="btn-group">
+                                                            <label class="btn btn-danger btn-xs" ng-model="studentSearch.Image" uib-btn-radio="'True'">Yes</label>
+                                                            <label class="btn btn-danger btn-xs" ng-model="studentSearch.Image" uib-btn-radio="'False'">No</label>
+                                                            <label class="btn btn-xs red" ng-click="studentSearch.Image=null"><span class="fa fa-times-circle"></span></label>
+                                                        </div>
+                                                        <div class="form-control-focus"> </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="form-group">
+                                                    <label class="col-md-5 control-label">
+                                                        SMS NO :
+                                                    </label>
+                                                    <div class="col-md-7">
+                                                        <div class="btn-group">
+                                                            <label class="btn btn-danger btn-xs" ng-model="studentSearch.SMSno" uib-btn-radio="'True'">Yes</label>
+                                                            <label class="btn btn-danger btn-xs" ng-model="studentSearch.SMSno" uib-btn-radio="'False'">No</label>
+                                                            <label class="btn btn-xs red" ng-click="studentSearch.SMSno=null"><span class="fa fa-times-circle"></span></label>
+                                                        </div>
+                                                        <div class="form-control-focus"> </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="form-group">
+                                                    <label class="col-md-5 control-label">
+                                                        Transport :
+                                                    </label>
+                                                    <div class="col-md-7">
+                                                        <div class="btn-group">
+                                                            <label class="btn btn-danger btn-xs" ng-model="studentSearch.TransportFacility" uib-btn-radio="'True'">Yes</label>
+                                                            <label class="btn btn-danger btn-xs" ng-model="studentSearch.TransportFacility" uib-btn-radio="'False'">No</label>
+                                                            <label class="btn btn-xs red" ng-click="studentSearch.TransportFacility=null"><span class="fa fa-times-circle"></span></label>
+                                                        </div>
+                                                        <div class="form-control-focus"> </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-3">
+                                                <div class="form-group">
+                                                    <label class="col-md-5 control-label">
+                                                        Route :
+                                                    </label>
+                                                    <div class="col-md-7">
+                                                        <select multiple multi-select class="form-control" ng-model="studentSearch.Routes1" name="Route" ng-options="Route.RouteId as Route.RouteName for Route in Routes"></select>
+                                                        <div class="form-control-focus"> </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-3">
+                                                <div class="form-group">
+                                                    <label class="col-md-5 control-label">
+                                                        Father's EQ :
+                                                    </label>
+                                                    <div class="col-md-7">
+                                                        <select multiple multi-select class="form-control" ng-model="studentSearch.FatherEQ1" ng-options="studentSearch.Value as studentSearch.Text for studentSearch in Dropdowns | filter:Type='Qualification'"></select>
+                                                        <div class="form-control-focus"> </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="form-group">
+                                                    <label class="col-md-5 control-label">
+                                                        Father's Profession :
+                                                    </label>
+                                                    <div class="col-md-7">
+                                                        <select multiple multi-select class="form-control" ng-model="studentSearch.FatherProfession1" ng-options="studentSearch.Value as studentSearch.Text for studentSearch in Dropdowns  | filter:Type='FatherProfession'"></select>
+                                                        <div class="form-control-focus"> </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="form-group">
+                                                    <div class="row">
+                                                        <label class="col-md-4 control-label">
+                                                            Father's Income :
+                                                        </label>
+
+                                                        <div class="col-md-4">
+                                                            <input type="number" class="form-control" min="0" placeholder="Min" ng-model="studentSearch.minFatherIncome" />
+                                                            <div class="form-control-focus"> </div>
+                                                        </div>
+                                                        <div class="col-md-4">
+                                                            <input type="number" class="form-control " min="0" ng-blur="compare(studentSearch.maxFatherIncome,$event.target,'Father Income')" placeholder="Max" ng-model="studentSearch.maxFatherIncome" />
+                                                            <div class="form-control-focus"> </div>
+                                                        </div>
+
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="form-group">
+                                                    <label class="col-md-5 control-label">
+                                                        Father's Image :
+                                                    </label>
+                                                    <div class="col-md-7">
+                                                        <div class="btn-group">
+                                                            <label class="btn btn-danger btn-xs" ng-model="studentSearch.FatherImage" uib-btn-radio="'True'">Yes</label>
+                                                            <label class="btn btn-danger btn-xs" ng-model="studentSearch.FatherImage" uib-btn-radio="'False'">No</label>
+                                                            <label class="btn btn-xs red" ng-click="studentSearch.FatherImage=null"><span class="fa fa-times-circle"></span></label>
+                                                        </div>
+                                                        <div class="form-control-focus"> </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-3">
+                                                <div class="form-group">
+                                                    <label class="col-md-5 control-label">
+                                                        Mother's EQ :
+                                                    </label>
+                                                    <div class="col-md-7">
+                                                        <select multiple multi-select class="form-control" ng-model="studentSearch.MotherEQ1" ng-options="studentSearch.Value as studentSearch.Text for studentSearch in Dropdowns | filter:Type='Qualification'"></select>
+                                                        <div class="form-control-focus"> </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="form-group">
+                                                    <label class="col-md-5 control-label">
+                                                        Mother's Profession :
+                                                    </label>
+                                                    <div class="col-md-7">
+                                                        <select multiple multi-select class="form-control" ng-model="studentSearch.MotherProfession1" ng-options="studentSearch.Value as studentSearch.Text for studentSearch in Dropdowns | filter:Type='MotherProfession'"></select>
+                                                        <div class="form-control-focus"> </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="form-group">
+                                                    <div class="row">
+                                                        <label class="col-md-4 control-label">
+                                                            Mother's Income :
+                                                        </label>
+
+                                                        <div class="col-md-4">
+                                                            <input type="number" class="form-control" min="0" placeholder="Min" ng-model="studentSearch.minMotherIncome" />
+                                                            <div class="form-control-focus"> </div>
+                                                        </div>
+                                                        <div class="col-md-4">
+                                                            <input type="number" class="form-control " min="0" ng-blur="compare(studentSearch.maxMotherIncome,$event.target,'Mother Income')" placeholder="Max" ng-model="studentSearch.maxMotherIncome" />
+                                                            <div class="form-control-focus"> </div>
+                                                        </div>
+
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="form-group">
+                                                    <label class="col-md-5 control-label">
+                                                        Mother Image :
+                                                    </label>
+                                                    <div class="col-md-7">
+                                                        <div class="btn-group">
+                                                            <label class="btn btn-danger btn-xs" ng-model="studentSearch.MotherImage" uib-btn-radio="'True'">Yes</label>
+                                                            <label class="btn btn-danger btn-xs" ng-model="studentSearch.MotherImage" uib-btn-radio="'False'">No</label>
+                                                            <label class="btn btn-xs red" ng-click="studentSearch.MotherImage=null"><span class="fa fa-times-circle"></span></label>
+                                                        </div>
+                                                        <div class="form-control-focus"> </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-3">
+                                                <div class="form-group">
+                                                    <label class="col-md-5 control-label">
+                                                        Present District:
+                                                    </label>
+                                                    <div class="col-md-7">
+                                                        <select multiple multi-select class="form-control" ng-model="studentSearch.PresentDistrictId1" ng-options="studentSearch.DistrictId as studentSearch.DistrictName for studentSearch in Districts" ng-change="getPStations1()"></select>
+                                                        <div class="form-control-focus"> </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="form-group">
+                                                    <label class="col-md-5 control-label">
+                                                        Present Thana:
+                                                    </label>
+                                                    <div class="col-md-7">
+                                                        <select multiple multi-select class="form-control" ng-model="studentSearch.PresentThanaId1" ng-disabled="studentSearch.PresentDistrictId == null" ng-options="studentSearch.PsId as studentSearch.PsName for studentSearch in PStations1"></select>
+                                                        <div class="form-control-focus"> </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="form-group">
+                                                    <label class="col-md-5 control-label">
+                                                        Permanent District:
+                                                    </label>
+                                                    <div class="col-md-7">
+                                                        <select multiple multi-select class="form-control" ng-model="studentSearch.PermanentDistrictId1" ng-options="studentSearch.DistrictId as studentSearch.DistrictName for studentSearch in Districts" ng-change="getPStations2()"></select>
+                                                        <div class="form-control-focus"> </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="form-group">
+                                                    <label class="col-md-5 control-label">
+                                                        Permanent Thana:
+                                                    </label>
+                                                    <div class="col-md-7">
+                                                        <select multiple multi-select class="form-control" ng-model="studentSearch.PermanentThanaId1" ng-disabled="studentSearch.PermanentDistrictId == null" ng-options="studentSearch.PsId as studentSearch.PsName for studentSearch in PStations2"></select>
+                                                        <div class="form-control-focus"> </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-3">
+                                                <div class="form-group">
+                                                    <label class="col-md-5 control-label">
+                                                        Interest In:
+                                                    </label>
+                                                    <div class="col-md-7">
+                                                        <select multiple multi-select class="form-control" ng-model="studentSearch.Interest1" name="Gender" ng-options="studentSearch.Value as studentSearch.Text for studentSearch in Dropdowns | filter:Type='Interest'"></select>
+                                                        <div class="form-control-focus"> </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="form-group">
+                                                    <label class="col-md-5 control-label">
+                                                        Organization:
+                                                    </label>
+                                                    <div class="col-md-7">
+                                                        <select multiple multi-select class="form-control" ng-model="studentSearch.Organization1" name="Gender" ng-options="studentSearch.Value as studentSearch.Text for studentSearch in Dropdowns | filter:Type='Organization'"></select>
+                                                        <div class="form-control-focus"> </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="form-group">
+                                                    <label class="col-md-5 control-label">
+                                                        Club :
+                                                    </label>
+                                                    <div class="col-md-7">
+                                                        <select multiple multi-select class="form-control" ng-model="studentSearch.MemberofClub1" name="Gender" ng-options="studentSearch.Value as studentSearch.Text for studentSearch in Dropdowns | filter:Type='Club'"></select>
+                                                        <div class="form-control-focus"> </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="form-group">
+                                                    <label class="col-md-5 control-label">
+                                                        Participation :
+                                                    </label>
+                                                    <div class="col-md-7">
+                                                        <input type="text" class="form-control" placeholder="Participation" ng-model="studentSearch.Participation" />
+                                                        <div class="form-control-focus"> </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-10">
+                        </div>
+                        <div class="col-md-2 pull-right">
+                            <button ng-click="Search()" type="submit" class="btn green">Search</button>
+                            <button ng-click="Reset()" class="btn info">Reset</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="portlet-body" ng-show="studentSearchs.length>0">
+        <div class="table-container">
+            <div id="sample_3_wrapper" class="dataTables_wrapper no-footer">
+
+                <div class="table-scrollable"> </div>
+                <table class="table table-bordered table-inverse">
+                    <thead class="bg-primary">
+                        <tr>
+                            <th><input type="checkbox" ng-model="selectedAll" ng-click="selectAll()" />  All</th>
+                            <th> Student ID </th>
+                            <th> Roll </th>
+                            <th> Name</th>
+                            <th>SMS Notification No</th>
+
+                        </tr>
+                    </thead>
+                    <tbody style="overflow:scroll">
+                        <tr ng-show="studentSearchs.length <= 0"><td colspan="5" style="text-align:center;"><i class="fa fa-refresh"></i> Loading new data!!</td></tr>
+                        <tr ng-repeat="item in studentSearchs">
+                            <td width="5%"> <input type="checkbox" ng-model="item.Selected" value="false" ng-click="checkIfAllSelected()" /> </td>
+                            <td width="15%"> {{item.StudentInsID}} </td>
+                            <td width="10%"> {{item.RollNo}} </td>
+                            <td width="35%"> {{item.FullName}} </td>
+                            <td width="35%"> {{item.SMSNotificationNo}} </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <button type="submit" class="btn green pull-right" data-target="#addmodal" data-toggle="modal">SMS</button>
+            <div style="color:white"> <label>.</label></div>
+        </div>
+    </div>
+    <div id="addmodal" class="modal fade" tabindex="-1" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <form name="addform" ng-submit="save1()" class="form-horizontal" id="form_sample_1" novalidate>
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                        <h4 class="modal-title">Filtered SMS</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-body">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group" ng-class="{ 'has-error' : submitted && addform.Title.$invalid}">
+                                        <label class="col-md-2 control-label">
+                                            Name :
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-8">
+                                            <select type="text" ng-model="sms.TemplateId" ng-change="getSMSBody(sms.TemplateId)" class="form-control" placeholder="SMS Title Name" name="Title" ng-options="item.TemplateId as item.Title for item in SMSTemplate" required>
+                                                <option selected="selected" value="">Select</option>
+                                            </select>
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted && addform.Title.$error.required" class="help-block">SMS Title Name Required</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="form-group" ng-class="{ 'has-error' : submitted && addform.SMSBody.$invalid}">
+                                        <label class="col-md-12 control-label" style="text-align:left;">
+                                            Template Body :
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-6">
+                                            <textarea type="text" maxlength="{{Settings[0].NoSMSPart*maximumLength}}" ng-change="nameEmpty();containsNonLatinCodepoints()" ng-model="sms.SMSBody" class="form-control" style="height:300px;width:100%;" name="SMSBody" required></textarea>
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted && addform.SMSBody.$error.required" class="help-block">SMS Body Required</span>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="col-md-12" style="color:cadetblue">
+                                                SMS Part:
+                                            </label>
+                                            <label class="col-md-12">
+                                                {{total()}}
+                                            </label>
+                                            <label class="col-md-12" style="color:cadetblue">
+                                                SMS Counts:
+                                            </label>
+                                            <label class="col-md-12">
+                                                {{SMSCounts}}
+                                            </label>
+                                            <label class="col-md-12" style="color:cadetblue">
+                                                Total Char :
+                                            </label>
+                                            <label class="col-md-12">
+                                                {{sms.SMSBody.length}}
+                                            </label>
+                                            <label class="col-md-12" style="color:cadetblue">
+                                                Total Recipiant:
+                                            </label>
+                                            <label class="col-md-12">
+                                                {{Recipiant}}
+                                            </label>
+                                            <label class="col-md-12" style="color:cadetblue">
+                                                Max SMS Part:
+                                            </label>
+                                            <label class="col-md-12">
+                                                {{Settings[0].NoSMSPart}}
+                                            </label>
+                                            <label class="col-md-12" style="color:cadetblue">
+                                                Client ID:
+                                            </label>
+                                            <label class="col-md-12">
+                                                {{SMSBalance.Result.CustomerId}}
+                                            </label>
+                                            <label class="col-md-12" style="color:cadetblue">
+                                                Client Name:
+                                            </label>
+                                            <label class="col-md-12">
+                                                {{SMSBalance.Result.FullName}}
+                                            </label>
+                                            <label class="col-md-12" style="color:cadetblue">
+                                                SMS Balance:
+                                            </label>
+                                            <label class="col-md-12">
+                                                {{SMSBalance.Result.TotalBalance}}
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group col-md-12" style="padding-top:2%;" ng-hide="Settings[0].AllowUnicode==false">
+                            <input type="radio" ng-model="sms.isUnicode" ng-value="false" /> English
+                            <input type="radio" ng-model="sms.isUnicode" ng-value="true" /> Unicode
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" data-dismiss="modal" class="btn dark btn-outline" ng-click="Reset();submitted=false">Cancel</button>
+                        <button ng-click="submitted=true;getSMS();" data-dismiss="modal" class="btn green">Send</button>
+                    </div>
+                    
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts{
+    <script type="text/javascript">
+        OEMSApp.controller("studentSearchrdCrlt", ["$scope", "$http", "SweetAlert", "filterFilter",
+          function ($scope, $http, SweetAlert, filterFilter) {
+              init();
+              function init() {
+                  initialize();
+                  getAllDropdowns();
+                  getAllCommons();
+                  getAllRoutes();
+                  $scope.format = 'dd/MM/yyyy';
+                  getAllSettings();
+                  getStaticSMSTemplate();
+                  getSMSBalance();
+              }
+              function initialize() {
+                  $scope.studentSearch = {};
+                  $scope.studentSearch.VersionID = 0;
+                  $scope.studentSearch.SessionId = 0;
+                  $scope.studentSearch.BranchID = 0;
+                  $scope.studentSearch.ShiftID = 0;
+                  $scope.studentSearch.ClassId = 0;
+                  $scope.studentSearch.GroupId = 0;
+                  $scope.studentSearch.SectionId = 0;
+                  $scope.studentSearch.HouseId = 0;
+                  $scope.studentSearch.StudentType = 0;
+                  $scope.studentSearch.Search = "";
+                  $scope.studentSearch = {};
+                  $scope.sms = {};
+                  $scope.Settings = {};
+                  $scope.DestinationNo = 1;
+                  $scope.sms.SMSPart = 0;
+                  $scope.sms.SMSLen = 0;
+                  $scope.Recipiant = 0;
+                  $scope.SMSCounts = 0;
+                  $scope.Settings = [];
+                  $scope.sms.SMSBody = [];
+                  $scope.studentSearchs = [];
+                  $scope.Dropdowns = [];
+                  $scope.DropdownGender = [];
+                  $scope.DropdownStuType = [];
+                  $scope.CommonFeilds = [];
+                  $scope.BulkStudentInfo = [];
+                  $scope.data = [];
+                  $scope.DataV = [];
+                  $scope.Districts = [];
+                  $scope.Groups = new Array();
+                  $scope.currentPage = 1;
+                  $scope.pageno = 1;
+                  $scope.pagesize = 10;
+                  $scope.total_count = 12;
+
+                  $scope.txtsearch = '';
+                  $scope.getAllCommons = getAllCommons;
+                  $scope.getAllDropdowns = getAllDropdowns;
+                  $scope.getDistricts = getDistricts;
+                  $scope.PStations1 = [];
+                  $scope.PStations2 = [];
+                  $scope.Routes = [];
+                  $scope.Search = Search;
+                  getDistricts();
+                  datatimes();
+                  $scope.getAllSettings = getAllSettings;
+                  $scope.getStaticSMSTemplate = getStaticSMSTemplate;
+                  $scope.nameEmpty = nameEmpty;
+                  $scope.getSMSBalance = getSMSBalance;
+                  $scope.SendBulkSMS = SendBulkSMS;
+                  $scope.total = total;
+                  $scope.pageSizeArray = [];
+                  $scope.pageSizeArray.push({ value: 5, text: 5 });
+                  $scope.pageSizeArray.push({ value: 10, text: 10 });
+                  $scope.pageSizeArray.push({ value: 20, text: 20 });
+                  $scope.pageSizeArray.push({ value: 50, text: 50 });
+                  $scope.currentPage = 1;
+                  $scope.pageSize = 10;
+                  $scope.pageno = 1;
+              };
+              $scope.Reset = function Reset() {
+                  $scope.studentSearch = [];
+                  initialize();
+                  getAllDropdowns();
+                  getAllCommons();
+              };
+              function Recipiant() {
+                  $scope.Recipiant = 0;
+                  if ($scope.studentSearchs.length > 0) {
+                      angular.forEach($scope.studentSearchs, function (item) {
+                          if (item.Selected) {
+                              $scope.Recipiant = $scope.Recipiant + 1;
+                          }
+                      });
+                  }
+
+                  $scope.SMSCounts = $scope.sms.SMSPart * $scope.Recipiant;
+              }
+              function total() {
+                  if ($scope.sms.isUnicode) {
+
+                      if ($scope.sms.SMSBody.length > 70) {
+                          $scope.sms.SMSPart = Math.ceil($scope.sms.SMSBody.length / 67);
+                          $scope.maximumLength = 67;
+                      }
+                      else {
+                          $scope.sms.SMSPart = 1;
+                          $scope.maximumLength = 70;
+                      }
+                  }
+                  else {
+                      if ($scope.sms.SMSBody.length > 160) {
+                          $scope.sms.SMSPart = Math.ceil($scope.sms.SMSBody.length / 153);
+                          $scope.maximumLength = 153;
+                      }
+                      else {
+                          $scope.sms.SMSPart = 1;
+                          $scope.maximumLength = 160;
+                      }
+                  }
+                  Recipiant();
+                  return $scope.sms.SMSPart;
+              }
+              $scope.containsNonLatinCodepoints = function containsNonLatinCodepoints(s) {
+                  $scope.sms.isUnicode = /[^\u0000-\u00ff]/.test(s);
+              }
+              function nameEmpty() {
+                  $scope.sms.TemplateId = 0;
+              };
+              function getAllSettings() {
+                  $scope.Settings = [];
+                  $http({
+                      method: 'GET',
+                      url: baseUrl + 'SMS/GetAllSettings/'
+                  }).then(function successCallback(response) {
+                      $scope.Settings = response.data.results;
+                      $scope.sms.isUnicode = $scope.Settings[0].AllowUnicode;
+                      if ($scope.Settings[0].ForStudent == 1) {
+                          $scope.IsStudentButton = true;
+                      }
+                      if ($scope.Settings[0].ForEmployee == 1) {
+                          $scope.IsEmployeeButton = true;
+                      }
+                  }, function errorCallback(response) {
+                      toastr["info"](response.data.message);
+                  });
+              }
+              function getSMSBalance() {
+                  $scope.SMSBalance = [];
+                  $http({
+                      method: 'GET',
+                      url: baseUrl + 'SMS/GetSMSBalance/'
+                  }).then(function successCallback(response) {
+                      $scope.SMSBalance = response.data.results;
+                      var balance = $scope.SMSBalance.Result.TotalBalance;
+                  }, function errorCallback(response) {
+                      toastr["info"](response.data.message);
+                  });
+              }
+              $scope.getSMSBody = function getSMSBody(id) {
+                  $scope.Template = {};
+                  $scope.Template = $scope.SMSTemplate.find(x => x.TemplateId === id);
+                  $scope.sms.SMSBody = $scope.Template.SMSBody;
+
+              };
+              function getStaticSMSTemplate() {
+                  $scope.SMSTemplate = [];
+                  $http({
+                      method: 'GET',
+                      url: baseUrl + 'SMS/GetStaticTemplate/'
+                  }).then(function successCallback(response) {
+                      $scope.SMSTemplate = response.data.results;
+                  }, function errorCallback(response) {
+                      toastr["warning"](response.Data.message);
+                  });
+              };
+              $scope.getSMS = function getSMS() {
+                  angular.forEach($scope.studentSearchs, function (value, key) {
+                      if (value.Selected == true) {
+                          $scope.BulkStudentInfo.push(value);
+                      }
+                  });
+                  SendBulkSMS();
+              };
+              function SendBulkSMS() {
+                  if ($scope.BulkStudentInfo.length > 0) {
+                      $http({
+                          method: 'POST',
+                          data: $scope.BulkStudentInfo,
+                          url: baseUrl + 'SMS/SendBulkSMS/' + $scope.sms.TemplateId + "/" + $scope.sms.SMSBody.length + "/" + $scope.sms.SMSPart + "/" + $scope.sms.SMSBody
+                      }).then(function successCallback(response) {
+                          $scope.submitted = false;
+                          $scope.BulkStudentInfo = [];
+                          toastr["info"](response.data.message);
+                      }, function errorCallback(response) {
+                          toastr["info"](response.data.message);
+                      });
+                  }
+                  else {
+                      toastr["info"]("Empty List");
+                      return;
+                  }
+              };
+              $scope.selectAll = function () {
+                  angular.forEach($scope.studentSearchs, function (item) {
+                      item.Selected = $scope.selectedAll;
+                  });
+                  Recipiant();
+              };
+              $scope.checkIfAllSelected = function () {
+                  $scope.selectedAll = $scope.studentSearchs.every(function (item) {
+                      return item.Selected == true
+                  });
+                  Recipiant();
+              };
+              function getAllDropdowns() {
+                  $scope.Dropdowns = [];
+                  $http({
+                      method: 'GET',
+                      url: baseUrl + 'Common/GetAllDropDown/'
+                  }).then(function successCallback(response) {
+                      $scope.Dropdowns = response.data.results;
+                  }, function errorCallback(response) {
+                      toastr["warning"](response.data.message);
+                  });
+              }
+              function getAllCommons() {
+                  $scope.CommonFeilds = [];
+                  $http({
+                      method: 'GET',
+                      url: baseUrl + 'Common/GetCommonItem/'
+                  }).then(function successCallback(response) {
+                      $scope.CommonFeilds = response.data.results;
+                  }, function errorCallback(response) {
+                      toastr["warning"](response.data.message);
+                  });
+              }
+              function getAllRoutes() {
+                  $scope.Routes = [];
+                  $http({
+                      method: 'GET',
+                      url: baseUrl + 'Student/GetAllRouteSetup/'
+                  }).then(function successCallback(response) {
+                      $scope.Routes = response.data.results;
+                  }, function errorCallback(response) {
+                  });
+              }
+              $scope.compare = function compare(a, b, c) {
+                  if (a > b.value) {
+                      toastr["warning"]("Please Check Min and Max " + c);
+                      $(b).focus();
+                      c = null;
+                  }
+              }
+              $scope.GetClass = function GetClass() {
+                  debugger;
+                  if ($scope.studentSearch.Version.length > 1)
+                      return;
+                  $http({
+                      method: 'GET',
+                      url: baseUrl + 'Common/GetCommonItem/'
+                  }).then(function successCallback(response) {
+                      //$scope.CommonFeilds.ClassInfo = filterFilter(response.data.results.ClassInfo, { VersionId: $scope.studentSearch.Version1.VersionId });
+                  }, function errorCallback(response) {
+                      toastr["warning"](response.data.message);
+                  });
+              }
+              $scope.GetGroup = function GetGroup(classid) {
+                  $scope.Groups = new Array();
+                  if (classid.length != 1)
+                      return;
+                  $http({
+                      method: 'GET',
+                      url: baseUrl + 'Common/GetGroup/' + classid[0]
+                  }).then(function successCallback(response) {
+                      $scope.Groups = response.data.results;
+                  }, function errorCallback(response) {
+                      toastr["warning"](response.data.message);
+                  });
+              }
+              $scope.GetSection = function GetSection() {
+                  $scope.Sections = [];
+                  if ($scope.studentSearch.Class1.length != 1)
+                      return;
+                  $http({
+                      method: 'GET',
+                      url: baseUrl + 'Common/GetSection/' + $scope.studentSearch.Session1[0] + "/" + $scope.studentSearch.Shift1[0] + "/" + $scope.studentSearch.Class1[0] 
+                  }).then(function successCallback(response) {
+                      $scope.Sections = response.data.results;
+                  }, function errorCallback(response) {
+                      toastr["warning"](response.data.Message);
+                  });
+              }
+
+              var log = [];
+              $scope.StudentTypeArr = [{ 'Value': 'I', 'Text': 'Inactive' }, { 'Value': 'A', 'Text': 'Active' }, { 'Value': 'D', 'Text': 'Delete' }, { 'Value': 'WTC', 'Text': 'Inactive With TC' }]
+              function getDistricts() {
+                  $scope.Districts = [];
+                  $http({
+                      method: 'GET',
+                      url: baseUrl + 'Common/GetDistrict/'
+                  }).then(function successCallback(response) {
+                      $scope.Districts = response.data.results;
+                  }, function errorCallback(response) {
+                      toastr["warning"](response.data.message);
+                  });
+              }
+              $scope.getPStations1 = function getPStations1() {
+                  $scope.PStations1 = [];
+                  if ($scope.studentSearch.PresentDistrictId1.length > 1)
+                      return;
+                  $http.get(baseUrl + 'Common/GetPoliceStaionByDId/' + $scope.studentSearch.PresentDistrictId1).then(function (response) {
+                      $scope.PStations1 = response.data.results;
+                  });
+              }
+              $scope.getPStations2 = function getPStations2() {
+                  $scope.PStations2 = [];
+                  if ($scope.studentSearch.PermanentDistrictId1.length > 1)
+                      return;
+                  $http.get(baseUrl + 'Common/GetPoliceStaionByDId/' + $scope.studentSearch.PermanentDistrictId1).then(function (response) {
+                      $scope.PStations2 = response.data.results;
+                  });
+              }
+
+              function Search() {
+                  $scope.studentSearch.Routes1 = []
+                  $scope.studentSearch.Statuses = createStringByArray($scope.studentSearch.Statuses1);
+                  $scope.studentSearch.Shift = createStringByArray($scope.studentSearch.Shift1);
+                  $scope.studentSearch.Session = createStringByArray($scope.studentSearch.Session1);
+                  $scope.studentSearch.Section = createStringByArray($scope.studentSearch.Section1);
+                  $scope.studentSearch.Class = createStringByArray($scope.studentSearch.Class1);
+                  $scope.studentSearch.StuType = createStringByArray($scope.studentSearch.StuType1);
+                  $scope.studentSearch.Branch = createStringByArray($scope.studentSearch.Branch1);
+                  $scope.studentSearch.House = createStringByArray($scope.studentSearch.House1);
+                  $scope.studentSearch.Gender = createStringByArray($scope.studentSearch.Gender1);
+                  $scope.studentSearch.Religion = createStringByArray($scope.studentSearch.Religion1);
+                  $scope.studentSearch.BloodGroup = createStringByArray($scope.studentSearch.BloodGroup1);
+                  $scope.studentSearch.Quota = createStringByArray($scope.studentSearch.Quota1);
+                  $scope.studentSearch.FatherEQ = createStringByArray($scope.studentSearch.FatherEQ1);
+                  $scope.studentSearch.FatherProfession = createStringByArray($scope.studentSearch.FatherProfession1);
+                  $scope.studentSearch.MotherEQ = createStringByArray($scope.studentSearch.MotherEQ1);
+                  $scope.studentSearch.MotherProfession = createStringByArray($scope.studentSearch.MotherProfession1);
+                  $scope.studentSearch.PresentDistrictId = createStringByArray($scope.studentSearch.PresentDistrictId1);
+                  $scope.studentSearch.PresentThanaId = createStringByArray($scope.studentSearch.PresentThanaId1);
+                  $scope.studentSearch.PermanentDistrictId = createStringByArray($scope.studentSearch.PermanentDistrictId1);
+                  $scope.studentSearch.PermanentThanaId = createStringByArray($scope.studentSearch.PermanentThanaId1);
+                  $scope.studentSearch.Interest = createStringByArray($scope.studentSearch.Interest1);
+                  $scope.studentSearch.Organization = createStringByArray($scope.studentSearch.Organization1);
+                  $scope.studentSearch.MemberofClub = createStringByArray($scope.studentSearch.MemberofClub1);
+                  $scope.studentSearch.Routes = createStringByArray($scope.studentSearch.Routes1);
+                  $scope.studentSearchs = [];
+                  $http({
+                      method: 'POST',
+                      url: baseUrl + 'Student/StuDetailInfo/',
+                      data: $scope.studentSearch
+                  }).then(function successCallback(response) {
+                      $scope.studentSearchs = response.data.results;
+                      $scope.selectedAll = true;
+                      angular.forEach($scope.studentSearchs, function (item) {
+                          item.Selected = $scope.selectedAll;
+                      });
+                      Recipiant();
+                      toastr["success"](response.data.message);
+                  }, function errorCallback(response) {
+                      toastr["warning"](response.data.message);
+                  });
+              };
+              $scope.pageChanged = function () {
+                  Search()
+              };
+              //This method is calling from dropDown
+              $scope.changePageSize = function () {
+                  $scope.studentSearch.pageIndex = 1;
+                  Search();
+              };
+              function DropDownValue(a, b) {
+                  var data = "";
+                  $scope.array = b;
+                  angular.forEach($scope.array, function (value, key) {
+                      if (!isNaN(parseInt(value))) {
+                          data = data.concat(value[a]).concat(',')
+                      }
+                      else {
+                          data = $scope.array.toString().concat(',')
+                      }
+                  });
+                  return "'" + data + "'";
+              }
+              function createStringByArray(array) {
+                  var output = '';
+                  angular.forEach(array, function (value, key) {
+                      if (!isNaN(parseInt(value))) {
+                          output += value + ',';
+                      }
+                      else {
+                          output += "'" + value.toString() + '\',';
+                      }
+                  });
+                  return output;
+              }
+
+              function datatimes() {
+                  $scope.Dateformat = 'dd/MM/yyyy';
+                  $scope.$watch('studentSearch.startDate', function (niu) {
+                      if (niu) {
+                          $scope.dateOptionsDOB.minDate = niu
+                      }
+                  });
+                  $scope.$watch('studentSearch.AdstartDate', function (niu) {
+                      if (niu) {
+                          $scope.dateOptionsAd.minDate = niu
+                      }
+                  });
+              }
+          }])
+    </script>
+}

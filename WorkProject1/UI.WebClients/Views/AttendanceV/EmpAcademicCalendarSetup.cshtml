@@ -1,0 +1,214 @@
+﻿
+@{
+    ViewBag.Title = "Employee Academic Calendar";
+}
+
+<div class="kt-container  kt-container--fluid  kt-grid__item kt-grid__item--fluid" ng-controller="AccademicCalendarSetupCntrl">
+
+    <div class="row">
+        <div class="kt-portlet kt-portlet--mobile">
+            <div class="kt-portlet__head kt-portlet__head--lg">
+                <div class="kt-portlet__head-label">
+                    <h3 class="kt-portlet__head-title">
+                        Academic Calendar Setup
+                    </h3>
+                </div>
+            </div>
+
+            <div class="kt-portlet__body">  
+                <div class="row">
+                    <form class="form-horizontal" ng-submit="getAccademicCalendarSetup()" name="frmAccademicCalendarSetup" novalidate style="width: 100%;">
+                        <div class="form-body">
+                            <div class="row">
+                                <div class="col-4">
+                                    <div class="form-group row">
+                                        <label class="col-lg-4 col-md-4 control-label " style="text-align:right">
+                                            Year:
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-8" ng-class="{ 'has-error' :Submitted  && frmAccademicCalendarSetup.Calyear.$invalid}">
+                                            <select class="form-control" ng-model="AccademicCalendarSetup.year" name="Calyear" required>
+                                                <option value="" selected="selected">Select</option>
+                                                <option value="2018">2018</option>
+                                                <option value="2019">2019</option>
+                                                <option value="2020">2020</option>
+                                                <option value="2021">2021</option>
+                                                <option value="2022">2022</option>
+                                                <option value="2023">2023</option>
+                                                <option value="2023">2024</option>
+                                                <option value="2023">2025</option>
+                                                <option value="2023">2026</option>
+                                                <option value="2023">2027</option>
+                                                <option value="2023">2028</option>
+                                                <option value="2023">2029</option>
+                                                <option value="2023">2030</option>
+                                            </select>
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="Submitted && frmAccademicCalendarSetup.Calyear.$error.required " class="help-block">Year Required</span>
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-4">
+                                    <div class="form-group row">
+                                        <label class="col-md-4 control-label" style="text-align:right">
+                                            Month :
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-8" ng-class="{ 'has-error' :Submitted && frmAccademicCalendarSetup.month.$invalid}">
+                                            <select class="form-control" ng-model="AccademicCalendarSetup.month" name="month" required>
+                                                <option value="" selected="selected">Select</option>
+                                                <option value="1">January</option>
+                                                <option value="2">February</option>
+                                                <option value="3">March</option>
+                                                <option value="4">April</option>
+                                                <option value="5">May</option>
+                                                <option value="6">June</option>
+                                                <option value="7">July</option>
+                                                <option value="8">August</option>
+                                                <option value="9">September</option>
+                                                <option value="10">October</option>
+                                                <option value="11">November</option>
+                                                <option value="12">December</option>
+                                            </select>
+                                            <span ng-show="Submitted && frmAccademicCalendarSetup.month.$error.required" class="help-block">Month Required</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-4"> 
+                                    <div class="row">
+                                      <div class="col-md-12 pull-right">
+                                          <button type="button" ng-click="Report();" class="btn btn-primary pull-right" style="margin-left:5px">Report</button>
+                                          <a href="@Url.Action("EmpAcademicCalendarView", "AttendanceV")" target="_blank" class="btn btn-warning pull-right" style="margin-left:5px">Calendar View</a>
+                                         <button type="submit" ng-click="Submitted=true" class="btn btn-success pull-right" style="margin-left:5px">Show</button>
+                                      </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            
+                <table class="table table-bordered table-hover rounded">
+                    <thead>
+                        <tr class="bg-primary">
+                            <th> Date </th>
+                            <th> Leave Type</th>
+                            <th>Holiday Name</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="item in Calendar" style="background-color:{{item.ColorCode}}">
+                            <td> {{item.CalendarDate| date:'MMMM dd, yyyy , (EEEE)' }} </td>
+                            <td>
+                                <select class="form-control" ng-disabled="item.IsDateDisable==true" ng-model="item.DayType" name="type">
+                                    <option value="Regular" selected="selected">Regular</option>
+                                    <option value="Holiday">Holiday</option>
+                                    <option value="Weekend">Weekend</option>
+                                </select>
+                            </td>
+                            <td>
+                                <input type="text" ng-model="item.HolidayName" ng-disabled="item.IsDateDisable==true" name="HolidayName" class="form-control" required>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="10" style="padding-right:0px">
+                                @*<button ng-click="DeleteVirtualExam()" class="btn red pull-right">Delete</button>*@
+                                <button ng-click="Save()" class="btn btn-success pull-right">  Save</button>
+                            </td>
+                        </tr>
+                    </tbody>
+             </table>
+                <div class="row">
+                    <dir-pagination-controls boundary-links="true" template-url="~/assets/angular/lib/dirPagination.tpl.html"></dir-pagination-controls>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts{
+
+    <script type="text/javascript">
+
+        OEMSApp.controller("AccademicCalendarSetupCntrl", ["$scope", "$http", "SweetAlert", "$window",
+              function ($scope, $http, SweetAlert, $window) {
+                  init();
+                  function init() {
+                      initialize();
+                  }
+                  function initialize() {
+                      $scope.AccademicCalendarSetup = {};
+                      $scope.Calendar = [];
+                      $scope.getAccademicCalendarSetup = getAccademicCalendarSetup;
+                      $scope.btnDis = false;
+                      $scope.spin = false;
+                      $scope.Submitted = false; 
+                  };
+                  function setProgress(s) {
+                      $scope.btnDis = s;
+                      $scope.spin = s;
+                  }
+                  function getAccademicCalendarSetup() {
+                      if ($scope.frmAccademicCalendarSetup.$invalid)
+                          return;
+                      $scope.Calendar = [];
+                      if ($scope.frmAccademicCalendarSetup.$invalid == true)
+                          return;
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Attendance/AccademicCalendarSetupEmp/' + $scope.AccademicCalendarSetup.year + '/' + $scope.AccademicCalendarSetup.month
+                      }).then(function successCallback(response) {
+                          $scope.Calendar = response.data.results;
+                      }, function errorCallback(response) {
+                          toastr["warning"](response.data.Message);
+                      });
+                  };
+                  $scope.Report = function Report() {
+                      if ($scope.AccademicCalendarSetup.year == null) {
+                          toastr["info"]("Year is Required.");
+                      }
+                      else {
+                          $scope.uri = "@Url.Action("CalenderSetupSummeryReport", "Report")?YearId=" + $scope.AccademicCalendarSetup.year;
+                          $window.open($scope.uri, '_blank');
+                      }
+                  }
+                  $scope.Save = function Save() {
+                      if ($scope.Calendar.length == 0)
+                          return;
+                      $http({
+                          method: 'POST',
+                          url: baseUrl + 'Attendance/AddAccademicCalendarSetupEmp/',
+                          data: $scope.Calendar
+                      }).then(function successCallback(response) {
+                          toastr["success"](response.data.message);
+                          getAccademicCalendarSetup();
+                      }, function errorCallback(response) {
+                          toastr["info"](response.data.Message);
+                      });
+                  };
+
+                  $scope.Reset = function Reset() {
+                      initialize();
+                      $scope.Submitted = false;
+                  };
+                  $scope.ResetSource = function ResetSource() {
+                      $scope.Calendar = [];
+                  };
+                  $scope.DeleteVirtualExam = function DeleteVirtualExam() {
+                      $http({
+                          method: 'POST',
+                          url: baseUrl + 'Result/DeleteVirtualExam/',
+                          data: $scope.VirtualExams
+                      }).then(function successCallback(response) {
+                          toastr["info"](response.data.message);
+                          AccademicCalendarSetup();
+                      }, function errorCallback(response) {
+                          toastr["info"](response.data.message);
+                      });
+                  }
+              }]);
+    </script>
+}
+

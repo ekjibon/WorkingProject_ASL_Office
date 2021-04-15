@@ -1,0 +1,192 @@
+﻿
+@{
+    ViewBag.Title = "Salary Hold Register Combind";
+}
+
+<div class="portlet box blue-hoki" style="width: 100%" ng-controller="ctrlSalaryReport">
+    <!-- Begin: life time stats -->
+    <div class="portlet light bordered">
+        <div class="portlet-title">
+            <div class="caption">
+                <i class="icon-settings font-green"></i>
+                <span class="caption-subject font-green sbold uppercase">@ViewBag.Title</span>
+            </div>
+            <div class="actions">
+
+            </div>
+        </div>
+        <div class="portlet-body">
+            <div class="table-container">
+                <div id="sample_3_wrapper" class="dataTables_wrapper no-footer">
+                    <form name="addBasic" ng-submit="Process()" class="form-horizontal" id="form_sample_1" novalidate>
+                        <div class="row">
+                            <div class="col-md-2">
+
+
+                            </div>
+                            <div class="col-md-5">
+                                <div class="form-group" ng-class="{ 'has-error' : submitted && addBasic.BranchId.$invalid}">
+                                    <label class="col-md-5 control-label">
+                                        Branch
+                                        <span class="required">*</span>
+                                    </label>
+                                    <div class="col-md-7">
+                                        <select class="form-control" ng-model="SalarySheet.BranchID" name="Branch" ng-options="b.BranchId as b.BranchName for b in CommonFeilds.Branch">
+                                            <option value="" selected="selected">Choose Option</option>
+                                        </select>
+                                        <span ng-show="submitted &&  addBasic.BranchId.$error.required" class="help-block">Branch Required</span>
+                                    </div>
+                                </div>
+                                
+                                
+                                
+                                <div class="form-group" ng-class="{ 'has-error' : submitted && addBasic.BranchId.$invalid}">
+                                    <div class="col-md-8">
+
+                                    </div>
+                                    <div class="col-md-4">
+                                        <button  type="button" ng-click="submitted=true;ReportwithBranch(addBasic.$valid)" class="btn green">Generate Report</button>
+                                        
+                                    </div>
+                                </div>
+
+                            </div>
+                            <div class="col-md-5">
+
+
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+<!-- END FORM-->
+@section Scripts{
+    <script type="text/javascript">
+        OEMSApp.controller("ctrlSalaryReport", ["$scope", "$http", "SweetAlert","$window",
+              function ($scope, $http, SweetAlert, $window) {
+                  init();
+                  function init() {
+                      initialize();
+                      getAllCommons();
+                      getAllSalaryYear();
+                      //getAllSalaryPeriod();
+
+                  }
+                  function initialize() {
+
+                      $scope.SalarySheet = {};
+
+                      $scope.employeeInfos = [];
+                      //$scope.SalaryReport.longholiday = false;
+                      //$scope.SalaryReport.DeductTax = false;
+                      $scope.resetForm = resetForm;
+
+                      $scope.MonthList = [{ MonthId: 1, Name: 'January' },
+                          { MonthId: 2, Name: 'February' },
+                          { MonthId: 3, Name: 'March' },
+                          { MonthId: 4, Name: 'April' },
+                          { MonthId: 5, Name: 'May' },
+                          { MonthId: 6, Name: 'June' },
+                          { MonthId: 7, Name: 'July' },
+                          { MonthId: 8, Name: 'August' },
+                          { MonthId: 9, Name: 'September' },
+                          { MonthId: 10, Name: 'October' },
+                          { MonthId: 11, Name: 'November' },
+                          { MonthId: 12, Name: 'December' },
+                      ];
+                      $scope.pagesize = 10;
+                      $scope.pageSizeArray = [];
+                      $scope.pageSizeArray.push({ value: 5, text: 5 });
+                      $scope.pageSizeArray.push({ value: 10, text: 10 });
+                      $scope.pageSizeArray.push({ value: 20, text: 20 });
+                      $scope.pageSizeArray.push({ value: 50, text: 50 });
+                      $scope.currentPage = 1;
+                      $scope.pageSize = 10;
+                  }
+                  function resetForm() {
+
+                      $scope.SalarySheet = {};
+
+
+                      $scope.addBasic.$setUntouched();
+                      $scope.addBasic.$setPristine();
+                      //$scope.submitted = false;
+
+                  }
+                  function getAllCommons() {
+                      $scope.CommonFeilds = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Common/GetCommonItemEmp/'
+                      }).then(function successCallback(response) {
+                          $scope.CommonFeilds = response.data.results;
+                          console.log($scope.CommonFeilds);
+                      }, function errorCallback(response) {
+                      });
+                  }
+
+                function getAllSalaryYear() {
+                      $scope.SalaryYearList = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Employee/GetAllSalaryYear/'
+                      }).then(function successCallback(response) {
+                          $scope.SalaryYearList = response.data.results;
+                      }, function errorCallback(response) {
+                          toastr["info"](response.data.Message);
+                      });
+                  }
+                $scope.GetSalaryPeriod = function GetSalaryPeriod() {
+                    $scope.salaryPeriodList = [];
+                    //if ($scope.SalarySheet.CategoryID ==0) {
+                    //    $scope.SalarySheet.CategoryID =0
+                    //}
+                    $http({
+                        method: 'POST',
+                        url: baseUrl + 'Employee/GetSalaryPeriodByCategoryIDSalaryYearId/',
+                        data: $scope.SalarySheet  // + $scope.SalarySheet.CategoryID + "/" + $scope.SalarySheet.SalaryYearId
+                    }).then(function successCallback(response) {
+                        $scope.salaryPeriodList = response.data.results;
+                        //toastr["warning"](response.data.message);
+
+                    }, function errorCallback(response) {
+                        toastr["error"](response.data.Message);
+                    });
+
+                }
+
+                  function getAllSalaryPeriod() {
+                      $scope.salaryHeadList = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Employee/GetAllSalaryPeriod/'
+                      }).then(function successCallback(response) {
+                          $scope.salaryPeriodList = response.data.results;
+
+                      }, function errorCallback(response) {
+                          toastr["info"](response.data.Message);
+                      });
+                  }
+
+                 
+
+                  $scope.ReportwithBranch = function ReportwithBranch(valid) {
+                      if (!valid) {
+                          return;
+                      }
+                      else {
+
+                          $scope.uri = "@Url.Action("SalaryHoldCombindReport", "Report")?BranchId=" + $scope.SalarySheet.BranchID ;
+                          $window.open($scope.uri, '_blank');
+                      }
+                  };
+
+
+              }]);
+    </script>
+}
+

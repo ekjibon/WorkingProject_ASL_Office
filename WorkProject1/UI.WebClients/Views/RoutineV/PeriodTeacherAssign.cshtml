@@ -1,0 +1,565 @@
+﻿
+@{
+    ViewBag.Title = "Period Teacher Assign";
+}
+<style type="text/css">
+    /*Maruf*/
+    input[type="number"]::-webkit-outer-spin-button,
+    input[type="number"]::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+
+    input[type="number"] {
+        -moz-appearance: textfield;
+    }
+</style>
+
+<div class="kt-container  kt-container--fluid  kt-grid__item kt-grid__item--fluid" ng-controller="PeriodTeacherSetup">
+    <div class="row">
+        <div class="kt-portlet kt-portlet--mobile">
+            <div class="kt-portlet__head kt-portlet__head--lg">
+                <div class="kt-portlet__head-label">
+                    <h3 class="kt-portlet__head-title">
+                        <!----Titel Text-->
+                        @ViewBag.Title
+                        <!----Titel Text -->
+                    </h3>
+                </div>
+                <div class="kt-portlet__head-toolbar">
+                    <div class="kt-portlet__head-wrapper">
+                        <div class="dropdown dropdown-inline">
+                            <button type="button" class="btn btn-brand btn-icon-sm" ng-click="resetForm()" data-toggle="modal" data-target="#addmodal" aria-haspopup="true" aria-expanded="false">
+                                <!----Add Button -->
+                                <i class="flaticon2-plus"></i> Add Period Teacher
+                                <!----Add Button -->
+                            </button>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="kt-portlet__body">
+                <form class="form-horizontal" ng-submit="getPeriodTeacherSetup()" name="formCommonFeilds" novalidate>
+                    <div class="form-body">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group row">
+                                    <label class="col-md-5 control-label" style="text-align:right">
+                                        Session :
+                                        <span class="required">*</span>
+                                    </label>
+                                    <div class="col-md-7" ng-class="{ 'has-error' :isSubmitted && formCommonFeilds.SessionId.$invalid}">
+                                        <select class="form-control" name="SessionId" ng-model="CommonFeild.SessionId" required ng-options="studentInfo.SessionId as studentInfo.SessionName for studentInfo in CommonFeilds.Session">
+                                            <option value="" selected="selected">Please Select</option>
+                                        </select>
+                                        <span ng-show="isSubmitted && formCommonFeilds.SessionId.$error.required" class="help-block">Session Required</span>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-md-5 control-label" style="text-align:right">
+                                        Branch :
+                                        @*<span class="required">*</span>*@
+                                    </label>
+                                    <div class="col-md-7" ng-class="{ 'has-error' :isSubmitted && formCommonFeilds.BranchID.$invalid }">
+                                        <select class="form-control" name="BranchID" ng-model="CommonFeild.BranchID" ng-options="studentInfo.BranchId as studentInfo.BranchName for studentInfo in CommonFeilds.Branch">
+                                            <option value="" selected="selected">Please Select</option>
+                                        </select>
+                                        <span ng-show="isSubmitted && formCommonFeilds.BranchID.$error.required" class="help-block">Branch Required</span>
+                                    </div>
+                                </div>
+
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group row">
+                                    <label class="col-md-5 control-label" style="text-align:right">
+                                        Shift :
+                                        @*<span class="required">*</span>*@
+                                    </label>
+                                    <div class="col-md-7" ng-class="{'has-error' : isSubmitted && formCommonFeilds.Shift.$invalid}">
+                                        <select class="form-control" ng-model="CommonFeild.ShiftId" name="Shift" ng-options="studentInfo.ShiftId as studentInfo.ShiftName for studentInfo in CommonFeilds.Shift| filter:{BranchId:CommonFeild.BranchID}:true">
+                                            <option value="" selected="selected">Please Select</option>
+                                        </select>
+                                        <span ng-show="isSubmitted && formCommonFeilds.Shift.$error.required" class="help-block">Shift Required</span>
+
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-md-5 control-label" style="text-align:right">
+                                        Class :
+                                        @*<span class="required">*</span>*@
+                                    </label>
+                                    <div class="col-md-7" ng-class="{ 'has-error' :isSubmitted && formCommonFeilds.ClassId.$invalid}">
+                                        <select class="form-control" name="ClassId" ng-model="CommonFeild.ClassId" ng-change="GetSection(CommonFeild.SessionId,CommonFeild.ShiftId,CommonFeild.ClassId);getTeacherList();" ng-options="studentInfo.ClassId as studentInfo.ClassName for studentInfo in CommonFeilds.ClassInfo">
+                                            <option value="" selected="selected">Please Select</option>
+                                        </select>
+                                        <span ng-show="isSubmitted && formCommonFeilds.ClassId.$error.required " class="help-block">Class Required</span>
+                                    </div>
+                                </div>
+
+
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group row">
+                                    <label class="col-md-5 control-label" style="text-align:right">
+                                        Section :
+                                        @*<span class="required">*</span>*@
+                                    </label>
+                                    <div class="col-md-7" ng-class="{ 'has-error' :isSubmitted && formCommonFeilds.SectionId.$invalid }">
+                                        <select class="form-control" name="SectionId" ng-model="CommonFeild.SectionId" ng-disabled="CommonFeild.ClassId==null" ng-options="S.SectionId as S.SectionName for S in Sections">
+                                            @*FilterSer by Shahin 17July2017*@
+                                            <option value="" selected="selected">Please Select</option>
+                                        </select>
+                                        <span ng-show="isSubmitted && formCommonFeilds.SectionId.$error.required" class="help-block">Section Required</span>
+                                    </div>
+                                </div>
+                                @*<div class="form-group row">
+                            <label class="col-md-5 control-label">
+                                Teacher :
+                            </label>
+                            <div class="col-md-7" ng-class="{ 'has-error' :isSubmitted && formCommonFeilds.Tid.$invalid}">
+                                <input type="text" name="Tid" ng-model="Emp1" placeholder="Search Teacher By ID or Name" uib-typeahead="emp  as emp.Text for emp in Search($viewValue)" typeahead-loading="loadingLocations" typeahead-no-results="noResults" class="form-control" >
+                                <i ng-show="loadingLocations" class="glyphicon glyphicon-refresh"></i>
+                                <div ng-show="noResults">
+                                    <i class="glyphicon glyphicon-remove"></i> No Results Found
+                                </div>
+                            </div>
+                        </div>*@
+                                <div class="form-group row">
+                                    <div class="col-md-3">
+                                        @*<button style="float:right" ng-click="isSubmitted=true" class="btn green">Search</button>*@
+                                    </div>
+                                    <div class="col-md-9">
+                                        @*<a style="margin-left:3px;" href="@Url.Action("StudentMarks","Report")?VersionID={{CommonFeild.VersionID}}&SessionId={{CommonFeild.SessionId}}&BranchID={{CommonFeild.BranchID}}&ShiftID={{CommonFeild.ShiftId}}&ClassId={{CommonFeild.ClassId}}&GroupId={{CommonFeild.GroupId}}&SectionId={{CommonFeild.SectionId}}&SubjectID={{CommonFeild.EmployeeID}}&MainExamId={{CommonFeild.MainExamId}}&SubExamId={{CommonFeild.SubExamId}}&DividedExamId={{CommonFeild.DividedExamId}}" class="btn btn-primary" target="_blank">Report</a>*@
+                                        <button ng-click="isSubmitted=true" class="btn  btn-secondary">Search</button>
+                                        <button type="button" ng-click="Report()" class="btn btn-primary">Report</button>
+                                        <button type="button" ng-click="reset()" class="btn btn-danger">Reset</button>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                        </div>
+                    </div>
+                </form>
+                <div class="row">
+                    <div class="col-md-4 col-sm-5 col-xs-6">
+                        <div class="form-group">
+                            <div class="col-lg-3 col-md-5 col-sm-4 col-xs-8" style="padding-left:0px">
+
+                                <select class="form-control kt-font-brand" ng-model="pagesize" ng-options="P.value as P.text for P in pageSizeArray"></select>
+                            </div>
+
+                        </div>
+
+                    </div>
+                    <div class="col-md-4 col-sm-3 col-xs-1">
+                    </div>
+                    <div class="col-md-4 col-sm-4 col-xs-5">
+                        <div id="sample_3_filter" class="pull-right">
+                            <input ng-model="q" id="search" class="form-control" placeholder="Filter text">
+                        </div>
+                    </div>
+                </div>
+                <table class="table table-bordered table-hover rounded">
+                    <thead style="background-color:#F4D03F">
+                        <tr>
+                            <th>Session</th>
+                            <th>Branch</th>
+                            <th>Class</th>
+                            <th>Shift</th>
+                            <th>Period</th>
+                            <th>Teacher</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr dir-paginate="item in PeriodTeacherSetups| filter:search | itemsPerPage:pagesize" current-page="currentPage">
+                            <td> {{item.SessionName}} </td>
+                            <td> {{item.BranchName}} </td>
+                            <td> {{item.ClassName}} </td>
+                            <td> {{item.ShiftName}}  </td>
+                            <td> {{item.PeriodName}}  </td>
+                            <td> {{item.FullName}}  </td>
+                            <td>
+                                <a class="btn btn-outline-brand btn-elevate btn-icon" ng-click="edit(item)" data-target="#addmodal" data-toggle="modal">
+                                    <i class="fa fa-edit"></i>
+                                </a>
+                                <a ng-click="deletePeriodTeacherSetup(item)" class="btn btn-outline-danger btn-elevate btn-icon">
+                                    <i class="fa fa-trash"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="row">
+                    <dir-pagination-controls boundary-links="true" template-url="~/assets/angular/lib/dirPagination.tpl.html"></dir-pagination-controls>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- End: life time stats -->
+    <!--Modal Area Start-->
+    <div id="addmodal" class="modal fade bd-example-modal-lg" tabindex="-1" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content modal-lg">
+                <form name="frmPeriodTeacherSetup" ng-submit="save()" class="form-horizontal" novalidate enctype="multipart/form-data">
+                    <div class="modal-header">
+                        <h4 class="modal-title">{{modalTitle}}</h4>
+                        <button type="button" ng-click="resetForm()" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <br />
+                           <div class="form-group row" ng-class="{ 'has-error' :submitted && frmPeriodTeacherSetup.SessionId.$invalid}">
+                                        <label class="col-md-4 control-label"style="text-align:right">
+                                            Session :
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-8">
+                                            <select class="form-control" name="SessionId" ng-model="PeriodTeacher.SessionId" required ng-options="PeriodTeacherSetup.SessionId as PeriodTeacherSetup.SessionName for PeriodTeacherSetup in CommonFeilds.Session">
+                                                <option value="" selected="selected">Please Select</option>
+                                            </select>
+                                            <span ng-show="submitted && frmPeriodTeacherSetup.SessionId.$error.required" class="help-block">Session Required</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group row" ng-class="{ 'has-error' :submitted && frmPeriodTeacherSetup.SessionId.$invalid}">
+                                        <label class="col-md-4 control-label"style="text-align:right">
+                                            Branch :
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-8">
+                                            <select class="form-control" name="BranchId" ng-model="PeriodTeacher.BranchId" required ng-options="PeriodTeacherSetup.BranchId as PeriodTeacherSetup.BranchName for PeriodTeacherSetup in CommonFeilds.Branch">
+                                                <option value="" selected="selected">Please Select</option>
+                                            </select>
+                                            <span ng-show="submitted && frmPeriodTeacherSetup.SessionId.$error.required" class="help-block">Branch Required</span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group row" ng-class="{ 'has-error' :submitted && frmPeriodTeacherSetup.ShiftId.$invalid}">
+                                        <label class="col-md-4 control-label"style="text-align:right">
+                                            Shift :
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-8">
+                                            <select class="form-control" name="ShiftId" ng-model="PeriodTeacher.ShiftId" ng-options="PeriodTeacherSetup.ShiftId as PeriodTeacherSetup.ShiftName for PeriodTeacherSetup in CommonFeilds.Shift| filter:{BranchId:PeriodTeacher.BranchId}:true" required>
+                                                <option value="" selected="selected">Please Select</option>
+                                            </select>
+                                            <span ng-show="submitted && frmPeriodTeacherSetup.ShiftId.$error.required " class="help-block">Shift Required</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <br />
+                                    <div class="form-group row" ng-class="{ 'has-error' :submitted && frmPeriodTeacherSetup.ClassId.$invalid}">
+                                        <label class="col-md-4 control-label"style="text-align:right">
+                                            Class :
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-8">
+                                            <select class="form-control" name="ClassId"  ng-model="PeriodTeacher.ClassId" ng-change="GetSection(PeriodTeacher.SessionId,PeriodTeacher.ShiftId,PeriodTeacher.ClassId);GetPeriod(PeriodTeacher.ShiftId,PeriodTeacher.ClassId);" ng-options="PeriodTeacherSetup.ClassId as PeriodTeacherSetup.ClassName for PeriodTeacherSetup in CommonFeilds.ClassInfo" required>
+                                                <option value="" selected="selected">Please Select</option>
+                                            </select>
+                                            <span ng-show="submitted && frmPeriodTeacherSetup.ClassId.$error.required " class="help-block">Class Required</span>
+                                        </div>
+                                    </div>
+                           
+                                    <div class="form-group row" ng-class="{ 'has-error' :submitted && frmPeriodTeacherSetup.SectionId.$invalid}">
+                                        <label class="col-md-4 control-label"style="text-align:right">
+                                            Section :
+                                        </label>
+                                        <div class="col-md-8" ng-class="{ 'has-error' :isSubmitted && frmFilter.SectionId.$invalid }">
+                                            <select class="form-control" name="SectionId" ng-model="PeriodTeacher.SectionId" ng-disabled="PeriodTeacher.ClassId==null" ng-options="S.SectionId as S.SectionName for S in Sections" required>
+                                                <option value="" selected="selected">Please Select</option>
+                                            </select>
+                                            <span ng-show="isSubmitted && frmFilter.SectionId.$error.required" class="help-block">Section Required</span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group row" ng-class="{ 'has-error' :submitted && frmPeriodTeacherSetup.EmpBasicInfoID.$invalid}">
+                                        <label class="col-md-4 control-label"style="text-align:right">
+                                            Select Period :
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-8">
+                                            <select class="form-control" name="EmpBasicInfoID" ng-model="PeriodTeacher.Period" ng-options="Period.PeriodId as Period.PeriodName for Period in Periods" required>
+                                                <option value="" selected="selected">Please Select</option>
+                                            </select>
+                                            <span ng-show="submitted && frmPeriodTeacherSetup.EmpBasicInfoID.$error.required " class="help-block">Period Required</span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group row" ng-class="{ 'has-error' :submitted && frmPeriodTeacherSetup.empId.$invalid}">
+                                        <label class="col-md-4 control-label"style="text-align:right">
+                                            Select Teacher :
+                                            <span class="required">*</span>
+                                        </label>
+
+                                        <div class="col-md-8">
+                                            <input type="text" name="empId" ng-model="Emp" required placeholder="Search Teacher By ID or Name or SMS Notification No." uib-typeahead="emp  as emp.Text for emp in Search($viewValue)" typeahead-loading="loadingLocations" typeahead-no-results="noResults" class="form-control">
+                                            <i ng-show="loadingLocations" class="glyphicon glyphicon-refresh"></i>
+                                            <div ng-show="noResults"><i class="glyphicon glyphicon-remove"></i> No Results Found</div>
+                                            <span ng-show="submitted && frmPeriodTeacherSetup.empId.$error.required " class="help-block">Teacher Required</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" data-dismiss="modal" class="btn  btn-secondary" ng-click="resetForm();submitted=false">Cancel</button>
+                        <button type="submit" ng-click="submitted=true" class="btn btn-success">{{modalButton}} <i ng-show="spin" class="fa fa-spinner fa-spin" style="font-size:20px"></i></button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!--Modal Area End-->
+</div>
+
+@section Scripts{
+
+    <script type="text/javascript">
+
+        OEMSApp.controller("PeriodTeacherSetup", ["$scope", "$http", "SweetAlert", "$window",
+              function ($scope, $http, SweetAlert, $window) {
+                  init();
+                  function init() {
+                      $scope.teachers = [];
+                      initialize();
+                      getAllDropdowns();
+                      getAllCommons();
+                      getAllPeriodTeacher();
+
+                  }
+                  function initialize() {
+                      $scope.modalTitle = "Period Teacher Assign";
+                      $scope.modalButton = "Add";
+                      $scope.PeriodTeacherSetup = {};
+                      $scope.PeriodTeacherSetups = [];
+                      $scope.CommonFeild = {};
+                      $scope.res = {};
+                      $scope.data = {};
+                      $scope.resetForm = resetForm;
+
+                      $scope.PeriodTeacher = {};
+                      $scope.PeriodTeacher.ID = 0;
+                      $scope.getAllPeriodTeacher = getAllPeriodTeacher;
+                      $scope.currentPage = 1;
+                      $scope.pagesize = 10;
+                      $scope.pageSizeArray = [];
+                      $scope.pageSizeArray.push({ value: 5, text: 5 });
+                      $scope.pageSizeArray.push({ value: 10, text: 10 });
+                      $scope.pageSizeArray.push({ value: 20, text: 20 });
+                      $scope.pageSizeArray.push({ value: 50, text: 50 });
+                  }
+                  $scope.Report = function Report() {
+                  if ($scope.CommonFeild.SessionId == null) {
+                          toastr["info"]("Session is Required.");
+                      }
+                      else if ($scope.CommonFeild.BranchID == null) {
+                          toastr["info"]("Branch is Required.");
+                      }
+                      else {
+                          if ($scope.CommonFeild.ShiftId == null) {
+                              $scope.CommonFeild.ShiftId = null
+                          }
+                          if ($scope.CommonFeild.ClassId == null) {
+                              $scope.CommonFeild.ClassId = null
+                          }
+                          if ($scope.CommonFeild.GroupId == null) {
+                              $scope.CommonFeild.GroupId = null
+                          }
+                          if ($scope.CommonFeild.SectionId == null) {
+                              $scope.CommonFeild.SectionId = null
+                          }
+                          $scope.uri = "@Url.Action("PeriodassignReport", "Report")?SessionID=" + $scope.CommonFeild.SessionId + "&BranchId=" + $scope.CommonFeild.BranchID + "&ShiftId=" + $scope.CommonFeild.ShiftId + "&ClassId=" + $scope.CommonFeild.ClassId +"&SectionId=" + $scope.CommonFeild.SectionId;
+                          $window.open($scope.uri, '_blank');
+                      }
+                  }
+                  $scope.Search = function (val) {
+                      return $http.get(baseUrl + 'Employee/SearchEmployee/' + val, {
+                          params: {}
+                      }).then(function (response) {
+                          return response.data.results.map(function (item) {
+                              return item;
+                          });
+                      });
+                  };
+                  function resetForm() {
+                      $scope.modalTitle = "Add Period Teacher";
+                      $scope.modalButton = "Add";
+                      $scope.PeriodTeacher = {};
+                      $scope.PeriodTeacher.ID = 0;
+                      $scope.submitted = false;
+                      $scope.submitted1 = false;
+                      $scope.Id = '';
+                      // setProgress(false);
+                      $scope.Emp = {};
+                      $scope.Emp.Text = null;
+                      $scope.Emp.Value = null;
+                  }
+                  $scope.reset = function reset() {
+                      $scope.submitted = false;
+                      $scope.isSubmitted = false;
+                      $scope.CommonFeild = {};
+                  }
+        
+                  $scope.GetSection = function GetSection(SessionId, ShiftId, ClassId) {
+                      $scope.Sections = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Common/GetSection/' + SessionId + "/" + ShiftId + "/" + ClassId
+                      }).then(function successCallback(response) {
+                          $scope.Sections = response.data.results;
+                      }, function errorCallback(response) {
+                         // toastr["info"](response.data.message);
+                      });
+                  }
+                  $scope.GetPeriod = function GetPeriod(ShiftId, ClassId) {
+                      $scope.Periods = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Routine/GetPeriod/' + ShiftId + '/' + ClassId,
+                      }).then(function successCallback(response) {
+                          $scope.Periods = response.data.results;
+                      }, function errorCallback(response) {
+                          toastr["info"](response.data.message);
+                      });
+
+                  }
+                  function getAllDropdowns() {
+                      $scope.Dropdowns = [];
+
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Common/GetAllDropDown/'
+                      }).then(function successCallback(response) {
+                          $scope.Dropdowns = response.data.results;
+                      }, function errorCallback(response) {
+                          toastr["info"](response.data.message);
+                      });
+                  }
+                  function getAllCommons() {
+                      $scope.CommonFeilds = [];
+
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Common/GetCommonItem/'
+                      }).then(function successCallback(response) {
+                          $scope.CommonFeilds = response.data.results;
+                      }, function errorCallback(response) {
+                          toastr["info"](response.data.message);
+                      });
+                  }
+
+                  $scope.getPeriodTeacherSetup = function getPeriodTeacherSetup() {
+                      if ($scope.formCommonFeilds.$invalid)
+                          return;
+                      $scope.PeriodTeacherSetups = [];
+                      $http({
+                          method: 'POST',
+                          url: baseUrl + 'Routine/SearchPeriodTeacherSetupInfo/',
+                          data: $scope.CommonFeild
+                      }).then(function successCallback(response) {
+                          $scope.PeriodTeacherSetups = response.data.results;
+                         // toastr["success"](response.data.message);
+                      }, function errorCallback(response) {
+                          toastr["info"](response.data.message);
+                      });
+                  };
+
+                  function getAllPeriodTeacher() {
+                      $scope.PeriodTeacherSetups = [];
+
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Routine/getPeriodTeacherSetupInfo/'
+                      }).then(function successCallback(response) {
+                          $scope.PeriodTeacherSetups = response.data.results;
+                         // toastr["success"](response.data.message);
+                      }, function errorCallback(response) {
+                          toastr["info"](response.data.message);
+                      });
+
+                  };
+
+                  $scope.edit = function (n) {
+                      $scope.PeriodTeacher = {};
+                      $scope.modalTitle = "Update Period Teacher";
+                      $scope.modalButton = "Update";
+                      $scope.PeriodTeacher = n;
+                      if (angular.isUndefined($scope.Groups)) {
+                          $scope.GetGroup(n.GroupId);
+                      }
+                      if (angular.isUndefined($scope.Sections)) {
+                          $scope.GetSection(n.SessionId, n.ShiftId, n.ClassId, n.GroupId);
+                      }
+                      if (angular.isUndefined($scope.Periods)) {
+                          $scope.GetPeriod(n.ShiftId, n.ClassId);
+                      }
+
+                      $scope.Emp = {};
+                      $scope.Emp.Text = n.FullName
+                      $scope.Emp.Value = n.TeacherId
+                      //$scope.Id = n.ID;
+                  };
+                  $scope.save = function save() {
+
+                      if ($scope.frmPeriodTeacherSetup.$invalid)
+                          return;
+
+                      if ($scope.PeriodTeacher != {}) {
+                          $scope.PeriodTeacher.TeacherId = $scope.Emp.Value;
+                          $http({
+                              method: 'POST',
+                              url: baseUrl + '/Routine/AddPeriodTeacherSetup/',
+                              data: $scope.PeriodTeacher
+                          }).then(function successCallback(response) {
+                              getAllPeriodTeacher()
+                              toastr["success"](response.data.message);
+                              $('#addmodal').modal('toggle');
+                              resetForm();
+                          }, function errorCallback(response) {
+                              toastr["info"](response.data.message);
+                          });
+
+                      }
+
+                  };
+
+                  $scope.deletePeriodTeacherSetup = function deletePeriodTeacherSetup(n) {
+
+                      // SweetAlert.swal("Good job!", "You clicked the button!", "success");
+                      SweetAlert.swal({
+                          title: "Are you sure to delete it ?", type: "warning", showCancelButton: true, confirmButtonColor: "#DD6B55",
+                          confirmButtonText: "Yes, delete it!",
+                          closeOnConfirm: false
+                      },
+          function (isConfirm) {
+
+
+              if (isConfirm) {
+                  $http({
+                      method: 'DELETE',
+                      url: baseUrl + 'Routine/deletePeriodTeacherSetup/' + n.ID
+                  }).then(function successCallback(response) {
+                      SweetAlert.swal("Deleted!", "Your data has been deleted.", "success");
+                      $scope.PeriodTeacherSetups = response.data.results;
+                      reset();
+                  }, function errorCallback(response) {
+                      toastr["info"](response.data.message);
+
+                  });
+
+              }
+          });
+
+
+                  };
+              }]);
+    </script>
+
+}

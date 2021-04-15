@@ -1,0 +1,428 @@
+﻿
+@{
+    ViewBag.Title = "Meeting Person Assign";
+}
+
+@section Styles{
+    <link href="~/assets/global/plugins/bootstrap-fileinput/bootstrap-fileinput.css" rel="stylesheet" type="text/css" />
+}
+<style>
+    .DrpdwnWidth ul {
+        width: 300px;
+    }
+</style>
+<div class="kt-container  kt-container--fluid  kt-grid__item kt-grid__item--fluid" ng-controller="employeeList">
+    <div class="row">
+        <div class="kt-portlet kt-portlet--mobile">
+            <div class="kt-portlet__head kt-portlet__head--lg">
+                <div class="kt-portlet__head-label">
+                    <h3 class="kt-portlet__head-title">
+                        <!----Titel Text-->
+                        Meeting Person Assign
+                        <!----Titel Text -->
+                    </h3>
+                </div>
+                <div class="kt-portlet__head-toolbar">
+                    <div class="kt-portlet__head-wrapper">
+                        <div class="dropdown dropdown-inline">
+                            <button type="button" class="btn btn-brand btn-icon-sm" ng-click="resetForm()" data-toggle="modal" data-target="#EmpNOC" aria-haspopup="true" aria-expanded="false">
+                                <!----Add Button -->
+                                <i class="flaticon2-plus"></i>  Add Employee
+                                <!----Add Button -->
+                            </button>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="kt-portlet__body">
+
+
+                <div class="row">
+                    <div class="col-md-4 col-sm-5 col-xs-6">
+                        <div class="form-group">
+                            <div class="col-lg-3 col-md-5 col-sm-4 col-xs-8" style="padding-left:0px">
+                                <select class="form-control kt-font-brand" ng-model="pageSize" ng-options="P.value as P.text for P in pageSizeArray"></select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-sm-3 col-xs-1">
+                    </div>
+                    <div class="col-md-4 col-sm-4 col-xs-5">
+                        <div id="sample_3_filter" class="pull-right">
+                            <input ng-model="q" id="search" class="form-control" placeholder="Filter text">
+                        </div>
+                    </div>
+                </div>
+                <table class="table table-bordered table-hover rounded">
+                    <thead class="btn-primary">
+                        <tr>
+                            <td>Category Name</td>
+                            <td>Class </td>
+                            <td>Day </td>
+                            <td>First Emp. Name</td>
+                            <td>Second Emp. Name </td>
+                            <td>Start Time </td>
+                            <td>End Time </td>
+                            <td>  Action </td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="item in MeetingList">
+                            @*<td><input type="checkbox" ng-model="item.Selected" value="false" /></td>*@
+
+                            <td>{{item.Text}} </td>
+                            <td ng-show="item.ClassName!=null">{{item.ClassName}} </td>
+                            <td ng-hide="item.ClassName!=null">N/A</td>
+                            <td ng-show="item.DayName!=null">{{item.DayName}} </td>
+                            <td ng-hide="item.DayName!=null">N/A</td>
+                            <td>{{item.FirstName}} </td>
+                            <td>{{item.SecondName}} </td>
+                            <td ng-hide="item.StartTime==null">{{item.StartTime |date:'hh: mm a'}} </td>
+                            <td ng-hide="item.EndTime==null">{{item.EndTime |date:'hh: mm a'}} </td>
+                            <td ng-show="item.StartTime==null"> N/A</td>
+                            <td ng-show="item.EndTime==null">N/A</td>
+                            <td>
+                                <a href="#" class="btn btn-outline-danger btn-elevate btn-icon" ng-click="delete(item)">
+                                    <i class="fa fa-trash"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="row">
+                    <dir-pagination-controls boundary-links="true" template-url="~/assets/angular/lib/dirPagination.tpl.html"></dir-pagination-controls>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--Modal Area Start-->
+    <div id="EmpNOC" class="modal fade" tabindex="-1" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <form name="addform" class="form-horizontal" id="form_sample_1" novalidate autocomplete="off">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Add Meeting</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                        
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group row" ng-class="{ 'has-error' : submitted && addform.EmpCategoryId.$invalid}">
+                                        <label class="col-md-4 control-label"style="text-align:right">
+                                            Category:
+                                        </label>
+                                        <div class="col-md-8">
+                                            <select class="form-control" ng-model="Emp.EmpCategoryId"  required  name="EmpCategoryId"  ng-options="employeeInfo.Value as employeeInfo.Text for employeeInfo in Dropdowns | filter:Type='EmpDept'">
+                                                <option value="" >Select</option>
+                                            </select>
+                                            <span ng-show="submitted && addform.EmpCategoryId.$error.required" class="required">Category Required</span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group row" ng-show="Emp.EmpCategoryId =='5'" ng-class="{ 'has-error' : submitted && addform.BranchID.$invalid}">
+                                        <label class="col-sm-4 control-label pull-left"style="text-align:right">
+                                            Branch:
+                                        </label>
+                                        <div class="col-md-8">
+                                            <select class="form-control" ng-model="Emp.BranchID" ng-required="Emp.EmpCategoryId=='5'" name="BranchID" ng-options="item.BranchId as item.BranchName for item in CommonFeilds.Branch">
+                                                <option value="" selected="selected">Choose Option</option>
+                                            </select>
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted && addform.BranchID.$error.required" class="required">Branch Required</span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group row" ng-show="Emp.EmpCategoryId =='5'" ng-class="{ 'has-error' : submitted && addform.Class.$invalid}">
+                                        <label class="col-sm-4 control-label pull-left"style="text-align:right">
+                                            Class:
+                                        </label>
+                                        <div class="col-md-8">
+                                            <select class="form-control" ng-model="Emp.ClassId" ng-required="Emp.EmpCategoryId=='5'" name="Class" ng-options="employeeInfo.ClassId as employeeInfo.ClassName for employeeInfo in CommonFeilds.ClassInfo">
+                                                <option value="" selected="selected">Choose Option</option>
+                                            </select>
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted && addform.Class.$error.required" class="required">Class Required</span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group row" ng-class="{ 'has-error' : submitted && addform.StudentId.$invalid}">
+                                        <label class="col-sm-4 control-label pull-left"style="text-align:right">
+                                            Select Emp:
+                                        </label>
+                                        <div class="col-md-8 DrpdwnWidth">
+                                            @*<input type="text" ng-model="employeeInfo.EmpID" class="form-control" placeholder="EmpID" name="EmpID">*@
+                                            <input type="text" name="StudentId" required  ng-model="Std" typeahead-on-select='onSelect($item, $model, $label)'
+                                                   placeholder="Search name/ID SMS Notification"
+                                                   uib-typeahead="i  as i.Text for i in Search($viewValue)"
+                                                   typeahead-loading="loadingLocations" typeahead-no-results="noResults" class="form-control">
+                                            <i ng-show="loadingLocations" class="glyphicon glyphicon-refresh"></i>
+                                            <div ng-show="noResults"><i class="glyphicon glyphicon-remove"></i> No Results Found</div>
+                                            <input type="hidden"  name="StudentIID" ng-value="Std.Value" />
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted && addform.StudentId.$error.required" class="required">Emp Required</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group row" ng-class="{ 'has-error' : submitted && addform.StudentId.$invalid}">
+                                        <label class="col-sm-4 control-label pull-left"style="text-align:right">
+                                            Correspondent:
+                                        </label>
+                                        <div class="col-md-8 DrpdwnWidth">
+                                            @*<input type="text" ng-model="employeeInfo.EmpID" class="form-control" placeholder="EmpID" name="EmpID">*@
+                                            <input type="text" name="StudentId" required ng-model="Std2" typeahead-on-select='onSelect2($item, $model, $label)'
+                                                   placeholder="Search name/ID SMS Notification"
+                                                   uib-typeahead="i  as i.Text for i in Search($viewValue)"
+                                                   typeahead-loading="loadingLocations" typeahead-no-results="noResults" class="form-control">
+                                            <i ng-show="loadingLocations" class="glyphicon glyphicon-refresh"></i>
+                                            <div ng-show="noResults"><i class="glyphicon glyphicon-remove"></i> No Results Found</div>
+                                            <input type="hidden" name="StudentIID" ng-value="Std2.Value" />
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted && addform.StudentId.$error.required" class="required">Emp Required</span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group row" ng-show="Emp.EmpCategoryId =='5'" ng-class="{ 'has-error' : submitted && addform.DayId.$invalid}">
+                                        <label class="col-sm-4 control-label pull-left"style="text-align:right">
+                                            Day:
+                                        </label>
+                                        <div class="col-md-8">
+                                            <select class="form-control" ng-model="Emp.DayId" ng-required="Emp.EmpCategoryId=='5'" name="Class" ng-options="d.DayId as d.DayName for d in Days">
+                                                <option value="" selected="selected">Choose Option</option>
+                                            </select>
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted && addform.DayId.$error.required" class="required">Class Required</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group row" ng-class="{ 'has-error' : submitted && addform.StartTime.$invalid}">
+                                        <label class="col-md-4 control-label" style="text-align:right;">
+                                            Meeting Time Start:
+                                        </label>
+                                        <div class="col-md-8">
+                                            <div uib-timepicker ng-model="Emp.StartTime" ng-required="Emp.EmpCategoryId=='5'" name="StartTime"
+                                                 onkeypress='return event.charCode >= 48 && event.charCode <= 57' ng-change="changed()" readonly-time="false"
+                                                 readonly-date="false" disabled-date="false" hour-step="hstep" minute-step="mstep" show-meridian="true"></div>
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted &&  addform.StartTime.$error.required" class="help-block">Invalid Time </span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group row" ng-class="{ 'has-error' : submitted && addform.EndTime.$invalid}">
+                                        <label class="col-md-4 control-label" style="text-align:right;">
+                                            End:
+                                        </label>
+                                        <div class="col-md-8">
+                                            <div uib-timepicker ng-model="Emp.EndTime" name="EndTime" ng-required="Emp.EmpCategoryId=='5'" ng-change="changed()"
+                                                 hour-step="hstep" minute-step="mstep" show-meridian="true" readonly-time="true" readonly-date="true"
+                                                 disabled-date="true"></div>
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted &&  addform.EndTime.$error.required" class="help-block">Invalid Time </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" data-dismiss="modal" class="btn  btn-secondary" submitted=false>Cancel</button>
+                        <button type="submit" ng-click="AddMeeting();submitted=true" class="btn btn-success">Save </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts{
+    <script src="~/assets/global/plugins/bootstrap-fileinput/bootstrap-fileinput.js" type="text/javascript"></script>
+    <script type="text/javascript">
+        OEMSApp.controller("employeeList", ["$scope", "$http", "SweetAlert",
+              function ($scope, $http, SweetAlert) {
+                  init();
+                  function init() {
+                      initialize();
+                      getAllDropdowns();
+                      getAllCommons();
+                  }
+                  function initialize() {
+                      $scope.pageSizeArray = [];
+                      $scope.pageSizeArray.push({ value: 5, text: 5 });
+                      $scope.pageSizeArray.push({ value: 10, text: 10 });
+                      $scope.pageSizeArray.push({ value: 20, text: 20 });
+                      $scope.pageSizeArray.push({ value: 50, text: 50 });
+                      $scope.currentPage = 1;
+                      $scope.pageSize = 10;
+                      $scope.tblshow = false;
+                      $scope.modalTitle = "Edit Employee Info";
+                      $scope.Emp = {};
+                      $scope.EmpBasicInfoID = '';
+                      $scope.employeeInfos = [];
+                      $scope.CommonFeilds = [];
+                      $scope.getAllDropdowns = getAllDropdowns;
+                      $scope.Emp.ConfigId = 0;
+                      $scope.hstep = 1;
+                      $scope.mstep = 15;
+                      //Edit
+                      //$scope.Std = {};
+                      GetMeetingList();
+                      //view
+                      $scope.pageno = 1;
+                      $scope.total_count = 12;
+                      $scope.search = '';
+                      $scope.Dropdowns = [];
+                      $scope.Days = [
+                                        { DayId: 6, DayName: 'Satureday' },
+                                        { DayId: 0, DayName: 'Sunday' },
+                                        { DayId: 1, DayName: 'Monday' },
+                                        { DayId: 2, DayName: 'ThuesDay' },
+                                        { DayId: 3, DayName: 'Wednesday' },
+                                        { DayId: 4, DayName: 'Thrusday' },
+                                        //{ DayId: 6, DayName: 'Satureday' },
+                                    ];
+                      //$scope.CommonFeilds = [];
+                      $scope.getAllDropdowns = getAllDropdowns;
+                  }
+
+                  $scope.edit = function edit(n) {
+                    
+                      $scope.Emp.ConfigId = n.ConfigId;
+                      $scope.Emp = n;
+                  }
+
+                  function getAllCommons() {
+                      $scope.CommonFeilds = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Common/GetCommonItem/'
+                      }).then(function successCallback(response) {
+                          $scope.CommonFeilds = response.data.results;
+                          console.log($scope.CommonFeilds);
+                      }, function errorCallback(response) {
+                      });
+                  }
+                  $scope.AddMeeting = function AddMeeting() {
+                      if ($scope.addform.$invalid)
+                          return;
+                      if ($scope.Emp.ConfigId!=0) { //update
+                          $http({
+                              method: 'POST',
+                              url: baseUrl + 'Employee/UpdateMeeting/',
+                              data: $scope.Emp
+                          }).then(function SuccessCallback(response) {
+                            toastr['success'](response.data.message);
+                              GetMeetingList();
+                              $('#EmpNOC').modal('hide');
+                          })
+                      } else { //add
+                           $http({
+                              method: 'POST',
+                              url: baseUrl + 'Employee/AddMeeting/',
+                              data: $scope.Emp
+                          }).then(function SuccessCallback(response) {
+                              $scope.Emp = {};
+                              $scope.submitted = false;
+                              toastr['success'](response.data.message);
+                              GetMeetingList();
+                              $('#EmpNOC').modal('hide');
+                          }, function errorCallback(response) {
+                              toastr['error'](response.data.Message);
+                          })
+                      }                   
+                  }
+
+                  function GetMeetingList() {
+                      $scope.MeetingList = [];
+
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Employee/GetMeetingList/'
+                      }).then(function SuccessCallback(response) {
+                          $scope.MeetingList = response.data.results;
+                      })
+                  }
+                  $scope.delete = function (n) {
+                      SweetAlert.swal({
+                          title: "Are you sure to delete it ?", type: "warning", showCancelButton: true, confirmButtonColor: "#DD6B55",
+                          confirmButtonText: "Yes, delete it!",
+                          closeOnConfirm: false
+                      },
+             function (isConfirm) {
+                 if (isConfirm) {
+                     $http({
+                         method: 'DELETE',
+                         url: baseUrl + 'Employee/DeleteMeetingList/' + n.ConfigId,
+                        
+                     }).then(function successCallback(response) {
+                         SweetAlert.swal("Deleted!", "Your data has been deleted.", "success");
+                         GetMeetingList();
+                     }, function errorCallback(response) {
+                         GetMeetingList();
+                         toastr["warning"](response.data.Message);
+                     });
+                 }
+                 });
+                     
+                  }
+               
+                $scope.resetForm =   function resetForm() {
+                      $scope.Emp = {};
+                      $scope.Emp.ConfigId = 0;
+                      $scope.Std = null;
+                      $scope.Std2 = null;
+                      $scope.submitted = false;
+                      //console.log($scope.Emp.ConfigId);
+                  }
+
+                  $scope.Search = function (val) {
+                      return $http.get(baseUrl + 'Employee/SearchEmployee/' + val, {
+                          params: {
+
+                          }
+                      }).then(function (response) {
+                          return response.data.results.map(function (item) {
+                              return item;
+                          });
+                      });
+                  };
+
+                  $scope.onSelect = function onSelect($item, $model, $label) {
+                      //console.log($item.Value);
+                      $scope.Emp.FirstEmpId = $item.Value;
+                      //console.log($scope.Emp.FirstEmpId);
+                      SearchEmployeeId($item.Value);
+                  };
+                  $scope.onSelect2 = function onSelect2($item, $model, $label) {
+                      $scope.Emp.SecondEmpId = $item.Value;
+                      SearchEmployeeId($item.Value);
+                  };
+
+                  function SearchEmployeeId(EmpID) {
+                      $scope.employeeInfos = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Employee/GetEmployeeID/' + EmpID
+                      }).then(function successCallback(response) {
+                          $scope.employeeInfos = response.data.results;
+                          $scope.tblshow = true;
+                      }, function errorCallback(response) {
+                          toastr["error"](response.data.Message);
+                      });
+                  }
+              function getAllDropdowns() {
+                      $scope.Dropdowns = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Common/GetAllDropDown/'
+                      }).then(function successCallback(response) {
+                          $scope.Dropdowns = response.data.results;
+                          console.log(response.data.results);
+                      }, function errorCallback(response) {
+                      });
+                  }
+
+
+
+              }]);
+    </script>
+}
+

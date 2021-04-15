@@ -1,0 +1,319 @@
+﻿@model OEMS.Models.Model.Employee.EmpCategory
+@{
+    ViewBag.Title = "Leave Modification Type";
+}
+
+<style>
+    .ColPadLeft {
+        padding: 0px 0px 0px 15px;
+    }
+</style>
+
+<div class="kt-container  kt-container--fluid  kt-grid__item kt-grid__item--fluid" ng-controller="ctrlLeaveModificationType">
+    <div class="row">
+        <div class="kt-portlet kt-portlet--mobile">
+            <div class="kt-portlet__head kt-portlet__head--lg">
+                <div class="kt-portlet__head-label">
+                    <h3 class="kt-portlet__head-title">
+                        <!----Title Text-->
+                        @ViewBag.Title
+                        <!----Title Text -->
+                    </h3>
+                </div>
+                <div class="kt-portlet__head-toolbar">
+                    <div class="kt-portlet__head-wrapper">
+                        <div class="dropdown dropdown-inline">
+                            <button type="button" class="btn btn-brand btn-icon-sm" data-toggle="modal" data-target="#addmodal" aria-haspopup="true" aria-expanded="false">
+                                <!----Add Button -->
+                                <i class="flaticon2-plus"></i> Add Modification Type
+                                <!----Add Button -->
+                            </button>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="kt-portlet__body">
+                <div class="row">
+                    <div class="col-md-4 col-sm-5 col-xs-6">
+                        <div class="form-group">
+                            <div class="col-lg-3 col-md-5 col-sm-4 col-xs-8" style="padding-left:0px">
+                                <select class="form-control kt-font-brand" ng-model="pageSize" ng-options="P.value as P.text for P in pageSizeArray"></select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-sm-3 col-xs-1">
+                    </div>
+                    <div class="col-md-4 col-sm-4 col-xs-5">
+                        <div id="sample_3_filter" class="pull-right">
+                            <input ng-model="q" id="search" class="form-control" placeholder="Filter text">
+                        </div>
+                    </div>
+                </div>
+                <table class="table table-bordered table-hover rounded">
+                    <thead>
+                        <tr class="btn-primary">
+                            <th width="20%">Modification Type</th>
+                            <th width="10%" class="text-center">Admin</th>
+                            <th width="10%" class="text-center">Employee</th>
+                            <th width="10%" class="text-center">Late</th>
+                            <th width="10%" class="text-center">Early Out</th>
+                            <th width="10%" class="text-center">Absent</th>
+                            <th width="10%" class="text-center">Leave</th>
+                            <th width="10%" class="text-center">NoAction</th>
+                            <th width="10%" class="text-center">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-show="ModificationTypeList.length <= 0"><td colspan="5" style="text-align:center;"><i class="fa fa-refresh"></i> Loading new data!!</td></tr>
+                        <tr dir-paginate="item in ModificationTypeList| filter:q  | itemsPerPage: pageSize " current-page="currentPage">
+
+                            <td>{{item.Title}}</td>
+                            <td class="text-center">{{item.IsAdmin == true ? 'Yes' : 'No'}}</td>
+                            <td class="text-center">{{item.IsEmployee == true ? 'Yes' : 'No'}}</td>
+                            <td class="text-center">{{item.IsLate == true ? 'Yes' : 'No'}}</td>
+                            <td class="text-center">{{item.IsEarlyout == true ? 'Yes' : 'No'}}</td>
+                            <td class="text-center">{{item.IsAbsent == true ? 'Yes' : 'No'}}</td>
+                            <td class="text-center">{{item.IsLeave == true ? 'Yes' : 'No'}}</td>
+                            <td class="text-center">{{item.IsNoAction == true ? 'Yes' : 'No'}}</td>
+
+                            <td align="center">
+                                <a href="javascript:;" class="btn btn-outline-brand btn-elevate btn-icon" ng-click="edit(item)" data-target="#addmodal" data-toggle="modal">
+                                    <i class="fa fa-edit"></i>
+                                </a>
+                                <a ng-click="deleteModificationType(item)" href="javascript:;" class="btn btn-outline-danger btn-elevate btn-icon" id="kt_sweetalert_demo_9">
+                                    <i class="fa fa-trash"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="row">
+                    <dir-pagination-controls boundary-links="true" template-url="~/assets/angular/lib/dirPagination.tpl.html"></dir-pagination-controls>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--Modal Area Start-->
+    <div id="addmodal" class="modal fade" tabindex="-1" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form name="addform" ng-submit="save()" class="form-horizontal" id="form_sample_1" novalidate>
+                    <div class="modal-header">
+                        <h5 class="modal-title">{{modalTitle}}</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-body">
+
+                            <div class="form-group row" ng-class="{ 'has-error' : submitted && addform.Title.$invalid}">
+                                <label class="col-md-5 control-label">
+                                    Modification Title :
+                                    <span class="required">*</span>
+                                </label>
+                                <div class="col-md-7">
+                                    <input type="text" ng-model="ModificationType.Title" class="form-control" placeholder="Modification Title" name="Title" required>
+                                    <div class="form-control-focus"> </div>
+                                    <span ng-show="submitted &&  addform.Title.$error.required" class="help-block">Modification Title Required</span>
+                                </div>
+                            </div>
+
+                            <div class="row ColPadLeft">
+                                <div class="col-md-6">
+                                    <div class="form-group row">
+                                        <div>
+                                            <label>
+                                                <input type="checkbox" ng-model="ModificationType.IsAdmin" ng-checked="ModificationType.IsAdmin==true"> For Admin
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <div>
+                                            <label>
+                                                <input type="checkbox" ng-model="ModificationType.IsLate" ng-checked="ModificationType.IsLate==true"> Update Late In As Not Late
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <div>
+                                            <label>
+                                                <input type="checkbox" ng-model="ModificationType.IsAbsent" ng-checked="ModificationType.IsAbsent==true"> Update Absent As Present
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <div>
+                                            <label>
+                                                <input type="checkbox" ng-model="ModificationType.IsNoAction" ng-checked="ModificationType.IsNoAction==true"> No Action
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group row">
+                                        <div>
+                                            <label>
+                                                <input type="checkbox" ng-model="ModificationType.IsEmployee" ng-checked="ModificationType.IsEmployee==true"> For Employee
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <div>
+                                            <label>
+                                                <input type="checkbox" ng-model="ModificationType.IsEarlyout" ng-checked="ModificationType.IsEarlyout==true"> Update Early Out As Not Early Out
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <div>
+                                            <label>
+                                                <input type="checkbox" ng-model="ModificationType.IsLeave" ng-checked="ModificationType.IsLeave==true"> Update Leave As Present
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" data-dismiss="modal" class="btn  btn-secondary" ng-click="resetForm();submitted=false">Cancel</button>
+                        <button type="submit" ng-click="submitted=true" class="btn btn-success">Save</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!--Modal Area End-->
+</div>
+@section Scripts{
+
+    <script type="text/javascript">
+
+        OEMSApp.controller("ctrlLeaveModificationType", ["$scope", "$http", "SweetAlert",
+          function ($scope, $http, SweetAlert) {
+
+              init();
+              function init() {
+                  initialize();
+                  getModificationTypes();
+
+              }
+              function initialize() {
+
+                  $scope.modalTitle = "Add Modification Type";
+                  $scope.ModificationType = {};
+                  $scope.ModificationTypeList = [];
+                  $scope.ModificationType.Id = 0;
+                  //$scope.ModificationType.IsNoAction = true;
+
+                  $scope.getModificationTypes = getModificationTypes;
+                  $scope.resetForm = resetForm;
+
+                  $scope.pageSizeArray = [];
+                  $scope.pageSizeArray.push({ value: 5, text: 5 });
+                  $scope.pageSizeArray.push({ value: 10, text: 10 });
+                  $scope.pageSizeArray.push({ value: 20, text: 20 });
+                  $scope.pageSizeArray.push({ value: 50, text: 50 });
+                  $scope.currentPage = 1;
+                  $scope.pageSize = 10;
+              }
+
+              function resetForm() {
+                  $scope.modalTitle = "Add Modification Type";
+                  $scope.ModificationType = {};
+                  $scope.ModificationType.Id = 0;
+                  $scope.addform.$setUntouched();
+                  $scope.addform.$setPristine();
+                  $scope.submitted = false;
+                  //$scope.ModificationType.IsNoAction = true;
+              }
+
+              function getModificationTypes() {
+                  $http({
+                      method: 'GET',
+                      url: baseUrl + 'Attendance/GetAllModificationTypeList/'
+                  }).then(function successCallback(response) {
+                      $scope.ModificationTypeList = response.data.results;
+                  }, function errorCallback(response) {
+                      toastr["error"](response.data.message);
+                  });
+              }
+
+              $scope.edit = function (n) {
+                  $scope.modalTitle = "Update Modification Type";
+                  //$scope.ModificationType = n;
+                  $scope.ModificationType.Id = n.Id;
+                  $scope.ModificationType.Title = n.Title;
+                  $scope.ModificationType.IsEmployee = n.IsEmployee;
+                  $scope.ModificationType.IsAdmin = n.IsAdmin;
+                  $scope.ModificationType.IsLate = n.IsLate;
+                  $scope.ModificationType.IsEarlyout = n.IsEarlyout;
+                  $scope.ModificationType.IsAbsent = n.IsAbsent;
+                  $scope.ModificationType.IsLeave = n.IsLeave;
+                  $scope.ModificationType.IsNoAction = n.IsNoAction;
+              };
+              $scope.save = function save() {
+                  if ($scope.addform.$invalid)
+                      return;
+
+                  if ($scope.ModificationType.Id != 0) /// For Update
+                  {
+                      $http({
+                          method: 'PUT',
+                          url: baseUrl + 'Attendance/UpdateLeaveModificationType/',
+                          data: $scope.ModificationType
+                      }).then(function successCallback(response) {
+                          $('#addmodal').modal('toggle');
+                          getModificationTypes();
+                          toastr["success"](response.data.message);
+                          resetForm();
+                      }, function errorCallback(response) {
+                          toastr["warning"](response.data.Message);
+                      });
+                  } else {  //  For Add
+                      $http({
+                          method: 'POST',
+                          url: baseUrl + '/Attendance/AddLeaveModificationType/',
+                          data: $scope.ModificationType
+                      }).then(function successCallback(response) {
+                          $('#addmodal').modal('toggle');
+                          getModificationTypes();
+                          toastr["success"](response.data.message);
+                          resetForm();
+                      }, function errorCallback(response) {
+                          toastr["warning"](response.data.Message);
+                      });
+                  }
+              };
+
+              $scope.deleteModificationType = function deleteModificationType(n) {
+
+                  SweetAlert.swal({
+                      title: "Are you sure to delete it ?", type: "warning", showCancelButton: true, confirmButtonColor: "#DD6B55",
+                      confirmButtonText: "Yes, delete it!",
+                      closeOnConfirm: false
+                  },
+                  function (isConfirm) {
+
+                      if (isConfirm) {
+                          $http({
+                              method: 'DELETE',
+                              url: baseUrl + '/Attendance/DeleteLeaveModificationType/' + n.Id,
+
+                          }).then(function successCallback(response) {
+                              SweetAlert.swal("Deleted!", "Your data has been deleted.", "success");
+                              getModificationTypes();
+                          }, function errorCallback(response) {
+                              toastr["success"](response.data.message);
+                          });
+                      }
+                  });
+              };
+
+          }]);
+    </script>
+}
+

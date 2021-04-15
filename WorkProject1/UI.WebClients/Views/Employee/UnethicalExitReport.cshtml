@@ -1,0 +1,141 @@
+﻿
+@{
+    ViewBag.Title = "Unethical Exit Report";
+}
+
+<div class="kt-container  kt-container--fluid  kt-grid__item kt-grid__item--fluid" ng-controller="UER">
+    <div class="row">
+        <div class="kt-portlet kt-portlet--mobile">
+            <div class="kt-portlet__head kt-portlet__head--lg">
+                <div class="kt-portlet__head-label">
+                    <h3 class="kt-portlet__head-title">
+                        <!----Title Text-->
+                        Unethical Exit Report
+                        <!----Title Text -->
+                    </h3>
+                </div>
+            </div>
+
+            <div class="kt-portlet__body">
+                <form class="form-horizontal" ng-submit="Report(formCommonFeilds.$valid)" id="formCommonFeilds" name="formCommonFeilds" novalidate>
+                    <div class="form-body">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group row" ng-class="{ 'has-error' : submitted && formCommonFeilds.Branch.$invalid}">
+                                    <label class="col-md-5 control-label" style="text-align:right">
+                                        Branch :
+                                        @*<span class="required">*</span>*@
+                                    </label>
+                                    <div class="col-md-7">
+                                        <select @*ng-disabled="sid"*@ class="form-control" ng-model="UnethicalExitReport.BranchId" @*required*@ name="Branch" ng-options="U.BranchId as U.Name for U in AcademicBranch">
+                                            <option value="" selected="selected">Choose Option</option>
+                                        </select>
+                                        <div class="form-control-focus"> </div>
+                                        @*<span ng-show="submitted && formCommonFeilds.Branch.$error.required" class="help-block">Branch Name Required</span>*@
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+
+
+                                <div class="form-group row" ng-class="{ 'has-error' : submitted && formCommonFeilds.StudentInsID.$invalid}">
+
+                                    <label class="col-md-5 control-label" style="text-align:right">
+                                        Empolyee ID :
+                                    </label>
+
+                                    <div class="col-md-7" >
+                                        <input type="text" name="EmpId" ng-model="sid" typeahead-on-select='onSelect($item, $model, $label)'
+                                               placeholder="Search name/ID SMS Notification"
+                                               uib-typeahead="i  as i.Text for i in Search($viewValue)"
+                                               typeahead-loading="loadingLocations" typeahead-no-results="noResults" class="form-control">
+                                        <i ng-show="loadingLocations" class="glyphicon glyphicon-refresh"></i>
+                                        <div ng-show="noResults"><i class="glyphicon glyphicon-remove"></i> No Results Found</div>
+                                        <div class="form-control-focus"> </div>
+                                        <span ng-show="sid && submitted && formCommonFeilds.EmpId.$error.required" class="help-block">Employee ID Required</span>
+                                    </div>
+                                </div>
+
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group row">
+                                    <label class="col-md-5 control-label">
+                                    </label>
+                                    <div class="col-md-7">
+                                        <button ng-click="submitted=true" class="btn btn-primary">Report</button>
+                                        <button type="button" ng-click="Reset()" class="btn btn-danger">Reset</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    <script type="text/javascript">
+        OEMSApp.controller("UER", ["$scope", "$http", "SweetAlert", "$filter", "$window",
+          function ($scope, $http, SweetAlert, $filter, $window) {
+
+              init();
+              function init() {
+                  initialize();
+                  getAllCommons();
+              }
+              function initialize() {
+                  $scope.UnethicalExitReport = {};
+                  $scope.UnethicalExitReport.BranchId = 0;
+                  $scope.UnethicalExitReport.EmpId = 0;
+              };
+              $scope.Reset = function Reset() {
+
+                  $scope.submitted = false;
+                  $scope.UnethicalExitReport = [];
+              };
+              function getAllCommons() {
+                  $scope.AcademicBranch = [];
+
+                  $http({
+                      method: 'GET',
+                      url: baseUrl + 'Common/GetAcademicBranchListWithAll/'
+                  }).then(function successCallback(response) {
+                      $scope.AcademicBranch = response.data.results;
+
+                  }, function errorCallback(response) {
+                      toastr["error"](response.data.message);
+                  });
+              }
+
+              $scope.Search = function (val) {
+                  return $http.get(baseUrl + 'Employee/SearchAllEmployee/' + val, {
+                      params: {
+
+                      }
+                  }).then(function (response) {
+                      return response.data.results.map(function (item) {
+                          return item;
+                      });
+                  });
+              };
+
+              $scope.onSelect = function onSelect($item, $model, $label) {
+                  $scope.UnethicalExitReport.EmpId = $item.Value;
+                
+              };
+
+
+              $scope.Report = function Report(valid) {
+                  if (valid) {
+
+                      $scope.uri = "@Url.Action("UnethicalExitReport", "Report")?BranchId=" + $scope.UnethicalExitReport.BranchId + "&EmpId=" + $scope.UnethicalExitReport.EmpId;
+                      $window.open($scope.uri, '_blank');
+
+                  }
+              };
+          }]);
+    </script>
+}
+

@@ -1,0 +1,592 @@
+﻿
+@{
+    ViewBag.Title = "My Task";
+}
+
+<div class="row" ng-controller="taskAddClt">
+    <div class="col-md-12">
+        <!-- BEGIN TODO SIDEBAR -->
+        <div class="todo-ui">
+            <div style="float: left;">
+
+                <div class="portlet light ">
+                    <div class="portlet-title">
+                        <div class="caption" data-toggle="collapse" data-target=".todo-project-list-content-tags">
+                            <span class="caption-subject font-red bold uppercase">Status </span>
+                            <span class="caption-helper visible-sm-inline-block visible-xs-inline-block">click to view</span>
+                        </div>
+                        @*<div class="actions">
+                                <div class="actions">
+                                    <a class="btn btn-circle grey-salsa btn-outline btn-sm" href="javascript:;">
+                                        <i class="fa fa-plus"></i> Add
+                                    </a>
+                                </div>
+                            </div>*@
+                    </div>
+                    <div class="portlet-body todo-project-list-content todo-project-list-content-tags" style="height: auto;">
+                        <div class="todo-project-list">
+                            <ul class="nav nav-pills nav-stacked" ng-repeat="item in TodayTaskStatus">
+                                <li>
+                                    <a href="javascript:;">
+                                        <span class="badge badge-info"> {{item.PendingTask}} </span> Pending
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="javascript:;">
+                                        <span class="badge badge-success"> {{item.InProgressTask}} </span> In Progress
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="javascript:;">
+                                        <span class="badge badge-info"> {{item.ResolvedTask}} </span> Resolved
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="javascript:;">
+                                        <span class="badge badge-danger"> {{item.ClosedTask}} </span> Closed
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- END TODO SIDEBAR -->
+            <!-- BEGIN TODO CONTENT -->
+            <div class="todo-content">
+                <div class="portlet light ">
+                    <!-- PROJECT HEAD -->
+                    <div class="portlet-title">
+                        <div class="caption">
+                            <i class="icon-bar-chart font-green-sharp hide"></i>
+                            @*<span class="caption-helper">Addie Apps:</span>*@
+                            <span class="caption-subject font-green-sharp bold uppercase">My Task  ({{MyTaskList.length}})</span>
+                        </div>
+
+                    </div>
+                    <!-- end PROJECT HEAD -->
+                    <div class="portlet-body">
+                        <div class="row">
+                            <div class="col-md-6 col-sm-4" style="margin-left: -2%;">
+                                <div class="todo-tasklist">
+                                    <div class="todo-tasklist-item" ng-repeat="item in MyTaskList" ng-style="item.Status=='Resolved' && {'border-left':'5px solid #36c6d3'}
+                                          || item.Status=='Pending' && {'border-left':'5px solid #337ab7'} || item.Status=='In Progress' && {'border-left':'5px solid #659be0'} || item.Status=='Paused' && {'border-left':'5px solid #F1C40F'}" ng-click="LoadLogList(item.Id);LoadCommentList(item.Id)">
+                                        <div class="todo-tasklist-item-title">
+                                            {{item.TaskName}} <a target="_blank" style="color:#36c6d3;" href="@Url.Action("TaskDetails","Home")?TaskId={{item.Id}}">(#{{item.Id}})</a>
+                                            &nbsp; &nbsp;
+
+                                            <a ng-hide="item.TicketId==0" style="color:#36c6d3;" target="_blank" href="@Url.Action("TicketDetails","Home")?TicketId={{item.TicketId}}">Ticket No:(#{{item.TicketId}})</a>
+                                        </div>
+                                        <div class="todo-tasklist-item-text">
+                                            {{item.Description}}
+                                        </div>
+                                        <div>
+                                            <a target="_blank" class="btn btn-primary showTicket" href="@Url.Action("TaskDetails","Home")?TaskId={{item.Id}}">Show Details</a>
+                                        </div>
+                                        <div class="todo-tasklist-controls pull-left">
+                                            <span class="todo-tasklist-date">
+                                                <i class="fa fa-calendar"></i> {{item.DueDate.replace('/Date(','').replace(')/','') |   date:'dd-MM-yyyy'}}
+                                            </span>
+                                            <div ng-if="item.Status!=='Closed'">
+                                                <span class="todo-tasklist-badge badge label label-success " ng-show="item.Status=='Resolved'">{{item.Status}}</span>
+                                                <span class="todo-tasklist-badge badge label label-primary " ng-show="item.Status=='Pending'">{{item.Status}}</span>
+                                                <span class="todo-tasklist-badge badge label label-warning " ng-show="item.Status=='Paused'">{{item.Status}}</span>
+                                                <span class="todo-tasklist-badge badge label label-default " ng-show="item.Status=='Closed'">{{item.Status}}</span>
+                                                <span class="todo-tasklist-badge badge label label-info" ng-show="item.Status=='In Progress'">{{item.Status}}</span>
+                                                <span class="todo-tasklist-badge badge label label-warning" ng-show="item.Status=='N/A'">{{item.Status}}</span>
+                                                <span ng-hide="item.Status=='In Progress' || item.Status=='Resolved'"><i class="fas fa-play text-center " id="icon" title="Start" ng-click="TaskStatusStart(item.Id)"></i></span>
+                                                <span ng-hide="item.Status=='Paused' || item.Status=='Resolved'"><i class="fas fa-pause text-center" id="icon" title="Paused" ng-click="TaskStatusPause(item.Id)"></i></span>
+                                                <span ng-hide="item.Status=='Resolved'"><i class="fas fa-check text-center" id="icon" title="Resolved" ng-click="TaskStatusResolve(item.Id)"></i></span>
+                                            </div>
+                                            <div ng-if="item.Status=='Closed'">
+                                                
+                                                <span style="padding: 4px 24px;background-color: #f52737;" class="todo-tasklist-badge badge label label-danger " ng-show="item.Status=='Closed'">{{item.Status}}</span>
+                                                
+                                            </div>
+
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                            <div class="todo-tasklist-devider"> </div>
+                            <div class="col-md-6 col-sm-8">
+
+                                <form class="form-horizontal" name="taskFrm" ng-submit="Submit()" novalidate autocomplete="off">
+                                    <div class="form">
+                                        <div class="form-group" ng-class="{ 'has-error' : submitted && taskFrm.TaskName.$invalid}">
+                                            <div class="col-md-12">
+                                                <input type="text" required class="form-control todo-taskbody-tasktitle" name="TaskName" ng-model="TaskInfo.TaskName" placeholder="Task Title...">
+                                                <div class="form-control-focus"> </div>
+                                                @*<span ng-show="submitted && taskFrm.TaskName.$error.required" class="help-block">Task Name Required</span>*@
+                                            </div>
+                                        </div>
+                                        <div class="form-group" ng-class="{ 'has-error' : submitted && taskFrm.ProjectId.$invalid}">
+                                            <div class="col-md-12">
+                                                <select class="form-control todo-taskbody-tags " tabindex="-1" aria-hidden="true" required name="ProjectId" ng-model="TaskInfo.ProjectId">
+                                                    <option value="">Select Project</option>
+                                                    <option ng-repeat="item in ProjectList" ng-if='item.Status=="A"' value="{{item.Id}}">
+                                                        {{item.ProjectName}}
+                                                    </option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <div class="col-md-12">
+                                                <select class="form-control todo-taskbody-tags " tabindex="-1" aria-hidden="true" name="ClientId" ng-model="TaskInfo.ClientId">
+                                                    <option value="">Select Client</option>
+                                                    <option ng-repeat="item in LoadClientList" ng-if='item.ActivityStatus=="A"' value="{{item.Id}}">
+                                                        {{item.ShortName}}
+                                                    </option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="form-group" ng-class="{ 'has-error' : submitted && taskFrm.DueDate.$invalid}">
+                                            <div class="col-md-12">
+                                                <div class="input-icon">
+                                                    <i class="fa fa-calendar"></i>
+                                                    <input type="text" class="form-control" uib-datepicker-popup="dd/MM/yyyy" placeholder="mm-dd-yyy" name="DueDate" ng-model="TaskInfo.TaskDueDate" is-open="duedate.opened" ng-click="duedate.opened=true" ng-required="true" close-text="Close" readonly="readonly" />
+                                                    @*<span ng-show="submitted && taskFrm.DueDate.$error.required" class="help-block">Due date Required</span>*@
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <div class="col-md-12">
+                                                <select class="form-control todo-taskbody-tags " ng-model="TaskInfo.SprintId" tabindex="-1" aria-hidden="true">
+                                                    <option value="">Select Sprint</option>
+                                                    <option ng-repeat="item in SprintList" value="{{item.Id}}">
+                                                        {{item.SprintTitle}}
+                                                    </option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <!-- TASK DESC -->
+                                        <div class="form-group" ng-class="{ 'has-error' : submitted && taskFrm.Description.$invalid}">
+                                            <div class="col-md-12">
+                                                <textarea ng-model="TaskInfo.Description" name="Description" required class="form-control todo-taskbody-taskdesc" rows="8" placeholder="Task Description..."></textarea>
+                                            </div>
+                                        </div>
+                                        <!-- END TASK DESC -->
+                                        <!-- TASK DUE DATE -->
+                                        <!-- TASK TAGS -->
+                                        <!-- TASK TAGS -->
+                                        <div class="form-actions right todo-form-actions">
+                                            @*<button class="">Save Changes</button>
+                                                <button class="btn btn-circle btn-sm btn-default">Cancel</button>*@
+
+                                            <input type="submit" style="font-size: 17px; margin-right: 10px; width: 15%;" class="btn btn-circle btn-sm green" title="Go To Back Task List" ng-click="submitted=true" value="Save" />
+                                            <button type="reset"  style="height: 34px; width: 82px;font-size: 17px;" class="btn  btn-circle btn-sm  btn-danger" id="resetbtn">Reset</button>
+                                        </div>
+                                    </div>
+
+                                </form>
+                                <div class="tabbable-line">
+                                    <ul class="nav nav-tabs ">
+                                        <li class="active" ng-hide="ActivityLogList.length==0">
+                                            <a href="#Activity" data-toggle="tab"> Activites </a>
+                                        </li>
+                                        <li>
+                                            <a href="#tab_1" data-toggle="tab"> Comments </a>
+                                        </li>
+
+                                    </ul>
+                                    <div class="tab-content">
+                                        <div class="tab-pane" id="tab_1">
+                                            <!-- TASK COMMENTS -->
+                                            <div class="form-group">
+                                                <div class="col-md-12">
+                                                    <ul class="media-list">
+                                                        <li class="media" ng-repeat="item in CommentList">
+                                                            <div class="media-body todo-comment">
+                                                                <button type="button" ng-click="DeleteComment(item)" class="todo-comment-btn btn btn-circle btn-danger btn-sm">Delete</button>
+                                                                <p class="todo-comment-head">
+                                                                    <span class="todo-comment-username">{{item.FullName}}</span>
+                                                                    <span class="todo-comment-date">at {{item.AddDate.replace('/Date(','').replace(')/','') |   date:'dd-MM-yyyy HH:mm'}}</span>
+                                                                </p>
+                                                                <p class="todo-text-color">
+                                                                    {{item.Description}}
+                                                                </p>
+                                                                <span class="badge badge-success"> {{item.Like}} </span><a href="#" ng-click="UpdateStatus(item,Type='Like')" style="text-decoration: none;"><i class="far fa-thumbs-up" style="font-size: 20px;"></i>Like</a>
+
+                                                                <span class="badge badge-danger"> {{item.Dislike}}  </span>  <a style="text-decoration: none;color: red;" href="#" ng-click="UpdateStatus(item,Type='DisLike')"><i class="far fa-thumbs-down" style="font-size: 20px;"></i>Dislike</a>
+                                                            </div>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                            <!-- END TASK COMMENTS -->
+                                            <!-- TASK COMMENT FORM -->
+                                            <form name="frm" role="form" ng-submit="CommentSubmit()" novalidate>
+                                                <div class="form-group" ng-class="{ 'has-error' : submitted2 && frm.Description.$invalid}">
+                                                    <div class="col-md-12">
+                                                        <ul class="media-list">
+                                                            <li class="media">
+                                                                <div class="media-body">
+                                                                    <textarea ng-model="Comments.Description" name="Description" class="form-control todo-taskbody-taskdesc" rows="4" required placeholder="Type comment..."></textarea>
+                                                                </div>
+
+                                                            </li>
+                                                        </ul>
+                                                        @*<button type="button" class="pull-right btn btn-sm btn-circle green"> Submit </button>*@
+                                                        <input class="pull-right btn btn-sm btn-circle green" type="submit" ng-click="submitted2=true" value="Post" />
+                                                    </div>
+                                                </div>
+                                            </form>
+                                            <!-- END TASK COMMENT FORM -->
+                                        </div>
+                                        <div class="tab-pane active" id="Activity">
+                                            <ul class="todo-task-history">
+                                                <li ng-repeat="item in ActivityLogList">
+                                                    <div class="todo-task-history-date"> {{item.LogDate.replace('/Date(','').replace(')/','') |  date:"dd/MM/yyyy HH:mm a"}} </div>
+                                                    <div class="todo-task-history-desc"> {{item.LogDescription}} </div>
+                                                </li>
+
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- END TODO CONTENT -->
+        </div>
+    </div>
+    <!-- END PAGE CONTENT-->
+</div>
+
+
+@section Scripts{
+    
+    <script type="text/javascript">
+
+    //$(document).ready(function () {
+
+    //    $("#DueDate").datepicker({
+    //        autoclose: true,
+    //        //startDate: '0d'
+    //    });
+
+
+    //});
+
+    OEMSApp.controller("taskAddClt", ["$scope", "$http", "SweetAlert",
+        function ($scope, $http, SweetAlert) {
+            init();
+            function init() {
+                $("#resetbtn").click();
+                initialize();
+            }
+
+            function initialize() {
+                //$scope.TaskInfo.Priority = 1;
+                $scope.TaskInfo = {};
+
+                LoadProjectList();
+                LoadSprintList();
+                //LoadDeveloperUserList();
+                LoadClientList();
+                //LoadMyTaskList();
+
+                $scope.ProjectList = [];
+                $scope.SprintList = [];
+                $scope.ClientList = [];
+
+                //TodayTaskStatusList();
+                $scope.Comments = {};
+                $scope.Comments.RefId = 0;
+                $scope.CommentList = [];
+                $scope.ActivityLogList = [];
+                $scope.submitted = false;
+                $scope.submitted2 = false;
+            }
+            function ResetFrm() {
+
+                $scope.btnTitle = 'Save';
+                $scope.TaskInfo = {};
+
+
+            }
+            $scope.reSetForm = function () {
+                $scope.IsEdit = 0;
+                $scope.btnTitle = 'Save';
+                $scope.User = {};
+                $scope.submitted = false;
+            }
+
+            //$scope.Resetbtn = function (n) {
+            //    swal({
+            //        title: "Are you sure?",
+            //        text: "Enable the User",
+            //        icon: "success",
+            //        buttons: true,
+            //        dangermode: true,
+            //    })
+            //      .then((willEnable) => {
+            //          if (willEnable) {
+            //              $http.post(baseUrl + 'UserAPI/UserUnLock?UserId=' + n.Id)
+            //             .then(function (response) {
+            //                 if (response.data == 1) {
+
+            //                     return;
+            //                 }
+
+
+            //             });
+            //          } else {
+
+            //          }
+            //      });
+            //}
+            //$scope.CommentSubmit = function () {
+            //    if ($scope.frm.$invalid)
+            //        return;
+
+            //    $http.post(baseUrl + 'Task/AddCommentTask', $scope.Comments).
+            //          then(function (response) {
+            //              if (response.data == 1) {
+            //                  $scope.Comments.Description = '';
+            //                  LoadCommentList($scope.Comments.RefId);
+            //                  $scope.submitted2 = false;
+            //              } else {
+            //              }
+            //          });
+            //}
+
+            //$scope.DeleteComment = function (n) {
+            //    $http.post(baseUrl + 'Task/DeleteComment', n).
+            //        then(function (response) {
+            //            if (response.data == 1) {
+            //                LoadCommentList(n.RefId);
+            //                toastr.success('Deleted Successfully');
+            //            } else {
+            //                toastr.error('You Dont Have Permission.');
+            //            }
+            //        });
+            //}
+
+            $scope.Submit = function () {
+                if ($scope.taskFrm.$invalid)
+                    return;
+                $scope.Save();
+            }
+
+            //$scope.Save = function () {
+            //    $http.post(baseUrl + 'TaskManagement/AddMyTask', $scope.TaskInfo).
+            //        then(function (response) {
+            //        if (response.data == 0) {
+            //            toastr.error('Not Saved');
+            //            $scope.TaskInfo = [];
+            //        } else {
+            //            $scope.TaskInfo = {};
+            //            $scope.submitted = false;
+            //            LoadMyTaskList();
+            //            toastr.success('Saved Successfully');
+            //            ResetFrm();
+            //        }
+            //    });
+            //}
+            $scope.Save = function () {
+                
+                $http({
+                    method: 'POST',
+                    url: baseUrl + 'TaskManagement/AddMyTask',
+                    data: $scope.TaskInfo
+                }).then(function successCallback(response) {
+                    $scope.submitted = false;
+                    toastr["info"](response.data.message);
+                    //LoadMyTaskList();
+                    ResetFrm();
+                }, function errorCallback(response) {
+                    toastr["warning"](response.data.Message);
+                });
+            }
+
+            function LoadProjectList() {
+                $http.get(baseUrl + 'TaskManagement/GetAllProject/').
+                  then(function (response) {
+                      $scope.ProjectList = response.data.results;
+                  });
+            };
+
+            function LoadSprintList() {
+                $http.get(baseUrl + 'TaskManagement/GetAllSprint/').
+                  then(function (response) {
+                      $scope.SprintList = response.data.results;
+                  });
+            };
+
+            function LoadClientList() {
+                $http.get(baseUrl + 'Client/GetAllClient/').
+                  then(function (response) {
+                      $scope.LoadClientList = response.data.results;
+                  });
+            }
+
+            //$scope.TaskStatusStart = function TaskStatusStart(TaskId) {
+            //    $http.get(baseUrl + 'Task/UpdateTaskStatus?TaskId=' + TaskId + '&Status=In Progress').
+            //      then(function (response) {
+            //          if (response.data == 2) {
+            //              toastr.error('Task is already closed.');
+            //          }
+            //          else if (response.data == 3) {
+            //              toastr.error('Task already started.');
+            //          }
+            //          else if (response.data == 4) {
+            //              toastr.error('Task has not started yet.');
+            //          }
+            //          else if (response.data == 5) {
+            //              toastr.error('Task is not assign to you. Only assign user can start the task.');
+            //          }
+            //          else if (response.data == 7) {
+            //              toastr.error('Task has not resolved yet.');
+            //          }
+            //          else if (response.data == 6) {
+            //              toastr.error('Task resolved already.');
+            //          }
+            //          else {
+            //              toastr.success('Task started successfully.');
+
+            //              LoadMyTaskList();
+            //          }
+            //      });
+            //}
+            //$scope.TaskStatusPause = function TaskStatusPause(TaskId) {
+            //    $http.get(baseUrl + 'Task/UpdateTaskStatus?TaskId=' + TaskId + '&Status=Paused').
+            //      then(function (response) {
+            //          if (response.data == 2) {
+            //              toastr.error('Task is already closed.');
+            //          }
+            //          else if (response.data == 3) {
+            //              toastr.error('Task already started.');
+            //          }
+            //          else if (response.data == 4) {
+            //              toastr.error('Task has not started yet.');
+            //          }
+            //          else if (response.data == 7) {
+            //              toastr.error('Task has not resolved yet.');
+            //          }
+            //          else if (response.data == 5) {
+            //              toastr.error('Task is not assign to you. Only assign user can start the task.');
+            //          }
+            //          else if (response.data == 6) {
+            //              toastr.error('Task resolved already.');
+            //          }
+            //          else {
+            //              toastr.success('Task paused successfully.');
+
+            //              LoadMyTaskList();
+            //          }
+            //      });
+            //}
+            //$scope.TaskStatusResolve = function TaskStatusResolve(TaskId) {
+            //    $http.get(baseUrl + 'Task/UpdateTaskStatus?TaskId=' + TaskId + '&Status=Resolved').
+            //      then(function (response) {
+            //          if (response.data == 2) {
+            //              toastr.error('Task is already closed.');
+            //          }
+            //          else if (response.data == 3) {
+            //              toastr.error('Task already started.');
+            //          }
+            //          else if (response.data == 4) {
+            //              toastr.error('Task has not started yet.');
+            //          }
+            //          else if (response.data == 7) {
+            //              toastr.error('Task has not resolved yet.');
+            //          }
+            //          else if (response.data == 5) {
+            //              toastr.error('Task is not assign to you. Only assign user can start the task.');
+            //          }
+            //          else if (response.data == 6) {
+            //              toastr.error('Task resolved already.');
+            //          }
+            //          else {
+            //              toastr.success('Task Resolved successfully.');
+
+            //              LoadMyTaskList();
+            //          }
+            //      });
+            //}
+
+            //function LoadMyTaskList() {
+            //    $http.get(baseUrl + 'Task/LoadMyTaskList').
+            //      then(function (response) {
+            //          //console.log(response.data);
+            //          $scope.MyTaskList = response.data;
+            //          LoadCommentList($scope.MyTaskList[0].Id);
+            //          LoadLogList($scope.MyTaskList[0].Id);
+            //      });
+            //}
+
+            //function LoadDeveloperUserList() {
+            //    $http.get(baseUrl + 'Setup/LoadUserListForTaskAdd').
+            //      then(function (response) {
+            //          //console.log(response.data);
+            //          $scope.DeveloperList = response.data;
+            //      });
+            //};
+
+            //function TodayTaskStatusList() {
+            //    $http.get(baseUrl + 'Task/TodayTaskStatus').
+            //      then(function (response) {
+            //          //console.log(response.data);
+            //          $scope.TodayTaskStatus = response.data;
+            //      });
+            //};
+
+
+            //$scope.LoadLogList = function (n) {
+            //    $http.get(baseUrl + 'Setup/AcitvityLog?type=' + 1 + '&&RefId=' + n).
+            //           then(function (response) {
+            //               //console.log(response.data);
+            //               $scope.ActivityLogList = response.data;
+
+            //           });
+            //}
+
+            //function LoadLogList(n) {
+            //    $http.get(baseUrl + 'Setup/AcitvityLog?type=' + 1 + '&&RefId=' + n).
+            //           then(function (response) {
+            //               //console.log(response.data);
+            //               $scope.ActivityLogList = response.data;
+
+            //           });
+            //}
+
+            
+
+           
+
+            //$scope.UpdateStatus = function (n, Type) {
+            //    $http.post(baseUrl + 'Task/UpdateStatus?Id=' + n.Id + '&&Type=' + Type).
+            //             then(function (response) {
+            //                LoadCommentList(n.RefId);
+            //             });
+            //}
+
+            //$scope.LoadCommentList = function (n) {
+            //    $scope.Comments.RefId = n;
+            //    $http.get(baseUrl + 'Task/LoadComment?RefId=' + n).
+            //              then(function (response) {
+            //                  //console.log(response.data);
+            //                  $scope.CommentList = response.data;
+
+            //              });
+            //}
+
+            //function LoadCommentList(n) {
+            //    $scope.Comments.RefId = n;
+            //    $http.get(baseUrl + 'Task/LoadComment?RefId=' + n).
+            //                then(function (response) {
+            //                    //console.log(response.data);
+            //                    $scope.CommentList = response.data;
+            //                    //console.log($scope.CommentList.length);
+            //                });
+            //}
+
+            
+        }]);
+</script>
+}

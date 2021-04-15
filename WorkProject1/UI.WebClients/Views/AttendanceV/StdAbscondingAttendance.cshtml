@@ -1,0 +1,381 @@
+﻿@{
+    ViewBag.Title = "Student Absconding";
+}
+<style>
+    table {
+        width: 50%;
+    }
+
+    thead, tbody, tr, td, th {
+        display: block;
+    }
+
+        thead th {
+        }
+
+    tbody {
+        overflow-y: auto;
+        height: 400px;
+    }
+
+        tbody td, thead th {
+            float: left;
+        }
+
+    tr:after {
+        clear: both;
+        content: ' ';
+        display: block;
+        visibility: hidden;
+    }
+        .present {
+        background-color:#58cf91;
+        color:white;
+    }
+</style>
+<div ng-controller="ctrlAttendance">
+    <!-- Begin: life time stats -->
+    <div class="portlet light bordered">
+        <div class="portlet-title">
+            <div class="caption">
+                <i class="icon-settings font-green"></i>
+                <span class="caption-subject font-green sbold uppercase">@ViewBag.Title</span>
+            </div>
+        </div>
+        <div class="portlet-body">
+            <form class="form-horizontal" ng-disabled="formDisable" ng-submit="SearchAttendance()" id="frmCommon" name="formCommonFeilds" novalidate>
+                <div class="form-body">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="form-group" ng-class="{ 'has-error' : submitted && formCommonFeilds.Class.$invalid}">
+                                <label class="col-md-5 control-label">
+                                    Branch :
+                                    <span class="required">*</span>
+                                </label>
+                                <div class="col-md-7">
+                                    <select class="form-control" ng-model="Attendance.BranchId" name="Branch" required ng-options="Attendance.BranchId as Attendance.BranchName for Attendance in CommonFeilds.Branch">
+                                        <option value="" selected="selected">Choose Option</option>
+                                    </select>
+                                    <div class="form-control-focus"> </div>
+                                    <span ng-show="submitted && formCommonFeilds.Branch.$error.required" class="help-block">Branch Required</span>
+                                </div>
+                            </div>
+                      <div class="form-group" ng-class="{ 'has-error' : submitted && formCommonFeilds.Session.$invalid}">
+                                <label class="col-md-5 control-label">
+                                    Session :
+                                    <span class="required">*</span>
+                                </label>
+                                <div class="col-md-7">
+                                    <select class="form-control" ng-model="Attendance.SessionId" required name="Session" ng-options="Attendance.SessionId as Attendance.SessionName for Attendance in CommonFeilds.Session">
+                                        <option value="" selected="selected">Choose Option</option>
+                                    </select>
+
+                                    <div class="form-control-focus"> </div>
+                                    <span ng-show="submitted && formCommonFeilds.Session.$error.required" class="help-block">Session Required</span>
+                                </div>
+                            </div>
+                      
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group" ng-class="{ 'has-error' : submitted && formCommonFeilds.Shift.$invalid}">
+                                <label class="col-md-5 control-label">
+                                    Shift :
+                                    <span class="required">*</span>
+                                </label>
+                                <div class="col-md-7">
+                                    <select class="form-control" ng-model="Attendance.ShiftId" required name="Shift" ng-options="Attendance.ShiftId as Attendance.ShiftName for Attendance in CommonFeilds.Shift | filter:{BranchId:Attendance.BranchId}:true">
+                                        <option value="" selected="selected">Choose Option</option>
+                                    </select>
+                                    <div class="form-control-focus"> </div>
+                                    <span ng-show="submitted && formCommonFeilds.Shift.$error.required" class="help-block">Shift Name Required</span>
+                                </div>
+                            </div>
+                            <div class="form-group" ng-class="{ 'has-error' : submitted && formCommonFeilds.Class.$invalid}">
+                                <label class="col-md-5 control-label">
+                                    Class :
+                                    <span class="required">*</span>
+                                </label>
+                                <div class="col-md-7">
+                                    <select class="form-control" ng-model="Attendance.ClassId" name="Class" ng-change="GetSection();getMainExam();GetAllClassPeriod()" required ng-options="Attendance.ClassId as Attendance.ClassName for Attendance in CommonFeilds.ClassInfo">
+                                        <option value="" selected="selected">Choose Option</option>
+                                    </select>
+                                    <div class="form-control-focus"> </div>
+                                    <span ng-show="submitted && formCommonFeilds.Class.$error.required" class="help-block">Class Required</span>
+                                </div>
+                            </div>
+                       
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group" ng-class="{ 'has-error' : submitted && formCommonFeilds.Section.$invalid}">
+                                <label class="col-md-5 control-label">
+                                    Section :
+                                    <span class="required">*</span>
+                                </label>
+                                <div class="col-md-7">
+                                    <select class="form-control" ng-model="Attendance.SectionId" required name="Section" ng-options="S.SectionId as S.SectionName for S in Sections">
+                                        <option value="" selected="selected">Choose Option</option>
+                                    </select>
+                                    <div class="form-control-focus"> </div>
+                                    <span ng-show="submitted && formCommonFeilds.Section.$error.required" class="help-block">Section Name Required</span>
+                                </div>
+                            </div>
+                            <div class="form-group" ng-class="{ 'has-error' : submitted && formCommonFeilds.Year.$invalid}">
+                                <label class="col-md-5 control-label">
+                                    Year :
+                                    <span class="required">*</span>
+                                </label>
+                                <div class="col-md-7">
+                                    <input class="form-control" readonly="readonly" ng-init="Attendance.Year=Year" ng-model="Attendance.Year" name="Year" />
+                                    <div class="form-control-focus"> </div>
+                                    <span ng-show="submitted && formCommonFeilds.Year.$error.required" class="help-block">Year Required</span>
+                                </div>
+                            </div>
+                    
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group" ng-class="{ 'has-error' : submitted && formCommonFeilds.Month.$invalid}">
+                                <label class="col-md-5 control-label">
+                                    Month :
+                                    <span class="required">*</span>
+                                </label>
+                                <div class="col-md-7">
+                                    <select class="form-control" ng-init="Attendance.Month=Month" ng-change="TotalDay(Attendance.Month)" ng-model="Attendance.Month" name="month" ng-options="m.Value as m.Text for m in months" required>
+                                        <option value="" selected="selected">Select</option>
+                                    </select>
+                                    <div class="form-control-focus"> </div>
+                                    <span ng-show="submitted && formCommonFeilds.Month.$error.required" class="help-block">Month Required</span>
+                                </div>
+                            </div>
+                            <div class="form-group" ng-class="{ 'has-error' : submitted && formCommonFeilds.Day.$invalid}">
+                                <label class="col-md-5 control-label">
+                                    Days :
+                                    <span class="required">*</span>
+                                </label>
+                                <div class="col-md-7">
+                                    <select class="form-control" ng-model="Attendance.Day" name="Day" ng-options="m.Value as m.Text for m in  Days" required>
+                                        <option value="" selected="selected">Select</option>
+                                    </select>
+                                    <div class="form-control-focus"> </div>
+                                    <span ng-show="submitted && formCommonFeilds.Day.$error.required" class="help-block">Day Required</span>
+                                </div>
+                            </div>
+                            <div class="pull-right">
+                                <button ng-click="submitted=true;" type="submit" class="btn green">Show</button>
+                                <button ng-click="submitted=false;resetForm()" class="btn info">Reset</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+            <div class="alert alert-info">
+                <div class="row">
+                    <div class="col-md-4">Total Student In List = {{totalSum}}</div>
+                    @*<div class="col-md-4">Total Present = {{totalcount}}</div>
+                    <div class="col-md-4">Total Absent = {{totalSum-totalcount}}</div>*@
+                </div>
+            </div>
+            <form ng-submit="SaveAttendance()">
+                <div class="table-container">
+
+                    <div id="sample_3_wrapper" class="dataTables_wrapper no-footer scroll-table-container">
+                        <div class="scroll-table">
+
+                            <table class="table table-bordered table-hover table-header-fixed">
+                                <thead>
+                                    <tr class="bg-primary">
+                                        <th width="22%"> StudentID</th>
+                                        <th width="13%">Roll</th>
+                                        <th width="28%">Student Name</th>
+                                        <th width="15%" ng-repeat="item in Attendancess[0].DayStatus">Absconding</th>
+                                        <th width="20%">Class Period</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-show="Attendancess.length <= 0"><td colspan="5" style="text-align:center;"><i class="fa fa-refresh"></i> Data not found!</td></tr>
+                                    <tr ng-repeat="item in Attendancess track by $index"   ng-class="{present:item.item1.IsAbsconding==true}">
+                                        <td width="22%"> {{item.StudentInsID}}</td>
+                                        <td width="13%">{{item.RollNo}}</td>
+                                        <td  width="29%">{{item.FullName}}</td>
+                                        <td  width="15%" ng-repeat="item1 in item.DayStatus track by $index">
+                                            <div class="md-checkbox">
+                                                <input type="checkbox" ng-model="item.IsAbsconding" ng-click="saveSingle(item,$event.target)" ng-checked="item1.IsAbsconding" id="checkbox+{{$parent.$index}}+{{$index}}" class="md-check">
+                                                <label for="checkbox+{{$parent.$index}}+{{$index}}">
+                                                    <span></span>
+                                                    <span class="check"></span>
+                                                    <span class="box"></span>
+                                                </label>
+                                            </div>
+                                        </td>
+                                        <td  width="20%">
+                                            <select class="form-control" ng-model="item.AbscondingPeriod" ng-options="m.PeriodName as m.PeriodName for m in  ClassPeriods">
+                                                <option value="" selected="selected">Select</option>
+                                            </select>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                         
+                        </div>
+                    </div>
+                </div>
+                @*<div class="pull-right">
+                    <button ng-click="submitted=true;" type="submit" class="btn green">Update</button>
+                </div>*@
+            </form>
+        </div>
+    </div>
+</div>
+@section Scripts{
+    <script type="text/javascript">
+        OEMSApp.controller("ctrlAttendance", ["$scope", "$http", "SweetAlert", "$window",
+              function ($scope, $http, SweetAlert, $window) {
+                  init();
+                  function init() {
+                      initialize();
+                      getAllCommons();
+                      TotalDay();
+                  }
+                  function initialize() {
+                      $scope.CommonFeilds = [];
+                      $scope.res = {};
+                      $scope.data = {};
+                      $scope.Attendance = {};
+                      $scope.getAllCommons = getAllCommons;
+                      $scope.modalTitle = "Save Attendance";
+                      $scope.BTNValue = "Save";
+                      $scope.Month = new Date().getMonth() + 1;
+                      $scope.Year = new Date().getFullYear();
+                      $scope.DayCount = new Date($scope.Year, $scope.Month, 0).getDate();
+                      $scope.Days = [];
+                      $scope.TotalDay = TotalDay;
+                      $scope.submited = false;
+                      $scope.formDisable = true;
+                      $scope.months = [{ Value: 1, Text: "January" }, { Value: 2, Text: "February" }, { Value: 3, Text: "March" },
+                        { Value: 4, Text: "April" }, { Value: 5, Text: "May" }, { Value: 6, Text: "June" }, { Value: 7, Text: "July" },
+                        { Value: 8, Text: "August" }, { Value: 9, Text: "September" }, { Value: 10, Text: "October" }, { Value: 11, Text: "November" } , { Value: 12, Text: "December" }]
+                  }
+                  function daysInMonth(month, year) {
+                      return new Date(year, month, 0).getDate();
+                  }
+                  function TotalDay() {
+                      $scope.Days = [];
+                      if(angular.isUndefined($scope.Attendance.Month))
+                          var m = $scope.Month;
+                      else
+                          var m = $scope.Attendance.Month;
+                      $scope.DayCount = daysInMonth(m, 2018);
+                      for (var i = 0; i <= $scope.DayCount - 1; i++) {                      
+                          $scope.Days.push({ 'Text': 1 + i, 'Value': 1 + i });
+                      }
+                  }
+                  $scope.resetForm = function resetForm() {
+                      $scope.Attendancess = [];
+                  }
+                  function getAllCommons() {
+                      $scope.CommonFeilds = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Common/GetCommonItem/'
+                      }).then(function successCallback(response) {
+                          $scope.CommonFeilds = response.data.results;
+                      }, function errorCallback(response) {
+                          if (response.data.message != null)
+                           toastr["info"](response.data.message);
+                      });
+                  }
+           
+                  $scope.GetSection = function GetSection() {
+                      $scope.Sections = [];
+                  
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Common/GetSection/' + $scope.Attendance.SessionId + "/" + $scope.Attendance.ShiftId + "/" + $scope.Attendance.ClassId 
+                      }).then(function successCallback(response) {
+                          $scope.Sections = response.data.results;
+                      }, function errorCallback(response) {
+                          if (response.data.message != null)
+                           toastr["info"](response.data.message);
+                      });
+                  }
+                  $scope.GetAllClassPeriod = function GetAllClassPeriod() {
+                      $scope.ClassPeriods = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Routine/GetClassPeriodByShiftClass/' + $scope.Attendance.ShiftId + '/' + $scope.Attendance.ClassId
+                      }).then(function successCallback(response) {
+                          $scope.ClassPeriods = response.data.results;
+                      }, function errorCallback(response) {
+                          if (response.data.message != null)
+                           toastr["warning"](response.data.message);
+                      });
+                  }
+                  $scope.SaveAttendance = function SaveAttendance() {
+                      $scope.stuAtt = [];
+                      angular.forEach($scope.Attendancess, function (value, key) {
+                          angular.forEach(value.DayStatus, function (value1, key1) {
+                              value.Day = value1.Day;
+                              value.IsDisable = value1.IsDisable;
+                              value.IsPresent = value1.IsPresent;
+                          });
+                          value.Year = $scope.Attendance.Year;
+                          value.Month = $scope.Attendance.Month;
+                          $scope.stuAtt.push(value)
+                      });
+                      $http({
+                          method: 'POST',
+                          url: baseUrl + 'Attendance/SaveDailyAbs/',
+                          data: $scope.stuAtt
+                      }).then(function successCallback(response) {
+                          if (response.data.message!=null)
+                            toastr["info"](response.data.message);
+                      }, function errorCallback(response) {
+                          item.checked = false;
+                          if (response.data.message != null)
+                             toastr["info"](response.data.message);
+                      });
+                  };
+                  $scope.saveSingle = function saveSingle(arr, item) {
+                      if (arr.AbscondingPeriod == null || arr.AbscondingPeriod == '') {
+                          item.checked = false;
+                          toastr["warning"]("Please Select Period");
+                          return;
+                      }
+                      arr.IsAbsconding = item.checked;
+                      arr.Year = $scope.Attendance.Year;
+                      arr.Month = $scope.Attendance.Month;
+                      arr.Day = $scope.Attendance.Day;
+                      $http({
+                          method: 'POST',
+                          url: baseUrl + 'Attendance/SaveDailyAbsSingle/',
+                          data: arr
+                      }).then(function successCallback(response) {
+                          if (response.data.message != null)
+                            toastr["info"](response.data.message);
+                      }, function errorCallback(response) {
+                          item.checked = false;
+                          if (response.data.message != null)
+                            toastr["info"](response.data.message);
+                      });
+                  };
+                  $scope.SearchAttendance = function SearchAttendance() {
+                      $scope.DateDay = new Date($scope.Attendance.Year, $scope.Attendance.Month, $scope.Attendance.Day).toDateString('DD/MM/YYYY');
+                      if ($scope.formCommonFeilds.$invalid)
+                          return;
+                      $scope.Attendancess = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Attendance/GetAttenAbsByDate/' + $scope.Attendance.SessionId + '/' + $scope.Attendance.BranchId + '/' + $scope.Attendance.ShiftId + '/' + $scope.Attendance.SectionId + '/' + $scope.Attendance.Year + '/' + $scope.Attendance.Month + '/' + $scope.Attendance.Day,
+                      }).then(function successCallback(response) {
+                          $scope.Attendancess = response.data.results;
+                          $scope.totalSum = response.data.totalSum// Total Student
+                          $scope.totalcount = response.data.totalcount // Total Present
+                          if (response.data.message != null)
+                              toastr["info"](response.data.message);
+                      }, function errorCallback(response) {
+                          if (response.data.message != null)
+                             toastr["info"](response.data.message);
+                      });
+                  };
+              }]);
+    </script>
+}

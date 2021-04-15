@@ -1,0 +1,88 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<div ng-controller="ResultCtrl">
+    <div class="row" style="padding-left: 30%;padding-top: 2%;margin-bottom: 2%;">
+        <p id="sitename" style="display:none">@ViewBag.sitename</p>
+        <div class="col-lg-2" style="font-size: larger;text-align:right">
+            @ViewBag.ExamType Exam :
+        </div>
+        <div class="col-lg-3">
+            @if (ViewBag.ExamType == "Main")
+            {
+                @Html.DropDownList("ExamID", new SelectList(ViewBag.examlist, "MainExamId", "MainExamName"), "Please Select", new { @class = "form-control", required = "required"})
+            }
+            else
+            {
+                @Html.DropDownList("ExamID", new SelectList(ViewBag.examlist, "GrandExamId", "GrandExamName"), "Please Select", new { @class = "form-control", required = "required"})
+            }
+        </div>
+        <div class="col-lg-2" style="font-size: larger;text-align:left">
+            <a class="btn Button" href="#" ng-click="showresult('@ViewBag.ExamType')">Show Result</a>
+        </div>
+    </div>
+    <div class="row" id="iframe" name="iframe" style="padding-left: 10%;">
+
+    </div>
+</div>
+@section Scripts{
+    <script type="text/javascript">
+        OEMSApp.controller("ResultCtrl", ["$scope", "$http","$window",
+        function ($scope, $http,$window) {
+            init();
+            function init() {
+                $scope.StudentInfo = [];
+                GetStudentInfo();
+            }
+
+            function GetStudentInfo() {
+                $scope.StudentInfo = [];
+                $http({
+                    method: 'GET',
+                    url: baseUrl + 'Result/StudentInfo/'
+                }).then(function successCallback(response) {
+                    // when the response is available
+                    $scope.StudentInfo = response.data;
+                    //console.log($scope.StudentInfo);
+                }, function errorCallback(response) {
+                });
+            }
+
+            $scope.showresult = function showresult(ExamType)
+            {
+                //console.log($scope.StudentInfo);
+                var examid = document.getElementById('ExamID').value;
+                if (examid === '')
+                {
+                    toastr["warning"]('Please select exam.');
+                }
+                else
+                {
+                    var link;
+                    var sitename = document.getElementById('sitename').innerText;
+                    if (ExamType === 'Grand')
+                    {
+                             link = sitename+'/Report/GrandExamResultCard?GrandExamId=' + examid + '&Versionid=' + $scope.StudentInfo.VersionID + '&SessionId=' + $scope.StudentInfo.SessionId + '&ClassId=' + $scope.StudentInfo.ClassId + '&StuId=' + $scope.StudentInfo.StudentIID
+                    }
+                    else
+                    {
+                            link = sitename+'/Report/MainExamResultCard?MainExamId=' + examid + '&Versionid=' + $scope.StudentInfo.VersionID + '&SessionId=' + $scope.StudentInfo.SessionId + '&ClassId=' + $scope.StudentInfo.ClassId + '&StuId=' + $scope.StudentInfo.StudentIID
+                    }
+                    AddIframe(link);
+                }
+            }
+
+        }]);
+
+        function AddIframe(link) {
+            console.log(link);
+            var ifrm = document.createElement("iframe");
+            ifrm.setAttribute("src", link);
+            ifrm.style.width = "90%";
+            ifrm.style.height = "560px";
+            document.getElementById('iframe').appendChild(ifrm);
+        }
+</script> 
+    }

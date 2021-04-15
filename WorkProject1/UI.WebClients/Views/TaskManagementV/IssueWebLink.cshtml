@@ -1,0 +1,293 @@
+﻿
+@{
+    ViewBag.Title = "Issue Web Link";
+}
+
+<div class="portlet box blue-hoki" style="width: 100%" ng-controller="ctrlIssueWebLink">
+    <!-- Begin: life time stats -->
+    <div class="portlet light bordered">
+        <div class="portlet-title">
+            <div class="caption">
+                <i class="icon-settings font-green"></i>
+                <span class="caption-subject font-green sbold uppercase">All IssueWebLink</span>
+            </div>
+            <div class="actions">
+                <div class="btn-group btn-group-solid">
+                    <button ng-click="submitted=false" class="btn green" data-target="#addmodal" data-toggle="modal"> <i class="fa fa-plus"></i> Add New IssueWebLink</button>
+                </div>
+            </div>
+        </div>
+        <div class="portlet-body">
+            <div class="table-container">
+                <div id="sample_3_wrapper" class="dataTables_wrapper no-footer">
+                    <div class="row">
+                        <div class="col-md-4 col-sm-5 col-xs-6">
+                            <div class="form-group">
+                                <div class="col-lg-3 col-md-5 col-sm-4 col-xs-8" style="padding-left:0px">
+                                    <select class="form-control" ng-model="pageSize" ng-options="P.value as P.text for P in pageSizeArray"></select>
+                                </div>
+                                <div class="col-md-7  col-sm-8  col-xs-4">
+                                    @*<label for="search" class="control-label" style="padding-top:5px">Items</label>*@
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 col-sm-3 col-xs-1">
+                        </div>
+                        <div class="col-md-4 col-sm-4 col-xs-5">
+                            <div id="sample_3_filter" class="pull-right">
+                                <input ng-model="q" id="search" class="form-control" placeholder="Filter text">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="table-scrollable"> </div>
+                    <table class="table table-bordered table-hover">
+                        <thead>
+                            <tr class="btn-primary">
+                                <th>SL#</th>
+                                <th>IssueId</th>
+                                <th>Url</th>
+                                <th>Description</th>
+                                <th style="text-align:center">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-show="IssueWebLinkList.length <= 0"><td colspan="5" style="text-align:center;"><i class="fa fa-refresh"></i> Loading new data!!</td></tr>
+                            <tr dir-paginate="item in IssueWebLinkList| filter:q  | itemsPerPage: pageSize" current-page="currentPage">
+                                <td>{{$index+1}}</td>
+                                <td>{{item.IssueId}} </td>
+                                <td>{{item.Url}}</td>
+                                <td>{{item.Description}}</td>
+
+                                <td align="center">
+                                    <a class="btn btn-icon-only green" ng-click="editIssueWebLink(item)" data-target="#addmodal" data-toggle="modal">
+                                        <i class="fa fa-edit"></i>
+                                    </a>
+                                    <a ng-click="deleteIssueWebLink(item.Id)" href="javascript:;" class="btn btn-icon-only red">
+                                        <i class="fa fa-trash"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="row">
+                        <dir-pagination-controls boundary-links="true" template-url="~/assets/angular/lib/dirPagination.tpl.html"></dir-pagination-controls>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- End: life time stats -->
+    <!--Modal Area Start-->
+    <div id="addmodal" class="modal fade" tabindex="-1" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form name="addBasic" ng-submit="save()" class="form-horizontal" id="form_sample_1" novalidate autocomplete="off">
+                    <div class="modal-header">
+                        <h5 class="modal-title">{{modalTitle}}</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true" ng-click="resetForm();submitted=false"></button>
+                      
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-body">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group" ng-class="{ 'has-error' : submitted && addBasic.IssueId.$invalid}">
+                                        <label class="col-md-4 control-label">
+                                            IssueId :
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-8">
+                                            <input type="text" ng-model="IssueWebLinkInfo.IssueId" class="form-control" placeholder="IssueId Name" name="IssueId" required>
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted &&  addBasic.IssueId.$error.required" class="help-block">IssueId Required</span>
+                                        </div>
+                                    </div>  
+
+                                    <div class="form-group" ng-class="{ 'has-error' : submitted && addBasic.Url.$invalid}">
+                                        <label class="col-md-4 control-label">
+                                            Url  :
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-8">
+                                            <input type="text" ng-model="IssueWebLinkInfo.Url" class="form-control" placeholder="Url" name="Url" required>
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted &&  addBasic.Url.$error.required" class="help-block">Url Required</span>
+                                        </div>
+                                    </div>  
+
+                                    <div class="form-group" ng-class="{ 'has-error' : submitted && addBasic.Description.$invalid}">
+                                        <label class="col-md-4 control-label">
+                                            Description :
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-8">
+                                            <textarea type="text" ng-model="IssueWebLinkInfo.Description" class="form-control" placeholder="Description Name" name="Description" required></textarea>
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted &&  addBasic.Description.$error.required" class="help-block">Description Required</span>
+                                        </div>
+                                    </div>
+
+                                    
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" data-dismiss="modal" class="btn dark btn-outline" ng-click="resetForm();submitted=false">Cancel</button>
+                        <button type="submit" ng-click="submitted=true" class="btn green-haze">{{modalbutton}}</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!--Modal Area End-->
+</div>
+<!-- END FORM-->
+@section Scripts{
+
+    <script type="text/javascript">
+        OEMSApp.controller("ctrlIssueWebLink", ["$scope", "$http", "SweetAlert",
+              function ($scope, $http, SweetAlert) {
+                  init();
+                  function init() {
+                      initialize();
+                      getAllIssueWebLink();
+                  }
+
+                  function initialize() {
+                      $scope.modalbutton = 'Save';
+                      $scope.modalTitle = 'Add New IssueWebLink';
+                      $scope.IssueWebLinkInfo = {};
+                      $scope.IssueWebLinkInfo.Id = 0;
+                      $scope.IssueWebLinkList = [];
+                      $scope.resetForm = resetForm;
+
+                      $scope.pageSizeArray = [];
+                      $scope.pageSizeArray.push({ value: 5, text: 5 });
+                      $scope.pageSizeArray.push({ value: 10, text: 10 });
+                      $scope.pageSizeArray.push({ value: 20, text: 20 });
+                      $scope.pageSizeArray.push({ value: 50, text: 50 });
+                      $scope.currentPage = 1;
+                      $scope.pageSize = 10;
+                  }
+
+                  function resetForm() {
+                      $scope.modalTitle = "Add New IssueWebLink";
+                      $scope.IssueWebLinkInfo = {};
+                      $scope.IssueWebLinkInfo.Id = 0;
+                      $scope.addBasic.$setUntouched();
+                      $scope.addBasic.$setPristine();
+                      $scope.modalbutton = 'Save';
+                  }
+
+                  $scope.save = function save() {
+                      if ($scope.addBasic.$invalid)
+                          return;
+                      else {
+                          var result = validation();
+                          if (result) {
+                              if ($scope.IssueWebLinkInfo.Id==0) { // Add 
+                                  $http({
+                                      method: 'POST',
+                                      url: baseUrl + 'TaskManagement/AddIssueWebLink',
+                                      data: $scope.IssueWebLinkInfo
+                                  }).then(function successCallback(response) {
+                                      $('#addmodal').modal('toggle');
+                                      toastr["info"](response.data.message);
+                                      getAllIssueWebLink();
+                                      resetForm();
+                                  }, function errorCallback(response) {
+                                      toastr["warning"](response.data.Message);
+                                  });
+                              } else { // Update
+                                  $http({
+                                      method: 'PUT',
+                                      url: baseUrl + 'TaskManagement/UpdateIssueWebLink',
+                                      data: $scope.IssueWebLinkInfo
+                                  }).then(function successCallback(response) {
+                                      toastr["info"](response.data.message);
+                                      if (response.data.httpStatusCode != 305) {
+                                          $('#addmodal').modal('toggle');
+                                          getAllIssueWebLink();
+                                          resetForm();
+                                      }
+
+                                  }, function errorCallback(response) {
+                                      toastr["warning"](response.data.Message);
+                                  });
+                              }
+                             
+
+                          }
+                      }
+                  }
+
+                  $scope.deleteIssueWebLink = function deleteIssueWebLink(id) {
+                      SweetAlert.swal({
+                          title: "Are you sure to delete it ?", type: "warning", showCancelButton: true, confirmButtonColor: "#DD6B55",
+                          confirmButtonText: "Yes, delete it!",
+                          closeOnConfirm: false
+                      },
+                        function (isConfirm) {
+                            if (isConfirm) {
+                                $http({
+                                    method: 'DELETE',
+                                    url: baseUrl + 'TaskManagement/DeleteIssueWebLink/' + id,
+                                }).then(function successCallback(response) {
+                                    SweetAlert.swal("Deleted!", "Your data has been deleted.", "success");
+                                    getAllIssueWebLink();
+                                }, function errorCallback(response) {
+                                    toastr["error"](response.data.Message);
+                                });
+                            }
+                        });
+                  }
+
+                  $scope.editIssueWebLink = function editIssueWebLink(item) {
+                      $scope.IssueWebLinkInfo = {};
+                      $scope.modalTitle = "Update IssueWebLink";
+                      $scope.modalbutton = 'Update';
+                      $scope.IssueWebLinkInfo.Id = item.Id;
+                      $scope.IssueWebLinkInfo.IssueId = item.IssueId;
+                      $scope.IssueWebLinkInfo.Url = item.Url;
+                      $scope.IssueWebLinkInfo.Description = item.Description;
+
+                     
+                  }
+
+                  function getAllIssueWebLink() {
+                      $scope.IssueWebLinkList = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'TaskManagement/GetAllIssueWebLink/'
+                      }).then(function successCallback(response) {
+                          $scope.IssueWebLinkList = response.data.results;
+                      }, function errorCallback(response) {
+                          toastr["info"](response.data.Message);
+                      });
+                  }
+
+
+                  function validation() {
+
+                      if ($scope.IssueWebLinkInfo.Id == undefined) {
+                          return true;
+                      }
+                      else {
+                          if ($scope.IssueWebLinkInfo.IssueId == undefined) {
+                              toastr["info"]("Please Select any option..!");
+                              return false;
+                          }
+
+                          else {
+                              //$scope.IssueWebLinkInfo.ActivityStatus = $scope.IssueWebLinkInfo.ActivityStatus;
+                              return true;
+                          }
+                      }
+                  }
+              }]);
+
+    </script>
+}
+

@@ -1,0 +1,310 @@
+﻿
+@{
+    ViewBag.Title = "ECA Changing Request";
+}
+<div ng-controller="ECAChangingClt">
+    <div class="portlet light bordered ">
+        <div class="portlet-title">
+            <div class="caption">
+                <i class="icon-settings font-green"></i>
+                <span class="caption-subject font-green sbold uppercase">@ViewBag.Title</span>
+            </div>
+        </div>
+        <div>
+             <form name="mform" ng-submit="ECARequestList(Rqst)" class="form-horizontal" id="form_sample_1" novalidate>
+               <div class="modal-body">
+                    <div class="form-body">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group" ng-class="{ 'has-error' : submitted && mform.TermId.$invalid}">
+                                    <label class="col-md-3 control-label">
+                                        Class:
+                                        <span class="required">*</span>
+                                    </label>
+                                    <div class="col-md-9">
+                                        <select class="form-control" ng-model="ClassId" name="TermId" ng-options="m.ClassId as m.ClassName for m in CommonFeilds.ClassInfo" required>
+                                            <option value="" selected="selected">Select</option>
+                                        </select>
+                                        <div class="form-control-focus"> </div>
+                                        <span ng-show="submitted && mform.TermId.$error.required" class="help-block">Term Required</span>
+                                    </div>
+                                </div>
+                                <div class="form-group" ng-class="{ 'has-error' : submitted && mform.TermId.$invalid}">
+                                    <label class="col-md-3 control-label">
+                                      Term
+                                        <span class="required">*</span>
+                                    </label>
+                                    <div class="col-md-9">
+                                        <select class="form-control" ng-disabled="ClassId==null" ng-model="Rqst.TermId" name="TermId" ng-options="m.TermId as m.Name for m in Terms |filter:{ClassId:ClassId}:true" required>
+                                            <option value="" selected="selected">Select</option>
+                                        </select>                                      
+                                         <div class="form-control-focus"> </div>
+                                        <span ng-show="submitted && mform.TermId.$error.required" class="help-block">Term Required</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group" ng-class="{ 'has-error' : submitted && mform.DayId.$invalid}">
+                                    <label class="col-md-3 control-label">
+                                        Day
+                                        <span class="required">*</span>
+                                    </label>
+                                    <div class="col-md-9">
+                                        <select class="form-control" ng-model="Rqst.DayId" ng-change="ECAClublist(Rqst.DayId)" name="DayId" ng-options="m.Id as m.text for m in Days" required>
+                                            <option value="" selected="selected">Select</option>
+                                        </select>                                        <div class="form-control-focus"> </div>
+                                        <span ng-show="submitted && mform.DayId.$error.required" class="help-block">Day Required</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group" ng-class="{ 'has-error' : submitted && mform.ClubId.$invalid}">
+                                    <label class="col-md-3 control-label">
+                                        ECA Club
+                                        <span class="required">*</span>
+                                    </label>
+                                    <div class="col-md-9">
+                                        <select class="form-control" ng-model="Rqst.ClubId" name="ClubId" ng-options="m.ClubId as m.ClubName for m in Clublist" required>
+                                            <option value="" selected="selected">Select</option>
+                                        </select>                                        
+                                        <div class="form-control-focus"> </div>
+                                        <span ng-show="submitted && mform.ClubId.$error.required" class="help-block">Club Required</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="reset" class="btn red" ng-click="submitted=false">Reset</button>
+                            <button type="submit" ng-click="submitted=true" class="btn green">Show Application</button>
+                        </div>
+                  </div>
+                </div>
+             
+            </form>
+        </div>
+        <div class="portlet-body">
+            <div class="table-container">
+                <div id="sample_3_wrapper" class="dataTables_wrapper no-footer">
+                    <div class="row">
+                        <div class="col-md-4 col-sm-5 col-xs-6">
+                            <div class="form-group">
+                                <div class="col-lg-4 col-md-8 col-sm-4 col-xs-8" style="padding-left:0px">
+                                    <select class="form-control" ng-model="pageSize" ng-options="P.value as P.text for P in pageSizeArray"></select>
+                                </div>
+                                <div class="col-md-7  col-sm-8  col-xs-4">
+
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 col-sm-3 col-xs-1">
+                        </div>
+                        <div class="col-md-4 col-sm-4 col-xs-5">
+                            <div id="sample_3_filter" class="pull-right">
+                                <input ng-model="q" id="search" class="form-control ng-pristine ng-untouched ng-valid ng-empty" placeholder="Filter text">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="table-scrollable"> </div>
+                    <table class="table table-bordered table-inverse">
+                        <thead class="btn-primary">
+                            <tr>
+                                <th>Student ID</th>
+                                <th>Choice Type</th>
+                                <th>Name</th>
+                                <th>Class</th>
+                                <th>Section</th>
+                                <th>Current ECA</th>
+                                <th>Change To</th>
+                                <th>Reason</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody style="overflow:scroll">
+                            <tr ng-show="RequestList.length <= 0"><td colspan="5" style="text-align:center;"><i class="fa fa-refresh"></i> No Data Found!!</td></tr>
+                            <tr dir-paginate="item in RequestList| filter:q  | itemsPerPage: pageSize " current-page="currentPage" ng-style="{'background-color':$even?evenColor:oddColor}">
+                                <td>{{item.StudentInsID}}</td>
+                                <td>{{item.Choice}}</td>
+                                <td>{{item.FullName}}</td>
+                                <td>{{item.ClassName}}</td>
+                                <td>{{item.SectionName}}</td>
+                                <td>{{item.ClubName}}</td>
+                                <td ng-if="item.NewClubName==null">N/A</td>
+                                <td ng-if="item.NewClubName!=null">{{item.NewClubName}}</td>
+                                <td>{{item.Reason}}</td>
+                                <td>{{item.Status}}</td>
+                                <td>
+                                    <div class="btn-group ">
+                                        <button class="btn btn-xs green dropdown-toggle" type="button" data-toggle="dropdown" aria-expanded="false">
+                                            Options
+                                            <i class="fa fa-angle-down"></i>
+                                        </button>
+                                        <ul class="dropdown-menu" role="menu" style="left: -111%;">
+                                            <li>
+                                                <a  ng-show="item.Status=='Pending'"  ng-click="edit(item)">
+                                                    Approve
+                                                </a>
+                                            </li>
+
+                                            <li>
+                                                <a  ng-hide="item.Status=='Approved' || item.Status=='Rejected'" ng-click="updateStatus(item)">
+                                                    Reject
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="row">
+                        <dir-pagination-controls boundary-links="true" template-url="~/assets/angular/lib/dirPagination.tpl.html"></dir-pagination-controls>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+@section Scripts{
+
+    <script type="text/javascript">
+        OEMSApp.controller("ECAChangingClt", ["$scope", "$http", "SweetAlert", "blockUI", "$window", "$filter",
+                     function ($scope, $http, SweetAlert, blockUI, $window, $filter) {
+                         init();
+                         function init() {
+                             initialize();
+                             //ECARequestList();
+                             getAllCommons();
+                             getTermList();
+                         }
+                         function initialize() {
+                             $scope.pageSizeArray = [];
+                             $scope.pageSizeArray.push({ value: 5, text: 5 });
+                             $scope.pageSizeArray.push({ value: 10, text: 10 });
+                             $scope.pageSizeArray.push({ value: 20, text: 20 });
+                             $scope.pageSizeArray.push({ value: 50, text: 50 });
+                             $scope.currentPage = 1;
+                             $scope.pageSize = 10;
+                             $scope.Rqst = {};
+                             $scope.View = {};
+                             $scope.RequestList = [];
+                             $scope.CategoryList = [];
+                             $scope.DesignationList = [];
+                             $scope.Terms = [];
+                   
+                             $scope.Days = [];
+                             $scope.Days.push(
+                                               { Id: 2, text: 'Sunday' },
+                                                { Id: 3, text: 'Monday' },
+                                                { Id: 4, text: 'Thuesday' });
+                             $scope.Status = '';
+                   
+                         };
+                      $scope.edit = function edit(n) {
+                          $scope.Rqst.StudentId = n.StudentIID;
+                          $scope.Status = 'Approved';
+                          $http({
+                              method: 'POST',
+                              url: baseUrl + 'Student/Request/ECAChangeRequestApproved/' + n.StudentId + '/' + $scope.Status
+
+                          }).then(function successCallback(response) {
+                              toastr["success"](response.data.message);
+                              ECARequestList(n);
+                          }, function errorCallback(response) {
+
+                              toastr["error"](response.data.Message);
+                          });
+                         }
+                      $scope.ECARequestList =    function ECARequestList(n) {
+                             $scope.RequestList = [];
+                            $http({
+                                 method: 'POST',
+                                 url: baseUrl + 'Student/Request/ECAChangingRequestList/',
+                                data: n
+                             }).then(function successCallback(response) {
+                                
+                                 $scope.RequestList = response.data.results;
+                              
+                                 //console.log($scope.RequestList);
+                                 // toastr["success"](response.data.message);
+                             }, function errorCallback(response) {
+                              
+                                 toastr["error"](response.data.Message);
+                             });
+
+                         }
+                      $scope.ECARequestList = function ECARequestList(n) {
+                          $scope.RequestList = [];
+                          $http({
+                              method: 'POST',
+                              url: baseUrl + 'Student/Request/ECAChangingRequestList/',
+                              data: n
+                          }).then(function successCallback(response) {
+
+                              $scope.RequestList = response.data.results;
+
+                              //console.log($scope.RequestList);
+                              // toastr["success"](response.data.message);
+                          }, function errorCallback(response) {
+
+                              toastr["error"](response.data.Message);
+                          });
+
+                      }
+                         $scope.updateStatus = function updateStatus(n) {
+                             $scope.Rqst.StudentId = n.StudentIID;
+                             $scope.Status = 'Rejected';
+                             $http({
+                                 method: 'POST',
+                                 url: baseUrl + 'Student/Request/ECAChangeRequestRejected/' + n.StudentId + '/' + $scope.Status
+
+                             }).then(function successCallback(response) {
+
+                                 ECARequestList(n);
+                              toastr["success"](response.data.message);
+                             }, function errorCallback(response) {
+                                 ECARequestList(n);
+                               toastr["error"](response.data.message);
+                             });
+                         }
+
+                         function getTermList() {
+                             $scope.Terms = [];
+                             $http({
+                                 method: 'GET',
+                                 url: baseUrl + 'SetupInstitution/GetTermList/'
+                             }).then(function SuccessCallback(response) {
+                                 $scope.Terms = response.data.results;
+                             },
+                             function errorCallback() { });
+                         }
+
+                         $scope.ECAClublist = function ECAClublist(n) {
+                             $scope.Clublist = [];
+                             $http({
+                                 method: 'GET',
+                                 url: baseUrl + 'Student/Request/GetDaywiseClubList/' + n
+                             }).then(function SuccessCallback(response) {
+                                 $scope.Clublist = response.data.results;
+                             },
+                             function errorCallback() { });
+                         }
+
+                         function getAllCommons() {
+                             $scope.CommonFeilds = [];
+                             $http({
+                                 method: 'GET',
+                                 url: baseUrl + 'Common/GetCommonItem/'
+                             }).then(function successCallback(response) {
+                                 $scope.CommonFeilds = response.data.results;
+                             }, function errorCallback(response) {
+                                 toastr["warning"](response.data.message);
+                             });
+                         }
+
+                     }]);
+    </script>
+}

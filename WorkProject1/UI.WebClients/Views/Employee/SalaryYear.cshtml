@@ -1,0 +1,319 @@
+﻿
+@{
+    ViewBag.Title = "Salary Year";
+}
+
+<div class="kt-container  kt-container--fluid  kt-grid__item kt-grid__item--fluid" ng-controller="ctrlSalaryYear">
+
+    <div class="row">
+        <div class="kt-portlet kt-portlet--mobile">
+            <div class="kt-portlet__head kt-portlet__head--lg">
+                <div class="kt-portlet__head-label">
+                    <h3 class="kt-portlet__head-title">
+                        Salary Year
+                    </h3>
+                </div>
+                <div class="kt-portlet__head-toolbar">
+                    <div class="kt-portlet__head-wrapper">
+                        <div class="dropdown dropdown-inline">
+                            <button type="button" class="btn btn-brand btn-icon-sm" data-toggle="modal" data-target="#addmodal" aria-haspopup="true" aria-expanded="false">
+                                <i class="flaticon2-plus"></i> Add New Salary Year
+                            </button>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="kt-portlet__body">
+
+                <div class="row">
+                    <div class="col-md-4 col-sm-5 col-xs-6">
+                        <div class="form-group">
+                            <div class="col-lg-3 col-md-5 col-sm-4 col-xs-8" style="padding-left:0px">
+
+                                <select class="form-control kt-font-brand" ng-model="pageSize" ng-options="P.value as P.text for P in pageSizeArray"></select>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="col-md-4 col-sm-3 col-xs-1">
+                    </div>
+                    <div class="col-md-4 col-sm-4 col-xs-5">
+                        <div id="sample_3_filter" class="pull-right">
+                            <input ng-model="q" id="search" class="form-control" placeholder="Filter text">
+                        </div>
+                    </div>
+                </div>
+                <table class="table table-bordered table-hover rounded">
+                    <thead>
+                        <tr class="btn-primary">
+                            <th>SI</th>
+                            <th>Year Name</th>
+                            <th>From Date</th>
+                            <th>To Date</th>
+                            <th style="text-align:center">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-show="SalaryYearList.length <= 0"><td colspan="5" style="text-align:center;"><i class="fa fa-refresh"></i> Loading new data!!</td></tr>
+                        <tr dir-paginate="item in SalaryYearList| filter:q  | itemsPerPage: pageSize" current-page="currentPage">
+                            <td>{{$index+1}}</td>
+                            <td>{{item.YearName}}</td>
+                            <td>{{item.FromDate | date:'dd/MM/yyyy'}}</td>
+                            <td>{{item.ToDate | date:'dd/MM/yyyy'}}</td>
+                            <td align="center">
+                                <a href="javascript:;" class="btn btn-outline-brand btn-elevate btn-icon" ng-click="editSalaryYear(item)" data-target="#addmodal" data-toggle="modal">
+                                    <i class="fa fa-edit"></i>
+                                </a>
+                                <a ng-click="deleteSalaryYear(item.Id)" href="javascript:;" class="btn btn-outline-danger btn-elevate btn-icon">
+                                    <i class="fa fa-trash"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="row">
+                    <dir-pagination-controls boundary-links="true" template-url="~/assets/angular/lib/dirPagination.tpl.html"></dir-pagination-controls>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--Modal Area Start-->
+    <div id="addmodal" class="modal fade" tabindex="-1" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form name="addBasic" ng-submit="save()" class="form-horizontal" id="form_sample_1" novalidate>
+                    <div class="modal-header">
+                        <h5 class="modal-title">{{modalTitle}}</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-body">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group row" ng-class="{ 'has-error' : submitted && addBasic.YearName.$invalid}">
+                                        <label class="col-md-3 control-label text-right">
+                                            Year Name :
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-9">
+                                            <input type="text" ng-model="SalaryYear.YearName" class="form-control" placeholder="Year Name" name="YearName" required>
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted &&  addBasic.YearName.$error.required" class="help-block">Year Name Required</span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group row" ng-class="{ 'has-error' : submitted && addBasic.FromDate.$invalid}">
+                                        <label class="col-md-3 control-label text-right">
+                                            From Date
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-9">
+                                            <input type="text" class="form-control" uib-datepicker-popup="dd/MM/yyyy" placeholder="Start Date" name="FromDate" ng-model="SalaryYear.fromDate" is-open="popup1.opened" ng-click="popup1.opened=true" ng-required="true" close-text="Close" alt-input-formats="altInputFormats" readonly="readonly" />
+
+                                            <span ng-show="submitted &&  addBasic.FromDate.$error.required" class="help-block">From Date Required</span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group row" ng-class="{ 'has-error' : submitted && addBasic.ToDate.$invalid}">
+                                        <label class="col-md-3 control-label text-right">
+                                            To Date
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-9">
+                                            <input type="text" class="form-control" uib-datepicker-popup="dd/MM/yyyy" placeholder="End Date" name="ToDate" ng-model="SalaryYear.toDate" min-date="employeeInfo.FromDate" is-open="popup2.opened" ng-click="popup2.opened=true" datepicker-options="dateOptionsDOB" ng-required="true" close-text="Close" alt-input-formats="altInputFormats" readonly="readonly" />
+
+                                            <span ng-show="submitted &&  addBasic.ToDate.$error.required" class="help-block">To Date Required</span>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" data-dismiss="modal" class="btn btn-secondary" ng-click="resetForm();submitted=false">Cancel</button>
+                        <button type="submit" ng-click="submitted=true" class="btn btn-success">{{modalbutton}}</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!--Modal Area End-->
+</div>
+<!-- END FORM-->
+@section Scripts{
+    <script src="~/assets/global/plugins/bootstrap-fileinput/bootstrap-fileinput.js" type="text/javascript"></script>
+    <script src="~/assets/pages/scripts/form-repeater.min.js"></script>
+    <script type="text/javascript">
+        for (i = new Date().getFullYear() ; i > 1900; i--) {
+            $('#yearpicker').append($('<option />').val(i).html(i));
+        }
+    </script>
+    <script type="text/javascript">
+        OEMSApp.controller("ctrlSalaryYear", ["$scope", "$http", "SweetAlert",
+              function ($scope, $http, SweetAlert) {
+                  init();
+                  function init() {
+                      initialize();
+                      getAllSalaryYear();
+                      datatimes();
+
+                  }
+                  function initialize() {
+                      $scope.modalbutton = 'Save';
+                      $scope.modalTitle = 'Add Salary Year';
+                      $scope.SalaryYear = {};
+                      $scope.SalaryYear.Id = 0;
+                      $scope.employeeInfos = [];
+                      $scope.SalaryYearList = [];
+                      $scope.resetForm = resetForm;
+                      $scope.getAllSalaryYear = getAllSalaryYear;
+
+                      $scope.pagesize = 10;
+                      $scope.pageSizeArray = [];
+                      $scope.pageSizeArray.push({ value: 5, text: 5 });
+                      $scope.pageSizeArray.push({ value: 10, text: 10 });
+                      $scope.pageSizeArray.push({ value: 20, text: 20 });
+                      $scope.pageSizeArray.push({ value: 50, text: 50 });
+                      $scope.currentPage = 1;
+                      $scope.pageSize = 10;
+                  }
+                  function resetForm() {
+                      $scope.modalbutton = 'Save';
+                      $scope.modalTitle = "Add Salary Year";
+                      $scope.SalaryYear = {};
+                      $scope.SalaryYear.Id = 0;
+
+                      $scope.addBasic.$setUntouched();
+                      $scope.addBasic.$setPristine();
+                      //$scope.submitted = false;
+
+                  }
+
+
+                  $scope.save = function save() {
+                      if ($scope.addBasic.$invalid)
+                          return;
+                      else {
+                          var result = validation();
+                          if (result) {
+                              if ($scope.SalaryYear.Id == 0) {
+                                  $http({
+                                      method: 'POST',
+                                      url: baseUrl + 'Employee/AddSalaryYear/',
+                                      data: $scope.SalaryYear
+                                  }).then(function successCallback(response) {
+                                      $('#addmodal').modal('toggle');
+                                      toastr["info"](response.data.message);
+                                      getAllSalaryYear();
+                                      resetForm();
+                                  }, function errorCallback(response) {
+                                      toastr["warning"](response.data.Message);
+                                  });
+                              }
+                              if ($scope.SalaryYear.Id != 0) {
+                                  if ($scope.addBasic.$invalid)
+                                      return;
+                                  else {
+                                      $http({
+                                          method: 'PUT',
+                                          url: baseUrl + 'Employee/UpdateSalaryYear/',
+                                          data: $scope.SalaryYear
+                                      }).then(function successCallback(response) {
+                                          toastr["info"](response.data.message);
+                                          if (response.data.httpStatusCode != 305) {
+                                              $('#addmodal').modal('toggle');
+                                              resetForm();
+                                              getAllSalaryYear();
+                                          }
+
+                                      }, function errorCallback(response) {
+                                          toastr["warning"](response.data.Message);
+                                      });
+                                  }
+                              }
+                          }
+                      }
+                  }
+
+                  function validation() {
+                      var check = 0;
+                      if ($scope.SalaryYear.FromDate > $scope.SalaryYear.ToDate) {
+                          toastr["info"]("Date Range Invalid.");
+                          $scope.employeeInfo.ToDate = null;
+                          check = 1;
+                          return false;
+
+                      }
+
+                      if (check == 0) {
+                          return true;
+                      }
+                  }
+
+                  function getAllSalaryYear() {
+                      $scope.SalaryYearList = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Employee/GetAllSalaryYear/'
+                      }).then(function successCallback(response) {
+                          $scope.SalaryYearList = response.data.results;
+                      }, function errorCallback(response) {
+                          toastr["info"](response.data.Message);
+                      });
+                  }
+
+                  $scope.deleteSalaryYear = function deleteSalaryYear(Id) {
+                      SweetAlert.swal({
+                          title: "Are you sure to delete it ?", type: "warning", showCancelButton: true, confirmButtonColor: "#DD6B55",
+                          confirmButtonText: "Yes, delete it!",
+                          closeOnConfirm: false
+                      },
+                        function (isConfirm) {
+                            if (isConfirm) {
+                                $http({
+                                    method: 'DELETE',
+                                    url: baseUrl + 'Employee/DeleteSalaryYear/' + Id,
+                                }).then(function successCallback(response) {
+                                    SweetAlert.swal("Deleted!", "Your data has been deleted.", "success");
+                                    getAllSalaryYear();
+                                }, function errorCallback(response) {
+                                    //toastr["warning"](response.data.message);
+                                    SweetAlert.swal("", "Year Name Already Exist. in Salary Period!", "warning");
+                                });
+                            }
+                        });
+                  }
+
+                  $scope.editSalaryYear = function editSalaryYear(item) {
+                      $scope.modalTitle = 'Update Salary Year';
+                      $scope.modalbutton = 'Update';
+                      $scope.SalaryYear = item;
+                      $scope.SalaryYear.Id = item.Id;
+                      $scope.SalaryYear.toDate = new Date(item.ToDate);
+                      $scope.SalaryYear.fromDate = new Date(item.FromDate);
+                      $scope.SalaryYear.YearName = item.YearName;
+
+                  }
+                  function datatimes() {
+                      $scope.$watch('employeeInfo.FromDate', function (niu) {
+                          if (niu) {
+                              $scope.dateOptionsDOB.minDate = niu
+                          }
+                      });
+                      $scope.$watch('employeeInfo.ToDate', function (niu) {
+                          if (niu) {
+                              $scope.dateOptionsAd.minDate = niu
+                          }
+                      });
+                  }
+              }]);
+    </script>
+}
+
+
+
+
+

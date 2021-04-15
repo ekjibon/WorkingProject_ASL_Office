@@ -1,0 +1,228 @@
+﻿
+@{
+
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<!--date picker-->
+<link href="http://cdn.addiesoft.com/admin/assets/global/plugins/bootstrap-daterangepicker/daterangepicker.min.css" rel="stylesheet" type="text/css" />
+<link href="http://cdn.addiesoft.com/admin/assets/global/plugins/bootstrap-datepicker/css/bootstrap-datepicker3.min.css" rel="stylesheet" type="text/css" />
+<link href="http://cdn.addiesoft.com/admin/assets/global/plugins/bootstrap-timepicker/css/bootstrap-timepicker.min.css" rel="stylesheet" type="text/css" />
+<link href="http://cdn.addiesoft.com/admin/assets/global/plugins/bootstrap-datetimepicker/css/bootstrap-datetimepicker.min.css" rel="stylesheet" type="text/css" />
+<script src="http://cdn.addiesoft.com/admin/assets/global/plugins/bootstrap-daterangepicker/daterangepicker.min.js" type="text/javascript"></script>
+<script src="http://cdn.addiesoft.com/admin/assets/global/plugins/bootstrap-datepicker/js/bootstrap-datepicker.min.js" type="text/javascript"></script>
+<script src="http://cdn.addiesoft.com/admin/assets/global/plugins/bootstrap-timepicker/js/bootstrap-timepicker.min.js" type="text/javascript"></script>
+<script src="http://cdn.addiesoft.com/admin/assets/global/plugins/bootstrap-datetimepicker/js/bootstrap-datetimepicker.min.js" type="text/javascript"></script>
+<script src="http://cdn.addiesoft.com/admin/assets/pages/scripts/components-date-time-pickers.min.js" type="text/javascript"></script>
+
+
+<h2 class="SetUpHead">Add Task</h2>
+<div ng-controller="taskAddClt">
+    <form name="taskFrm" ng-submit="Submit()" novalidate class="form-horizontal" role="form">
+        <div class="portlet-body form" style="display: block;">
+            <div class="form-body">
+                <div class="row" style="margin-right: 1%;">
+                    <div class="form-group" style="margin-left:-17%;width: 117%;" ng-class="{ 'has-error' : submitted && taskFrm.TaskName.$invalid}">
+                        <label class="col-md-3 control-label">Task Name</label>
+                        <div class="col-md-9">
+                            <input type="text" ng-model="TaskInfo.Id" hidden />
+                            <input autocomplete="off" type="text" maxlength="50" ng-model="TaskInfo.TaskName" class="form-control input-lg" name="TaskName" required placeholder="Task Name">
+                            <span ng-show="submitted &&  taskFrm.TaskName.$error.required" class="text-danger">Task Name is Required</span>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                      <div class="form-group" ng-class="{ 'has-error' : submitted && taskFrm.ProjectId.$invalid}">
+                            <label class="col-md-3 control-label">Project</label>
+                            <div class="col-md-9">
+                                <select class="form-control input-lg" required name="ProjectId" ng-model="TaskInfo.ProjectId">
+                                    <option value="">Select Please</option>
+                                    <option ng-repeat="item in ProjectList" ng-if='item.Status=="A"' value="{{item.Id}}">
+                                        {{item.ProjectName}}
+                                    </option>
+                                </select>
+                                <span ng-show="submitted &&  taskFrm.ProjectId.$error.required" class="text-danger">Project Name is Required</span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">Client</label>
+                            <div class="col-md-9">
+                                <select class="form-control input-lg" name="ClientId" ng-model="TaskInfo.ClientId">
+                                    <option value="">Select Please</option>
+                                    <option ng-repeat="item in LoadClientList" ng-if='item.Status=="A"' value="{{item.Id}}">
+                                        {{item.ShortName}}
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">Assign User</label>
+                            <div class="col-md-9">
+                                <select class="form-control input-lg" name="AddBy" ng-model="TaskInfo.AddBy">
+                                    <option value="">Select User</option>
+                                    <option ng-repeat="item in DeveloperList" value="{{item.UserName}}">
+                                        {{item.FullName}}
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group" ng-class="{ 'has-error' : submitted && taskFrm.DueDate.$invalid}">
+                            <label class="col-md-3 control-label">Due Date</label>
+                            <div class="col-md-9">
+                                <input type="text" id=""  name="DueDate" class="form-control" uib-datepicker-popup="{{format}}" placeholder="Date Time" readonly ng-click="q1=true" ng-model="TaskInfo.DueDate" is-open="q1" min-date="minDate" max-date="maxDate" datepicker-options="dateOptions" date-disabled="disabled(date, mode)" ng-required="true" close-text="Close" required />
+                                @*<input type="text" id="DueDate"  autocomplete="off" required name="DueDate" class="form-control input-lg" ng-model="TaskInfo.DueDate" min="@DateTime.Now.ToString("yyyy-MM-dd")" placeholder="mm-dd-yyyy">*@
+                                <span ng-show="submitted &&  taskFrm.DueDate.$error.required" class="text-danger">Due Date is Required</span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">Sprint</label>
+                            <div class="col-md-9">
+                                <select class="form-control input-lg" ng-model="TaskInfo.SprintId">
+                                    <option value="">Select Please</option>
+
+                                    <option ng-repeat="item in SprintList" ng-if='item.Status=="A"' value="{{item.Id}}">
+                                        {{item.SprintTitle}}
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label">Priority</label>
+                            <div class="mt-radio-inline col-md-9" style="border-radius: 17px;font-size: 14px; background: #ddd;cursor: pointer;height: 25px;width: 341px;margin-left: 14px;">
+                                <label class="mt-radio" style="color:red;padding-right: 8%;">
+                                    <input type="radio" ng-checked="true" ng-model="TaskInfo.Priority"  name="optionsRadios" id="optionsRadios4" value="1">High
+                                    <span></span>
+                                </label>
+                                <label class="mt-radio" style="color:green;font-size: 14px;padding-right: 8%;">
+                                    <input type="radio" ng-model="TaskInfo.Priority" name="optionsRadios" id="optionsRadios5" value="2"> Medium
+                                    <span></span>
+                                </label>
+                                <label class="mt-radio mt-radio" style="color:#27a4b0; font-size: 14px;padding-right: 8%;">
+                                    <input type="radio"  ng-model="TaskInfo.Priority"  name="optionsRadios" id="optionsRadios6" value="3" > Low
+                                    <span></span>
+                                </label>
+                            </div>
+                        </div>
+                      
+                    </div>
+                    </div>
+                <div class="form-group" ng-class="{ 'has-error' : submitted && taskFrm.Description.$invalid}">
+                    <div class="col-md-1">
+                        <label class="control-label" style="font-size: 120%;margin-left: 31%;">Description</label>
+                    </div>
+                    <textarea name="Description" rows="5" ng-model="TaskInfo.Description" style="margin-left:5.5%;font-size: x-large;width:837px;" required></textarea>
+                    <span ng-show="submitted &&  taskFrm.Description.$error.required" class="text-danger" style="margin-left: 13%;">Description is Required</span>
+                </div>
+                <div class="modal-footer" style="margin-right: 1%;">
+                    <button type="reset" class="btn btn-danger" id="resetbtn" >Reset</button>
+                    <input type="submit" class="btn btn-success" title="Go To Back Task List" ng-click="submitted=true" value="Save" />
+                </div>
+            </div>
+        </div>
+
+    </form>
+</div>
+<script type="text/javascript">
+ 
+    $(document).ready(function () {
+     
+        //$("#DueDate1").datepicker({
+        //        autoclose: true
+        //   });
+        
+        //$('#example2').datepicker({
+        //    format: "dd/mm/yyyy"
+        //}).on('change', function () {
+        //    $('.datepicker').hide();
+        //});
+      
+
+    });
+    
+    AddieApp.controller("taskAddClt", ["$scope", "$http", "SweetAlert",
+        function ($scope, $http,SweetAlert) {
+        init();
+        function init() {
+            $("#resetbtn").click();
+           
+            initialize();
+        }
+
+        function initialize() {
+            //$scope.TaskInfo.Priority = 1;
+            LoadProjectList();
+            LoadSprintList();
+            LoadDeveloperUserList();
+            LoadClientList();
+            $scope.submitted = false;
+
+       }
+        $scope.ResetFrm = function () {
+            
+            $scope.btnTitle = 'Save';
+            $scope.IsEdit = 0;
+               
+        }
+        $scope.Submit = function () {
+            if ($scope.taskFrm.$invalid)
+                    return;
+                $scope.Save();
+        }
+
+            $scope.Save = function () {
+                 $http.post(baseUrl + 'Task/AddTask', $scope.TaskInfo).then(function (response) {
+                if (response.data == 0) {
+                    toastr.error('Not Saved');
+                        $scope.TaskInfo = [];
+                } else {
+                    swal({
+                        title: "Congratulations!",
+                            text: "Task has been successfully saved.",
+                            icon: "success",
+                            showConfirmButton: true,
+                            showCancelButton: false,
+                            dangerMode: false,
+                        })
+                     .then((willDelete) => {
+                          if (willDelete) {
+                              window.location.href = ('@Url.Action("MyTask", "Home")');
+                          } else {
+                              window.location.href = ('@Url.Action("MyTask", "Home")');
+                          }
+                      });
+                }
+            });
+        }
+
+        function LoadDeveloperUserList() {
+                $http.get(baseUrl + 'Setup/LoadUserListForTaskAdd').
+                  then(function (response) {
+                      console.log(response.data);
+                     $scope.DeveloperList = response.data;
+            });
+        };
+
+        function LoadSprintList() {
+                $http.post(baseUrl + 'Setup/LoadSprintList').
+                  then(function (response) {
+                      $scope.SprintList = response.data;
+            });
+        };
+
+        function LoadClientList() {
+                $http.post(baseUrl + 'Setup/LoadClientList').
+                  then(function (response) {
+                      $scope.LoadClientList = response.data;
+              
+            });
+        }
+
+        function LoadProjectList() {
+                $http.post(baseUrl + 'Setup/LoadProjectList').
+                  then(function (response) {
+                      $scope.ProjectList = response.data;
+            });
+        };
+    }]);
+</script>

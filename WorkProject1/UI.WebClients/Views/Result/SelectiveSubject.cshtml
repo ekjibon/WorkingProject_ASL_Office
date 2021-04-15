@@ -1,0 +1,555 @@
+﻿
+@{
+    ViewBag.Title = "Selective Subject";
+}
+
+<style type="text/css">
+    .table thead tr th {
+        font-size: 12px !important;
+        color: white !important;
+        font-weight: 600 !important;
+    }
+</style>
+<div ng-controller="ctrlSelectivesubjectSetup">
+    <!-- Begin: life time stats -->
+    <div class="portlet light bordered">
+        <div class="portlet-title">
+            <div class="caption">
+                <i class="icon-settings font-green"></i>
+                <span class="caption-subject font-green sbold uppercase">@ViewBag.Title</span>
+            </div>
+        </div>
+        <div class="portlet-body">
+            <form class="form-horizontal" @*ng-submit="getSubject()"*@ id="frmCommon" name="formCommonFeilds" novalidate>
+                <div class="form-body">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="form-group" ng-class="{ 'has-error' : !sid && submitted1 && formCommonFeilds.Version.$invalid}">
+                                <label class="col-md-5 control-label">
+                                    Version :
+                                    <span class="required">*</span>
+                                </label>
+                                <div class="col-md-7">
+                                    <select class="form-control" ng-disabled="sid" ng-model="SubjectSetup.VersionID" required name="Version" ng-options="SubjectSetup.VersionId as SubjectSetup.VersionName for SubjectSetup in CommonFeilds.Version">
+                                        <option value="" selected="selected">Select</option>
+                                    </select>
+                                    <div class="form-control-focus"> </div>
+                                    <span ng-show="!sid && submitted1 && formCommonFeilds.Version.$error.required" class="help-block">Version Required</span>
+                                </div>
+                            </div>
+                            <div class="form-group" ng-class="{ 'has-error' : !sid && submitted1 && formCommonFeilds.Session.$invalid}">
+                                <label class="col-md-5 control-label">
+                                    Session :
+                                    <span class="required">*</span>
+                                </label>
+                                <div class="col-md-7">
+                                    <select class="form-control" ng-disabled="sid" ng-model="SubjectSetup.SessionId" required name="Session" ng-options="SubjectSetup.SessionId as SubjectSetup.SessionName for SubjectSetup in CommonFeilds.Session">
+                                        <option value="" selected="selected">Select</option>
+                                    </select>
+                                    <div class="form-control-focus"> </div>
+                                    <span ng-show="!sid && submitted1 && formCommonFeilds.Session.$error.required" class="help-block">Session Required</span>
+                                </div>
+                            </div>
+                            <div class="form-group" ng-class="{ 'has-error' : !sid && submitted1 && formCommonFeilds.Branch.$invalid}">
+                                <label class="col-md-5 control-label">
+                                    Branch :
+                                    <span class="required">*</span>
+                                </label>
+                                <div class="col-md-7">
+                                    <select class="form-control" ng-disabled="sid" ng-model="SubjectSetup.BranchID" required name="Branch" ng-options="SubjectSetup.BranchId as SubjectSetup.BranchName for SubjectSetup in CommonFeilds.Branch">
+                                        <option value="" selected="selected">Select</option>
+                                    </select>
+                                    <div class="form-control-focus"> </div>
+                                    <span ng-show="!sid &&submitted1 && formCommonFeilds.Branch.$error.required" class="help-block">Branch Name Required</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group" ng-class="{ 'has-error' : !sid && submitted1 && formCommonFeilds.Shift.$invalid}">
+                                <label class="col-md-5 control-label">
+                                    Shift :
+                                    <span class="required">*</span>
+                                </label>
+                                <div class="col-md-7">
+                                    <select class="form-control" ng-disabled="sid" ng-model="SubjectSetup.ShiftID" required name="Shift" ng-options="SubjectSetup.ShiftId as SubjectSetup.ShiftName for SubjectSetup in CommonFeilds.Shift| filter:{BranchId:SubjectSetup.BranchID}:true">
+                                        <option value="" selected="selected">Select</option>
+                                    </select>
+                                    <div class="form-control-focus"> </div>
+                                    <span ng-show="!sid && submitted1 && formCommonFeilds.Shift.$error.required" class="help-block">Shift Name Required</span>
+                                </div>
+                            </div>
+                            <div class="form-group" ng-class="{ 'has-error' : !sid && submitted1 && formCommonFeilds.Class.$invalid}">
+                                <label class="col-md-5 control-label">
+                                    Class :
+                                    <span class="required">*</span>
+                                </label>
+                                <div class="col-md-7">
+                                    <select class="form-control" ng-disabled="sid || SubjectSetup.VersionID == null" ng-model="SubjectSetup.ClassId" ng-change="GetGroup(SubjectSetup.ClassId)" name="Class" required ng-options="SubjectSetup.ClassId as SubjectSetup.ClassName for SubjectSetup in CommonFeilds.ClassInfo | filter:{VersionId:SubjectSetup.VersionID}:true">
+                                        <option value="" selected="selected">Select</option>
+                                    </select>
+                                    <div class="form-control-focus"> </div>
+                                    <span ng-show="!sid && submitted1 && formCommonFeilds.Class.$error.required" class="help-block">Class Required</span>
+                                </div>
+                            </div>
+                            <div class="form-group" ng-class="{ 'has-error' : !sid && submitted1 && formCommonFeilds.Group.$invalid}">
+                                <label class="col-md-5 control-label">
+                                    Group :
+                                    <span class="required">*</span>
+                                </label>
+                                <div class="col-md-7">
+                                    <select class="form-control" ng-change="FilterSection();" ng-disabled="sid || Groups.length <= 0 || SubjectSetup.ClassId==null" ng-model="SubjectSetup.GroupId" required name="Group" ng-options="G.GroupId as G.GroupName for G in Groups">
+                                        <option value="" selected="selected">Select</option>
+                                    </select>
+                                    <div class="form-control-focus"> </div>
+                                </div>
+                                <span ng-show="!sid && submitted1 && formCommonFeilds.Group.$error.required" class="help-block">Group Required</span>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="form-group" ng-class="{ 'has-error' : !sid && submitted1 && formCommonFeilds.Section.$invalid}">
+                                <label class="col-md-5 control-label">
+                                    Section :
+                                    <span class="required">*</span>
+                                </label>
+                                <div class="col-md-7">
+                                    @*ng-options="SubjectSetup.SectionId as SubjectSetup.SectionName for SubjectSetup in CommonFeilds.Section | filter:{ClassId:SubjectSetup.ClassId, ShiftId:SubjectSetup.ShiftID}:true">*@
+                                    <select class="form-control" ng-disabled="sid || SubjectSetup.ClassId==null" ng-model="SubjectSetup.SectionId" required name="Section" ng-options="S.SectionId as S.SectionName for S in Sections">
+                                        <option value="" selected="selected">Select</option>
+                                    </select>
+                                    <div class="form-control-focus"> </div>
+                                    <span ng-show="!sid && submitted1 && formCommonFeilds.Section.$error.required" class="help-block">Section Name Required</span>
+                                </div>
+                            </div>
+                            @*<div class="form-group" ng-class="{ 'has-error' : sid && submitted1 && formCommonFeilds.studentID.$invalid}">
+                                    <label class="col-md-5 control-label">
+                                        Student ID &nbsp;
+                                        <span><input type="checkbox" ng-change="SubjectSetup.SID = sid ? '' : undefined" ng-model="sid" ng-true-value="true" ng-false-value="false" /></span>
+                                    </label>
+                                    <div class="col-md-7" ng-show="sid">
+                                        <input type="text" ng-model="SubjectSetup.SID" class="form-control" placeholder="Student ID" name="studentID" required />
+                                        <div class="form-control-focus"> </div>
+                                        <span ng-show="sid && submitted1 && formCommonFeilds.studentID.$error.required" class="help-block">Student ID Required</span>
+                                    </div>
+                                </div>*@
+                            <div class="btn-group btn-group-solid pull-right" style="margin-bottom:5px">
+                                @*<button style="margin-left:0 !important" ng-click="submitted1=true" class="btn btn-primary btn-large"><i class="fa fa-search"></i>Show</button>*@
+                                <a style="margin-left:3px;" href="@Url.Action("SelectiveSubject","Report")?SID={{SubjectSetup.SID}}&BranchId={{SubjectSetup.BranchID}}&VersionID={{SubjectSetup.VersionID}}&ShiftID={{SubjectSetup.ShiftID }} &SessionId={{SubjectSetup.SessionId}}&ClassId={{SubjectSetup.ClassId}}&SectionId={{SubjectSetup.SectionId}}&GroupId={{SubjectSetup.GroupId}}" class="btn btn-primary" target="_blank">Report</a>
+
+                            </div>
+                        </div>
+
+
+                    </div>
+
+
+                </div>
+            </form>
+            <div class="clearfix"><hr /></div>
+            <form class="form-horizontal" name="frmGetSubject" ng-submit="getSubject()" novalidate>
+                <div class="form-body">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="form-group" ng-class="{ 'has-error' : submitted && frmGetSubject.sid.$invalid}">
+                                <label class="col-md-4 control-label">
+                                    Student ID :
+                                    <span class="required">*</span>
+                                </label>
+                                <div class="col-md-5" style="margin-top: 8px;">
+                                    <input type="text" ng-model="SelectiveSubjectSetup.StudentIID" class="form-control" placeholder="Student ID" name="sid" required>
+                                    <div class="form-control-focus"> </div>
+                                    <span ng-show="submitted && frmGetSubject.sid.$error.required" class="help-block">Student ID Required</span>
+
+                                </div>
+                                <div class="col-md-3 pull-right" style="margin-top:7px;">
+                                    <button ng-click="submitted=true" type="submit" class="btn btn-primary btn-large">&nbsp;&nbsp; <i class="fa fa-search"></i> Show &nbsp;&nbsp;&nbsp;&nbsp;</button>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+
+                </div>
+            </form>
+
+
+            <div class="clearfix"><hr /></div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="table-container">
+                        <div id="sample_3_wrapper" class="dataTables_wrapper no-footer">
+                            <div class="table-scrollable"> </div>
+                            <table class="table table-bordered table-hover">
+                                <tr>
+                                    <td> Student Name :</td>
+                                    <td>{{SelectiveSubjectSetups.SelectiveSetup[0].Name}}</td>
+                                </tr>
+                                <tr>
+                                    <td>  Class Name :</td>
+                                    <td>{{SelectiveSubjectSetups.SelectiveSetup[0].ClassName}}</td>
+                                </tr>
+                                <tr>
+                                    <td>  Group Name :</td>
+                                    <td>{{SelectiveSubjectSetups.SelectiveSetup[0].GroupName}}</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="table-container">
+                        <div id="sample_3_wrapper" class="dataTables_wrapper no-footer">
+                            <div class="table-scrollable"> </div>
+                            <table class="table table-bordered table-hover">
+                                <thead>
+                                    <tr style="background-color: #83b3db;">
+                                        <th width="20%">Subject Name</th>
+                                        <th width="20%">Selective</th>
+                                        <th width="11%">Action</th>
+
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-show="SelectiveSubjectSetups.SelectiveSetup.length == 0"><td colspan="5" style="text-align:center;"><i class="fa fa-refresh"></i> Data not found !</td></tr>
+                                    <tr dir-paginate="item in SelectiveSubjectSetups.SelectiveSetup|itemsPerPage:pagesize" total-items="total_count">
+                                        <td>{{item.SubjectName}}</td>
+                                        <td><input type="checkbox" id="Assigned" ng-disabled="item.Status !='M'" ng-model="item.Assigned" ng-checked="item.ID !=0" /></td>
+                                        <td>
+                                            <a href="javascript:;" class="btn btn-icon-only green" ng-click="view(item)" data-target="#viewModal" data-toggle="modal">
+                                                <i class="fa fa-eye"></i>
+                                            </a>
+                                        </td>
+
+                                    </tr>
+                                </tbody>
+
+                            </table>
+                        </div>
+                        <div class="col-md-3 pull-right" style="margin-top:7px;">
+                            <button ng-click="save()" type="submit" class="btn btn-primary btn-large">&nbsp;&nbsp; <i class="fa fa-floppy-o"></i> Save &nbsp;&nbsp;&nbsp;&nbsp;</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="viewModal" class="modal fade" tabindex="-1" data-backdrop="static" data-keyboard="false">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                            <h4 class="modal-title">{{modalTitle}}</h4>
+                        </div>
+                        <div class="modal-body">
+                            <div class="form-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label class="col-md-4 control-label">
+                                                Name :
+                                            </label>
+                                            <div class="col-md-8">
+                                                <input type="text" disabled="disabled" ng-model="SubjectSetup.Name" readonly class="form-control" name="subjectName">
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label class="col-md-4 control-label">
+                                                Class Name :
+                                            </label>
+                                            <div class="col-md-8">
+                                                <input type="text" disabled="disabled" ng-model="SubjectSetup.ClassName" readonly class="form-control" name="ClassName">
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6" style="margin-top:10px">
+                                        <div class="form-group">
+                                            <label class="col-md-4 control-label">
+                                                Group :
+                                            </label>
+                                            <div class="col-md-8">
+                                                <input type="text" disabled="disabled" ng-model="SubjectSetup.GroupName" readonly class="form-control" name="GroupName">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6" style="margin-top:10px">
+                                        <div class="form-group">
+                                            <label class="col-md-4 control-label">
+                                                Subject Name :
+                                            </label>
+                                            <div class="col-md-8">
+                                                <input type="text" disabled="disabled" ng-model="SubjectSetup.SubjectName" readonly class="form-control" placeholder="Subject Name" name="subjectName" required>
+
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label class="col-md-8 control-label">
+                                                Is Pair
+                                            </label>
+                                            <div class="col-md-4" style="margin-top: 8px;">
+                                                <input type="checkbox" disabled="disabled" id="IsPair" ng-model="SubjectSetup.IsPair" readonly ng-checked="SubjectSetup.IsPair==true" />
+
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label class="col-md-8 control-label">
+                                                Effect On Exam :
+                                            </label>
+                                            <div class="col-md-4" style="margin-top: 8px;">
+                                                <input type="checkbox" disabled="disabled" id="NoEffectOnExam" ng-model="SubjectSetup.NoEffectOnExam" readonly ng-checked="SubjectSetup.NoEffectOnExam==true" />
+
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label class="col-md-8 control-label">
+                                                Impact On Merit :
+                                            </label>
+                                            <div class="col-md-4" style="margin-top: 8px;">
+                                                <input type="checkbox" disabled="disabled" id="ImpactOnMeritPosition" readonly ng-model="SubjectSetup.ImpactOnMeritPosition" ng-checked="SubjectSetup.ImpactOnMeritPosition==true" />
+
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label class="col-md-8 control-label">
+                                                Compulsory :
+                                            </label>
+                                            <div class="col-md-4" style="margin-top: 8px;">
+                                                <input type="checkbox" disabled="disabled" id="IsCompulsory" ng-model="SubjectSetup.IsCompulsory" readonly ng-checked="SubjectSetup.IsCompulsory==true" />
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label class="col-md-8 control-label">
+                                                Selective :
+                                            </label>
+                                            <div class="col-md-4" style="margin-top: 8px;">
+                                                <input type="checkbox" disabled="disabled" id="IsSelective" ng-model="SubjectSetup.IsSelective" readonly ng-checked="SubjectSetup.IsSelective==true" />
+
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label class="col-md-8 control-label">
+                                                IsThird :
+                                            </label>
+                                            <div class="col-md-4" style="margin-top: 8px;">
+                                                <input type="checkbox" disabled="disabled" id="IsThird" ng-model="SubjectSetup.IsThird" readonly ng-checked="SubjectSetup.IsThird==true" />
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label class="col-md-8 control-label">
+                                                IsFourth :
+                                            </label>
+                                            <div class="col-md-4" style="margin-top: 8px;">
+                                                <input type="checkbox" disabled="disabled" id="IsFourth" ng-model="SubjectSetup.IsFourth" readonly ng-checked="SubjectSetup.IsFourth==true" />
+
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label class="col-md-8 control-label">
+                                                Special Subject :
+                                            </label>
+                                            <div class="col-md-4" style="margin-top: 8px;">
+                                                <input type="checkbox" disabled="disabled" id="SpecialSubject" ng-model="SubjectSetup.SpecialSubject" readonly ng-checked="SubjectSetup.SpecialSubject==true" />
+
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label class="col-md-8 control-label">
+                                                IsReligious :
+                                            </label>
+                                            <div class="col-md-4" style="margin-top: 8px;">
+                                                <input type="checkbox" disabled="disabled" id="IsReligious" ng-model="SubjectSetup.IsReligious" readonly ng-checked="SubjectSetup.IsReligious==true" />
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" data-dismiss="modal" class="btn dark btn-outline" ng-click="resetForm();submitted=false">Cancel</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+</div>
+
+@section Scripts{
+    <script type="text/javascript">
+        OEMSApp.controller("ctrlSelectivesubjectSetup", ["$scope", "$http", "SweetAlert",
+              function ($scope, $http, SweetAlert) {
+
+                  init();
+                  function init() {
+                      initialize();
+                      getAllCommons();
+                  }
+                  function initialize() {
+                      $scope.modalTitle = "Selective Subject Setup";
+                      $scope.SelectiveSubjectSetup = {};
+                      $scope.SelectiveSubjectSetup.ID = 0;
+                      $scope.currentPage = 1;
+                      $scope.pageno = 1;
+                      $scope.pagesize = 10;
+                      $scope.total_count = 12;
+                      $scope.search = '';
+                      $scope.SelectiveSubjectSetups = [];
+                      //$scope.SelectiveSetup.IsAssigned = false;
+
+                      $scope.CommonFeilds = [];
+
+                      $scope.getSubject = getSubject;
+                      $scope.res = {};
+                      $scope.data = {};
+                      $scope.resetForm = resetForm;
+                      $scope.getAllCommons = getAllCommons;
+
+                  }
+                  function resetForm() {
+                      $scope.modalTitle = "Add Selective Subject";
+                      $scope.SelectiveSubjectSetup = {};
+                      $scope.SelectiveSubjectSetup.ID = 0;
+                      $scope.submitted = false;
+                  }
+                  function getAllCommons() {
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Common/GetCommonItem/'
+                      }).then(function successCallback(response) {
+                          $scope.CommonFeilds = response.data.results;
+                      }, function errorCallback(response) {
+                      });
+                  }
+                  $scope.GetGroup = function GetGroup(classid) {
+                      $scope.Groups = [];
+
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Common/GetGroup/' + classid
+                      }).then(function successCallback(response) {
+                          $scope.Groups = response.data.results;
+
+
+                      }, function errorCallback(response) {
+                          toastr["info"](response.data.message);
+                      });
+
+                  }
+                  $scope.FilterSection = function FilterSection() {
+                      $scope.Sections = [];
+
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Common/GetSection/' + $scope.SubjectSetup.SessionId + "/" + $scope.SubjectSetup.ShiftID + "/" + $scope.SubjectSetup.ClassId + "/" + $scope.SubjectSetup.GroupId
+                      }).then(function successCallback(response) {
+                          $scope.Sections = response.data.results;
+
+
+                      }, function errorCallback(response) {
+                          toastr["info"](response.data.message);
+                      });
+
+                  }
+                  function getSubject() {
+                      $scope.SelectiveSubjectSetups = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'SubjectSetup/GetSelectiveSubject/' + $scope.SelectiveSubjectSetup.StudentIID
+                      }).then(function successCallback(response) {
+                          $scope.SelectiveSubjectSetups = response.data.results;
+
+                      }, function errorCallback(response) {
+                          toastr["info"](response.data.message);
+                      });
+
+                  }
+                  $scope.searchData = function () {
+                      getSubject();
+                  };
+
+                  $scope.view = function (n) {
+                      $scope.modalTitle = "Subject Details";
+                      $scope.SubjectSetup = n;
+                  };
+
+                  $scope.save = function save() {
+                      $http({
+                          method: 'POST',
+                          url: baseUrl + 'SubjectSetup/AddSelectiveSubject/',
+                          data: $scope.SelectiveSubjectSetups.SelectiveSetup
+                      }).then(function successCallback(response) {
+                          toastr["info"](response.data.message);
+                          getSubject();
+                          //resetForm();
+                      }, function errorCallback(response) {
+                          toastr["error"](response.data.Message);
+                      });
+                  };
+
+                  $scope.deleteSbuject = function deleteSbuject(n) {
+
+                      // SweetAlert.swal("Good job!", "You clicked the button!", "success");
+                      SweetAlert.swal({
+                          title: "Are you sure to delete it ?", type: "warning", showCancelButton: true, confirmButtonColor: "#DD6B55",
+                          confirmButtonText: "Yes, delete it!",
+                          closeOnConfirm: false
+                      },
+                      function (isConfirm) {
+
+
+                          if (isConfirm) {
+                              $http({
+                                  method: 'DELETE',
+                                  url: baseUrl + 'SubjectSetup/DeleteSubject/' + n.SubID
+                              }).then(function successCallback(response) {
+                                  SweetAlert.swal("Deleted!", "Your data has been deleted.", "success");
+                                  getSubject();
+                              }, function errorCallback(response) {
+                                  ttoastr["error"](response.data.Message);
+                              });
+
+                          }
+                      });
+
+
+                  };
+
+              }]);
+    </script>
+
+}
+

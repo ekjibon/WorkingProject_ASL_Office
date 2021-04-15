@@ -1,0 +1,447 @@
+﻿@{
+    ViewBag.Title = "Assesment Dropdown Setup";
+}
+<style type="text/css">
+    body {
+        height: 1000px;
+    }
+
+    .table thead tr th {
+        font-size: 12px !important;
+        color: white !important;
+        font-weight: 600 !important;
+    }
+
+    #header-fixed {
+        position: fixed;
+        top: 75px;
+        display: none;
+        background-color: white;
+        width: 74%;
+    }
+</style>
+<div ng-controller="subjectSetup">
+    <!-- Begin: life time stats -->
+    <div class="portlet light bordered">
+        <div class="portlet-title">
+            <div class="caption">
+                <i class="icon-settings font-green"></i>
+                <span class="caption-subject font-green sbold uppercase">Assesment Dropdown Setup</span>
+            </div>
+           
+        </div>
+        <div class="portlet-body">
+            <div class="form-horizontal">
+                <div class="form-body">
+                    <form ng-submit="Search()" name="frmFilter" method="post" enctype="multipart/form-data" novalidate>
+
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label class="col-md-5 control-label">
+                                        Branch :
+                                    </label>
+                                    <div class="col-md-7" ng-class="{ 'has-error' :isSubmitted && frmFilter.BranchID.$invalid }">
+                                        <select class="form-control" name="BranchID" ng-model="StudentExamFilter.BranchID" ng-options="studentInfo.BranchId as studentInfo.BranchName for studentInfo in CommonFeilds.Branch" required>
+                                            <option value="" selected="selected">Please Select</option>
+                                        </select>
+                                        <span ng-show="isSubmitted && frmFilter.BranchID.$error.required" class="help-block">Branch Required</span>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-md-5 control-label">
+                                        Session :
+                                    </label>
+                                    <div class="col-md-7" ng-class="{ 'has-error' :isSubmitted && frmFilter.SessionId.$invalid}">
+                                        <select class="form-control" name="SessionId" ng-model="StudentExamFilter.SessionId" required ng-options="studentInfo.SessionId as studentInfo.SessionName for studentInfo in CommonFeilds.Session | filter:{VersionId:StudentExamFilter.VersionId}:true">
+                                            <option value="" selected="selected">Please Select</option>
+                                        </select>
+                                        <span ng-show="isSubmitted && frmFilter.SessionId.$error.required" class="help-block">Session Required</span>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-md-5 control-label">
+                                        Shift :
+                                    </label>
+                                    <div class="col-md-7" ng-class="{'has-error' : isSubmitted && frmFilter.Shift.$invalid}">
+                                        <select class="form-control" ng-model="StudentExamFilter.ShiftID" name="Shift" ng-options="studentInfo.ShiftId as studentInfo.ShiftName for studentInfo in CommonFeilds.Shift | filter:{BranchId:StudentExamFilter.BranchID}:true" required>
+                                            <option value="" selected="selected">Please Select</option>
+                                        </select>
+                                        <span ng-show="isSubmitted && frmFilter.Shift.$error.required" class="help-block">Shift Required</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                               
+                                <div class="form-group">
+                                    <label class="col-md-5 control-label">
+                                        Class :
+                                    </label>
+                                    <div class="col-md-7" ng-class="{ 'has-error' :isSubmitted && frmFilter.ClassId.$invalid}">
+                                        <select class="form-control" name="ClassId" ng-disabled="StudentExamFilter.ShiftID==null" ng-model="StudentExamFilter.ClassId" ng-change="GetSection();LoadTerms(StudentExamFilter.ClassId)" ng-options="studentInfo.ClassId as studentInfo.ClassName for studentInfo in CommonFeilds.ClassInfo" required>
+                                            <option value="" selected="selected">Please Select</option>
+                                        </select>
+                                        <span ng-show="isSubmitted && frmFilter.ClassId.$error.required " class="help-block">Class Required</span>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-md-5 control-label">
+                                        Section :
+                                    </label>
+                                    <div class="col-md-7" ng-class="{ 'has-error' :isSubmitted && frmFilter.SectionId.$invalid }">
+                                        <select class="form-control" name="SectionId" ng-model="StudentExamFilter.SectionId" ng-disabled="StudentExamFilter.ClassId==null" ng-options="S.SectionId as S.SectionName for S in Sections" required>
+                                            @*FilterSer by Shahin 17July2017*@
+                                            <option value="" selected="selected">Please Select</option>
+                                        </select>
+                                        <span ng-show="isSubmitted && frmFilter.SectionId.$error.required" class="help-block">Section Required</span>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-md-5 control-label">
+                                        Term :
+                                    </label>
+                                    <div class="col-md-7" ng-class="{ 'has-error' :isSubmitted && frmFilter.TermId.$invalid }">
+                                        <select class="form-control" name="TermId" ng-model="StudentExamFilter.TermId" ng-disabled="StudentExamFilter.ClassId==null" ng-options="term.TermId as term.Name for term in TermList" required>
+                                            @*FilterSer by Shahin 17July2017*@
+                                            <option value="" selected="selected">Please Select</option>
+                                        </select>
+                                        <span ng-show="isSubmitted && frmFilter.TermId.$error.required" class="help-block">Term Required</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label class="col-md-5 control-label">
+                                        Main Exam :
+                                    </label>
+                                    <div class="col-md-7" ng-class="{ 'has-error' :isSubmitted && frmFilter.MainExamId.$invalid }">
+                                        <select class="form-control" name="MainExamId" ng-model="StudentExamFilter.MainExamId" ng-disabled="StudentExamFilter.TermId==null" ng-options="ex.MainExamId as ex.MainExamName for ex in mainExams |filter :{TermId:StudentExamFilter.TermId}:true" required>
+                                            @*FilterSer by Shahin 17July2017*@
+                                            <option value="" selected="selected">Please Select</option>
+                                        </select>
+                                        <span ng-show="isSubmitted && frmFilter.MainExamId.$error.required" class="help-block">MainExam Required</span>
+                                    </div>
+                                </div>
+                               
+                                <div class="form-group">
+                                    <div class="col-md-8" style="text-align:right">
+                                        <button type="reset"  class="btn red">Reset</button>
+                                       
+                                    </div>
+                                    <div class="col-md-3">
+                                        <button ng-click="isSubmitted=true" class="btn green">Search</button>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-md-12" style="text-align:right">
+                                        <button ng-click="OpenAddModal();" class="btn blue"> <i class="fa fa-plus"></i> Add Dropdown Item</button>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="table-container">
+                <div id="sample_3_wrapper" class="dataTables_wrapper no-footer">
+                    @*<div class="table-scrollable" style="height:500px; overflow: scroll;">*@
+                    @*<table class="table table-bordered table-hover table-fixed" ng-table="tableParams" fixed-table-headers="scrollable-area">*@
+                    <table class="table table-bordered table-hover" id="table-1">
+                        <thead>
+                            <tr class="bg-primary">
+                                <th width="10%">Class</th>
+                                <th width="10%">Mainexam</th>
+                                <th width="10%">Term</th>
+                                <th width="10%">Assesment</th>
+                                <th width="10%">Dropdown</th>
+                                <th width="12%">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="item in AssesmentListWithDropdowns" style="background-color:rgba(245, 204, 88, 0.32);color:#ff6a00">
+                                <td>{{item.ClassName}}</td>
+                                <td>{{item.MainExamName}}</td>  
+                                <td>{{item.TermName}}</td>
+                                <td>{{item.AssesmentName}}</td>  
+                                <td>{{item.DropdownName}}</td>  
+                                <td align="center">
+                                    <a href="javascript:;" class="btn btn-icon-only green" ng-click="EditItem(item)">
+                                        <i class="fa fa-edit"></i>
+                                    </a>
+                                    <a ng-click="deleteitem(item)" class="btn btn-icon-only red">
+                                        <i class="fa fa-trash"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <table class="table table-bordered table-hover" id="header-fixed"></table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="addmodal" class="modal fade" tabindex="-1" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form name="addform" ng-submit="save()" class="form-horizontal" id="form_sample_1" novalidate>
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                        <h4 class="modal-title">{{aemodalTitle}}</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-body">
+                            <div class="form-group" ng-class="{ 'has-error' : submitted2 && addform.AssessmentClassSetUId.$invalid}">
+                                <label class="col-md-3 control-label">
+                                    Assesment
+                                    <span class="required">*</span>
+                                </label>
+                                <div class="col-md-9">
+                                    <select class="form-control" name="AssessmentClassSetUId" id="AssessmentClassSetUId" ng-model="DropItem.AssessmentClassSetUId" ng-options="item.Id as item.Name for item in AssesmentfilteredArray" required>
+                                        <option value="" selected="selected">Choose Assesment</option>
+                                    </select>
+                                    <div class="form-control-focus"> </div>
+                                    <span ng-show="submitted2 && addform.AssessmentClassSetUId.$error.required" class="help-block">Required</span>
+                                </div>
+                            </div>
+                            <div class="form-group" ng-class="{ 'has-error' : submitted2 && addform.Name.$invalid}">
+                                <label class="col-md-3 control-label" for="form_control_1">
+                                    Item Name
+                                    <span class="required">*</span>
+                                </label>
+                                <div class="col-md-9">
+                                    <input type="text" name="Name" ng-model="DropItem.Name"  class="form-control" placeholder="Item name" required>
+                                    <div class="form-control-focus"> </div>
+                                    <span ng-show="submitted2 && addform.Name.$error.required" class="help-block">Name Required</span>
+                                </div>
+                            </div>
+                          
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" data-dismiss="modal" class="btn dark btn-outline" ng-click="submitted2=false">Cancel</button>
+                        <button type="submit" ng-click="submitted2=true" class="btn green">Save</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+@section Scripts{
+    <script type="text/javascript">
+        OEMSApp.controller("subjectSetup", ["$scope", "$http", "SweetAlert", "blockUI", "$window", "$filter",
+              function ($scope, $http, SweetAlert, blockUI, $window, $filter) {
+                  init();
+                  // Initial Methods
+                  function init() {
+                      initialize();
+                      getAllCommons();
+                      getmainExams();
+                  }
+                  function initialize() {
+                      $scope.DropdownsList = [];
+                      $scope.SubjectsetupFilter = {};
+                      $scope.DropItem = {};
+                      $scope.DropItem.Id = 0;
+                      $scope.currentPage = 1;
+                      $scope.pageno = 1;
+                      $scope.pagesize = 1000;
+                      $scope.total_count = 2000;
+                      $scope.search = '';
+                      $scope.CommonFeilds = [];
+                      $scope.getAllCommons = getAllCommons;
+                      $scope.SubjectList = [];
+                      $scope.btnDis = false;
+                      $scope.AssesmentfilteredArray = [];
+                  }
+                
+                  function getmainExams() {
+                      $scope.mainExams = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'ExamSetup/GetAllMainExam/'
+                      }).then(function successCallback(response) {
+                          $scope.mainExams = response.data.results;
+                          //console.log($scope.mainExams);
+                          // $scope.AspNetRoles = response.data;
+                          $scope.total_count = response.data.totalcount;
+                          //console.log(response.data);
+                      }, function errorCallback(response) {
+                          toastr["warning"](response.data.Message);
+                      });
+                      //$scope.AspNetRoles = $scope.data;
+                      //console.log($scope.data.totalcount);
+                      // $scope.totalcount = 3; //$scope.data.totalcount;
+                  }
+                
+                  $scope.OpenAddModal =function OpenAddModal()
+                  {
+                      $scope.isSubmitted = true;
+                      if ($scope.StudentExamFilter==undefined)
+                      {
+                          return;
+                      }
+                      else if ($scope.StudentExamFilter.BranchID == undefined || $scope.StudentExamFilter.SessionId == undefined || $scope.StudentExamFilter.ShiftID == undefined || $scope.StudentExamFilter.ClassId == undefined
+                          || $scope.StudentExamFilter.MainExamId == undefined || $scope.StudentExamFilter.TermId == undefined || $scope.StudentExamFilter.SectionId == undefined)
+                      {
+                          return;
+                      }
+                      else
+                      {
+                          $scope.LoadAllAssesmentForAdd();
+                          $scope.aemodalTitle = 'Add Dropdown Item';
+                          $('#addmodal').modal('toggle');
+                          return;
+                      }
+                  }
+                  $scope.deleteitem=function deleteitem(item)
+                  {
+                      SweetAlert.swal({
+                          title: "Are you sure to delete it ?", type: "warning", showCancelButton: true, confirmButtonColor: "#DD6B55",
+                          confirmButtonText: "Yes, delete it!",
+                          closeOnConfirm: false
+                      },
+                      function (isConfirm) {
+                          if (isConfirm) {
+                              $http({
+                                  method: 'DELETE',
+                                  url: baseUrl + 'Student/DeleteAssesmentDropdown/' + item.DropdownId,
+                                  data: $scope.class
+                              }).then(function successCallback(response) {
+                                  SweetAlert.swal("Deleted!", "Your data has been deleted.", "success");
+                                  $scope.Search();
+                              }, function errorCallback(response) {
+                                  toastr["warning"](response.data.Message);
+                              });
+                          }
+                      });
+                  }
+                  $scope.EditItem=function EditItem(item)
+                  {
+                      $scope.aemodalTitle = 'Update Dropdown Item';
+                      $scope.DropItem.AssessmentClassSetUId = item.AssesmentId;
+                      $scope.DropItem.Name = item.DropdownName;
+                      $scope.DropItem.Id = item.DropdownId;
+                      $('#addmodal').modal('toggle');
+                      
+                  }
+                  $scope.save = function save() {
+                      if ($scope.addform.$invalid == true)
+                          return;
+                      console.log($scope.DropItem);
+                      
+                      $http({
+                          method: 'POST',
+                          url: baseUrl + '/Student/AddAssesmentDropdown',
+                          data: $scope.DropItem
+                      }).then(function successCallback(response) {
+                          //$('#addmodal').modal('toggle');
+                          toastr["info"](response.data.message);
+                          $scope.Search();
+                          $scope.DropItem = {};
+                          $scope.DropItem.Id = 0;
+                      }, function errorCallback(response) {
+                          toastr["warning"](response.data.Message);
+                      });
+                    
+                  }
+                  $scope.GetSection = function GetSection() {
+                      $scope.Sections = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Common/GetSection/' + $scope.StudentExamFilter.SessionId + "/" + $scope.StudentExamFilter.ShiftID + "/" + $scope.StudentExamFilter.ClassId
+                      }).then(function successCallback(response) {
+                          $scope.Sections = response.data.results;
+                      }, function errorCallback(response) {
+                          toastr["error"](response.data.Message);
+                      });
+                  }
+
+                  $scope.Search = function Search()
+                  {
+                      if ($scope.StudentExamFilter.$invalid == true)
+                          return;
+                      $scope.LoadAssesmentList();
+                  }
+                  $scope.LoadAllAssesmentForAdd = function LoadAllAssesmentForAdd() {
+                      if ($scope.frmFilter.$invalid == true)
+                          return;
+                      $http.post(baseUrl + 'Student/GetAssesmentListForDropdownSetupAdd/' + $scope.StudentExamFilter.BranchID + '/' + $scope.StudentExamFilter.SessionId + '/' + $scope.StudentExamFilter.ShiftID + '/' + $scope.StudentExamFilter.ClassId + '/' + $scope.StudentExamFilter.SectionId + '/' + $scope.StudentExamFilter.TermId + '/' + $scope.StudentExamFilter.MainExamId).
+                       then(function (response) {
+                           $scope.AssesmentfilteredArray = response.data.results;
+                       });
+                  };
+                  $scope.LoadAssesmentList = function LoadAssesmentList() {
+                      if ($scope.frmFilter.$invalid == true)
+                          return;
+
+                      $http.post(baseUrl + 'Student/GetAssesmentListForDropdownSetup/' + $scope.StudentExamFilter.BranchID + '/' + $scope.StudentExamFilter.SessionId + '/' + $scope.StudentExamFilter.ShiftID + '/' + $scope.StudentExamFilter.ClassId + '/' + $scope.StudentExamFilter.SectionId + '/' + $scope.StudentExamFilter.TermId + '/' + $scope.StudentExamFilter.MainExamId).
+                       then(function (response) {
+                           $scope.AssesmentListWithDropdowns = response.data.results;
+                       });
+                  };
+
+                  function getAllDropdowns() {
+                      $scope.Dropdowns = [];
+
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Common/GetAllDropDown/'
+                      }).then(function successCallback(response) {
+                          $scope.Dropdowns = response.data.results;
+                          $scope.DropdownsList = $scope.Dropdowns.filter(function (v) {
+                              return v.Type == 'AssesmentComment';
+                          });
+                      }, function errorCallback(response) {
+                      });
+                  };
+                  function getAllCommons() { // Get VSC
+                      //$scope.CommonFeilds = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Common/GetCommonItem/'
+                      }).then(function successCallback(response) {
+                          $scope.CommonFeilds = response.data.results;
+                      }, function errorCallback(response) {
+                      });
+                      getAllDropdowns();
+                  }
+                  $scope.LoadTerms = function LoadTerms(ClassId) {
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'SetupInstitution/GetTermByClassId' + '/' + ClassId
+                      }).then(function successCallback(response) {
+                          $scope.TermList = response.data.results;
+                      }, function errorCallback(response) {
+                          if (response.data.message != null)
+                              toastr["info"](response.data.message);
+                      });
+                  }
+
+              }]);
+        $(document).ready(function () {
+            $('[data-toggle="tooltip"]').tooltip();
+        });
+    </script>
+    <script type="text/javascript">
+     var tableOffset = $("#table-1").offset().top;
+     var $header = $("#table-1 > thead").clone();
+     var $fixedHeader = $("#header-fixed").append($header);
+
+     $(window).bind("scroll", function () {
+         var offset = $(this).scrollTop();
+
+         if (offset >= tableOffset && $fixedHeader.is(":hidden")) {
+             $fixedHeader.show();
+         }
+         else if (offset < tableOffset) {
+             $fixedHeader.hide();
+         }
+     });
+    </script>
+
+
+
+}   

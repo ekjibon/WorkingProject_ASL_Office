@@ -1,0 +1,124 @@
+﻿
+@{
+    ViewBag.Title = "TicketReport";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<link href="http://cdn.addiesoft.com/admin/assets/global/plugins/bootstrap-daterangepicker/daterangepicker.min.css" rel="stylesheet" type="text/css" />
+<link href="http://cdn.addiesoft.com/admin/assets/global/plugins/bootstrap-datepicker/css/bootstrap-datepicker3.min.css" rel="stylesheet" type="text/css" />
+<link href="http://cdn.addiesoft.com/admin/assets/global/plugins/bootstrap-timepicker/css/bootstrap-timepicker.min.css" rel="stylesheet" type="text/css" />
+<link href="http://cdn.addiesoft.com/admin/assets/global/plugins/bootstrap-datetimepicker/css/bootstrap-datetimepicker.min.css" rel="stylesheet" type="text/css" />
+<script src="http://cdn.addiesoft.com/admin/assets/global/plugins/bootstrap-daterangepicker/daterangepicker.min.js" type="text/javascript"></script>
+<script src="http://cdn.addiesoft.com/admin/assets/global/plugins/bootstrap-datepicker/js/bootstrap-datepicker.min.js" type="text/javascript"></script>
+<script src="http://cdn.addiesoft.com/admin/assets/global/plugins/bootstrap-timepicker/js/bootstrap-timepicker.min.js" type="text/javascript"></script>
+<script src="http://cdn.addiesoft.com/admin/assets/global/plugins/bootstrap-datetimepicker/js/bootstrap-datetimepicker.min.js" type="text/javascript"></script>
+<script src="http://cdn.addiesoft.com/admin/assets/pages/scripts/components-date-time-pickers.min.js" type="text/javascript"></script>
+
+
+<script type="text/javascript">
+    //$(function () {
+    //    $('#FromDate').datetimepicker();
+    //    $('#ToDate').datetimepicker({
+    //        useCurrent: false //Important! See issue #1075
+    //    });
+    //    $("#FromDate").on("dp.change", function (e) {
+    //        $('#ToDate').data("DateTimePicker").minDate(e.date);
+    //    });
+    //    $("#ToDate").on("dp.change", function (e) {
+    //        $('#FromDate').data("DateTimePicker").maxDate(e.date);
+    //    });
+    //});
+</script>
+
+<h2 class="SetUpHead">Ticket Report</h2>
+
+<div ng-controller="TicketReportClt">
+    @*<label class="col-md-3 control-label" style="font-size:x-large;text-align:right;">  From :</label>*@
+    <form name="frm" novalidate ng-submit="Submit(S)" role="form">
+       <div class="row">
+           <div class="col-md-6">
+               <div class="form-group" ng-class="{ 'has-error' : submitted && frm.FromDate.$invalid}">
+                   <label class="col-md-3 control-label">From Date</label>
+                   <div class="col-md-9">
+                       <input ng-change="todatechange()" autocomplete="off" class="form-control input-lg" data-date-format="dd/mm/yyyy" type="text" id="FromDate" name="FromDate" ng-model="S.FromDate"
+                              placeholder="yyyy-MM-dd" required />
+                      <span ng-show="submitted &&  frm.FromDate.$error.required" class="text-danger">From Date is Required</span>
+                   </div>
+               </div>
+               <div class="form-group" style="margin-top: 11%;" ng-class="{ 'has-error' : submitted && frm.ToDate.$invalid}">
+                   <label class="col-md-3 control-label">To Date</label>
+                   <div class="col-md-9">
+                       <input autocomplete="off"  class="form-control input-lg" data-date-format="dd/mm/yyyy" type="text" id="ToDate" name="ToDate" ng-model="S.ToDate"
+                              placeholder="yyyy-MM-dd" required />
+                       <span ng-show="submitted &&  frm.ToDate.$error.required" class="text-danger">To Date is Required</span>
+                   </div>
+               </div>
+               <div class="row pull-right" style="margin-top: 2%;margin-right: 3%;">
+                   <input type="submit" ng-click="submitted=true" class="btn btn-success" value="View Report" />
+               </div>
+           
+           </div> </div>
+      </form>
+   </div>
+
+<script type="text/javascript">
+    //$(function () {
+    //    /* global setting */
+    //    var datepickersOpt = {
+    //        dateFormat: 'dd-mm-yy',
+    //        minDate: 0
+    //    }
+
+    //    $("#FromDate").datepicker($.extend({
+    //        onSelect: function () {
+    //            var minDate = $(this).datepicker('getDate');
+    //            minDate.setDate(minDate.getDate() + 2); //add two days
+    //            $("#ToDate").datepicker("option", "minDate", minDate);
+    //        }
+    //    }, datepickersOpt));
+    //});
+
+
+    $(document).ready(function () {
+        $("#FromDate").datepicker({
+            format: 'mm/dd/yyyy',
+            autoclose: true,
+
+        });
+        $("#ToDate").datepicker({
+            format: 'mm/dd/yyyy',
+            autoclose: true,
+
+        });
+
+    });
+    AddieApp.controller("TicketReportClt", ["$scope", "$http", "SweetAlert",
+          function ($scope, $http,  SweetAlert) {
+                  init();
+                  function init() {
+                      initialize();
+                  }
+                  function initialize() {
+                      $scope.StartDate = new Date();
+                      $scope.EndDate = new Date();
+                  };
+
+                 
+                  $scope.Submit = function Submit(n)
+                  {
+                      if ($scope.frm.$invalid)
+                          return;
+                      $scope.StartDate =n.FromDate;
+                      $scope.EndDate = n.ToDate;
+                      if ($scope.StartDate > $scope.EndDate) {
+                          alert("From Date is bigger than End Date");
+                      } else {
+                          var win = window.open('/Report/TicketListReport/?FromDate=' + $scope.StartDate + '&ToDate='+$scope.EndDate, '_blank');
+                          win.focus();
+                      }
+                     
+                    
+                    }
+
+              }]);
+</script>

@@ -1,0 +1,291 @@
+﻿
+@{
+    ViewBag.Title = "Quotation List";
+}
+
+<div class="kt-container  kt-container--fluid  kt-grid__item kt-grid__item--fluid" ng-controller="quotationListClt">
+    <div class="row">
+        <div class="kt-portlet kt-portlet--mobile">
+            <div class="kt-portlet__head kt-portlet__head--lg">
+                <div class="kt-portlet__head-label">
+                    <h3 class="kt-portlet__head-title">
+                        <!----Titel Text-->
+                        @ViewBag.Title
+                        <!----Titel Text -->
+                    </h3>
+                </div>
+            </div>
+            <div class="kt-portlet__body">
+                <div class="row">
+                    <div class="col-md-4 col-sm-5 col-xs-6">
+                        <div class="form-group">
+                            <div class="col-lg-3 col-md-5 col-sm-4 col-xs-8" style="padding-left:0px">
+
+                                <select class="form-control kt-font-brand" ng-model="pageSize" ng-options="P.value as P.text for P in pageSizeArray"></select>
+                            </div>
+
+                        </div>
+
+                    </div>
+                    <div class="col-md-4 col-sm-3 col-xs-1">
+                    </div>
+                    <div class="col-md-4 col-sm-4 col-xs-5">
+                        <div id="sample_3_filter" class="pull-right">
+                            <input ng-model="q" id="search" class="form-control" placeholder="Filter text">
+                        </div>
+                    </div>
+                </div>
+                <table class="table table-bordered table-hover">
+                    <thead>
+                        <tr class="btn-primary">
+                            <th>#Quotation Code</th>
+                            <th>Supplier Name</th>
+                            <th>Account Code</th>
+                            <th>Due Date</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-show="QuotationList.QutatinList.length <= 0"><td colspan="5" style="text-align:center;"><i class="fa fa-refresh"></i> Loading new data!!</td></tr>
+                        <tr dir-paginate="item in QuotationList.QutatinList | filter: q  | itemsPerPage: pageSize " current-page="currentPage">
+                            <td> {{item.QuotationCode}} </td>
+                            <td> {{item.SupplierName}} </td>
+                            <td> {{item.AccountCode}} </td>
+                            <td> {{item.DueDate | date:"dd/MM/yyyy"}} </td>
+                            <td>
+                                <div class="btn-group ">
+                                    <button class="btn btn-xs green dropdown-toggle" type="button" data-toggle="dropdown" aria-expanded="false">
+                                        Options
+                                        <i class="fa fa-angle-down"></i>
+                                    </button>
+                                    <ul class="dropdown-menu" role="menu" style="left: -10%;">
+                                        <li>
+                                            <a data-target="#addmodal" data-toggle="modal" ng-click="edit(item)">
+                                                <i class="fa fa-search-plus"></i> Approve
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a data-target="#detailsModal" data-toggle="modal" ng-click="details(item)">
+                                                <i class="fa fa-book" aria-hidden="true"></i> Details
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a ng-click="delete(item)" ng-hide="item.IsApproved">
+                                                <i class="fa fa-times" aria-hidden="true"></i> Delete
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </td>
+
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="row">
+                    <dir-pagination-controls boundary-links="true" template-url="~/assets/angular/lib/dirPagination.tpl.html"></dir-pagination-controls>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+
+
+    <div id="detailsModal" class="modal fade" tabindex="-1" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form name="addform" ng-submit="save()" class="form-horizontal" id="form_sample_1" novalidate>
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">X</button>
+                        <h4 class="modal-title">Quotation Details</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-body">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <table class="table table-bordered table-hover rounded">
+                                        <thead class="btn-primary">
+                                            <tr>
+                                                <th>Product Name </th>
+                                                <th>Quantity</th>
+                                                <th>Unit</th>
+                                                <th>Unit Price</th>
+                                                <th>Discount Price</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr ng-repeat="item in QuotationDetails">
+                                                <td width="7%"> {{item.ProductName}} </td>
+                                                <td width="7%"> {{item.Quantity}} </td>
+                                                <td width="7%"> {{item.Unit}} </td>
+                                                <td width="7%"> {{item.UnitPrice}} </td>
+                                                <td width="7%"> {{item.Discount}} </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" data-dismiss="modal" class="btn dark btn-outline" ng-click="submitted=false">Close</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- End: life time stats -->
+        <!--Modal Area Start-->
+        <div id="addmodal" class="modal fade" tabindex="-1" data-backdrop="static" data-keyboard="false">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <form name="addform" ng-submit="save()" class="form-horizontal" id="form_sample_1" novalidate>
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">X</button>
+                            <h4 class="modal-title">Requisition Approve</h4>
+                        </div>
+                        <div class="modal-body">
+                            <div class="form-body">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            <label class="col-md-4 control-label">
+                                                Description:
+                                                <span class="required">*</span>
+                                            </label>
+                                            <div class="col-md-8">
+                                                <textarea type="text" disabled ng-model="Requisition.Description" class="form-control" readonly></textarea>
+                                                <div class="form-control-focus"> </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group" ng-class="{ 'has-error' : submitted && addform.ApprovedComments.$invalid}">
+                                            <label class="col-md-4 control-label">
+                                                Comments:
+                                                <span class="required">*</span>
+                                            </label>
+                                            <div class="col-md-8">
+                                                <textarea type="text" ng-model="Requisition.ApprovedComments" class="form-control" name="ApprovedComments" required></textarea>
+                                                <div class="form-control-focus"> </div>
+                                                <span ng-show="submitted &&  addform.ApprovedComments.$error.required" class="help-block">Approved Comments Required</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" data-dismiss="modal" class="btn dark btn-outline" ng-click="submitted=false">Cancel</button>
+                            <button type="submit" ng-click="submitted=true" class="btn green-haze">Save</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+    <!--Modal Area End-->
+@section Scripts{
+
+    <script type="text/javascript">
+
+        OEMSApp.controller("quotationListClt", ["$scope", "$http", "SweetAlert",
+              function ($scope, $http, SweetAlert) {
+
+                  init();
+                  function init() {
+                      initialize();
+                      getQuotationList(1);
+
+                  }
+                  function initialize() {
+                             $scope.currentPage = 1;
+                      $scope.pageno = 1;
+                      $scope.pageSize = 10;
+                      $scope.total_count = 12;
+                      $scope.search = '';
+                      $scope.Requisition = {};
+
+                      $scope.QuotationList = [];
+
+                      $scope.getQuotationList = getQuotationList;
+                      $scope.res = {};
+                      $scope.data = {};
+
+
+                      $scope.btnDis = false;
+                      $scope.spin = false;
+                      $scope.pageSizeArray = [];
+                      $scope.pageSizeArray.push({ value: 5, text: 5 });
+                      $scope.pageSizeArray.push({ value: 10, text: 10 });
+                      $scope.pageSizeArray.push({ value: 20, text: 20 });
+                      $scope.pageSizeArray.push({ value: 50, text: 50 });
+                      $scope.currentPage = 1;
+                      $scope.pageSize = 10;
+                  }
+                  function setProgress(s) {
+                      $scope.btnDis = s;
+                      $scope.spin = s;
+                  }
+
+                  $scope.edit = function (n) {
+                      $scope.Requisition = n;
+                      $scope.Requisition.RequisitionId = n.RequisitionId;
+                      $scope.Requisition.Description = n.Description;
+
+                  }
+
+                
+                  function getQuotationList(pageno) {
+                      $scope.QuotationList = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Inventory/GetQuotationList/'
+                      }).then(function successCallback(response) {
+                          $scope.QuotationList = response.data.results;
+                          console.log($scope.QuotationList);                    
+                      }, function errorCallback(response) {
+                          toastr["warning"](response.data.Message);
+                      });
+                  }
+
+                  $scope.details = function (n) {
+                      $scope.QuotationDetails = [];
+                      angular.forEach($scope.QuotationList.QuoDetailsList, function (item) {
+                          if (n.QuotationId == item.QuotationId) {
+                              $scope.QuotationDetails.push(item);
+                          }
+                      });
+                      console.log($scope.QuotationDetails);
+                  };
+
+                  $scope.delete = function(n) {
+                      // SweetAlert.swal("Good job!", "You clicked the button!", "success");
+                      SweetAlert.swal({
+                          title: "Are you sure to delete it ?", type: "warning", showCancelButton: true, confirmButtonColor: "#DD6B55",
+                          confirmButtonText: "Yes, delete it!",
+                          closeOnConfirm: false
+                      },
+                      function (isConfirm) {
+                          if (isConfirm) {
+                              $http({
+                                  method: 'POST',
+                                  url: baseUrl + 'Inventory/QuotationDelete/',
+                                  data: n
+                              }).then(function successCallback(response) {
+                                  SweetAlert.swal("Deleted!", "Your data has been deleted.", "success");
+                                  getQuotationList(1);
+                              }, function errorCallback(response) {
+
+                                  toastr["warning"](response.data.Message);
+                              });
+                          }
+                      });
+                  };
+              }]);
+    </script>
+
+}
+
+

@@ -1,0 +1,398 @@
+﻿
+@{
+    ViewBag.Title = "Customer";
+}
+
+<div ng-controller="CustomerClt">
+    <!-- Begin: life time stats -->
+    <div class="portlet light bordered">
+        <div class="portlet-title">
+            <div class="caption">
+                <i class="icon-settings font-green"></i>
+                <span class="caption-subject font-green sbold uppercase">@ViewBag.Title</span>
+            </div>
+            <div class="actions">
+                <div class="btn-group btn-group-solid">
+                    <button ng-click="resetForm()" class="btn green" data-target="#addmodal" data-toggle="modal"> <i class="fa fa-plus"></i> Add Customer</button>
+                </div>
+            </div>
+        </div>
+        <div class="portlet-body">
+            <div class="table-container">
+                <div id="sample_3_wrapper" class="dataTables_wrapper no-footer">
+                    <div class="row">
+                        <div class="col-md-4 col-sm-5 col-xs-6">
+                            <div class="form-group">
+                                <div class="col-lg-3 col-md-5 col-sm-4 col-xs-8" style="padding-left:0px">
+                                    <select class="form-control" ng-model="pageSize" ng-options="P.value as P.text for P in pageSizeArray"></select>
+                                </div>
+                                <div class="col-md-7  col-sm-8  col-xs-4">
+                                    @*<label for="search" class="control-label" style="padding-top:5px">Items</label>*@
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 col-sm-3 col-xs-1">
+                        </div>
+                        <div class="col-md-4 col-sm-4 col-xs-5">
+                            <div id="sample_3_filter" class="pull-right">
+                                <input ng-model="q" id="search" class="form-control" placeholder="Filter text">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="table-scrollable"> </div>
+                    <table class="table table-bordered table-hover">
+                        <thead>
+                            <tr class="btn-primary">
+                                <th width="30%">Customer Name</th>
+                                <th width="10%">Code</th>
+                                <th width="10%">BIN</th>
+                                <th width="10%">Company Name</th>
+                                <th width="10%">Contact Person</th>
+                                <th width="10%">Contact No</th>
+                                <th width="10%">Customer A/C Code</th>
+                                <th width="15%" style="text-align:center">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-show="Customers.length <= 0"><td colspan="5" style="text-align:center;"><i class="fa fa-refresh"></i> Loading new data!!</td></tr>
+                            <tr dir-paginate="item in Customers| filter:q  | itemsPerPage: pageSize " current-page="currentPage">
+                                <td>{{item.CustomerName}}</td>
+                                <td>{{item.CustomerCode}}</td>
+                                <td>{{item.BIN}}</td>
+                                <td>{{item.CompanyName}}</td>
+                                <td>{{item.ContactPersonName}}</td>
+                                <td>{{item.ConatactPersonMobileNo}}</td>
+                                <td>{{item.AccountCode}}</td>
+                                <td align="center">
+                                    <a class="btn btn-icon-only green" ng-click="edit(item)" data-target="#addmodal" data-toggle="modal">
+                                        <i class="fa fa-edit"></i>
+                                    </a>
+                                    <a ng-click="deleteCustomer(item)" href="javascript:;" class="btn btn-icon-only red">
+                                        <i class="fa fa-trash"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="row">
+                        <dir-pagination-controls boundary-links="true" template-url="~/assets/angular/lib/dirPagination.tpl.html"></dir-pagination-controls>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- End: life time stats -->
+    <!--Modal Area Start-->
+    <div id="addmodal" class="modal fade" tabindex="-1" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form name="addform" ng-submit="save()" class="form-horizontal" id="form_sample_1" novalidate autocomplete="off">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">X</button>
+                        <h4 class="modal-title">{{modalTitle}}</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-body">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group" ng-class="{ 'has-error' : submitted && addform.CustomerName.$invalid}">
+                                        <label class="col-md-4 control-label">
+                                            Customer Name :
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-8">
+                                            <input type="text" ng-model="Customer.CustomerName" class="form-control" placeholder="Customer Name" maxlength="25" name="CustomerName" required>
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted && addform.CustomerName.$error.required" class="help-block">Customer Name Required</span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group" ng-class="{ 'has-error' : submitted && addform.code.$invalid}">
+                                        <label class="col-md-4 control-label">
+                                            Code :
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-8">
+                                            <input type="text" ng-model="Customer.CustomerCode" ng-pattern="/^\S{0,50}$/" class="form-control"
+                                                   placeholder="Customer Code" name="code" required>
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted &&  addform.code.$error.required" class="help-block">Code Required</span>
+                                            <span style="color:red" class="help-block" ng-if="submitted && addform.code.$error.pattern">No Space Allow</span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group" ng-class="{ 'has-error' : submitted && addform.code.$invalid}">
+                                        <label class="col-md-4 control-label">
+                                            BIN :
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-8">
+                                            <input type="text" ng-model="Customer.BIN" ng-pattern="/^\S{0,50}$/" class="form-control"
+                                                   placeholder="Customer BIN" name="bin" required>
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted &&  addform.bin.$error.required" class="help-block">BIN Required</span>
+                                            <span style="color:red" class="help-block" ng-if="submitted && addform.bin.$error.pattern">No Space Allow</span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group" ng-class="{ 'has-error' : submitted && addform.CompanyName.$invalid}">
+                                        <label class="col-md-4 control-label">
+                                            Company Name :
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-8">
+                                            <input type="text" ng-model="Customer.CompanyName" class="form-control" placeholder="Company Name" name="CompanyName" required>
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted && addform.CompanyName.$error.required" class="help-block">Company Name Required</span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group" ng-class="{ 'has-error' : submitted && addform.ContactPersonName.$invalid}">
+                                        <label class="col-md-4 control-label">
+                                            Contact Person :
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-8">
+                                            <input type="text" ng-model="Customer.ContactPersonName" class="form-control" placeholder="Contact Person Name" name="ContactPersonName" required>
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted && addform.ContactPersonName.$error.required" class="help-block">Contact Person Name Required</span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group" ng-class="{ 'has-error' : submitted && addform.ConatactPersonMobileNo.$invalid}">
+                                        <label class="col-md-4 control-label">
+                                            Contact No:
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-8">
+                                            <input type="number" ng-model="Customer.ConatactPersonMobileNo" @*ng-pattern="mobile_no"*@ @*onkeypress='return event.charCode >= 48 && event.charCode <= 57'*@ maxlength="18" class="form-control" placeholder="Contact No" name="ConatactPersonMobileNo" required>
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted && addform.ConatactPersonMobileNo.$error.required" class="help-block">Contact No Required</span>
+                                            <span ng-show="submitted && addform.ConatactPersonMobileNo.$error.pattern" class="help-block">Contact No Invalid</span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group" @*ng-class="{ 'has-error' : submitted && addform.Email.$invalid}"*@>
+                                        <label class="col-md-4 control-label">
+                                            Email:
+                                            @*<span class="required">*</span>*@
+                                        </label>
+                                        <div class="col-md-8">
+                                            <input type="text" ng-model="Customer.Email" class="form-control" ng-pattern="eml_add" placeholder="Email" name="Email">
+                                            <div class="form-control-focus"> </div>
+                                            @*<span ng-show="submitted && addform.Email.$error.required" class="help-block">Email Required</span>*@
+                                            <span ng-show="submitted && addform.Email.$error.pattern" class="help-block">Email Invalid</span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group" ng-class="{ 'has-error' : submitted && addform.Address.$invalid}">
+                                        <label class="col-md-4 control-label">
+                                            Address:
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-8">
+                                            <textarea type="text" ng-model="Customer.Address" class="form-control" placeholder="Address" name="Address" required></textarea>
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted && addform.Address.$error.required" class="help-block">Address Required</span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group" ng-show="show" ng-class="{ 'has-error' : submitted && addform.Address.$invalid}">
+                                        <label class="col-md-4 control-label">
+                                            Account Code:
+                                            @*<span class="required">*</span>*@
+                                        </label>
+                                        <div class="col-md-8">
+                                            <label class="form-control">{{Customer.AccountCode}}</label>
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted && addform.Address.$error.required" class="help-block">Address Required</span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group" ng-class="{ 'has-error' : submitted && addform.AccountCode.$invalid}">
+                                        <label class="col-md-4 control-label">
+                                            Account Code:
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-7">
+                                            <input type="text" ng-model="drRow.SearchLedger" typeahead-on-select='onSelect($item, $model, $label,drRow)' placeholder="Search Ledger by Name"
+                                                   uib-typeahead="i  as i.Text for i in Search($viewValue)" typeahead-loading="loadingLocations" typeahead-no-results="noResults" class="form-control">
+                                            <i ng-show="loadingLocations" class="glyphicon glyphicon-refresh"></i>
+                                            <div ng-show="noResults"><i class="glyphicon glyphicon-remove"></i> No Results Found</div>
+                                            @*<input type="text" ng-model="Customer.AccountCode" class="form-control" placeholder="Account Code" name="AccountCode" required>*@
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted && addform.AccountCode.$error.required" class="help-block">Account Code Required</span>
+                                        </div>
+                                        <div class="col-md-1">
+                                            <i class="glyphicon" ng-class="(shw==1) ? 'Ok glyphicon-ok' : 'cross glyphicon-remove-sign'"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" data-dismiss="modal" class="btn dark btn-outline" ng-click="resetForm();">Cancel</button>
+                        <button type="submit" ng-click="submitted=true" class="btn green-haze">Save</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!--Modal Area End-->
+</div>
+
+@section Scripts{
+
+    <script type="text/javascript">
+
+        OEMSApp.controller("CustomerClt", ["$scope", "$http", "SweetAlert",
+              function ($scope, $http, SweetAlert) {
+
+                  init();
+                  function init() {
+                      initialize();
+                      getCustomers(1);
+                  }
+                  function initialize() {
+                      $scope.modalTitle = "Add Customer";
+                      $scope.Customer = {};
+                      $scope.drRow = {};
+                      $scope.Customer.CustomerId = 0
+
+                      $scope.Customers = [];
+                      $scope.getCustomers = getCustomers;
+                      $scope.resetForm = resetForm;
+
+                      $scope.pageSizeArray = [];
+                      $scope.pageSizeArray.push({ value: 5, text: 5 });
+                      $scope.pageSizeArray.push({ value: 10, text: 10 });
+                      $scope.pageSizeArray.push({ value: 20, text: 20 });
+                      $scope.pageSizeArray.push({ value: 50, text: 50 });
+                      $scope.currentPage = 1;
+                      $scope.pageSize = 10;
+                      $scope.pageno = 1;
+                      $scope.total_count = 12;
+                      $scope.show = false;
+                      $scope.shw = 0;
+
+                      $scope.eml_add = /^[^\s@@]+@@[^\s@@]+\.[^\s@@]{2,}$/;
+                      $scope.mobile_no = /^(?:\+?88)?01[13-9]\d{8}$/;
+
+                  }
+
+                  function resetForm() {
+                      $scope.modalTitle = "Add Customer";
+                      $scope.Customer = {};
+                      $scope.Customer.CustomerId = 0
+                      $scope.addform.$setUntouched();
+                      $scope.addform.$setPristine();
+                      $scope.submitted = false;
+                      $scope.show = false;
+                      $scope.shw = 0;
+                      $scope.drRow = {};
+                      //getCustomers(1);
+                  }
+                  function getCustomers(pageno) {
+                      $scope.Customers = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Inventory/GetCustomers'
+                      }).then(function successCallback(response) {
+                          $scope.Customers = response.data.results;
+                          toastr["info"](response.data.message);
+                      }, function errorCallback(response) {
+                          toastr["warning"](response.data.Message);
+                      });
+                  }
+
+                  $scope.edit = function (n) {
+                      $scope.modalTitle = "Update Customer";
+                      $scope.Customer = n;
+                      $scope.Customer.CustomerId = n.CustomerId;
+                      $scope.show = true;
+                  };
+                  $scope.save = function save(e) {
+                      debugger;
+                      if (Validation())
+                      {
+                          if ($scope.Customer.CustomerId != 0) /// For Update
+                          {
+                              if ($scope.Customer != '') {
+                                  $http({
+                                      method: 'PUT',
+                                      url: baseUrl + 'Inventory/UpdateCustomer/',
+                                      data: $scope.Customer
+                                  }).then(function successCallback(response) {
+                                      $('#addmodal').modal('toggle');
+                                      toastr["info"](response.data.message);
+                                      getCustomers(1);
+                                      resetForm();
+                                  }, function errorCallback(response) {
+                                      toastr["warning"](response.data.Message);
+                                  });
+                              }
+                          } else {  //  For Add
+                              if ($scope.Customer != {}) {
+                                  $http({
+                                      method: 'POST',
+                                      url: baseUrl + '/Inventory/AddCustomer/',
+                                      data: $scope.Customer
+                                  }).then(function successCallback(response) {
+                                      $('#addmodal').modal('toggle');
+                                      toastr["info"](response.data.message);
+                                      getCustomers(1);
+                                      resetForm();
+                                  }, function errorCallback(response) {
+                                      toastr["warning"](response.data.Message);
+                                  });
+                              }
+                          }
+                      } else {
+                          toastr["warning"]('Form Invalid');
+                      }
+                  };
+
+                  $scope.deleteCustomer = function deleteCustomer(n) {
+                      SweetAlert.swal({
+                          title: "Are you sure to delete it ?", type: "warning", showCancelButton: true, confirmButtonColor: "#DD6B55",
+                          confirmButtonText: "Yes, delete it!",
+                          closeOnConfirm: false
+                      },
+                      function (isConfirm) {
+                          if (isConfirm) {
+                              $http({
+                                  method: 'POST',
+                                  url: baseUrl + 'Inventory/DeleteCustomer/',
+                                  data: n
+                              }).then(function successCallback(response) {
+                                  SweetAlert.swal("Deleted!", "Your data has been deleted.", "success");
+                                  getCustomers(1);
+                              }, function errorCallback(response) {
+                                  toastr["warning"](response.data.Message);
+                              });
+                          }
+                      });
+                  };
+
+                  $scope.Search = function (val) {
+                      if (val.length >= 2)
+                          return $http.get(baseUrl + 'Inventory/SearchLedger/' + val ,
+                          {
+                              params: {}
+                          }).then(function (response) {
+                              return response.data.results.map(function (item) {
+                                  return item;
+                              });
+                          });
+                  };
+
+                  // for dropdown select list event....
+                  $scope.onSelect = function onSelect($item, $model, $label, itemRow) {
+                      $scope.Customer.AccountCode = $item.Text;
+                      $scope.shw = 1;
+                      }
+                  function Validation() {
+                      if ($scope.addform.$invalid) {
+                          return false;
+                      }
+                      if ($scope.addform.$valid) {
+                          return true;
+                      }
+                  }
+              }]);
+    </script>
+
+}
+

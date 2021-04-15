@@ -1,0 +1,159 @@
+﻿
+@{
+    ViewBag.Title = "Attendance Details";
+}
+
+
+<div class="kt-container  kt-container--fluid  kt-grid__item kt-grid__item--fluid" ng-controller="BSU">
+    <div class="row">
+        <div class="kt-portlet kt-portlet--mobile">
+            <div class="kt-portlet__head kt-portlet__head--lg">
+                <div class="kt-portlet__head-label">
+                    <h3 class="kt-portlet__head-title">
+                        Attendance Details
+                    </h3>
+                </div>
+            </div>
+            <div class="kt-portlet__body">
+                <!-- BEGIN FORM-->
+                <form class="form-horizontal" ng-submit="Report(formCommonFeilds.$valid)" id="formCommonFeilds" name="formCommonFeilds" novalidate>
+                    <div class="form-body">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group row" ng-class="{ 'has-error' : submitted && formCommonFeilds.Branch.$invalid}">
+                                    <label class="col-md-5 control-label" style="text-align:right">
+                                        Branch :
+                                        <span class="required">*</span>
+                                    </label>
+                                    <div class="col-md-6">
+                                        <select class="form-control" ng-model="StdDailyAtteneance.BranchId" required name="Branch" ng-options="StdDailyAtteneance.BranchId as StdDailyAtteneance.BranchName for StdDailyAtteneance in CommonFeilds.Branch">
+                                            <option value="" selected="selected">Choose Option</option>
+                                        </select>
+                                        <div class="form-control-focus"> </div>
+                                        <span ng-show="submitted && formCommonFeilds.Branch.$error.required" class="help-block">Branch Name Required</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group row" ng-class="{ 'has-error' : submitted && formCommonFeilds.FromDate.$invalid}">
+                                    <label class="col-md-5 control-label" style="text-align:right">
+                                        From :
+                                        <span class="required">*</span>
+                                    </label>
+                                    <div class="col-md-6">
+                                        <input class="form-control" ng-change="check()" datepicker-options="dateOptions" name="FromDate" type="datetime" required placeholder="From Date" readonly ng-click="p1=true" is-open="p1" uib-datepicker-popup="dd/MM/yyyy" ng-model="StdDailyAtteneance.From" />
+                                        <div class="form-control-focus"> </div>
+                                        <span ng-show="submitted && formCommonFeilds.FromDate.$error.required" class="help-block">From Date Required</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group row" ng-class="{ 'has-error' : submitted && formCommonFeilds.ToDate.$invalid}">
+                                    <label class="col-md-5 control-label" style="text-align:right">
+                                        To :
+                                        <span class="required">*</span>
+                                    </label>
+                                    <div class="col-md-6">
+                                        <input class="form-control" datepicker-options="dateOptionsEnd" name="ToDate" type="datetime" required placeholder="To Date" readonly ng-click="p2=true" is-open="p2" uib-datepicker-popup="dd/MM/yyyy" ng-model="StdDailyAtteneance.To" />
+                                        <div class="form-control-focus"> </div>
+                                        <span ng-show="submitted && formCommonFeilds.ToDate.$error.required" class="help-block">To Date Required</span>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-md-5 control-label">
+                                    </label>
+                                    <div class="col-md-6 text-right">
+                                        <button ng-click="submitted=true" class="btn btn-primary">Report</button>
+                                        <button type="button" ng-click="Reset()" class="btn btn-danger">Reset</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+@section Scripts{
+    <script type="text/javascript">
+        OEMSApp.controller("BSU", ["$scope", "$http", "SweetAlert", "$filter", "$window",
+          function ($scope, $http, SweetAlert, $filter, $window) {
+
+              init();
+              function init() {
+                  initialize();
+                  getAllCommons();
+              }
+              function initialize() {
+                  $scope.StdDailyAtteneance = [];
+
+              };
+              $scope.Reset = function Reset() {
+
+                  $scope.submitted = false;
+                  $scope.StdDailyAtteneance = [];
+              };
+              function getAllCommons() {
+                  $scope.CommonFeilds = [];
+
+                  $http({
+                      method: 'GET',
+                      url: baseUrl + 'Common/GetCommonItem/'
+                  }).then(function successCallback(response) {
+                      $scope.CommonFeilds = response.data.results;
+
+                  }, function errorCallback(response) {
+                      toastr["error"](response.data.message);
+                  });
+              }
+              $scope.GetGroup = function GetGroup(classid) {
+                  $scope.Groups = [];
+                  $http({
+                      method: 'GET',
+                      url: baseUrl + 'Common/GetGroup/' + classid
+                  }).then(function successCallback(response) {
+                      $scope.Groups = response.data.results;
+                  }, function errorCallback(response) {
+                      toastr["error"](response.data.message);
+                  });
+
+              }
+              $scope.GetSection = function GetSection() {
+                  $scope.Sections = [];
+                  $http({
+                      method: 'GET',
+                      url: baseUrl + 'Common/GetSection/' + $scope.StdDailyAtteneance.SessionId + "/" + $scope.StdDailyAtteneance.ShiftId + "/" + $scope.StdDailyAtteneance.ClassId
+                  }).then(function successCallback(response) {
+                      $scope.Sections = response.data.results;
+                  }, function errorCallback(response) {
+                      toastr["error"](response.data.message);
+                  });
+              }
+
+              $scope.check = function () {
+                  $scope.dateOptionsEnd = { minDate: $scope.StdDailyAtteneance.From };
+              }
+
+              $scope.Report = function Report(valid) {
+                  if (valid) {
+
+                      if ($scope.StdDailyAtteneance.From > $scope.StdDailyAtteneance.To) {
+                          toastr["warning"]("To Date must be greater than From Date");
+                      }
+                      else {
+                          var FromDate = $filter('date')($scope.StdDailyAtteneance.From, "MM/dd/yyyy");
+                          var ToDate = $filter('date')($scope.StdDailyAtteneance.To, "MM/dd/yyyy");
+                          $scope.uri = "@Url.Action("EmployeeAttendanceDetailsDateRange", "Report")?BranchId=" + $scope.StdDailyAtteneance.BranchId + "&FromDate=" + FromDate + '&ToDate=' + ToDate;
+                          $window.open($scope.uri, '_blank');
+                      }
+
+                  }
+              };
+          }]);
+    </script>
+}

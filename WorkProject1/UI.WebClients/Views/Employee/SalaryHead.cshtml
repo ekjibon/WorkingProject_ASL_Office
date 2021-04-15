@@ -1,0 +1,424 @@
+﻿
+@{
+    ViewBag.Title = "SalaryHead";
+}
+
+<div class="kt-container  kt-container--fluid  kt-grid__item kt-grid__item--fluid" ng-controller="ctrlSalaryHead">
+    <div class="row">
+        <div class="kt-portlet kt-portlet--mobile">
+            <div class="kt-portlet__head kt-portlet__head--lg">
+                <div class="kt-portlet__head-label">
+                    <h3 class="kt-portlet__head-title">
+                        All Salary Head
+                    </h3>
+                </div>
+                <div class="kt-portlet__head-toolbar">
+                    <div class="kt-portlet__head-wrapper">
+                        <div class="dropdown dropdown-inline">
+                            <button type="button" class="btn btn-brand btn-icon-sm" data-toggle="modal" data-target="#addmodal" aria-haspopup="true" aria-expanded="false">
+                                <i class="flaticon2-plus"></i> Add New Salary Head
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="kt-portlet__body">
+
+                <div class="row">
+                    <div class="col-md-4 col-sm-5 col-xs-6">
+                        <div class="form-group">
+                            <div class="col-lg-3 col-md-5 col-sm-4 col-xs-8" style="padding-left:0px">
+
+                                <select class="form-control kt-font-brand" ng-model="pageSize" ng-options="P.value as P.text for P in pageSizeArray"></select>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="col-md-4 col-sm-3 col-xs-1">
+                    </div>
+                    <div class="col-md-4 col-sm-4 col-xs-5">
+                        <div id="sample_3_filter" class="pull-right">
+                            <input ng-model="q" id="search" class="form-control" placeholder="Filter text">
+                        </div>
+                    </div>
+                </div>
+                <table class="table table-bordered table-hover rounded">
+                    <thead>
+                        <tr class="btn-primary">
+                            <th>SI</th>
+                            <th>Head Name</th>
+                            <th>Category</th>
+                            <th>Display Order</th>
+                            <th style="text-align:center">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-show="salaryHeadList.length <= 0"><td colspan="5" style="text-align:center;"><i class="fa fa-refresh"></i> Loading new data!!</td></tr>
+                        <tr dir-paginate="item in salaryHeadList| filter:q  | itemsPerPage: pageSize" current-page="currentPage">
+                            <td>{{$index+1}}</td>
+                            <td>{{item.HeadName}}</td>
+                            <td ng-if="item.Category==1">Earning</td>
+                            <td ng-if="item.Category==2">Deduction</td>
+                            <td>{{item.DisplayOrder}}</td>
+                            <td align="center" ng-show="item.IsEdit==0">
+                                <a href="javascript:;" class="btn btn-outline-brand btn-elevate btn-icon" ng-click="editSalaryHead(item)" data-target="#addmodal" data-toggle="modal">
+                                    <i class="fa fa-edit"></i>
+                                </a>
+                                <a ng-click="deleteSalaryHead(item.Id)" href="javascript:;" class="btn btn-outline-danger btn-elevate btn-icon">
+                                    <i class="fa fa-trash"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="row">
+                    <dir-pagination-controls boundary-links="true" template-url="~/assets/angular/lib/dirPagination.tpl.html"></dir-pagination-controls>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--Modal Area Start-->
+    <div id="addmodal" class="modal fade" tabindex="-1" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form name="addBasic" ng-submit="save()" class="form-horizontal" id="form_sample_1" novalidate>
+                    <div class="modal-header">
+                        <h5 class="modal-title">{{modalTitle}}</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-body">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group row" ng-class="{ 'has-error' : submitted && addBasic.HeadName.$invalid}">
+                                        <label class="col-md-4 control-label text-right">
+                                            Head Name :
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-8">
+                                            <input type="text" ng-model="employeeInfo.HeadName" class="form-control" placeholder="Head Name" name="HeadName" required>
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted &&  addBasic.HeadName.$error.required" class="help-block">Head Name Required</span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group row" ng-class="{ 'has-error' : submitted && addBasic.DisplayOrder.$invalid}">
+                                        <label class="col-md-4 control-label text-right">
+                                            Display Order :
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-8">
+                                            <input type="number" ng-model="employeeInfo.DisplayOrder" class="form-control" placeholder="Display Order" name="DisplayOrder" required>
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted &&  addBasic.DisplayOrder.$error.required" class="help-block">Display Order Required</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group row" ng-class="{ 'has-error' : submitted && addBasic.Category.$invalid}">
+                                        <label class="col-md-4 control-label text-right">
+                                            Head Category :
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-8">
+                                            <select ng-model="employeeInfo.Category" class="form-control" placeholder="Category" name="Category" required>
+                                                <option value=''>Select Category</option>
+                                                <option value='1'>Earning</option>
+                                                <option value='2'>Deduction</option>
+                                            </select>
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted &&  addBasic.Category.$error.required" class="help-block">Category Required</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" data-dismiss="modal" class="btn btn-secondary" ng-click="resetForm();submitted=false">Cancel</button>
+                        <button type="submit" ng-click="submitted=true" class="btn btn-success">{{modalbutton}}</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!--Modal Area End-->
+</div>
+<!-- END FORM-->
+@section Scripts{
+    <script src="~/assets/global/plugins/bootstrap-fileinput/bootstrap-fileinput.js" type="text/javascript"></script>
+    <script src="~/assets/pages/scripts/form-repeater.min.js"></script>
+    <script type="text/javascript">
+        for (i = new Date().getFullYear() ; i > 1900; i--) {
+            $('#yearpicker').append($('<option />').val(i).html(i));
+        }
+    </script>
+    <script type="text/javascript">
+        OEMSApp.controller("ctrlSalaryHead", ["$scope", "$http", "SweetAlert",
+              function ($scope, $http, SweetAlert) {
+                  init();
+                  function init() {
+                      initialize();
+                      getAllSalaryHead();
+                      getAllLedger();
+                  }
+
+                  function initialize() {
+                      $scope.modalbutton = 'Save';
+                      $scope.modalTitle = 'Add Salary Head';
+                      $scope.brnlist = [];
+                      $scope.getAllLedger = [];
+                      $scope.categorieslist = [];
+                      $scope.subSubCategorieslist = [];
+                      $scope.employeeInfo = {};
+                      $scope.employeeInfos = [];
+                      $scope.salaryHeadList = [];
+                      $scope.subSubCategorieslist = [];
+                      $scope.resetForm = resetForm;
+                      $scope.getAllLedger = getAllLedger;
+                      $scope.checkUpdateId = 0;
+                      $scope.pagesize = 10;
+                      $scope.pageSizeArray = [];
+                      $scope.pageSizeArray.push({ value: 5, text: 5 });
+                      $scope.pageSizeArray.push({ value: 10, text: 10 });
+                      $scope.pageSizeArray.push({ value: 20, text: 20 });
+                      $scope.pageSizeArray.push({ value: 50, text: 50 });
+                      $scope.currentPage = 1;
+                      $scope.pageSize = 10;
+                      $scope.subCategorydd = 0;
+                      $scope.subSubCategorydd = 0;
+                      $scope.categorydd = 0;
+
+                      $scope.getAllSubCategoryById = getAllSubCategoryById;
+                      $scope.getAllSubSubCategoryById = getAllSubSubCategoryById;
+                  }
+
+                  function resetForm() {
+                      $scope.modalTitle = "Add Salary Head";
+                      $scope.employeeInfo = {};
+                      $scope.Id = '';
+                      $scope.checkUpdateId = 0;
+                      $scope.addBasic.$setUntouched();
+                      $scope.addBasic.$setPristine();
+                      //$scope.submitted = false;
+                      $scope.modalbutton = 'Save';
+                      $scope.subCategorydd = 0;
+                      $scope.subSubCategorydd = 0;
+                      $scope.categorydd = 0;
+                      $scope.categorieslist = [];
+                      $scope.subSubCategorieslist = [];
+                  }
+
+
+                  function getAllLedger() {
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Employee/GetHeadLedger/',
+                      }).then(function successCallback(response) {
+                          $scope.ledgerlist = response.data.results;
+                      }, function errorCallback(response) {
+                      });
+                  }
+
+                  $scope.getAllCategorylist = function getAllCategorylist(ledgerId) {
+                      $scope.categorieslist = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Employee/GetSubCategory/' + ledgerId,
+                      }).then(function successCallback(response) {
+                          $scope.categorieslist = response.data.results;
+                          if ($scope.categorieslist.length != 0)
+                              $scope.subCategorydd = 1;
+                          else
+                              $scope.subCategorydd = 0;
+                      }, function errorCallback(response) {
+                      });
+                  }
+
+                  $scope.getAllSubSubCategorylist = function getAllSubSubCategorylist(ledgerId) {
+                      $scope.subSubCategorieslist = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Employee/GetSubCategory/' + ledgerId,
+                      }).then(function successCallback(response) {
+                          $scope.subSubCategorieslist = response.data.results;
+                          if ($scope.subSubCategorieslist.length != 0)
+                              $scope.subSubCategorydd = 1;
+                          else
+                              $scope.subSubCategorydd = 0;
+                      }, function errorCallback(response) {
+                      });
+                  }
+                  $scope.save = function save() {
+                      if ($scope.addBasic.$invalid)
+                          return;
+                      else {
+                          var result = validation();
+                          if (result) {
+                              if ($scope.checkUpdateId != 10002) {
+                                  $http({
+                                      method: 'POST',
+                                      url: baseUrl + 'Employee/AddSalaryHead/',
+                                      data: $scope.employeeInfo
+                                  }).then(function successCallback(response) {
+                                      $('#addmodal').modal('toggle');
+                                      toastr["info"](response.data.message);
+                                      getAllSalaryHead();
+                                      resetForm();
+                                  }, function errorCallback(response) {
+                                      toastr["warning"](response.data.Message);
+                                  });
+                              }
+                              if ($scope.checkUpdateId == 10002) {
+                                  $http({
+                                      method: 'PUT',
+                                      url: baseUrl + 'Employee/UpdateSalaryHead/',
+                                      data: $scope.employeeInfo
+                                  }).then(function successCallback(response) {
+                                      toastr["info"](response.data.message);
+                                      if (response.data.httpStatusCode != 305) {
+                                          $('#addmodal').modal('toggle');
+                                          getAllSalaryHead();
+                                          resetForm();
+                                      }
+
+                                  }, function errorCallback(response) {
+                                      toastr["warning"](response.data.Message);
+                                  });
+                              }
+                          }
+                      }
+
+                  }
+
+                  function getAllSalaryHead() {
+                      $scope.salaryHeadList = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Employee/GetAllSalaryHead/'
+                      }).then(function successCallback(response) {
+                          $scope.salaryHeadList = response.data.results;
+                      }, function errorCallback(response) {
+                          toastr["info"](response.data.Message);
+                      });
+                  }
+
+                  var categoryId;
+
+                  $scope.deleteSalaryHead = function deleteSalaryHead(salaryId) {
+                      SweetAlert.swal({
+                          title: "Are you sure to delete it ?", type: "warning", showCancelButton: true, confirmButtonColor: "#DD6B55",
+                          confirmButtonText: "Yes, delete it!",
+                          closeOnConfirm: false
+                      },
+                        function (isConfirm) {
+                            if (isConfirm) {
+                                $http({
+                                    method: 'DELETE',
+                                    url: baseUrl + 'Employee/DeleteSalaryHead/' + salaryId,
+                                }).then(function successCallback(response) {
+                                    SweetAlert.swal("Deleted!", "Your data has been deleted.", "success");
+                                    getAllSalaryHead();
+                                }, function errorCallback(response) {
+                                    toastr["error"](response.data.Message);
+                                });
+                            }
+                        });
+                  }
+
+                  $scope.editSalaryHead = function editSalaryHead(item) {
+                      $scope.modalTitle = "Update Salary Head";
+                      $scope.modalbutton = 'Update';
+                      var catId = item.Category;
+                      //$scope.categorydd = 1;
+                      $scope.employeeInfo.Id = item.Id;
+                      //$scope.employeeInfo.AccHeadId = item.LedgerId;
+                      $scope.employeeInfo.HeadName = item.HeadName;
+                      $scope.employeeInfo.HeadCode = item.HeadCode;
+                      $scope.employeeInfo.Category = '' + item.Category + '';
+                      $scope.employeeInfo.IsBasic = item.IsBasic;
+                      $scope.employeeInfo.DisplayOrder = item.DisplayOrder;
+                      $scope.checkUpdateId = 10002;
+                      categoryId = item.Category;
+                  }
+
+                  $scope.showLedgerdd = function showLedgerdd(value) {
+                      if (value)
+                          $scope.categorydd = 1;
+                      else {
+                          $scope.subCategorydd = 0;
+                          $scope.subSubCategorydd = 0;
+                          $scope.categorydd = 0;
+                      }
+                  }
+
+                  function validation() {
+
+                      if ($scope.employeeInfo.IsAccLedger == undefined || $scope.employeeInfo.IsAccLedger == false) {
+                          return true;
+                      }
+                      else {
+                          if ($scope.employeeInfo.AccHeadId == null) {
+                              toastr["info"]("Please Select Head Account..!");
+                              return false;
+                          }
+                          else if ($scope.employeeInfo.Category == null) {
+                              toastr["info"]("Please Select Sub Category..!");
+                              return false;
+                          }
+                          else if ($scope.employeeInfo.SubSubCategory == null && $scope.subSubCategorieslist.length != 0) {
+                              toastr["info"]("Please Select Sub Sub Category..!");
+                              return false;
+                          }
+                          else if ($scope.subSubCategorieslist.length == 0) {
+                              return true;
+                          }
+                          else {
+                              $scope.employeeInfo.Category = $scope.employeeInfo.SubSubCategory;
+                              return true;
+                          }
+
+                      }
+                  }
+
+                  function getAllSubCategoryById(catId) {
+                      $scope.categorieslist = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Employee/GetSubCategory/' + catId,
+                      }).then(function successCallback(response) {
+                          $scope.categorieslist = response.data.results;
+                          if ($scope.categorieslist.length != 0) {
+                              $scope.subCategorydd = 1;
+                              getAllSubSubCategoryById(categoryId);
+                          }
+
+                          else
+                              $scope.subCategorydd = 0;
+                      }, function errorCallback(response) {
+                      });
+                  }
+
+                  function getAllSubSubCategoryById(catId) {
+                      $scope.subSubCategorieslist = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Employee/GetSubSubCategory/' + catId,
+                      }).then(function successCallback(response) {
+                          $scope.subSubCategorieslist = response.data.results;
+                          if ($scope.subSubCategorieslist.length != 0) {
+                              $scope.subSubCategorydd = 1;
+                              $scope.employeeInfo.SubSubCategory = $scope.subSubCategorieslist[0].LedgerId;
+                          }
+
+                          else
+                              $scope.subSubCategorydd = 0;
+                      }, function errorCallback(response) {
+                      });
+                  }
+
+              }]);
+    </script>
+}
+

@@ -1,0 +1,154 @@
+﻿@{
+    ViewBag.Title = "Generate Root Group Report";
+}
+
+<div class="kt-container  kt-container--fluid  kt-grid__item kt-grid__item--fluid" ng-controller="AccountReports">
+    <!-- Begin: life time stats -->
+    <div class="row">
+        <div class="kt-portlet kt-portlet--mobile">
+            <div class="kt-portlet__head kt-portlet__head--lg">
+                <div class="kt-portlet__head-label">
+                    <span class="kt-portlet__head-icon">
+                        @*<i class="kt-font-brand flaticon2-line-chart"></i>*@
+                    </span>
+                    <h3 class="kt-portlet__head-title">
+                        <!----Titel Text-->
+                        <span class="caption-subject font-green sbold uppercase">@ViewBag.Title</span>
+                        <!----Titel Text -->
+                    </h3>
+                </div>
+                <div class="kt-portlet__head-toolbar">
+                    <div class="kt-portlet__head-wrapper">
+                        <div class="dropdown dropdown-inline">
+                            @*<button type="button" class="btn btn-brand btn-icon-sm" data-toggle="modal" data-target="#addmodal" aria-haspopup="true" aria-expanded="false">
+                               
+                                <i class="flaticon2-plus"></i> Add New
+                               
+                            </button>*@
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="kt-portlet__body">
+
+
+                <div class="row">
+                    <div class="col-md-12 col-sm-12 col-xs-12">
+                        <div class="form-group">
+                            <form name="addform" class="form-horizontal" id="form_sample_1" novalidate autocomplete="off">
+                                <div class="row">
+                                    <div class="form-group row col-lg-5" ng-class="{ 'has-error' : submitted && addform.Category.$invalid}">
+                                        <label class="col-md-4 control-label" style="text-align:right">
+                                            Root Groups:
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-8">
+                                            <select class="form-control" ng-model="Reports.RootGroup" name="Category" ng-options="RGroup.LedgerId as RGroup.Name for RGroup in RootGroups" required>
+                                                <option value="">Select One</option>
+                                            </select>
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted &&  addform.Category.$error.required" class="help-block">Root Group Required</span>
+                                        </div>
+                                    </div>
+                                    @*<div class="form-group row col-lg-5" ng-class="{ 'has-error' : submitted && addform.reportType.$invalid}">
+                    <label class="col-md-4 control-label">
+                        Reports:
+                        <span class="required">*</span>
+                    </label>
+                    <div class="col-md-8">
+                        <select ng-model="Reports.ReportType" class="form-control" name="reportType" required>
+                            <option value="">Select One</option>
+                            <option value="1">rptBalanceSheet</option>
+                            <option value="2">rptProfitLoss</option>
+                            <option value="3">rptReceiptPayment</option>
+                            <option value="4">rptTrialBalance</option>
+                            <option value="5">rptCashFlow</option>
+                        </select>
+                        <div class="form-control-focus"> </div>
+                        <span ng-show="submitted &&  addform.reportType.$error.required" class="help-block">Report Required</span>
+                    </div>
+                </div>*@
+                                    <div class="form-group row col-lg-2" ng-class="{ 'has-error' : submitted && addform.name.$invalid}">
+                                        <a href="@Url.Action("AccountViewReport","AccountV")?RootGroup={{Reports.RootGroup}}" class="btn btn-success" target="_blank">Show Report</a>
+                                    </div>
+                                </div>
+                            </form>
+
+                        </div>
+
+                    </div>
+                    <div class="col-md-4 col-sm-3 col-xs-1">
+                    </div>
+                </div>                           
+            </div>
+        </div>
+    </div>
+
+    <!-- End: life time stats -->
+
+</div>
+
+@section Scripts{
+
+    <script type="text/javascript">
+        OEMSApp.controller("AccountReports", ["$scope", "$http", "SweetAlert", "$filter",
+              function ($scope, $http, SweetAlert, $filter) {
+
+                  init();
+                  function init() {
+                      initialize();
+                      getAcRootGroups();
+                  }
+                  function initialize() {
+                      $scope.Reports = {};
+                      $scope.arrNum = 0;
+
+
+                      $scope.RootGroups = [];
+                      $scope.currentPage = 1;
+                      $scope.pageno = 1;
+                      $scope.pagesize = 10;
+                      $scope.total_count = 12;
+                      $scope.search = '';
+                      $scope.Id = '';
+                      $scope.res = {};
+                      $scope.data = {};
+                      $scope.resetForm = resetForm;
+                      $scope.hstep = 1;
+                      $scope.mstep = 15;
+
+                      $scope.pageSizeArray = [];
+                      $scope.pageSizeArray.push({ value: 5, text: 5 });
+                      $scope.pageSizeArray.push({ value: 10, text: 10 });
+                      $scope.pageSizeArray.push({ value: 20, text: 20 });
+                      $scope.pageSizeArray.push({ value: 50, text: 50 });
+                      $scope.currentPage = 1;
+                      $scope.pageSize = 10;
+
+                  }
+                  function resetForm() {
+
+                      $scope.Reports = {};
+                      //$scope.Reports.LedgerId = 0;
+                      $scope.addform.$setUntouched();
+                      $scope.addform.$setPristine();
+                      $scope.submitted = false;
+                  }
+                  function getAcRootGroups() {
+                      $scope.RootGroups = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Accounts/GetAllRootLedger/'
+                      }).then(function successCallback(response) {
+                          $scope.RootGroups = response.data.results;
+                      }, function errorCallback(response) {
+                          toastr["warning"](response.data.Message);
+                      });
+                  }
+
+
+              }]);
+    </script>
+}

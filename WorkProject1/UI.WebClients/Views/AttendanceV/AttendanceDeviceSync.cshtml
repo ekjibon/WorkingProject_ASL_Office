@@ -1,0 +1,362 @@
+﻿
+@{
+    ViewBag.Title = "Attendance Device Sync";
+}
+<style>
+    .textWhite{
+        color: #ffffff !important;
+    }
+   
+</style>
+
+<div class="kt-container  kt-container--fluid  kt-grid__item kt-grid__item--fluid" ng-controller="ctrlSyncAttDevice">
+    <div class="row">
+        <div class="kt-portlet kt-portlet--mobile">
+            <div class="kt-portlet__head kt-portlet__head--lg">
+                <div class="kt-portlet__head-label">
+                    <h3 class="kt-portlet__head-title">
+                        Attendance Process/Device Sync
+                    </h3>
+                </div>
+            </div>
+            <div class="kt-portlet__body">
+                <!-- BEGIN FORM-->
+                <form class="form-horizontal"  id="formCommonFeilds" name="formCommonFeilds" novalidate>
+                    <div class="form-body">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group row" ng-class="{ 'has-error' : submitted && formCommonFeilds.SyncType.$invalid}">
+                                    <label class="col-md-4 control-label text-right">
+                                        Type<span class="required">*</span>
+                                    </label>
+                                    <div class="col-md-8">
+                                        <select class="form-control" ng-model="AttendanceDevice.SyncType" required name="SyncType" ng-options="aBranch.value as aBranch.text for aBranch in DeviceSyncType" >
+                                            <option value="" selected="selected">Select</option>
+                                        </select>
+                                         <div class="form-control-focus"> </div>
+                                                                             <span ng-show="submitted && formCommonFeilds.SyncType.$error.required" class="help-block">Type Required</span>
+                                    </div>
+                                </div>
+
+                                <div class="form-group row" ng-class="{ 'has-error' : submitted1 && formCommonFeilds.Branch.$invalid}" ng-show="AttendanceDevice.SyncType=='AP'">
+                                    <label class="col-md-4 control-label text-right">
+                                        Branch
+                                    </label>
+                                    <div class="col-md-8">
+                                        <select class="form-control" ng-model="AttendanceDevice.BranchId" name="Branch" ng-options="aBranch.BranchId as aBranch.BranchName for aBranch in CommonFeilds.Branch" ng-disabled="AttendanceDevice.IsSingleEmp==true">
+                                            <option value="" selected="selected">Select</option>
+                                        </select>
+                                        @*<div class="form-control-focus"> </div>
+                                        <span ng-show="submitted1 && formCommonFeilds.Branch.$error.required" class="help-block">Branch Name Required</span>*@
+                                    </div>
+                                </div>
+
+                                <div class="form-group row" ng-class="{ 'has-error' : submitted && formCommonFeilds.FromDate.$invalid}" ng-show="AttendanceDevice.SyncType=='AP'">
+                                    <label class="col-md-4 control-label" style="text-align:right">
+                                        From Date :
+                                        <span class="required">*</span>
+                                    </label>
+                                    <div class="col-md-8">
+                                        <input class="form-control" name="FromDate" type="datetime" ng-required="AttendanceDevice.SyncType=='AP'" placeholder="From Date" readonly ng-click="p2=true" is-open="p2" uib-datepicker-popup="dd/MM/yyyy" ng-model="AttendanceDevice.FromDate" />
+                                        <div class="form-control-focus"> </div>
+                                        <span ng-show="submitted && formCommonFeilds.FromDate.$error.required" class="help-block">From Date Required</span>
+                                    </div>
+                                </div>
+
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group row" ng-class="{ 'has-error' : submitted && formCommonFeilds.Device.$invalid}" ng-show="AttendanceDevice.SyncType=='SD'">
+                                    <label class="col-md-4 control-label" style="text-align:right">
+                                        Device :
+                                        <span class="required">*</span>
+                                    </label>
+                                    <div class="col-md-8">
+                                        <select class="form-control" ng-model="AttendanceDevice.AttDeviceId" ng-required="AttendanceDevice.SyncType=='SD'" name="Device" ng-options="aDevice.value as aDevice.text for aDevice in AttendanceDeviceList">
+                                            <option value="" selected="selected">Choose Option</option>
+                                        </select>
+                                        <div class="form-control-focus"> </div>
+                                        <span ng-show="submitted && formCommonFeilds.Device.$error.required" class="help-block">Device Name Required</span>
+                                    </div>
+                                </div>
+                                <div class="form-group row" ng-show="AttendanceDevice.SyncType=='AP'">
+                                    <label class="col-md-4 col-sm-offset-0 control-label text-right">
+                                        Designation
+
+                                    </label>
+                                    <div class="col-sm-8">
+                                        <select class="form-control" ng-model="AttendanceDevice.DesignationId" name="Designation" ng-options="aDesignation.DesignationID as aDesignation.DesignationName for aDesignation in CommonFeilds.Designation" ng-disabled="AttendanceDevice.IsSingleEmp==true">
+                                            <option value="" selected="selected">Select</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group row" ng-show="AttendanceDevice.SyncType=='AP'">
+                                    <label class="col-md-4 control-label text-right">
+                                        Category
+                                    </label>
+                                    <div class="col-md-8">
+                                        <select class="form-control" ng-model="AttendanceDevice.CategoryId" name="Class" ng-change="" ng-options="aCategory.CategoryID as aCategory.CategoryName for aCategory in CommonFeilds.Category" ng-disabled="AttendanceDevice.IsSingleEmp==true">
+                                            <option value="" selected="selected">Select</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group row" ng-class="{ 'has-error' : submitted && formCommonFeilds.ToDate.$invalid}" ng-show="AttendanceDevice.SyncType=='AP'">
+                                    <label class="col-md-4 control-label" style="text-align:right">
+                                        To Date :
+                                        <span class="required">*</span>
+                                    </label>
+                                    <div class="col-md-8">
+                                        <input class="form-control" name="ToDate" type="datetime" ng-required="AttendanceDevice.SyncType=='AP'" placeholder="To Date" readonly ng-click="p3=true" is-open="p3" uib-datepicker-popup="dd/MM/yyyy" ng-model="AttendanceDevice.ToDate" />
+                                        <div class="form-control-focus"> </div>
+                                        <span ng-show="submitted && formCommonFeilds.ToDate.$error.required" class="help-block">To Date Required</span>
+                                    </div>
+                                </div>
+              
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group row" ng-show="AttendanceDevice.SyncType=='AP'">
+                                    <label class="col-md-4 col-sm-offset-0 control-label text-right">
+                                        Department
+
+                                    </label>
+                                    <div class="col-sm-8">
+                                        <select class="form-control" ng-model="AttendanceDevice.DepartmentId" name="Department" ng-options="aDept.DepartmentID as aDept.DepartmentName for aDept in CommonFeilds.Department" ng-disabled="AttendanceDevice.IsSingleEmp==true">
+                                            <option value="" selected="selected">Select</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group row" ng-show="AttendanceDevice.SyncType=='AP'">
+                                    <label class="col-sm-4 control-label pull-left text-right">
+                                        <input type="checkbox" class="" style="margin-top:9px" name="IsOverlap" ng-model="AttendanceDevice.IsSingleEmp" ng-checked="AttendanceDevice.IsSingleEmp==true" /> Single Employee
+                                    </label>
+                                    <div class="col-md-8"  ng-show="AttendanceDevice.IsSingleEmp==true">
+                                        <input type="text"
+                                               name="EmpId"
+                                               ng-model="Emp"
+                                               typeahead-on-select='onSelect($item, $model, $label)'
+                                               placeholder="Search name/ID"
+                                               uib-typeahead="i  as i.Text for i in Search($viewValue)"
+                                               typeahead-loading="loadingLocations" typeahead-no-results="noResults" class="form-control">
+                                        <i ng-show="loadingLocations" class="glyphicon glyphicon-refresh"></i>
+                                        <div ng-show="noResults"><i class="glyphicon glyphicon-remove"></i> No Results Found</div>
+                                        <input type="hidden" name="EmpBasicInfoId" ng-value="Emp.Value" />
+                                        <div class="form-control-focus"> </div>
+                                        <span ng-show="Submitted && AttendanceDevice.EmpId.$error.required " class="help-block">Employee Required</span>
+                                    </div>
+                                </div>
+                                <div class="form-group row" ng-class="{ 'has-error' : submitted && formCommonFeilds.SyncDate.$invalid}" ng-show="AttendanceDevice.SyncType=='SD'">
+                                    <label class="col-md-4 control-label" style="text-align:right">
+                                        Date :
+                                        <span class="required">*</span>
+                                    </label>
+                                    <div class="col-md-8">
+                                        <input class="form-control" name="SyncDate" type="datetime" ng-required="AttendanceDevice.SyncType=='SD'" placeholder="Sync Date" readonly ng-click="p1=true" is-open="p1" uib-datepicker-popup="dd/MM/yyyy" ng-model="AttendanceDevice.Date" />
+                                        <div class="form-control-focus"> </div>
+                                        <span ng-show="submitted && formCommonFeilds.SyncDate.$error.required" class="help-block">Sync Date Required</span>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <div class="col-md-12 text-right">
+                                        <a ng-click="Reset()" class="btn btn-danger textWhite">Reset</a>
+                                        <a ng-click="SyncDeviceData();submitted=true" ng-show="AttendanceDevice.SyncType=='SD'" class="btn btn-primary textWhite">Sync</a>
+                                        <a ng-click="SyncDeviceEmpData();submitted=true" class="btn btn-primary textWhite" ng-hide="AttendanceDevice.SyncType=='SD'">Attndance Process</a>
+                                        <a ng-click="LoadLogList()" class="btn btn-success textWhite" ng-show="AttendanceDevice.SyncType=='SD' || AttendanceDevice.SyncType=='AP'">Log</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+
+                <div class="row">
+                    <div class="col-md-4 col-sm-5 col-xs-6">
+                        <div class="form-group">
+                            <div class="col-lg-3 col-md-5 col-sm-4 col-xs-8" style="padding-left:0px">
+
+                                <select class="form-control kt-font-brand" ng-model="pageSize" ng-options="P.value as P.text for P in pageSizeArray"></select>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="col-md-4 col-sm-3 col-xs-1">
+                    </div>
+                    <div class="col-md-4 col-sm-4 col-xs-5">
+                        <div id="sample_3_filter" class="pull-right">
+                            <input ng-model="q" id="search" class="form-control" placeholder="Filter text">
+                        </div>
+                    </div>
+                </div>
+                <table class="table table-bordered table-hover rounded">
+                    <thead>
+                        <tr class="btn-primary">
+                            <th class="text-center">SL</th>
+                            <th>Log Status</th>
+                            <th>Description</th>
+                            <th>Processed By</th>
+                            <th>Log Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-show="LogList.length <= 0"><td colspan="6" style="text-align:center;"><i class="fa fa-refresh"></i> No Data Found..</td></tr>
+
+
+                        <tr dir-paginate="item in LogList| filter:q  | itemsPerPage: pageSize" current-page="currentPage">
+                            <td align="center">{{$index+1}}</td>
+                            <td>{{item.LogStatus}} </td>
+                            <td>{{item.Description}}</td>
+                            <td>{{item.FullName}} </td>
+                            <td>{{item.LogDate | date:'dd/MM/yyyy'}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="row">
+                    <dir-pagination-controls boundary-links="true" template-url="~/assets/angular/lib/dirPagination.tpl.html"></dir-pagination-controls>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+@section Scripts{
+    <script type="text/javascript">
+        OEMSApp.controller("ctrlSyncAttDevice", ["$scope", "$http", "SweetAlert", "$filter", "$window", "blockUI",
+          function ($scope, $http, SweetAlert, $filter, $window, blockUI) {
+
+              init();
+              function init() {
+                  initialize();
+                  getAllDropdowns();
+                  getAllCommons();
+              }
+              function initialize() {
+                  $scope.AttendanceDevice = {};
+                  $scope.AttendanceDeviceList = [];
+                  $scope.AttendanceDeviceList.push({ value: 'd_001', text: 'device-001' });
+                  $scope.AttendanceDeviceList.push({ value: 'd_002', text: 'device-002' });
+                  $scope.AttendanceDeviceList.push({ value: 'd_003', text: 'device-003' });
+                  $scope.DeviceSyncType = [{ value: 'SD', text: 'Sync Device' },{ value: 'AP', text: 'Attendance Process' }];
+                  $scope.AttendanceDevice.IsSingleEmp == false;
+
+                  $scope.pageSize = 20;
+                  $scope.pageSizeArray = [];
+                  $scope.pageSizeArray.push({ value: 5, text: 5 });
+                  $scope.pageSizeArray.push({ value: 10, text: 10 });
+                  $scope.pageSizeArray.push({ value: 20, text: 20 });
+                  $scope.pageSizeArray.push({ value: 50, text: 50 });
+                  $scope.currentPage = 1;
+              };
+              $scope.Reset = function Reset() {
+                  $scope.submitted = false;
+                  $scope.AttendanceDevice = [];
+              };
+
+              function getAllCommons() {
+                  $scope.CommonFeilds = [];
+
+                  $http({
+                      method: 'GET',
+                      url: baseUrl + 'Common/GetCommonItemEmp/'
+                  }).then(function successCallback(response) {
+                      $scope.CommonFeilds = response.data.results;
+                  }, function errorCallback(response) {
+                  });
+              }
+
+              function getAllDropdowns() {
+                  $scope.Dropdowns = [];
+                  $http({
+                      method: 'GET',
+                      url: baseUrl + 'Common/GetAllDropDown/'
+                  }).then(function successCallback(response) {
+                      $scope.Dropdowns = response.data.results;
+                  }, function errorCallback(response) {
+                  });
+              }
+
+              $scope.Search = function (val) {
+                  return $http.get(baseUrl + 'Employee/SearchEmployee/' + val, {
+                      params: {
+
+                      }
+                  }).then(function (response) {
+                      return response.data.results.map(function (item) {
+                          return item;
+                      });
+                  });
+              };
+              $scope.onSelect = function onSelect($item, $model, $label) {
+                  $scope.AttendanceDevice.EmpId = $item.Value;
+              };
+
+              $scope.SyncDeviceData = function SyncDeviceData() {
+                  
+                  if ($scope.formCommonFeilds.$invalid)
+                      return;
+                  blockUI.start();
+
+                  $scope.SyncDataList = [];
+                  $http({
+                      method: 'POST',
+                      url: baseUrl + 'Attendance/SyncAttDeviceData/',
+                      data: $scope.AttendanceDevice
+                  }).then(function successCallback(response) {
+                      $scope.SyncDataList = response.data.results;
+                      toastr["success"]("Processed Successfully");
+                      blockUI.stop();
+                  }, function errorCallback(response) {
+                      toastr["info"](response.data.Message);
+                  });
+              }
+              $scope.SyncDeviceEmpData = function SyncDeviceEmpData() {
+
+                  if ($scope.formCommonFeilds.$invalid)
+                      return;
+                  blockUI.start();
+                  $scope.SyncDataList = [];
+                  $http({
+                      method: 'POST',
+                      url: baseUrl + 'Attendance/SyncDeviceEmpData/',
+                      data: $scope.AttendanceDevice
+                  }).then(function successCallback(response) {
+                      $scope.SyncDataList = response.data.results;
+                      toastr["success"]("Processed Successfully");
+                      blockUI.stop();
+                  }, function errorCallback(response) {
+                      toastr["info"](response.data.Message);
+                  });
+              }
+
+              $scope.LoadLogList = function LoadLogList() {
+                  $scope.LogList = [];
+                  blockUI.start();
+                  var processType = null;
+                  if($scope.AttendanceDevice.SyncType == "AP"){
+                      processType = "Attendance Process";
+                  }
+                  else {
+                      processType = "Attendance Device Sync";
+                  };                  
+                  $http({
+                      method: 'GET',
+                      url: baseUrl + 'Attendance/GetAttdModifyLogList/' + processType,
+                  }).then(function successCallback(response) {
+                      $scope.LogList = response.data.results;
+                      toastr["success"](response.data.message);
+                      blockUI.stop();
+                  }, function errorCallback(response) {
+                      toastr["info"](response.data.message);
+                  });
+              }
+              
+          }]);
+    </script>
+}
+
+
+
+
+
+
+
+

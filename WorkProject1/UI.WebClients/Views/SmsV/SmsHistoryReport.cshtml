@@ -1,0 +1,722 @@
+﻿
+@{
+    ViewBag.Title = "SMS History Report";
+}
+
+<div class="portlet box blue-hoki" ng-controller="MEGR">
+    <div class="portlet-title">
+        <div class="caption">
+            <span class="caption-subject sbold uppercase">SMS History Report</span>
+        </div>
+    </div>
+    <div class="portlet-body form">
+        <form class="form-horizontal" name="addform" ng-submit="Save1()" novalidate>
+            <div class="form-body">
+                <div class="col-md-12" style="padding-bottom:2%;">
+                    <div class="col-md-2">
+                        <div class="btn-group btn-group-solid" ng-show="IsStudentButton">
+                            <button class="btn green" data-target="#addmodal" data-toggle="modal">Student SMS History</button>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="btn-group btn-group-solid" ng-show="IsEmployeeButton">
+                            <button class="btn green" data-target="#addmodal1" data-toggle="modal">Employee SMS History</button>
+                        </div>
+                    </div>
+                </div>
+                <div ng-show="IsVisible">
+                    <!-- Default panel contents -->
+                    <div class="panel-success">
+                        <h3 class="panel-title" style="color:#ffffff; font-size:large">Student Records</h3>
+                    </div>
+                    <div class="panel-body">
+                        <table class="table table-bordered table-inverse">
+                            <thead class="btn-primary">
+                                <tr>
+                                    <th> Branch </th>
+                                     <th>Session </th>
+                                  
+                                    <th> Shift</th>
+                                    <th> Class</th>
+                                  <th> Section</th>
+                                    <th> Total SMS</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="item in StudentInfos">
+                                    <td> {{item.BranchName}} </td>
+                                    <td> {{item.SessionName}} </td>
+                                
+                                    <td> {{item.ShiftName}} </td>
+                                    <td> {{item.ClassName}} </td>
+                                  
+                                    <td> {{item.SectionName}} </td>
+                                    <td>{{item.TotalSms}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <!-- Table -->
+                </div>
+                <div ng-show="IsVisibleEmp">
+                    <!-- Default panel contents -->
+                    <div class="panel-success">
+                        <h3 class="panel-title" style="color:#ffffff; font-size:large">Employee Records</h3>
+                    </div>
+                    <div class="panel-body">
+                        <table class="table table-bordered table-inverse">
+                            <thead class="btn-primary">
+                                <tr>
+                                    <th> Designation</th>
+                                    <th> Total SMS</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="item in employeeInfos">
+                                    <td width="25%"> {{item.DesignationName}} </td>
+                                    <td> {{item.TotalSms}} </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <!-- Table -->
+                </div>
+                <div class="col-md-12" ng-show="IsVisible">
+                    <div class="form-group">
+                        <div class="col-md-3 pull-right">
+                            <a href="@Url.Action("SMSHistoryReport","Report")?StartDate={{sms.StartDate}}&EndDate={{sms.EndDate}}&BodyType={{sms.BodyType}}&CategoryId={{sms.CategoryId}}&VersionID={{sms.VersionID}}&SessionId={{sms.SessionId}}&BranchId={{sms.BranchID}}&ShiftId={{sms.ShiftID}}&ClassId={{sms.ClassId}}&GroupId={{sms.GroupId}}&StudentIID={{sms.StudentIID}}" class="btn btn-info btn-sm pull-right" target="_blank">Report</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-12" ng-show="IsVisibleEmp">
+                    <div class="form-group">
+                        <div class="col-md-3 pull-right">
+                            <a href="@Url.Action("SMSEmpHistoryReport","Report")?StartDate={{employeeInfo.StartDate}}&EndDate={{employeeInfo.EndDate}}&BodyType={{employeeInfo.BodyType}}&CategoryId={{employeeInfo.CategoryId}}&VersionID={{employeeInfo.VersionID}}&BranchId={{employeeInfo.BranchID}}" class="btn btn-info btn-sm pull-right" target="_blank">Report</a>
+                        </div>
+                    </div>
+                </div>
+                <div><label style="color:white;">.</label></div>
+            </div>
+        </form>
+
+    </div>
+    <br /> <br />
+    <div id="addmodal" class="modal fade" tabindex="-1" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <form name="addform" ng-submit="save1()" class="form-horizontal" id="form_sample_1" novalidate>
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">X</button>
+                        <h4 class="modal-title">Student SMS</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-body">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="form-group" ng-class="{ 'has-error' : submitted1 && addform.StartDate.$invalid}">
+                                        <label class="col-md-5 control-label">
+                                            Start Date :
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-7">
+                                            <input class="form-control" name="StartDate" type="datetime" placeholder="Start Date" required
+                                                   readonly ng-change="getOrderbydate()" ng-click="p1=true" is-open="p1" uib-datepicker-popup="dd-MM-yyyy" ng-model="sms.StartDate1" />
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted1 && addform.StartDate.$error.required" class="help-block">Start Date Required</span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group" ng-class="{ 'has-error' : submitted1 && addform.BodyType.$invalid}">
+                                        <label class="col-md-5 control-label">
+                                            SMS Type :
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-7">
+                                            <select class="form-control" required ng-model="sms.BodyType" name="BodyType">
+                                                <option value="" selected="selected">Choose Option</option>
+                                                <option value="1">Static</option>
+                                                <option value="2">Dynamic</option>
+                                            </select>
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted1 && addform.BodyType.$error.required" class="help-block">SMS Type Required</span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group" ng-class="{ 'has-error' : submitted1 && addform.CategoryId.$invalid}">
+                                        <label class="col-md-5 control-label">
+                                            Category :
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-7">
+                                            <select class="form-control" ng-model="sms.CategoryId" required name="CategoryId" ng-options="sms.Key as sms.Value for sms in SMSCategorySeed ">
+                                                <option value="" selected="selected">Choose Option</option>
+                                            </select>
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted1 && addform.CategoryId.$error.required" class="help-block">Category Name Required</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group" ng-class="{ 'has-error' : submitted1 && addform.EndDate.$invalid}">
+                                        <label class="col-md-5 control-label">
+                                            End Date :
+                                            <span class="required">*</span>
+                                           
+                                        </label>
+                                        <div class="col-md-7">
+                                            <input class="form-control" required name="EndDate" type="datetime" placeholder="End Date" datepicker-options="dateOptions" readonly ng-change="getOrderbydate()" ng-click="p2=true" is-open="p2" uib-datepicker-popup="dd-MM-yyyy" ng-model="sms.EndDate1" />
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted1 && addform.EndDate.$error.required" class="help-block">End Date Required</span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group" ng-class="{ 'has-error' : submitted1 && addform.Branch.$invalid}">
+                                        <label class="col-md-5 control-label">
+                                            Branch :
+                                        </label>
+                                        <div class="col-md-7">
+                                            <select class="form-control" ng-model="sms.BranchID" name="Branch" ng-options="sms.BranchId as sms.BranchName for sms in CommonFeilds.Branch">
+                                                <option value="" selected="selected">Choose Option</option>
+                                            </select>
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted1 && addform.Branch.$error.required" class="help-block">Branch Name Required</span>
+                                        </div>
+                                    </div>
+                         <div class="form-group" ng-class="{ 'has-error' : submitted1 && addform.Session.$invalid}">
+                                        <label class="col-md-5 control-label">
+                                            Session :
+                                        </label>
+                                        <div class="col-md-7">
+                                            <select class="form-control" ng-model="sms.SessionId"  name="Session" ng-options="sms.SessionId as sms.SessionName for sms in CommonFeilds.Session">
+                                                <option value="" selected="selected">Choose Option</option>
+                                            </select>
+
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted1 && addform.Session.$error.required" class="help-block">Session Required</span>
+                                        </div>
+                                    </div>
+                               
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group" ng-class="{ 'has-error' : submitted1 && addform.Shift.$invalid}">
+                                        <label class="col-md-5 control-label">
+                                            Shift :
+                                        </label>
+                                        <div class="col-md-7">
+                                            <select class="form-control" ng-model="sms.ShiftID"  name="Shift" ng-options="sms.ShiftId as sms.ShiftName for sms in CommonFeilds.Shift | filter:{BranchId:sms.BranchID}:true">
+                                                <option value="" selected="selected">Choose Option</option>
+                                            </select>
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted1 && addform.Shift.$error.required" class="help-block">Shift Name Required</span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group" ng-class="{ 'has-error' : submitted1 && addform.Class.$invalid}">
+                                        <label class="col-md-5 control-label">
+                                            Class :
+                                        </label>
+                                        <div class="col-md-7">
+                                            <select class="form-control" ng-model="sms.ClassId" name="Class" ng-change="GetSection()"  ng-options="sms.ClassId as sms.ClassName for sms in CommonFeilds.ClassInfo">
+                                                <option value="" selected="selected">Choose Option</option>
+                                            </select>
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted1 && addform.Class.$error.required" class="help-block">Class Required</span>
+                                        </div>
+                                    </div>
+                             
+                                </div>
+                                <div class="row">
+                                    <div class="col-lg-12 col-md-12">
+                                        <label class="col-md-2 control-label ">Search Box</label>
+                                        <div class="col-md-10">
+                                            <input type="text" ng-model="Std" typeahead-on-select='onSelect($item, $model, $label)' placeholder="Search Student By ID or Name or mdS Notification No."
+                                                   uib-typeahead="i  as i.Text for i in SearchStudent($viewValue)" typeahead-loading="loadingLocations" typeahead-no-results="noResults" class="form-control">
+                                            <i ng-show="loadingLocations" class="glyphicon glyphicon-refresh"></i>
+                                            <div ng-show="noResults"><i class="glyphicon glyphicon-remove"></i> No Results Found</div>
+                                            <input type="hidden" name="StudentIID" ng-model="StudentIID" ng-value="Std.Value" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" id="dismissModal" data-dismiss="modal" class="btn dark btn-outline" ng-click="Reset();submitted1=false">Cancel</button>
+                        <button ng-click="submitted1=true;Search();" class="btn green">Show</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div id="addmodal1" class="modal fade" tabindex="-1" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <form name="addform2" ng-submit="save2()" class="form-horizontal" id="form_sample_1" novalidate>
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                        <h4 class="modal-title">Employee SMS</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-body">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="col-md-6">
+                                        <div class="form-group" ng-class="{ 'has-error' : submitted && addform2.StartDate.$invalid}">
+                                            <label class="col-md-5 control-label">
+                                                Start Date :
+                                                <span class="required">*</span>
+                                            </label>
+                                            <div class="col-md-7">
+                                                <input class="form-control" name="StartDate" type="datetime" placeholder="Start Date" required
+                                                       readonly ng-change="getOrderbydate()" ng-click="p1=true" is-open="p1" uib-datepicker-popup="dd-MM-yyyy" ng-model="employeeInfo.StartDate1" />
+                                                <div class="form-control-focus"> </div>
+                                                <span ng-show="submitted && addform2.StartDate.$error.required" class="help-block">Start Date Required</span>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-md-5 control-label">
+                                                SMS Type :
+                                            </label>
+                                            <div class="col-md-7">
+                                                <select class="form-control" ng-model="employeeInfo.BodyType" name="BodyType">
+                                                    <option value="" selected="selected">Choose Option</option>
+                                                    <option value="1">Static</option>
+                                                    <option value="2">Dynamic</option>
+                                                </select>
+                                                <div class="form-control-focus"> </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-md-5 control-label">
+                                                Category :
+                                            </label>
+                                            <div class="col-md-7">
+                                                <select class="form-control" ng-model="employeeInfo.CategoryId" name="CategoryId" ng-options="sms.Key as sms.Value for sms in SMSCategorySeed ">
+                                                    <option value="" selected="selected">Choose Option</option>
+                                                </select>
+                                                <div class="form-control-focus"> </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group" ng-class="{ 'has-error' : submitted && addform2.EndDate.$invalid}">
+                                            <label class="col-md-4 control-label">
+                                                End Date :
+                                                <span class="required">*</span>
+                                                
+                                            </label>
+                                            <div class="col-md-8">
+                                                
+                                                <input class="form-control" required name="EndDate" type="datetime" placeholder="End Date" datepicker-options="dateOptionsemp" readonly ng-change="getOrderbydate()" ng-click="p2=true"  is-open="p2" uib-datepicker-popup="dd-MM-yyyy" ng-model="employeeInfo.EndDate1" />
+                                                <div class="form-control-focus"> </div>
+                                                <span ng-show="submitted && addform2.EndDate.$error.required" class="help-block">End Date Required</span>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-md-4 control-label">
+                                                Branch
+                                            </label>
+                                            <div class="col-md-8">
+                                                <select class="form-control" ng-model="employeeInfo.BranchID" name="Branch" ng-options="employeeInfo.BranchId as employeeInfo.BranchName for employeeInfo in CommonFeildsEmp.Branch">
+                                                    <option value="" selected="selected">Select</option>
+                                                </select>
+                                                <div class="form-control-focus"> </div>
+                                            </div>
+                                        </div>
+                                </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" data-dismiss="modal" class="btn dark btn-outline" ng-click="resetForm();submitted=false">Cancel</button>
+                        <button type="submit" ng-click="submitted=true;GetEmployeeList();" class="btn green-haze">Show</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+<script src="~/assets/global/plugins/bootstrap-fileinput/bootstrap-fileinput.js" type="text/javascript"></script>
+<script src="~/assets/pages/scripts/form-repeater.min.js"></script>
+<script type="text/javascript">
+        for (i = new Date().getFullYear() ; i > 1900; i--) {
+            $('#yearpicker').append($('<option />').val(i).html(i));
+        }
+</script>
+    <script type="text/javascript">
+        OEMSApp.controller("MEGR", ["$scope", "$http", "SweetAlert", "$window" ,"$filter",
+          function ($scope, $http, SweetAlert, $window, $filter) {
+
+              init();
+              function init() {
+                  initialize();
+                  getAllDropdowns();
+                  getAllSettings();
+                  getStaticSMSTemplate();
+                  getAllCommons();
+                  getAllCommonsEmp();
+                  getStudentType();
+                  getSMSBalance();
+                  GetSMSCategorySeed();
+              }
+              function initialize() {
+                  $scope.IsVisible = false;
+                  $scope.IsVisibleEmp = false;
+                  $scope.isShow = false;
+                  $scope.isShow2 = false;
+                  $scope.isShow3 = false;
+                  $scope.IsStudentButton = false;
+                  $scope.IsEmployeeButton = false;
+                  $scope.sms = {};
+                  $scope.Settings = {};
+                  $scope.DestinationNo = 1;
+                  $scope.sms.SMSPart = 0;
+                  $scope.sms.SMSLen = 0;
+                  $scope.sms.SMSNotificationNo = true;
+                  // $scope.sms.SMSBody.length = 0;
+                  $scope.Dropdowns = [];
+                  $scope.StudentInfos = [];
+                  $scope.employeeInfos = [];
+                  $scope.Settings = [];
+                  $scope.TempTag = [];
+                  $scope.CommonFeilds = [];
+                  $scope.CommonFeildsEmp = [];
+                  $scope.sms.SMSBody = [];
+                  $scope.BulkStudentInfo = [];
+                  $scope.BulkEmployeeInfo = [];
+                  $scope.getAllDropdowns = getAllDropdowns;
+                  $scope.getAllSettings = getAllSettings;
+                  $scope.getAllTempTag = getAllTempTag;
+                  $scope.getStaticSMSTemplate = getStaticSMSTemplate;
+                  $scope.nameEmpty = nameEmpty;
+                  // $scope.total = total;
+                  $scope.getStudentType = getStudentType;
+                  $scope.SendBulkSMS = SendBulkSMS;
+                  $scope.SendBulkSMSEmp = SendBulkSMSEmp;
+                  $scope.GetEmployeeList = GetEmployeeList;
+                  $scope.getSMSBalance = getSMSBalance;
+
+              };
+              $scope.SearchStudent = function (val) {
+                  if (val.length >= 3)
+                      return $http.get(baseUrl + 'Student/SearchStudent/' + val, {
+                          params: {}
+                      }).then(function (response) {
+                          return response.data.results.map(function (item) {
+                              return item;
+                          });
+                      });
+              };
+              $scope.onSelect = function onSelect($item, $model, $label) {
+                  $scope.StudentInfos = [];
+                  $scope.sms.StudentIID = $item.Value;
+                  if ($scope.sms.StartDate1 == null || $scope.sms.EndDate1 == null)
+                  {
+                      $window.alert("Please Select Date Range");
+                      return;
+                  }
+                  $scope.sms.StartDate = $filter('date')($scope.sms.StartDate1, "dd-MM-yyyy");
+                  $scope.sms.EndDate = $filter('date')($scope.sms.EndDate1, "dd-MM-yyyy");
+                  $http({
+                      method: 'GET',
+                      url: baseUrl + 'SMS/GetStudentByID/' + $item.Value + "/" + $scope.sms.StartDate + "/" + $scope.sms.EndDate
+                  }).then(function successCallback(response) {
+                      //alert(response.data.results[0]);
+                      $scope.StudentInfos = response.data.results;
+                      // toastr["success"](response.data.message);
+                      $("#addmodal").modal('toggle');
+                      $scope.IsVisible = true;
+                      $scope.IsVisibleEmp = false;
+                  }, function errorCallback(response) {
+                      toastr["error"](response.data.Message);
+                  });
+              };
+              function GetSMSCategorySeed() {
+                  $scope.TempTag = [];
+                  $http({
+                      method: 'GET',
+                      url: baseUrl + 'SMS/GetSMSCategorySeed/'
+                  }).then(function successCallback(response) {
+                      $scope.SMSCategorySeed = response.data.results;
+                  }, function errorCallback(response) {
+                      toastr["info"](response.data.message);
+                  });
+              }
+              $scope.checkIfAllSelected = function () {
+                  $scope.selectedAll = $scope.StudentInfos.every(function (item) {
+                      return item.Selected == true
+                  })
+              };
+              $scope.checkIfAllSelectedEmp = function () {
+                  $scope.selectedAllEmp = $scope.employeeInfos.every(function (item) {
+                      return item.SelectedEmp == true
+                  })
+              };
+              $scope.selectAll = function () {
+                  angular.forEach($scope.StudentInfos, function (item) {
+                      item.Selected = $scope.selectedAll;
+                  });
+
+              };
+              $scope.selectAllEmp = function () {
+                  angular.forEach($scope.employeeInfos, function (item) {
+                      item.SelectedEmp = $scope.selectedAllEmp;
+                  });
+
+              };
+              $scope.Reset = function Reset() {
+                  $scope.employeeInfo = {};
+                  $scope.submitted = false;
+              };
+              function GetEmployeeList() {
+                  if ($scope.addform2.$invalid == true)
+                      return;
+                  $scope.employeeInfos = [];
+                  $scope.employeeInfo.StartDate = $filter('date')($scope.employeeInfo.StartDate1, "dd-MM-yyyy");
+                  $scope.employeeInfo.EndDate = $filter('date')($scope.employeeInfo.EndDate1, "dd-MM-yyyy");
+                  $http({
+                      method: 'POST',
+                      url: baseUrl + 'SMS/EmployeeSMSHistory/',
+                      data: $scope.employeeInfo
+                  }).then(function successCallback(response) {
+                      $scope.employeeInfos = response.data.results;
+                      $scope.IsVisibleEmp = true;
+                      $scope.IsVisible = false;
+                      $scope.submitted = false;
+                      $("#addmodal1").modal('toggle');
+                      toastr["info"](response.data.message);
+                  }, function errorCallback(response) {
+                      toastr["error"](response.data.message);
+                  });
+
+              }
+              $scope.Search = function Search() {
+                  if ($scope.addform.$invalid == true)
+                      return;
+                  $scope.sms.StartDate = $filter('date')($scope.sms.StartDate1, "dd-MM-yyyy");
+                  $scope.sms.EndDate = $filter('date')($scope.sms.EndDate1, "dd-MM-yyyy");
+                  $scope.StudentInfos = [];
+                  $http({
+                      method: 'POST',
+                      url: baseUrl + 'SMS/StudentSMSHistory/',
+                      data: $scope.sms
+                  }).then(function successCallback(response) {
+                      $scope.StudentInfos = response.data.results;
+                      $scope.IsVisible = true;
+                      $scope.IsVisibleEmp = false;
+                      $scope.submitted1 = false;
+                      $("#addmodal").modal('toggle');
+                      toastr["success"](response.data.message);
+                  }, function errorCallback(response) {
+                      toastr["error"](response.data.message);
+                  });
+
+              };
+              $scope.Save = function Save() {
+                  if ($scope.addform.$invalid == true)
+                      return;
+                  $scope.sms.SMSLen = $scope.sms.SMSBody.length;
+                  if ($scope.sms != {}) {
+                      $http({
+                          method: 'POST',
+                          url: baseUrl + 'SMS/SaveTemplate/',
+                          data: $scope.sms
+                      }).then(function successCallback(response) {
+                          toastr["info"](response.data.message);
+                      }, function errorCallback(response) {
+                          toastr["info"](response.data.message);
+                      });
+                  }
+
+              };
+              $scope.getSMSBody = function getSMSBody(id) {
+                  $scope.Template = {};
+                  $scope.Template = $scope.SMSTemplate.find(x => x.TemplateId === id);
+                  $scope.sms.SMSBody = $scope.Template.SMSBody;
+
+              };
+              $scope.getSMS = function getSMS() {
+                  angular.forEach($scope.StudentInfos, function (value, key) {
+                      if (value.Selected == true) {
+                          $scope.BulkStudentInfo.push(value);
+                      }
+                  });
+                  SendBulkSMS();
+              };
+              function SendBulkSMS() {
+                  if ($scope.BulkStudentInfo.length > 0) {
+                      $http({
+                          method: 'POST',
+                          data: $scope.BulkStudentInfo,
+                          url: baseUrl + 'SMS/SendBulkSMS/' + $scope.sms.TemplateId + "/" + $scope.sms.SMSBody.length + "/" + $scope.sms.SMSPart + "/" + $scope.sms.SMSBody
+                      }).then(function successCallback(response) {
+                          $scope.submitted = false;
+                          $scope.BulkStudentInfo = [];
+                          toastr["info"](response.data.message);
+                      }, function errorCallback(response) {
+                          toastr["info"](response.data.message);
+                      });
+                  }
+                  else {
+                      toastr["info"]("Empty List");
+                      return;
+                  }
+              };
+              $scope.getSMSEmp = function getSMSEmp() {
+                  angular.forEach($scope.employeeInfos, function (value, key) {
+                      if (value.SelectedEmp == true) {
+                          $scope.BulkEmployeeInfo.push(value);
+                      }
+                  });
+                  SendBulkSMSEmp();
+              };
+              function SendBulkSMSEmp() {
+                  if ($scope.BulkEmployeeInfo.length > 0) {
+                      $http({
+                          method: 'POST',
+                          data: $scope.BulkEmployeeInfo,
+                          url: baseUrl + 'SMS/SendBulkSMSEmp/' + $scope.sms.TemplateId + "/" + $scope.sms.SMSBody.length + "/" + $scope.sms.SMSPart + "/" + $scope.sms.SMSBody
+                      }).then(function successCallback(response) {
+                          $scope.submitted = false;
+                          $scope.BulkEmployeeInfo = [];
+                          toastr["info"](response.data.message);
+                      }, function errorCallback(response) {
+                          toastr["info"](response.data.message);
+                      });
+                  }
+                  else {
+                      toastr["info"]("Empty List");
+                      return;
+                  }
+              };
+              function nameEmpty() {
+                  $scope.sms.TemplateId = 0;
+                  };
+              function getAllSettings() {
+                  $scope.Settings = [];
+                  $http({
+                      method: 'GET',
+                      url: baseUrl + 'SMS/GetAllSettings/'
+                  }).then(function successCallback(response) {
+                      $scope.Settings = response.data.results;
+                      $scope.sms.isUnicode = $scope.Settings[0].AllowUnicode;
+                      if ($scope.Settings[0].ForStudent == 1) {
+                          $scope.IsStudentButton = true;
+                      }
+                      if ($scope.Settings[0].ForEmployee == 1) {
+                          $scope.IsEmployeeButton = true;
+                      }
+                  }, function errorCallback(response) {
+                      toastr["info"](response.data.message);
+                  });
+              }
+
+              function getAllTempTag() {
+                  $scope.TempTag = [];
+                  $http({
+                      method: 'GET',
+                      url: baseUrl + 'SMS/GetAllTempTag/'
+                  }).then(function successCallback(response) {
+                      $scope.TempTag = response.data.results;
+                  }, function errorCallback(response) {
+                      toastr["info"](response.data.message);
+                  });
+              }
+              function getSMSBalance() {
+                  $scope.SMSBalance = [];
+                  $http({
+                      method: 'GET',
+                      url: baseUrl + 'SMS/GetSMSBalance/'
+                  }).then(function successCallback(response) {
+                      $scope.SMSBalance = response.data.results;
+                      var balance = $scope.SMSBalance.Result.TotalBalance;
+                  }, function errorCallback(response) {
+                      toastr["info"](response.data.message);
+                  });
+              }
+              function getAllDropdowns() {
+                  $scope.Dropdowns = [];
+                  $http({
+                      method: 'GET',
+                      url: baseUrl + 'Common/GetAllDropDown/'
+                  }).then(function successCallback(response) {
+                      $scope.Dropdowns = response.data.results;
+                  }, function errorCallback(response) {
+                      toastr["info"](response.data.message);
+                  });
+              }
+              function getStaticSMSTemplate() {
+                  $scope.SMSTemplate = [];
+                  $http({
+                      method: 'GET',
+                      url: baseUrl + 'SMS/GetStaticTemplate/'
+                  }).then(function successCallback(response) {
+                      $scope.SMSTemplate = response.data.results;
+                  }, function errorCallback(response) {
+                      toastr["warning"](response.Data.message);
+                  });
+              };
+
+              function getAllCommons() {
+                  $scope.CommonFeilds = [];
+                  $http({
+                      method: 'GET',
+                      url: baseUrl + 'Common/GetCommonItem/'
+                  }).then(function successCallback(response) {
+                      $scope.CommonFeilds = response.data.results;
+                  }, function errorCallback(response) {
+                      toastr["info"](response.data.message);
+                  });
+              }
+          
+              $scope.GetSection = function GetSection() {
+                  $scope.Sections = [];
+
+                  $http({
+                      method: 'GET',
+                      url: baseUrl + 'Common/GetSection/' + $scope.sms.SessionId + "/" + $scope.sms.ShiftID + "/" + $scope.sms.ClassId
+                  }).then(function successCallback(response) {
+                      $scope.Sections = response.data.results;
+
+
+                  }, function errorCallback(response) {
+                      toastr["error"](response.data.message);
+                  });
+              }
+              function getStudentType() {
+                  $scope.StudentType = [];
+                  $http({
+                      method: 'GET',
+                      url: baseUrl + 'Common/GetStudentType/'
+                  }).then(function successCallback(response) {
+                      $scope.StudentType = response.data.results;
+                  }, function errorCallback(response) {
+                      toastr["error"](response.data.message);
+                  });
+              }
+              function getAllCommonsEmp() {
+                  $scope.CommonFeildsEmp = [];
+
+                  $http({
+                      method: 'GET',
+                      url: baseUrl + 'Common/GetCommonItemEmp/'
+                  }).then(function successCallback(response) {
+                      $scope.CommonFeildsEmp = response.data.results;
+                  }, function errorCallback(response) {
+                  });
+              }
+              function datatimes() {
+                  $scope.Dateformat = 'dd/MM/yyyy';
+                  $scope.$watch('sms.StartDate1', function (niu) {
+                      if (niu) {
+                          $scope.dateOptions.minDate = niu
+                      }
+                  });
+                  $scope.$watch('employeeInfo.StartDate1', function (niu) {
+                      if (niu) {
+                          $scope.dateOptionsemp.minDate = niu
+                      }
+                  });
+              }
+          }]);
+    </script>
+} 

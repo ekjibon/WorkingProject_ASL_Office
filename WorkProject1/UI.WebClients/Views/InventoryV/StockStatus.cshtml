@@ -1,0 +1,241 @@
+﻿
+@{
+    ViewBag.Title = "Stock Status";
+}
+
+
+<div class="portlet box blue-hoki" ng-controller="requisitionEntryCrlt">
+    <div class="portlet-title">
+        <div class="caption">
+            <i class="fa fa-user-plus"></i>@ViewBag.Title
+        </div>
+    </div>
+    <div class="portlet-body form">
+        <!-- BEGIN FORM-->
+        <form name="addform" novalidate class="form-horizontal">
+            <div class="form-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group" ng-class="{ 'has-error' : submitted && addform.Catagory.$invalid}">
+                            <label class="col-md-4 control-label">
+                             Catagory :
+                                <span class="required">*</span>
+                            </label>
+                            <div class="col-md-7">
+                                <select class="form-control" required name="Catagory" ng-model="StockStatus.Catagory" ng-options="p.SupplierId  as p.SupplierName for p in Suppliers.results">
+                                    <option selected value="">Choose Options</option>
+                                </select>
+                                <div class="form-control-focus"> </div>
+                                <span ng-show="submitted && addform.Catagory.$error.required" class="help-block">Catagory Required</span>
+                            </div>
+                        </div>
+                        <div class="form-group" ng-class="{ 'has-error' : submitted && addform.SubCat.$invalid}">
+                            <label class="col-md-4 control-label">
+                                Sub Cat :
+                                <span class="required">*</span>
+                            </label>
+                            <div class="col-md-7">
+                                <select class="form-control" required name="SubCat" ng-model="StockStatus.SubCat" ng-options="p.SupplierId  as p.SupplierName for p in Suppliers.results">
+                                    <option selected value="">Choose Options</option>
+                                </select>
+                                <div class="form-control-focus"> </div>
+                                <span ng-show="submitted && addform.SubCat.$error.required" class="help-block">SubCatagory Required</span>
+                            </div>
+                        </div>
+                    
+                        
+                    </div>
+                    @*<div class="col-md-4">
+
+                        </div>*@
+                    <div class="col-md-6">
+                        <div class="row">
+                            <div class="col-md-12">
+
+
+                                <div class="form-group" ng-class="{ 'has-error' : submitted && addform.Unit.$invalid}">
+                                    <label class="col-md-5 control-label">
+                                        Unit:
+                                        <span class="required">*</span>
+                                    </label>
+                                    <div class="col-md-7">
+                                        <select class="form-control" required name="Unit" ng-model="StockStatus.Unit" ng-options="p.SupplierId  as p.SupplierName for p in Suppliers.results">
+                                            <option selected value="">Choose Options</option>
+                                        </select>
+                                        <div class="form-control-focus"> </div>
+                                        <span ng-show="submitted && addform.Unit.$error.required" class="help-block">Unit Required</span>
+                                    </div>
+                                </div>
+
+                                
+                                <div class="form-group" ng-class="{ 'has-error' : submitted && addform.Recorderlevel.$invalid}">
+                                    <label class="col-md-5 control-label">
+                                        Recorder level:
+                                        <span class="required">*</span>
+                                    </label>
+                                    <div class="col-md-7">
+                                        <input class="form-control" type="text" ng-model="StockStatus.Recorderlevel" name="Recorderlevel" required />
+                                        <div class="form-control-focus"> </div>
+                                        <span ng-show="submitted && addform.Recorderlevel.$error.required" class="help-block">Recorder level Required</span>
+                                    </div>
+                                </div>
+                            </div>
+                          
+                           
+                        </div>
+                       
+                       <div class="row">
+                           <div class="col-lg-12 text-right">
+                               <div class="col-md-12">
+
+                                   <a class="btn btn-success" ng-click="save();submitted=true">Show</a>
+                                   <a class="btn btn-danger" ng-click="Reset();submitted=false">Reset</a>
+
+                               </div>
+                           </div>
+                       </div>
+                    </div>
+                </div>
+
+            </div>
+        </form>
+        <div class="panel">
+
+        </div>
+    </div>
+</div>
+@section Scripts{
+    <script type="text/javascript">
+        OEMSApp.controller("requisitionEntryCrlt", ["$scope", "$http", "SweetAlert", "filterFilter", "$filter",
+          function ($scope, $http, SweetAlert, filterFilter, $filter) {
+              init();
+              function init() {
+                  initialize();
+                  getSuppliers(1);
+              }
+              function initialize() {
+                  $scope.StockStatus = {};
+                  $scope.PurchaseOrder = {};
+                  $scope.Suppliers = [];
+                  $scope.currentPage = 1;
+                  $scope.pageno = 1;
+                  $scope.pagesize = 10;
+                  $scope.total_count = 12;
+                  $scope.txtsearch = '';
+                  $scope.ProductId = 0;
+                  $scope.PurchaseList = [];
+                  $scope.StockStatus.Product = '';
+                  /////
+                  $scope.pageSizeArray = [];
+                  $scope.pageSizeArray.push({ value: 5, text: 5 });
+                  $scope.pageSizeArray.push({ value: 10, text: 10 });
+                  $scope.pageSizeArray.push({ value: 20, text: 20 });
+                  $scope.pageSizeArray.push({ value: 50, text: 50 });
+                  $scope.currentPage = 1;
+                  $scope.pageSize = 10;
+              };
+              $scope.Reset = function Reset() {
+                  $scope.StockStatus = {};
+                  $scope.PurchaseOrder = {};
+              };
+              //Active Inactive student
+
+              function getSuppliers(pageno) {
+                  $scope.Suppliers = [];
+                  $http({
+                      method: 'GET',
+                      url: baseUrl + 'Inventory/GetSuppliers'
+                  }).then(function successCallback(response) {
+                      $scope.Suppliers = response.data;
+                      toastr["info"](response.data.message);
+                  }, function errorCallback(response) {
+                      toastr["warning"](response.data.Message);
+                  });
+              }
+
+              $scope.addProduct = function () {
+                  $scope.PurchaseList.push({
+                      'ProductName': $scope.Product, 'UnitCode': $scope.Unit
+                      , 'Quantity': $scope.StockStatus.Quantity
+                      , 'ProductId': $scope.StockStatus.ProductId
+                      , 'UnitPrice': $scope.StockStatus.UnitPrice
+                      , 'Discount': $scope.StockStatus.Discount
+                      , 'TotalPrice': (($scope.StockStatus.Quantity * $scope.StockStatus.UnitPrice) - ($scope.StockStatus.Quantity*$scope.StockStatus.Discount))
+                      , 'done': false
+                  })
+                  $scope.Product = '';
+                  $scope.StockStatus.Quantity = '';
+                  $scope.StockStatus.UnitPrice = '';
+                  $scope.StockStatus.Discount = '';
+                  $scope.StockStatus.ProductId = 0;
+                  //console.log($scope.ProductList);
+              }
+
+              $scope.deleteProduct = function (index) {
+                  $scope.PurchaseList.splice(index, 1);
+              }
+
+
+              $scope.Search = function (val) {
+                  if (val.length >= 3)
+                      return $http.get(baseUrl + 'Inventory/SearchProduct/' + val, {
+                          params: {}
+                      }).then(function (response) {
+                          return response.data.results.map(function (item) {
+                              return item;
+                          });
+                      });
+              };
+
+
+              $scope.save = function () {
+                  if ($scope.addform.$invalid) {
+                      return;
+                  }
+                  if ($scope.PurchaseList.length == 0) {
+                      toastr["warning"]('Please Choose Product.');
+                      return;
+                  }
+                  if ($scope.addform.$invalid) {
+                      return;
+                  }
+                  $scope.PurchaseOrder.OrderDetails = $scope.PurchaseList;
+                  $http({
+                      method: 'POST',
+                      url: baseUrl + '/Inventory/AddPurchaseOrder/',
+                      data: $scope.PurchaseOrder
+                  }).then(function successCallback(response) {
+                      $scope.submitted = false;
+                      toastr["info"](response.data.message);
+                  }, function errorCallback(response) {
+                      toastr["warning"](response.data.Message);
+                  });
+                  //console.log($scope.Req);
+              }
+              // for droupdown select list event....
+              $scope.onSelect = function onSelect($item, $model, $label) {
+                  $scope.StockStatus.ProductId = Number($item.Value);
+                  $scope.Product = $item.Text;
+                  $http({
+                      method: 'GET',
+                      url: baseUrl + '/Inventory/GetProductListById/' + $scope.StockStatus.ProductId
+
+                  }).then(function successCallback(response) {
+                      $scope.Unit = response.data.results[0].UnitCode;
+                      //console.log($scope.Unit);
+                  }, function errorCallback(response) {
+                      toastr["warning"](response.data.Message);
+                  });
+
+              };
+              //This method is calling from dropDown
+              $scope.changePageSize = function () {
+                  $scope.studentSearch.pageIndex = 1;
+                  Search();
+              };
+
+          }]);
+    </script>
+}
+
+ 

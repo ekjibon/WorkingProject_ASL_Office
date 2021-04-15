@@ -1,0 +1,346 @@
+﻿@{
+    ViewBag.Title = "Leave Quota";
+}
+<div class="kt-container  kt-container--fluid  kt-grid__item kt-grid__item--fluid" ng-controller="EmpLeaveQuotaCTRL">
+    <div class="row">
+        <div class="kt-portlet kt-portlet--mobile">
+            <div class="kt-portlet__head kt-portlet__head--lg">
+                <div class="kt-portlet__head-label">
+                    <h3 class="kt-portlet__head-title">
+                        <!----Title Text-->
+                        Leave Quota
+                        <!----Title Text -->
+                    </h3>
+                </div>
+            </div>
+
+            <div class="kt-portlet__body">
+
+                <form class="form-horizontal" id="formEmpLeaveQuota" name="formEmpLeaveQuota" novalidate>
+
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="form-group row" ng-class="{ 'has-error' : submitted && formEmpLeaveQuota.Branch.$invalid}">
+                                <label class="col-md-5 control-label" style="text-align:right">
+                                    Branch :
+                                    <span class="required">*</span>
+                                </label>
+                                <div class="col-md-7">
+                                    <select class="form-control" ng-model="EmpLeaveQuota.BranchId" required name="Branch" ng-options="B.BranchId as B.BranchName for B in CommonFeilds.Branch">
+                                        <option value="" selected="selected">Choose Option</option>
+                                    </select>
+                                    <div class="form-control-focus"> </div>
+                                    <span ng-show="submitted && formEmpLeaveQuota.Branch.$error.required" class="help-block">Branch Required</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group row" ng-class="{ 'has-error' : submitted && formEmpLeaveQuota.Department.$invalid}">
+                                <label class="col-md-5 control-label" style="text-align:right">
+                                    Department :
+                                    <span class="required">*</span>
+                                </label>
+                                <div class="col-md-7">
+                                    <select class="form-control" ng-change="getEmpClanderList()"  ng-model="EmpLeaveQuota.DepartmentId" required name="Department" ng-options="item.DepartmentID as item.DepartmentName for item in CommonFeilds.Department">
+                                        <option value="" selected="selected">Choose Option</option>
+                                    </select>
+                                    <div class="form-control-focus"> </div>
+                                    <span ng-show="submitted && formEmpLeaveQuota.Department.$error.required" class="help-block">Department Required</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-3">
+                            <div class="form-group row" ng-class="{ 'has-error' : submitted && formEmpLeaveQuota.Designation.$invalid}">
+                                <label class="col-md-5 control-label" style="text-align:right">
+                                    Designation :
+                                    @*<span class="required">*</span>*@
+                                </label>
+                                <div class="col-md-7">
+                                    <select class="form-control" ng-model="EmpLeaveQuota.DesignationId" name="Designation" ng-options="item.DesignationID as item.DesignationName for item in CommonFeilds.Designation">
+                                        <option value="" selected="selected">Choose Option</option>
+                                    </select>
+                                    <div class="form-control-focus"> </div>
+                                    <span ng-show="submitted && formEmpLeaveQuota.Designation.$error.required" class="help-block">Designation Required</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-3">
+                            <div class="form-group row" ng-class="{ 'has-error' : submitted && formEmpLeaveQuota.CalenderId.$invalid}">
+                                <label class="col-md-5 control-label" style="text-align:right">
+                                    Calendar :
+                                    <span class="required">*</span>
+                                </label>
+                                <div class="col-md-7">
+                                    <select class="form-control" ng-model="EmpLeaveQuota.CalenderId" name="CalenderId" required ng-options="item.Id as item.Title for item in EmpCalenderList">
+                                        <option value="" selected="selected">Choose Option</option>
+                                    </select>
+                                    <div class="form-control-focus"> </div>
+                                    <span ng-show="submitted && formEmpLeaveQuota.CalenderId.$error.required" class="help-block">Calendar Required</span>
+                                </div>
+                            </div>
+                            <div class="form-group row ">
+                                <div class="col-md-7">
+
+                                </div>
+                                <div class="col-md-2 ">
+                                    <button class="btn btn-primary btn-sm text-right" ng-click="ShowEmpLeaveQuotaList();submitted=true">Show</button>
+                                </div>
+                                <div class="col-md-2 ">
+                                    <a class="btn btn-danger btn-sm" ng-click="resetForm()">Reset</a>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div style="height:2px;border-width:0;color:gray;background-color:gray;opacity:0.5;margin-bottom:10px;"></div>
+                    <div class="row">
+                        <div class="col-md-4 col-sm-5 col-xs-6">
+                            <div class="form-group">
+                                <div class="col-lg-3 col-md-5 col-sm-4 col-xs-8" style="padding-left:0px">
+
+                                    <select class="form-control kt-font-brand" ng-model="pageSize" ng-options="P.value as P.text for P in pageSizeArray"></select>
+                                </div>
+
+                            </div>
+
+                        </div>
+                        <div class="col-md-4 col-sm-3 col-xs-1">
+                        </div>
+                        <div class="col-md-4 col-sm-4 col-xs-5">
+                            <div id="sample_3_filter" class="pull-right">
+                                <input ng-model="q" id="search" class="form-control" placeholder="Filter text">
+                            </div>
+                        </div>
+                    </div>
+                    <table class="table table-bordered table-hover rounded">
+                        <thead>
+                            <tr class="btn-primary">
+                                <th ng-show="EmpLeaveQuotaList.length > 0" style="width:5%">
+                                    <input type="checkbox" id="all" ng-change="allItems(allCheck);" ng-model="allCheck" ng-checked="allCheck" />
+                                    @*<input type="checkbox" ng-model="AllChecked" ng-checked="item.IsChecked" />*@
+                                    All
+                                </th>
+                                <th width="20%">Employee</th>
+                                <th width="15%">Calender</th>
+                                <th width="15%">Routing Path</th>
+                                <th width="10%">Annual</th>
+                                <th width="10%">Sick</th>
+                                <th width="10%">Casual</th>
+                                <th width="10%">Maternity</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-show="EmpLeaveQuotaList.length <= 0"><td colspan="8" style="text-align:center;"><i class="fa fa-refresh"></i> Loading new data!!</td></tr>
+                            <tr dir-paginate="item in EmpLeaveQuotaList | filter:q | itemsPerPage: pageSize " current-page="currentPage">
+                                <td>
+                                    <input type="checkbox" ng-change="singleItem(item.IsChecked);" ng-model="item.IsChecked" ng-checked="item.IsChecked" />
+                                </td>
+                                <td>{{item.EmpID}} <br />{{item.FullName}} <br />{{item.DesignationName}}</td>
+                                <td>
+                                    @*<select ng-model="item.CalenderId" class="form-control" ng-options="item.Id as item.Title for item in EmpCalenderList">
+                                        <option value="">Select</option>
+                                    </select>*@
+                                    {{item.Title}}
+                                </td>
+                                <td>
+                                    <select ng-model="item.RoutingId" class="form-control" ng-options="route.RoutingId as route.RouteName for route in RoutingList | filter: { DesignationId : item.DesignationID }">
+                                        <option value="">Select</option>
+                                    </select>
+                                   
+                                </td>
+                                <td><input type="number" ng-model="item.AnnualLeaveDay" class="form-control" /></td>
+                                <td><input type="number" ng-model="item.SickLeaveDay" class="form-control" /></td>
+                                <td><input type="number" ng-model="item.AdvanceLeaveDay" class="form-control" /></td>
+                                <td><input type="number" ng-model="item.MaternityLeaveDay" class="form-control" /></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </form>
+                <div class="col-md-12">
+                    <div class="col-md-offset-8">
+                        <div class="col-md-2 pull-right">
+                            <button class="btn btn-success" ng-click="Save();submitted = true" type="submit">Save/Update</button>
+                        </div>
+
+                    </div>
+                </div>
+                <div class="row">
+                    <dir-pagination-controls boundary-links="true" template-url="~/assets/angular/lib/dirPagination.tpl.html"></dir-pagination-controls>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+<!-- END FORM-->
+@section Scripts{
+
+    <script type="text/javascript">
+        OEMSApp.controller("EmpLeaveQuotaCTRL", ["$scope", "$http", "SweetAlert", "blockUI", "$filter",
+              function ($scope, $http, SweetAlert, blockUI, $filter) {
+                  init();
+                  function init() {
+                      initialize();
+                      getAllCommons();
+                      GetRoutingList();
+
+                  }
+                  function initialize() {
+                      $scope.EmpLeaveQuota = {};
+                      $scope.submitted = false
+                      $scope.showButton = false;
+                      $scope.EmpLeaveQuotaList = [];
+
+                      $scope.pageSizeArray = [];
+                      $scope.pageSizeArray.push({ value: 5, text: 5 });
+                      $scope.pageSizeArray.push({ value: 10, text: 10 });
+                      $scope.pageSizeArray.push({ value: 20, text: 20 });
+                      $scope.pageSizeArray.push({ value: 50, text: 50 });
+                      $scope.currentPage = 1;
+                      $scope.pageSize = 10;
+
+                      $scope.CommonFeilds = [];
+                      $scope.allCheck = false;
+                  }
+
+
+
+
+
+                  $scope.resetForm =  function resetForm() {
+                      $scope.EmpLeaveQuota = {};
+                      $scope.submitted = false;
+                  }
+
+                  $scope.ShowEmpLeaveQuotaList = function () {
+                      if ($scope.formEmpLeaveQuota.$invalid) {
+                          return;
+                      }
+
+                      $scope.EmpLeaveQuotaList = [];
+                      $http({
+                          method: 'POST',
+                          url: baseUrl + 'Employee/GetEmpLeaveQuotaList/',
+                          data: $scope.EmpLeaveQuota
+                      }).then(function successCallback(response) {
+                          $scope.EmpLeaveQuotaList = response.data.results;
+                          angular.forEach($scope.EmpLeaveQuotaList, function (value, key) {
+                              value.IsChecked = false;
+                          });
+                      }, function errorCallback(response) {
+
+                      })
+                  }
+
+
+                  $scope.Save = function Save() {
+                      $scope.EmployeeLeaveQuotaList = [];
+                      //debugger;
+                      if ($scope.EmpLeaveQuotaList.length == 0) {
+                          toastr["warning"]('At least Select One.');
+                          return;
+                      }
+                      else {
+
+                          for (var i = 0 ; i < $scope.EmpLeaveQuotaList.length; i++) {
+                              if ($scope.EmpLeaveQuotaList[i].IsChecked == true) {
+                                  $scope.EmployeeLeaveQuotaList.push($scope.EmpLeaveQuotaList[i]);
+                              }
+                          }
+                      }
+                      console.log($scope.EmployeeLeaveQuotaList.length);
+                      console.log($scope.EmpLeaveQuotaList.length);
+
+                      if ($scope.EmployeeLeaveQuotaList.length == 0) {
+                          toastr["warning"]('At least Select One.');
+                          return;
+                      }
+
+                      blockUI.start("Proccessing");
+                      $http({
+                          method: 'POST',
+                          url: baseUrl + 'Employee/AddEmpLeaveQuota/',
+                          data: $scope.EmployeeLeaveQuotaList
+                      }).then(function successCallback(response) {
+                          toastr["success"](response.data.message);
+                          blockUI.stop();
+                      }, function errorCallback(response) {
+                          toastr["error"](response.data.Message);
+                          blockUI.stop();
+                      });
+                  };
+
+
+                  function getAllCommons() {
+                      $scope.CommonFeilds = [];
+
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Common/GetCommonItemEmp/'
+                      }).then(function successCallback(response) {
+                          $scope.CommonFeilds = response.data.results;
+                      }, function errorCallback(response) {
+                      });
+                  }
+
+
+                  $scope.getEmpClanderList = function getEmpClanderList() {
+                      $scope.EmpCalenderList = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Attendance/GetEmpCalendarList/'
+                      }).then(function successCallback(response) {
+                          $scope.EmpCalenderList = response.data.results;
+                          
+                      }, function errorCallback(response) {
+
+                      });
+                  }
+
+                  function GetRoutingList() {
+                      $scope.RoutingList = [];
+
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Employee/GetAllLeaveRoutingConfig/'
+                      }).then(function successCallback(response) {
+                          $scope.RoutingList = response.data.results;
+                      }, function errorCallback(response) {
+                      });
+                  }
+
+
+                  $scope.allItems = function allItems(c) {
+                      angular.forEach($scope.EmpLeaveQuotaList, function (value, key) {
+                          if (c) {
+                              value.IsChecked = true;
+                          }
+                          else {
+                              value.IsChecked = false;
+                          }
+                      });
+                  };
+
+                  $scope.singleItem = function singleItem(n) {
+                      $scope.DisCountDisplay = false;
+
+                      $scope.allCheck = true;
+                      angular.forEach($scope.EmpLeaveQuotaList, function (value, key) {
+                          if ($scope.IsChecked) {
+                              if (value.IsChecked)
+                                  $scope.allCheck = true;
+                              else
+                                  $scope.allCheck = false;
+                          }
+                      });
+                  };
+
+              }]);
+    </script>
+}

@@ -1,0 +1,115 @@
+﻿@{
+    ViewBag.Title = "Mraks Entry Subjects List";
+} 
+<style type="text/css">
+    @@media only screen and (max-width: 600px) {
+        #mobileEntry {
+            width: 280px !important;
+            height: 400px !important;
+            overflow: scroll;
+        } 
+    }
+
+    input[type=number]::-webkit-inner-spin-button,
+    input[type=number]::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+</style>
+<div class="row" ng-controller="ctrlMraksEntrySubjectsList">
+    <div class="portlet light bordered">
+        <div class="portlet-title">
+            <div class="caption">
+                <i class="icon-settings font-green"></i>
+                <span class="caption-subject font-green sbold uppercase">@ViewBag.Title</span>
+            </div>
+        </div>              
+        <div class="portlet-body">
+            <!-- BEGIN FORM-->
+            <div>
+                <span style="color:#efa446">Name: </span> <span style="color:#000000">{{SubjectList[0].FullName}}</span>|
+                <span style="color:#efa446">Version: </span> <span style="color:#000000">{{SubjectList[0].VersionName}}</span>|
+                <span style="color:#efa446">Branch: </span><span style="color:#000000">{{SubjectList[0].BranchName}}</span>|
+                <span style="color:#efa446">Session: </span><span style="color:#000000">{{SubjectList[0].SessionName}}</span>|
+                <span style="color:#efa446">Shift: </span><span style="color:#000000">{{SubjectList[0].ShiftName}}</span>
+            </div>
+            <hr />
+            <clearfix></clearfix>         
+                <div id="mobileEntry" ng-show="SubjectList.length > 0" class="table-container">
+                    <table class="table table-bordered table-inverse fixed-table-toolbar">
+                        <thead class="btn-primary">
+                            <tr>
+                                <th> Class </th>
+                                <th> Group </th>
+                                <th> Section </th>
+                                <th> MainExam </th>
+                                <th> SubExam </th>
+                                <th> DividedExam </th>
+                                <th> Subject </th>
+                                <th>Entry</th>
+                                <th> Action </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="item in SubjectList">
+                                <td> {{item.ClassName}} </td>
+                                <td> {{item.GroupName}} </td>
+                                <td> {{item.SectionName}} </td>
+                                <td> {{item.MainExamName}} </td>
+                                <td> {{item.SubExamName}} </td>
+                                <td> {{item.DividedExamName}} </td>
+                                <td> {{item.SubjectName}} </td>
+                                <td>
+                                    <span ng-show="item.MARKS>0" style="background-color:#000000; color:orangered; padding:3px">Done</span>
+                                </td>
+                                <td>
+                                    <a href="@Url.Action("TeacherMarksEntry","Result")?VersionID={{item.VersionId}}&SessionId={{item.SessionId}}&BranchID={{item.BranchId}}&ShiftID={{item.ShiftId}}&ClassId={{item.ClassId}}&GroupId={{item.GroupId}}&SectionId={{item.SectionId}}&SubjectID={{item.SubjectID}}&MainExamId={{item.MainExamID}}&SubExamId={{item.SubExamID}}&DividedExamId={{item.DivideExamID}}&VersionName={{item.VersionName}}&BranchName={{item.BranchName}}&SessionName={{item.SessionName}}&ShiftName={{item.ShiftName}}&ClassName={{item.ClassName}}&GroupName={{item.GroupName}}&SectionName={{item.SectionName}}&SubjectName={{item.SubjectName}}&MainExamName={{item.MainExamName}}&SubExamName={{item.SubExamName}}&DividedExamName={{item.DividedExamName}}&FullName={{item.FullName}}" target="_blank" class="btn btn-primary">Show</a>
+                                </td>
+
+
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+        </div>
+        <!-- END FORM-->
+    </div>
+</div>
+@section Scripts{
+
+    <script type="text/javascript">
+
+        OEMSApp.controller("ctrlMraksEntrySubjectsList", ["$scope", "$http", "SweetAlert", "blockUI",
+                  function ($scope, $http, SweetAlert, blockUI) {
+
+                      init();
+                      function init() {
+                          initialize();
+                          GetSubjectList();
+                      }
+                      function initialize() {
+                          $scope.SubjectList = [];
+                          $scope.GetSubjectList = GetSubjectList;
+                      };
+                      function GetSubjectList() {            
+                              $http({
+                                  method: 'GET',
+                                  url: baseUrl + 'Employee/TeacherSubjectLists/'
+                              }).then(function successCallback(response) {
+                                  $scope.SubjectList = response.data.results;
+                                  toastr["info"](response.data.message);
+                              }, function errorCallback(response) {
+                                  toastr["info"](response.data.message);
+                              });
+
+                      };
+                  }]);
+    </script>
+}
+
+
+
+
+
+
+

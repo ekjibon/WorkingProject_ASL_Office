@@ -1,0 +1,383 @@
+﻿@{
+    ViewBag.Title = "Class Period";
+}
+@section Styles{
+    <link href="~/assets/global/plugins/bootstrap-timepicker/css/bootstrap-timepicker.css" rel="stylesheet" />
+}
+<style type="text/css">
+    .table thead tr th {
+        font-size: 12px !important;
+        color: white !important;
+        font-weight: 600 !important;
+    }
+</style>
+<div ng-controller="ctrlClassPeriod">
+    <!-- Begin: life time stats -->
+    <div class="portlet light bordered">
+        <div class="portlet-title">
+            <div class="caption">
+                <i class="icon-settings font-green"></i>
+                <span class="caption-subject font-green sbold uppercase">@ViewBag.Title</span>
+            </div>
+            <div class="actions">
+                <div class="btn-group btn-group-solid">
+                    <a class="btn green" data-target="#addmodal" data-toggle="modal"> <i class="fa fa-plus"></i>Add ClassPeriod</a>
+                </div>
+            </div>
+        </div>
+        <div class="portlet-body">
+            <form class="form-horizontal" ng-submit="SearchClassPeriod()" id="frmCommon" name="formCommonFeilds" novalidate>
+                <div class="form-body">
+                    <div class="row">
+                        
+                        <div class="col-md-4">
+                            <div class="form-group" ng-class="{ 'has-error' : submitted && formCommonFeilds.Shift.$invalid}">
+                                <label class="col-md-5 control-label">
+                                    Shift :
+                                    <span class="required">*</span>
+                                </label>
+                                <div class="col-md-7">
+                                    <select class="form-control" ng-model="SClassPeriod.ShiftID" required name="Shift" ng-options="LIEOSetup.ShiftId as LIEOSetup.ShiftName for LIEOSetup in CommonFeilds.Shift | filter:{BranchId:LIEOSetup.BranchID}:true">
+                                        <option value="" selected="selected">Choose Option</option>
+                                    </select>
+                                    <div class="form-control-focus"> </div>
+                                    <span ng-show="submitted && formCommonFeilds.Shift.$error.required" class="help-block">Shift Required</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group" ng-class="{ 'has-error' : submitted && formCommonFeilds.Class.$invalid}">
+                                <label class="col-md-5 control-label">
+                                    Class :
+                                    <span class="required">*</span>
+                                </label>
+                                <div class="col-md-7">
+                                    <select class="form-control" ng-model="SClassPeriod.ClassId" name="Class" required ng-options="LIEOSetup.ClassId as LIEOSetup.ClassName for LIEOSetup in CommonFeilds.ClassInfo | filter:{VersionId:SearchClassPeriod.VersionId}:true">
+                                        <option value="" selected="selected">Choose Option</option>
+                                    </select>
+                                    <div class="form-control-focus"> </div>
+                                    <span ng-show="submitted && formCommonFeilds.Class.$error.required" class="help-block">Class Required</span>
+                                </div>
+                            </div>
+                            <div class="pull-right">
+                                <button ng-click="submitted=true;" type="submit" class="btn green">Show</button>
+                                <button ng-click="Reset()" class="btn info">Reset</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+            <hr />
+            <div class="table-container">
+                <div class="row">
+                    <div class="col-md-4 pull-left">
+                        <div class="form-group">                            
+                            <div class="col-md-4">
+                                <select class="form-control" ng-model="pagesize" ng-options="P.value as P.text for P in pageSizeArray"></select>
+                            </div>
+                            <div class="col-md-6" style="text-align:left;padding-left: 0px;margin-top: 5px;" >
+                                <label for="search" class="control-label">Items per page</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 pull-right">
+                        <div class="form-group">
+                            <div class="col-md-4">
+                              
+                            </div>
+                            <div class="col-md-8 form-group">
+                                <input ng-model="search" id="search" class="form-control" placeholder="Filter text">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="sample_3_wrapper" class="dataTables_wrapper no-footer">                   
+                    @*<div class="table-scrollable"> </div>*@
+                    <table class="table table-bordered table-hover">
+                        <thead>
+                            <tr class="bg-primary">
+                                <th width="22%">Shift Name</th>
+                                <th width="10%">Class Name</th>
+                                <th width="10%">Period Name</th>
+                                <th width="12%">Is Attendance</th>
+                                <th width="12%">Show Order</th>
+                                <th width="12%">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-show="GetClassPeriod.length <= 0"><td colspan="6" style="text-align:center;"><i class="fa fa-refresh"></i> Data not found!</td></tr>
+                            @* <tr dir-paginate="item in GetClassPeriod|itemsPerPage:pagesize" total-items="total_count">*@
+                            <tr dir-paginate="item in GetClassPeriod| filter:search | itemsPerPage:pagesize" current-page="currentPage">
+                                <td>{{item.ShiftName}}</td>
+                                <td>{{item.ClassName}}</td>
+                                <td>{{item.PeriodName}}</td>
+                                <td>{{item.IsAttendance}}</td>
+                                <td>{{item.ShowOrder}}</td>
+                                <td>
+                                    <a href="javascript:;" class="btn btn-icon-only green" ng-click="edit(item)" data-target="#addmodal" data-toggle="modal">
+                                        <i class="fa fa-edit"></i>
+                                    </a>
+                                    <a ng-click="deleteClassPeriod(item)" href="javascript:;" class="btn btn-icon-only red">
+                                        <i class="fa fa-trash"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="row ">
+                        <dir-pagination-controls boundary-links="true" template-url="~/assets/angular/lib/dirPagination.tpl.html"></dir-pagination-controls>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--Modal Area Start-->
+        <div id="addmodal" class="modal fade" tabindex="-1" data-backdrop="static" data-keyboard="false">
+            <div class="modal-dialog">
+                <div class="modal-content modal-lg">
+                    <form name="frmClassPeriod" ng-submit="SaveClassPeriod()" class="form-horizontal" novalidate>
+                        <div class="modal-header">
+                            <a ng-click="resetForm();" class="close" data-dismiss="modal" aria-hidden="true">X</a>
+                            <h4 class="modal-title">{{modalTitle}}</h4>
+                        </div>
+                        <div class="modal-body">
+                            <div class="form-body">
+                                <div class="row">
+                                    <div class="col-md-4">
+                               <div class="form-group" style="margin-top: 20px;">
+                                            <label class="col-md-5 control-label">
+                                            </label>
+                                            <div class="col-md-7">
+                                                <div class="md-checkbox">
+                                                    <input type="checkbox" name="" id="checkbox3" class="md-check" ng-model="ClassPeriod.IsAttendance">
+                                                    <label for="checkbox3">
+                                                        <span></span>
+                                                        <span class="check"></span>
+                                                        <span class="box"></span>
+                                                        IsAttendance
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+
+                                        <div class="form-group" ng-class="{ 'has-error' : submitted1 && frmClassPeriod.Shift.$invalid}">
+                                            <label class="col-md-5 control-label">
+                                                Shift :
+                                                <span class="required">*</span>
+                                            </label>
+                                            <div class="col-md-7">
+                                                <select class="form-control" ng-model="ClassPeriod.ShiftId" required name="Shift" ng-options="ClassPeriod.ShiftId as ClassPeriod.ShiftName for ClassPeriod in CommonFeilds.Shift | filter:{BranchId:LIEOSetup.BranchID}:true">
+                                                    <option value="" selected="selected">Choose Option</option>
+                                                </select>
+                                                <div class="form-control-focus"> </div>
+                                                <span ng-show="submitted1 && frmClassPeriod.Shift.$error.required" class="help-block">Shift Name Required</span>
+                                            </div>
+                                        </div>
+                                        <div class="form-group" ng-class="{ 'has-error' : submitted1 && frmClassPeriod.ShowOrder.$invalid}">
+                                            <label class="col-md-5 control-label">
+                                                Show Order:
+                                                <span class="required">*</span>
+                                            </label>
+                                            <div class="col-md-7">
+                                                <input type="text" ng-model="ClassPeriod.ShowOrder" class="form-control" name="ShowOrder" required />
+                                                <div class="form-control-focus"> </div>
+                                                <span ng-show="submitted1 && frmClassPeriod.ShowOrder.$error.required" class="help-block">ShowingOrder Required</span>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group" ng-class="{ 'has-error' : submitted1 && frmClassPeriod.Class.$invalid}">
+                                            <label class="col-md-5 control-label">
+                                                Class :
+                                                <span class="required">*</span>
+                                            </label>
+                                            <div class="col-md-7">
+                                                <select class="form-control" ng-model="ClassPeriod.ClassId" name="Class" required ng-options="ClassPeriod.ClassId as ClassPeriod.ClassName for ClassPeriod in CommonFeilds.ClassInfo">
+                                                    <option value="" selected="selected">Choose Option</option>
+                                                </select>
+                                                <div class="form-control-focus"> </div>
+                                                <span ng-show="submitted1 && frmClassPeriod.Class.$error.required" class="help-block">Class Required</span>
+                                            </div>
+                                        </div>
+                                        <div class="form-group" ng-class="{ 'has-error' : submitted1 && frmClassPeriod.PeriodName.$invalid}">
+                                            <label class="col-md-5 control-label">
+                                                Period Name:
+                                                <span class="required">*</span>
+                                            </label>
+                                            <div class="col-md-7">
+                                                <input type="text" ng-model="ClassPeriod.PeriodName" class="form-control" name="PeriodName" required />
+                                                <div class="form-control-focus"> </div>
+                                                <span ng-show="submitted1 && frmClassPeriod.PeriodName.$error.required" class="help-block">PeriodName Required</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                       
+                                        <div class="form-group" ng-class="{ 'has-error' : submitted1 && frmClassPeriod.ShortCode.$invalid}">
+                                            <label class="col-md-5 control-label">
+                                                Short Code:
+                                                <span class="required">*</span>
+                                            </label>
+                                            <div class="col-md-7">
+                                                <input type="number" ng-model="ClassPeriod.ShortCode" class="form-control" name="ShortCode" required />
+                                                <div class="form-control-focus"> </div>
+                                                <span ng-show="submitted1 && frmClassPeriod.ShortCode.$error.required" class="help-block">Short Code Required</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="submit" ng-click="submitted1=true" class="btn green-haze" ng-disabled="btnDis">{{BTNValue}} <i ng-show="spin" class="fa fa-spinner fa-spin" style="font-size:20px"></i></button>
+                            <button type="reset" data-dismiss="modal" class="btn dark btn-outline" ng-click="resetForm();">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <!--Modal Area End-->
+    </div>
+</div>
+@section Scripts{
+    <script type="text/javascript">
+        OEMSApp.controller("ctrlClassPeriod", ["$scope", "$http", "SweetAlert", "$window", "blockUI",
+              function ($scope, $http, SweetAlert, $window, blockUI) {
+                  init();
+                  function init() {
+                      initialize();
+                      getAllCommons();
+                      GetAllClassPeriod();
+                  };
+                  function initialize() {
+                      $scope.CommonFeilds = [];
+                      $scope.res = {};
+                      $scope.data = {};
+                      $scope.SearchClassPeriod = [];
+                      $scope.SaveClassPeriod = [];
+                      $scope.GetClassPeriod = [];
+                      $scope.ClassPeriod = {};
+                      $scope.getAllCommons = getAllCommons;
+                      $scope.SearchClassPeriod = SearchClassPeriod;
+                      $scope.SaveClassPeriod = SaveClassPeriod;
+                      $scope.modalTitle = "Save Class Period";
+                      $scope.BTNValue = "Save";
+                      $scope.currentPage = 1;
+                      $scope.pagesize = 10;
+                      $scope.pageSizeArray = [];
+                      $scope.pageSizeArray.push({ value: 5, text: 5 });
+                      $scope.pageSizeArray.push({ value: 10, text: 10 });
+                      $scope.pageSizeArray.push({ value: 20, text: 20 });
+                      $scope.pageSizeArray.push({ value: 50, text: 50 });
+                  };
+                  $scope.Reset = function Reset() {
+                      $scope.submitted = false;
+                      $scope.SClassPeriod = {};
+                      //$scope.GetClassPeriod = [];
+                  };
+                  $scope.resetForm = function resetForm() {
+                      $scope.submitted1 = false;
+                      $scope.ClassPeriod = {};
+                      $scope.modalTitle = "Save Class Period";
+                      $scope.BTNValue = "Save";
+                  };
+                  function getAllCommons() {
+                      $scope.CommonFeilds = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Common/GetCommonItem/'
+                      }).then(function successCallback(response) {
+                          $scope.CommonFeilds = response.data.results;
+                      }, function errorCallback(response) {
+                          toastr["warning"](response.data.message);
+                      });
+                  };
+                  $scope.GetGroup = function GetGroup(classid) {
+                      $scope.Groups = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Common/GetGroup/' + classid
+                      }).then(function successCallback(response) {
+                          $scope.Groups = response.data.results;
+                      }, function errorCallback(response) {
+                          toastr["warning"](response.data.message);
+                      });
+                  };
+                  function GetAllClassPeriod() {
+                      $scope.GetClassPeriod = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Routine/GetAllClassPeriod'
+                      }).then(function successCallback(response) {
+                          $scope.GetClassPeriod = response.data.results;
+                      }, function errorCallback(response) {
+                          toastr["warning"](response.data.message);
+                      });
+                  };
+                  function SaveClassPeriod() {
+                      if ($scope.frmClassPeriod.$invalid)
+                          return;
+                      $http({
+                          method: 'POST',
+                          url: baseUrl + 'Routine/AddClassPeriod/',
+                          data: $scope.ClassPeriod
+                      }).then(function successCallback(response) {
+                          $scope.GetClassPeriod = response.data.results;
+                          $('#addmodal').modal('toggle');
+                          toastr["info"](response.data.message)
+                          $scope.modalTitle = "Save Class Period";
+                          $scope.BTNValue = "Save";
+                          blockUI.stop();
+                          $scope.resetForm();
+                      }, function errorCallback(response) {
+                          blockUI.stop();
+                          toastr["warning"](response.data.message);
+                      });
+                  };
+                  function SearchClassPeriod() {
+                      if ($scope.formCommonFeilds.$invalid)
+                          return;
+                      $scope.GetClassPeriod = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Routine/GetClassPeriodByShiftClass/' + $scope.SClassPeriod.ShiftID + '/' + $scope.SClassPeriod.ClassId
+                      }).then(function successCallback(response) {
+                          $scope.GetClassPeriod = response.data.results;
+                      }, function errorCallback(response) {
+                          toastr["warning"](response.data.message);
+                      });
+                  };
+                  $scope.edit = function Edit(n) {
+                      $scope.ClassPeriod = n;
+                      $scope.modalTitle = "Update Class Period";
+                      $scope.BTNValue = "Update";
+                  };
+                  $scope.deleteClassPeriod = function (ClassPeriod) {
+                      $scope.ClassPeriod = ClassPeriod;
+                      SweetAlert.swal({
+                          title: "Are you sure to delete it ?", type: "warning", showCancelButton: true, confirmButtonColor: "#DD6B55",
+                          confirmButtonText: "Yes, delete it!",
+                          closeOnConfirm: false
+                      },
+                      function (isConfirm) {
+                          if (isConfirm) {
+                              $http({
+                                  method: 'POST',
+                                  url: baseUrl + '/Routine/DeleteClassPeriod/', // + dividedExam
+                                  data: ClassPeriod
+                              }).then(function successCallback(response) {
+                                  SweetAlert.swal("Deleted!", "Your data has been deleted.", "success");
+                                  $scope.GetClassPeriod = response.data.results;
+                              }, function errorCallback(response) {
+                                  toastr["warning"](response.data.message);
+                              });
+                          }
+                      });
+                  };
+              }]);
+    </script>
+}
+
+

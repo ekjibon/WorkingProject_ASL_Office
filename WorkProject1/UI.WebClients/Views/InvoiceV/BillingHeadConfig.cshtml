@@ -1,0 +1,663 @@
+﻿
+@{
+    ViewBag.Title = "Billing Head Config";
+}
+<style>
+    .DrpdwnWidth ul{
+        width:350px;
+    }
+</style>
+<div class="kt-container  kt-container--fluid  kt-grid__item kt-grid__item--fluid" ng-controller="ctrlBillingHeadConfigPanel">
+    <div class="row">
+        <div class="kt-portlet kt-portlet--mobile">
+            <div class="kt-portlet__head kt-portlet__head--lg">
+                <div class="kt-portlet__head-label">
+                    <h3 class="kt-portlet__head-title">
+                        All Billing Head Config
+                    </h3>
+                </div>
+                <div class="kt-portlet__head-toolbar">
+                    <div class="kt-portlet__head-wrapper">
+                        <div class="dropdown dropdown-inline">
+                            <button type="button" class="btn btn-brand btn-icon-sm" ng-click="btnDisable = false;" data-toggle="modal" data-target="#addmodal" aria-haspopup="true" aria-expanded="false">
+                                <i class="flaticon2-plus"></i> Add New Config
+                            </button>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="kt-portlet__body">
+                <div class="row">
+                    <div class="col-md-4">
+                       
+                        <div class="form-group row" ng-class="{ 'has-error' : submitted && addform.Client.$invalid}">
+                            <label class="col-md-6 control-label" style="text-align:right">
+                                Client Name:
+                            </label>
+                            <div class="col-md-6 DrpdwnWidth">
+                                <input type="text" ng-model="Client" typeahead-on-select='onSelect($item, $model, $label)' placeholder="Enter client name or ID" uib-typeahead="i  as i.Text for i in Searchtext($viewValue)" typeahead-loading="loadingLocations" typeahead-no-results="noResults" class="form-control">
+                                <i ng-show="loadingLocations" class="glyphicon glyphicon-refresh"></i>
+                                <div ng-show="noResults"><i class="glyphicon glyphicon-remove"></i> No Results Found</div>
+                                <input type="hidden" name="ClientId" ng-model="BillingHeadConfigFilter.Value" ng-value="Std.Value" />
+                            </div>
+                        </div>
+                        <div class="form-group row" ng-class="{ 'has-error' : submitted && addform.Service.$invalid}">
+                            <label class="col-md-6 control-label" style="text-align:right">
+                                Service Name:
+                            </label>
+                            <div class="col-md-6">
+                                <select class="form-control" ng-model="BillingHeadConfigFilter.InvoiceServiceId" name="Service" ng-options="aInvService.Id as aInvService.ServiceName for aInvService in invoiceServiceList">
+                                    <option value="" selected="selected">Choose Option</option>
+                                </select>
+                                <div class="form-control-focus"> </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group row" ng-class="{ 'has-error' : submitted && addform.BillingHead.$invalid}">
+                            <label class="col-md-6 control-label" style="text-align:right">
+                                Billing Head:
+                            </label>
+                            <div class="col-md-6">
+                                <select class="form-control" ng-model="BillingHeadConfigFilter.BillingHeadId" name="BillingHead" ng-options="aBillingHead.Id as aBillingHead.BillingHeadName for aBillingHead in BillingHeadList">
+                                    <option value="" selected="selected">Choose Option</option>
+                                </select>
+                                <div class="form-control-focus"> </div>
+                            </div>
+                        </div>
+                        <div class="form-group row" ng-class="{ 'has-error' : submitted && addform.Billing.$invalid}">
+                            <label class="col-md-6 control-label" style="text-align:right">
+                                Billing Type:
+                            </label>
+                            <div class="col-md-6">
+                                <select ng-model="BillingHeadConfigFilter.BillingHeadType" class="form-control" name="BillingType">
+                                    <option value="">Select One</option>
+                                    <option value="PostPaid">Post Paid</option>
+                                    <option value="Prepaid">Prepaid</option>
+
+                                </select>
+                                <div class="form-control-focus"> </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group row" ng-class="{ 'has-error' : submitted && addform.BillingMethod.$invalid}">
+                            <label class="col-md-6 control-label" style="text-align:right">
+                                Billing Method:
+                            </label>
+                            <div class="col-md-6">
+                                <select class="form-control" ng-model="BillingHeadConfigFilter.BillingMethodId" name="BillingMethod" ng-options="aBillingMethod.Id as aBillingMethod.BillingMethodName for aBillingMethod in invoiceBillingMethodlist">
+                                    <option value="" selected="selected">Choose Option</option>
+                                </select>
+                                <div class="form-control-focus"> </div>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-md-12 text-right">
+                                <button type="submit" ng-click="ReportForBillingHeadConfig()"  class="btn btn-success">Report</button>
+                                <button type="submit" ng-click="getAllBillingHeadConf()" class="btn btn-primary">Show</button>
+                                <button class="btn btn-danger" ng-click="resetFilterForm()">Reset</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-4 col-sm-5 col-xs-6">
+                        <div class="form-group">
+                            <div class="col-lg-3 col-md-5 col-sm-4 col-xs-8" style="padding-left:0px">
+
+                                <select class="form-control kt-font-brand" ng-model="pageSize" ng-options="P.value as P.text for P in pageSizeArray"></select>
+                            </div>
+
+                        </div>
+
+                    </div>
+                    <div class="col-md-4 col-sm-3 col-xs-1">
+                    </div>
+                    <div class="col-md-4 col-sm-4 col-xs-5">
+                        <div id="sample_3_filter" class="pull-right">
+                            <input ng-model="q" id="search" class="form-control" placeholder="Filter text">
+                        </div>
+                    </div>
+                </div>
+                <table class="table table-bordered table-hover rounded">
+                    <thead>
+                        <tr class="btn-primary">
+                            <th>SL</th>
+                            <th style="width:15%">Client ID & Name</th>
+                            <th style="width:8%">Service</th>
+                            <th style="width:8%"> Head</th>
+                            <th style="width:5%"> Year</th>
+                            <th style="width:8%"> Type</th>
+                            <th style="width:8%"> Method</th>
+                            <th>Month</th>
+                            <th style="width:8%">Rate</th>
+                            <th style="width:8%">Min Amount</th>
+                            <th style="text-align:center">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-show="BillingHeadConfigList.length <= 0"><td colspan="11" style="text-align:center;"><i class="fa fa-refresh"></i> Loading new data!!</td></tr>
+                        <tr dir-paginate="item in BillingHeadConfigList | filter: q  | itemsPerPage: pageSize " current-page="currentPage">
+                            <td>{{$index+1}}</td>
+                            <td>{{item.GenerateClientId}} - <br />{{item.FullName}}</td>
+                            <td>{{item.ServiceName}} </td>
+                            <td>{{item.BillingHeadName}} </td>
+                            <td>{{item.Year}} </td>
+                            <td>{{item.BillingHeadType}} </td>
+                            <td>{{item.BillingMethodName}} </td>
+                            <td>{{item.MonthNames}} </td>
+                            <td>{{item.Rate}}</td>
+                            <td>{{item.MinAmount}}</td>
+                            <td align="center" style="width:8%">
+                                <a href="javascript:;" class="btn btn-outline-brand btn-elevate btn-icon" ng-click="edit(item)" data-target="#addmodal" data-toggle="modal">
+                                    <i class="fa fa-edit"></i>
+                                </a>
+                                <a ng-click="deleteBillingHeadConfig(item.Id)" href="javascript:;" class="btn btn-outline-danger btn-elevate btn-icon">
+                                    <i class="fa fa-trash"></i>
+                                </a>
+                            </td>
+
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="row">
+                    <dir-pagination-controls boundary-links="true" template-url="~/assets/angular/lib/dirPagination.tpl.html"></dir-pagination-controls>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--Modal Area Start-->
+    <div id="addmodal" class="modal fade bd-example-modal-lg" tabindex="-1" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <form name="addform" ng-submit="save()" class="form-horizontal" id="form_sample_1" novalidate>
+                    <div class="modal-header">
+                        <h4 class="modal-title">{{modalTitle}}</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true" ng-click="resetForm();submitted=false"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group row" ng-class="{ 'has-error' : submitted && addform.Client.$invalid}">
+                                        <label class="col-md-6 control-label"style="text-align:right">
+                                            Client Name:
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-6">
+                                            <select class="form-control" ng-model="BillingHeadConfig.ClientId" ng-disabled="btnDisable" required name="Client" ng-options="aClient.Id as aClient.FullName for aClient in clientList">
+                                                <option value="" selected="selected">Choose Option</option>
+                                            </select>
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted && addform.Client.$error.required" class="help-block">Client Name Required</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="form-group row" ng-class="{ 'has-error' : submitted && addform.Service.$invalid}">
+                                        <label class="col-md-6 control-label"style="text-align:right">
+                                            Service Name:
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-6">
+                                            <select class="form-control" ng-model="BillingHeadConfig.InvoiceServiceId" required name="Service" ng-options="aInvService.Id as aInvService.ServiceName for aInvService in invoiceServiceList">
+                                                <option value="" selected="selected">Choose Option</option>
+                                            </select>
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted && addform.Service.$error.required" class="help-block">Service Name Required</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group row" ng-class="{ 'has-error' : submitted && addform.BillingHead.$invalid}">
+                                        <label class="col-md-6 control-label"style="text-align:right">
+                                            Billing Head:
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-6">
+                                            <select class="form-control" ng-model="BillingHeadConfig.BillingHeadId" ng-disabled="btnDisable" required name="BillingHead" ng-options="aBillingHead.Id as aBillingHead.BillingHeadName for aBillingHead in BillingHeadList">
+                                                <option value="" selected="selected">Choose Option</option>
+                                            </select>
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted && addform.BillingHead.$error.required" class="help-block">Billing Head Required</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group row" ng-class="{ 'has-error' : submitted && addform.Billing.$invalid}">
+                                        <label class="col-md-6 control-label"style="text-align:right">
+                                            Billing Type:
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-6">
+                                            <select ng-model="BillingHeadConfig.BillingHeadType" class="form-control" name="BillingType" required>
+                                                <option value="">Select One</option>
+                                                <option value="PostPaid">Post Paid</option>
+                                                <option value="Prepaid">Prepaid</option>
+
+                                            </select>
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted &&  addform.BillingType.$error.required" class="help-block">Billing Type Required</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group row" ng-class="{ 'has-error' : submitted && addform.BillingMethod.$invalid}">
+                                        <label class="col-md-6 control-label"style="text-align:right">
+                                            Billing Method:
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-6">
+                                            <select class="form-control" ng-model="BillingHeadConfig.BillingMethodId" required name="BillingMethod" ng-options="aBillingMethod.Id as aBillingMethod.BillingMethodName for aBillingMethod in invoiceBillingMethodlist">
+                                                <option value="" selected="selected">Choose Option</option>
+                                            </select>
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted && addform.BillingMethod.$error.required" class="help-block">Billing Method Required</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group row" ng-class="{ 'has-error' : submitted && addform.Rate.$invalid}">
+                                        <label class="col-md-6 control-label"style="text-align:right">
+                                            Rate :
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-6">
+                                            <input type="text" onkeypress='return (event.charCode >= 48 && event.charCode <= 57) ||
+                                             event.charCode == 0 || event.charCode == 46'  class="form-control" ng-model="BillingHeadConfig.Rate" placeholder="Rate" name="Rate" required maxlength="10">
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted &&  addform.Rate.$error.required" class="help-block">Rate is Required</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group row" ng-class="{ 'has-error' :submitted && addform.Value.$invalid}">
+                                        <label class="col-md-6 control-label"style="text-align:right">
+                                            Year :  <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-6">
+                                            <select class="form-control" name="Value" ng-model="BillingHeadConfig.Value" required ng-options="aYear.Value as aYear.Text for aYear in YearList" ng-change="getAllMonth()">
+                                                <option value="" selected="selected">Please Select</option>
+                                            </select>
+                                            <span ng-show="submitted && addform.Value.$error.required" class="help-block">Year Required</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group row" ng-class="{ 'has-error' : submitted && addform.MinAmount.$invalid}">
+                                        <label class="col-md-6 control-label"style="text-align:right">
+                                            Min Fix Amount :
+                                        </label>
+                                        <div class="col-md-6">
+                                            <input type="text" onkeypress='return (event.charCode >= 48 && event.charCode <= 57) ||
+                                             event.charCode == 0 || event.charCode == 46' class="form-control" ng-model="BillingHeadConfig.MinAmount" placeholder="Min Fix Amount" name="MinAmount"  maxlength="10">
+                                            
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group row" ng-class="{ 'has-error' : submitted && addform.Value.$invalid}">
+                                        <label class="col-md-6 control-label"style="text-align:right">
+                                            Month:
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-6">
+                                            <div ng-show="MonthList.length>0"><input type="checkbox" ng-model="checkedAll" ng-click="selectAll()" />  All</div>
+                                            <div ng-repeat="aMonth in MonthList">
+                                                <input type="checkbox" ng-disabled="aMonth.IsProcess==1" ng-model="aMonth.IsChecked" ng-checked="aMonth.IsChecked==true"  ng-click="selectMonth()"/> {{aMonth.Text}}
+                                            </div>
+                                            <span ng-show="submitted &&  addform.Value.$error.required" class="help-block">Month is Required</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" data-dismiss="modal" class="btn btn-secondary" ng-click="resetForm();submitted=false">Cancel</button>
+                        <button type="submit" ng-click="submitted=true" class="btn btn-success" ng-disabled="btnDis">{{modalbutton}} <i ng-show="spin" class="fa fa-spinner fa-spin" style="font-size:20px"></i></button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!--Modal Area End-->
+</div>
+@section Scripts{
+    <script type="text/javascript">
+        OEMSApp.controller("ctrlBillingHeadConfigPanel", ["$scope", "$http", "$window","SweetAlert",
+            function ($scope, $http,$window, SweetAlert) {
+                init();
+                function init() {
+                    initialize();
+                    getAllBillingHeadConfig();
+                    getAllClient();
+                    getAllInvoiceService();
+                    GetAllInvoiceBillingHead();
+                    GetAllInvoiceBillingMethod();
+                    getAllYear();
+                }
+                function initialize() {
+                    $scope.modalTitle = "Add Billing Head Configuration";
+                    $scope.modalbutton = 'Save';
+                    $scope.BillingHeadConfig = {};
+                    $scope.BillingHeadConfigFilter = {};
+                    $scope.search = '';
+                    $scope.categories = [];
+                    $scope.designations = [];
+                    $scope.BillingHeadConfig.Id = 0;
+                    $scope.resetForm = resetForm;
+                    $scope.resetFilterForm = resetFilterForm;
+                    $scope.getAllMonth = getAllMonth;
+
+                    $scope.res = {};
+                    $scope.data = {};
+                    $scope.btnDis = false;
+                    $scope.spin = false;
+                    
+                    $scope.pageSizeArray = [];
+                    $scope.pageSizeArray.push({ value: 5, text: 5 });
+                    $scope.pageSizeArray.push({ value: 10, text: 10 });
+                    $scope.pageSizeArray.push({ value: 20, text: 20 });
+                    $scope.pageSizeArray.push({ value: 50, text: 50 });
+                    $scope.currentPage = 1;
+                    $scope.pageSize = 10;
+                    $scope.pageno = 1;
+                    $scope.total_count = 12;
+
+                }
+                
+                function getAllClient() {
+                    $scope.clientList = [];
+                    $http({
+                        method: 'GET',
+                        url: baseUrl + 'Client/GetAllActiveClient/'
+                    }).then(function successCallback(response) {
+                        $scope.clientList = response.data.results;
+                    }, function errorCallback(response) {
+                        toastr["info"](response.data.Message);
+                    });
+                }
+
+                function getAllInvoiceService() {
+                    $scope.invoiceServiceList = [];
+                    $http({
+                        method: 'GET',
+                        url: baseUrl + 'Invoice/GetAllInvoiceService/'
+                    }).then(function successCallback(response) {
+                        $scope.invoiceServiceList = response.data.results;
+                    }, function errorCallback(response) {
+                        toastr["info"](response.data.Message);
+                    });
+                }
+
+                function GetAllInvoiceBillingHead() {
+                    $scope.BillingHeadList = [];
+                    $http({
+                        method: 'GET',
+                        url: baseUrl + 'Invoice/GetAllActiveInvoiceBillingHead'
+                    }).then(function successCallback(response) {
+                        $scope.BillingHeadList = response.data.results;
+                    }, function errorCallback(response) {
+                        toastr["info"](response.data.Message);
+                    });
+                }
+
+                function GetAllInvoiceBillingMethod() {
+                    $scope.invoiceBillingMethodlist = [];
+                    $http({
+                        method: 'GET',
+                        url: baseUrl + 'Invoice/GetAllInvoiceBillingMethod'
+                    }).then(function successCallback(response) {
+                        $scope.invoiceBillingMethodlist = response.data.results;
+                    }, function errorCallback(response) {
+                        toastr["info"](response.data.Message);
+                    });
+                }
+
+                function getAllYear() {
+                    $scope.YearList = [];
+                    $http({
+                        method: 'GET',
+                        url: baseUrl + 'Common/GetAllYear/'
+                    }).then(function successCallback(response) {
+                        $scope.YearList = response.data.results.Table;
+                    }, function errorCallback(response) {
+                        toastr["warning"](response.data.Message);
+                    });
+                }
+
+                function getAllMonth() {
+                    $scope.MonthList = [];
+                    $scope.checkedAll = false;
+                    if ($scope.BillingHeadConfig.Value == null) {
+                        return;
+                    }
+                    $http({
+                        method: 'GET',
+                        url: baseUrl + 'Common/GetAllMonth/'
+                    }).then(function successCallback(response) {
+                        $scope.MonthList = response.data.results.Table;
+                        
+                        if ($scope.MonthList.length>0) {
+                            for (var i = 0; i < $scope.MonthList.length; i++) {
+                                $scope.MonthList[i].IsChecked = false;
+                            }
+                        }
+                        if ($scope.modalbutton == 'Update') {
+                            chkMonth();
+                        }
+                        
+                    }, function errorCallback(response) {
+                        toastr["warning"](response.data.Message);
+                    });
+
+                    
+                }
+
+                function chkMonth(){
+                    $http({
+                        method: 'GET',
+                        url: baseUrl + 'Invoice/GetAllSelectedMonthByBillingHeadConfigId/' + $scope.BillingHeadConfig.Id
+                    }).then(function successCallback(response) {
+                        var MonthCheckList = response.data.results;
+                        MonthCheckList.sort();
+                        var monthChkCount = 0;
+
+                        for (var i = 0; i < $scope.MonthList.length; i++) {
+                            for (var j = 0; j < MonthCheckList.length; j++) {
+                                if ($scope.MonthList[i].Value == MonthCheckList[j].MonthId) {
+                                    $scope.MonthList[i].IsChecked = true;
+                                    $scope.MonthList[i].IsProcess = MonthCheckList[j].IsProcess;
+                                    monthChkCount++;
+                                }
+                            }
+                        }
+                        if (monthChkCount > 11) {
+                            $scope.checkedAll = true;
+                        }
+                        else {
+                            $scope.checkedAll = false;
+                        }
+
+                    }, function errorCallback(response) {
+                        toastr["info"](response.data.Message);
+                    });
+                }
+                function getAllBillingHeadConfig() {
+                    $scope.salaryHeadList = [];
+                    $http({
+                        method: 'POST',
+                        url: baseUrl + 'Invoice/GetAllBillingHeadConfig/',
+                        data: $scope.BillingHeadConfigFilter
+                    }).then(function successCallback(response) {
+                        $scope.BillingHeadConfigList = response.data.results;
+                    }, function errorCallback(response) {
+                        toastr["info"](response.data.Message);
+                    });
+                }
+                $scope.Searchtext = function (val) {
+                    return $http.get(baseUrl + 'Client/SearchClient/' + val
+                        ).then(function (response) {
+                            return response.data.results.map(function (item) {
+                                return item;
+                            });
+                        });
+                };
+                $scope.onSelect = function onSelect($item, $model, $label) {
+                    $scope.BillingHeadConfigFilter.ClientId = $item.Value;
+                };
+                $scope.selectAll = function () {
+                    angular.forEach($scope.MonthList, function (item) {
+                        item.IsChecked = $scope.checkedAll;
+                    });
+
+                }; 
+                $scope.selectMonth = function () {
+                    $scope.checkedAll = $scope.MonthList.every(function (item) {
+                        return item.IsChecked == true
+                    })
+                };
+                $scope.getAllBillingHeadConf = function getAllBillingHeadConf()
+                {
+                    getAllBillingHeadConfig();
+                }
+
+                $scope.edit = function (n) {
+                   
+                    $scope.btnDisable = true;
+                    $scope.modalTitle = "Update Billing Head Configuration";
+                    $scope.modalbutton = 'Update';
+                    $scope.BillingHeadConfig = n;
+
+                    $scope.BillingHeadConfig.Value = n.Year.toString();
+                    getAllMonth();
+                    $scope.BillingHeadConfig.Id = n.Id;
+                    $scope.show = true;
+                    
+                };
+
+                $scope.save = function save() {
+                    $scope.BillingHeadConfig.Year = Number($scope.BillingHeadConfig.Value);
+                    if ($scope.BillingHeadConfig.Rate < 0) {
+                        console.log($scope.BillingHeadConfig.Rate);
+                        toastr["warning"]("Rate is required");
+                        return;
+                    }
+
+                        if ($scope.addform.$invalid)
+                            return;
+                        else {
+                            var MonthCheckList = [];
+                            angular.forEach($scope.MonthList, function (aMonth) {
+                                if (aMonth.IsChecked) {
+                                    MonthCheckList.push(aMonth);
+                                }
+                            })
+                            if (MonthCheckList.length < 1) {
+                                toastr["warning"]("Select at least one month");
+                                return;
+                            }
+                            else {
+                                $scope.BillingHeadConfig.Month = MonthCheckList;
+                            }
+
+                            if ($scope.BillingHeadConfig.Id == 0) {
+                                $http({
+                                    method: 'POST',
+                                    url: baseUrl + 'Invoice/AddBillingHeadConfig/',
+                                    data: $scope.BillingHeadConfig
+                                }).then(function successCallback(response) {
+                                    $('#addmodal').modal('toggle');
+                                    toastr["info"](response.data.message);
+                                    init();
+                                    resetForm();
+                                }, function errorCallback(response) {
+                                    toastr["warning"](response.data.Message);
+                                });
+                            }
+                            if ($scope.BillingHeadConfig.Id != 0) {
+                                    if ($scope.addform.$invalid)
+                                        return;
+                                    else {
+                                        $http({
+                                            method: 'PUT',
+                                            url: baseUrl + 'Invoice/UpdateBillingHeadConfig/',
+                                            data: $scope.BillingHeadConfig
+                                        }).then(function successCallback(response) {
+                                            toastr["info"](response.data.message);
+                                            if (response.data.httpStatusCode != 305) {
+                                                $('#addmodal').modal('toggle');
+                                                resetForm();
+                                            }
+                                            init();
+                                        }, function errorCallback(response) {
+                                            toastr["warning"](response.data.Message);
+                                        });
+                                    }
+                                }
+                        }
+                }
+                $scope.deleteBillingHeadConfig = function deleteBillingHeadConfig(id) {
+                    SweetAlert.swal({
+                        title: "Are you sure to delete it ?", type: "warning", showCancelButton: true, confirmButtonColor: "#DD6B55",
+                        confirmButtonText: "Yes, delete it!",
+                        closeOnConfirm: false
+                    },
+                      function (isConfirm) {
+                          if (isConfirm) {
+                              $http({
+                                  method: 'DELETE',
+                                  url: baseUrl + 'Invoice/DeleteBillingHeadConfig/' + id,
+                              }).then(function successCallback(response) {
+                                  SweetAlert.swal("Deleted!", "Your data has been deleted.", "success");
+                                  getAllBillingHeadConfig();
+                              }, function errorCallback(response) {
+                                  toastr["error"](response.data.Message);
+                              });
+                          }
+                      });
+                }
+
+                function resetForm() {
+                    $scope.modalTitle = "Add Billing Head Configuration";
+                    $scope.BillingHeadConfig = {};
+                    $scope.BillingHeadConfig.Id = 0;
+                    $scope.show = false;
+                    $scope.modalbutton = 'Save';
+                    $scope.MonthList = [];
+                  
+                    $scope.addform.$setUntouched();
+                    $scope.addform.$setPristine();
+                    $scope.submitted = false;
+                }
+
+                function resetFilterForm()
+                {
+                    $scope.BillingHeadConfigFilter = {}; 
+                    $scope.BillingHeadConfigList = [];
+                    $scope.Client = "";
+                }
+
+                $scope.ReportForBillingHeadConfig = function ReportForBillingHeadConfig() {
+                    $scope.uri = "@Url.Action("ReportForBillingHeadConfig", "Report")?ClientId=" + $scope.BillingHeadConfigFilter.ClientId + "&InvoiceServiceId=" + $scope.BillingHeadConfigFilter.InvoiceServiceId + "&BillingHeadId=" + $scope.BillingHeadConfigFilter.BillingHeadId + "&BillingHeadType=" + $scope.BillingHeadConfigFilter.BillingHeadType + "&BillingMethodId=" + $scope.BillingHeadConfigFilter.BillingMethodId;
+                    $window.open($scope.uri, '_blank');
+                }
+
+            }]);
+    </script>
+}

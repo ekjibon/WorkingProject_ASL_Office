@@ -1,0 +1,688 @@
+﻿
+@{
+    ViewBag.Title = "Merit List Config";
+}
+<style type="text/css">
+    /*Maruf*/
+    input[type="number"]::-webkit-outer-spin-button,
+    input[type="number"]::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+
+    input[type="number"] {
+        -moz-appearance: textfield;
+    }
+</style>
+
+<div ng-controller="cltrMeritList">
+    <!-- Begin: life time stats -->
+    <div class="portlet light bordered">
+        <div class="portlet-title">
+            <div class="caption">
+                <i class="icon-settings font-green"></i>
+                <span class="caption-subject font-green sbold uppercase">@ViewBag.Title</span>
+            </div>
+            <div class="actions">
+                <div class="btn-group btn-group-solid">
+                    <button ng-click="resetForm()" class="btn green" data-target="#addmodal" data-toggle="modal"> <i class="fa fa-plus"></i> Add Merit Config</button>
+                </div>
+
+            </div>
+        </div>
+
+        <form class="form-horizontal" ng-submit="getMeritConfig()" name="frmCommonFeilds" novalidate>
+            <div class="form-body">
+                <div class="row">
+                     <div class="col-md-6">
+                        <div class="form-group" ng-class="{ 'has-error' :submitted1 && frmCommonFeilds.SessionId.$invalid}">
+                            <label class="col-md-5 control-label">
+                                Session:
+                                <span class="required">*</span>
+                            </label>
+                            <div class="col-md-7">
+                                <select class="form-control" name="SessionId" ng-model="CommonFeild.SessionId" required ng-options="CommonFeild.SessionId as CommonFeild.SessionName for CommonFeild in CommonFeilds.Session">
+                                    <option value="" selected="selected">Please Select</option>
+                                </select>
+                                <span ng-show="submitted1 && frmCommonFeilds.SessionId.$error.required" class="help-block">Session Required</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group" ng-class="{ 'has-error' :submitted1 && frmCommonFeilds.ClassId.$invalid}">
+                            <label class="col-md-5 control-label">
+                                Class:
+                            </label>
+                            <div class="col-md-7">
+                                <select class="form-control" name="ClassId"  ng-model="CommonFeild.ClassId" ng-change="GetGroup(CommonFeild.ClassId)" ng-options="CommonFeild.ClassId as CommonFeild.ClassName for CommonFeild in CommonFeilds.ClassInfo">
+                                    <option value="" selected="selected">Please Select</option>
+                                </select>
+                                <span ng-show="submitted1 && frmCommonFeilds.ClassId.$error.required " class="help-block">Class Required</span>
+                            </div>
+                        </div>
+                    </div>
+              </div>
+                <div class="btn-group btn-group-solid pull-right" style="margin-bottom:5px">
+                    <button ng-click="submitted1=true" class="btn btn-info btn-large">&nbsp;&nbsp; <i class="fa fa-search"></i> Show &nbsp;&nbsp;&nbsp;&nbsp;</button>
+                    <a ng-click="generateReport()" style="margin-left:3px;" class="btn btn-primary">Report</a>
+                </div>
+
+            </div>
+        </form>
+
+        <div class="portlet-body">
+            <div class="table-container">
+                <div id="sample_3_wrapper" class="dataTables_wrapper no-footer">
+
+                    <div class="table-scrollable"> </div>
+                    <table class="table table-bordered table-hover">
+                        <thead>
+                            <tr class="bg-primary">
+                                <th width="10%">Class Name</th>
+                                <th width="10%">Branch Wise</th>
+                                <th width="13%">GPA with 4th</th>
+                                <th width="15%">GPA without 4th</th>
+                                <th width="11%">Total Mark</th>
+                                <th width="12%">Roll</th>
+                                <th width="12%"> Name</th>
+                                <th width="12%">Subject1</th>
+                                <th width="12%">Subject2</th>
+                                <th width="12%">Subject3</th>
+                                <th width="20%">Total Mark Same Merit</th>
+                                <th width="15%">Total Is Fraction</th>
+                                <th width="14%">Action</th>
+
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="item in MeritConfigs">
+                                <td> {{item.ClassName}} </td>
+                                <td><input type="checkbox" ng-model="item.BranchWise" ng-checked="item.BranchWise==true"></td>
+                                <td> {{item.SortSerialByGPAWith4th}} </td>
+                                <td> {{item.SortSerialByGPAWithout4th}} </td>
+                                <td> {{item.SortSerialByTotalMark}} </td>
+                                <td> {{item.SortSerialByRoll}} </td>
+                                <td> {{item.SortSerialByName}} </td>
+                                <td> {{item.SortSerialBySubjectId1}} </td>
+                                <td> {{item.SortSerialBySubjectId2}} </td>
+                                <td> {{item.SortSerialBySubjectId3}} </td>
+                                <td><input type="checkbox" ng-model="item.TotalMarkSameMerit" ng-checked="item.TotalMarkSameMerit==true"></td>
+                                <td><input type="checkbox" ng-model="item.TotalIsFraction" ng-checked="item.TotalIsFraction==true"></td>
+                                <td>
+                                    <a href="javascript:;" class="btn btn-icon-only green" ng-click="edit(item)" data-target="#addmodal" data-toggle="modal">
+                                        <i class="fa fa-edit"></i>
+                                    </a>
+                                    <a ng-click="deleteMeritConfig(item)" href="javascript:;" class="btn btn-icon-only red">
+                                        <i class="fa fa-trash"></i>
+                                    </a>
+
+
+                                </td>
+                            </tr>
+                        </tbody>
+
+                    </table>
+
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- End: life time stats -->
+    <!--Modal Area Start-->
+    <div id="addmodal" class="modal fade" tabindex="-1" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog">
+            <div class="modal-content modal-lg">
+                <form name="frmMeritConfig" ng-submit="save()" class="form-horizontal" novalidate>
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                        <h4 class="modal-title">{{modalTitle}}</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-body">
+                            <div class="row">
+                                <div class="col-md-5">
+                                    <br />
+                                    <br />
+                               <div class="form-group" ng-class="{ 'has-error' :submitted && frmMeritConfig.SessionId.$invalid}">
+                                        <label class="col-md-4 control-label">
+                                            Session :
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-8">
+                                            <select class="form-control" name="SessionId" ng-change="getSubjects();" ng-model="MeritConfig.SessionId" ng-disabled="MeritConfig.Clone==true" required ng-options="MeritConfig.SessionId as MeritConfig.SessionName for MeritConfig in CommonFeilds.Session">
+                                                <option value="" selected="selected">Please Select</option>
+                                            </select>
+                                            <span ng-show="submitted && frmMeritConfig.SessionId.$error.required" class="help-block">Session Required</span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-4 control-label">
+                                            Clone :
+                                            <input type="checkbox" ng-disabled="MeritConfig.SessionId==null" ng-change="filterSession();" ng-model="MeritConfig.Clone" ng-checked="MeritConfig.Clone==true">
+                                        </label>
+                                        <div class="col-md-8" ng-show="MeritConfig.Clone==true">
+                                            <select class="form-control" ng-model="MeritConfig.NewSessionId" name="NewSessionId" ng-options="MeritConfig.SessionId as MeritConfig.SessionName for MeritConfig in CloneSession.Session">
+                                                <option value="" selected="selected">Select New Session</option>
+                                            </select>
+                                            <div class="form-control-focus"> </div>
+                                        </div>
+                                    </div>
+                                    <fieldset ng-hide="MeritConfig.Clone" style="width:100%">
+                                        <div class="form-group" ng-class="{ 'has-error' :submitted && frmMeritConfig.ClassId.$invalid}">
+                                            <label class="col-md-4 control-label">
+                                                Class :
+                                                <span class="required">*</span>
+                                            </label>
+                                            <div class="col-md-8">
+                                                <select class="form-control" name="ClassId"  ng-model="MeritConfig.ClassId" ng-change="GetGroup(MeritConfig.ClassId)" ng-options="MeritConfig.ClassId as MeritConfig.ClassName for MeritConfig in CommonFeilds.ClassInfo" required>
+                                                    <option value="" selected="selected">Please Select</option>
+                                                </select>
+                                                <span ng-show="submitted && frmMeritConfig.ClassId.$error.required " class="help-block">Class Required</span>
+                                            </div>
+                                        </div>
+                                 <div class="form-group">
+                                            <label class="col-md-4 control-label">
+                                                Branch Wise :
+                                            </label>
+                                            <div class="col-md-8">
+                                                <input type="checkbox" class="form-control" ng-model="MeritConfig.BranchWise" ng-checked="MeritConfig.BranchWise==true" style="background-color:#ff6a00" />
+                                            </div>
+                                        </div>
+                                    </fieldset>
+                                </div>
+                                <div class="col-md-7">
+                                    <fieldset ng-hide="MeritConfig.Clone" style="width:100%">
+                                        <label style="color:cadetblue">Order By</label>
+                                        <div class="form-group" ng-class="{ 'has-error' : submitted && frmMeritConfig.GPAWith4th.$invalid}">
+                                            <label class="col-md-5 control-label">
+                                                GPA With 4th Subject:
+                                                <span class="required">*</span>
+                                            </label>
+                                            <div class="col-md-6">
+                                                <input type="number" max="10" ng-model="MeritConfig.SortSerialByGPAWith4th" class="form-control" placeholder="GPA With 4th Subject" name="GPAWith4th" required />
+                                                <div class="form-control-focus"> </div>
+                                                <span ng-show="submitted &&  frmMeritConfig.GPAWith4th.$error.required" class="help-block">GPA With 4th Subject Required</span>
+                                                <span ng-show="submitted4 && frmMeritConfig.GPAWith4th.$error.number" class="help-block">Not Valid GPA</span>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group" ng-class="{ 'has-error' : submitted && frmMeritConfig.GPAWithout4th.$invalid}">
+                                            <label class="col-md-5 control-label">
+                                                GPA Without 4th Subject:
+                                                <span class="required">*</span>
+                                            </label>
+                                            <div class="col-md-6">
+                                                <input type="number" max="10" ng-model="MeritConfig.SortSerialByGPAWithout4th" class="form-control" placeholder="GPA Without 4th Subject" name="GPAWithout4th" required>
+                                                <div class="form-control-focus"> </div>
+                                                <span ng-show="submitted &&  frmMeritConfig.GPAWithout4th.$error.required" class="help-block">GPA Without 4th Subject Required</span>
+                                            </div>
+                                        </div>
+                                        <div class="form-group" ng-class="{ 'has-error' : submitted && frmMeritConfig.TotalMark.$invalid}">
+                                            <label class="col-md-5 control-label">
+                                                Total Mark:
+                                                <span class="required">*</span>
+                                            </label>
+                                            <div class="col-md-6">
+                                                <input type="text" maxlength="5" ng-model="MeritConfig.SortSerialByTotalMark" class="form-control" placeholder="Total Mark" name="TotalMark" required>
+                                                <div class="form-control-focus"> </div>
+                                                <span ng-show="submitted &&  frmMeritConfig.TotalMark.$error.required" class="help-block">Total Mark Required</span>
+                                            </div>
+                                        </div>
+                                        <div class="form-group" ng-class="{ 'has-error' : submitted && frmMeritConfig.Roll.$invalid}">
+                                            <label class="col-md-5 control-label">
+                                                Roll:
+                                                <span class="required">*</span>
+                                            </label>
+                                            <div class="col-md-6">
+                                                <input type="text" maxlength="13" ng-model="MeritConfig.SortSerialByRoll" class="form-control" onkeypress='return event.charCode >= 48 && event.charCode <= 57' placeholder="Roll" name="Roll" required>
+                                                <div class="form-control-focus"> </div>
+                                                <span ng-show="submitted &&  frmMeritConfig.Roll.$error.required" class="help-block">Roll Required</span>
+                                            </div>
+                                        </div>
+                                        <div class="form-group" ng-class="{ 'has-error' : submitted && frmMeritConfig.Name.$invalid}">
+                                            <label class="col-md-5 control-label">
+                                                Name:
+                                                <span class="required">*</span>
+                                            </label>
+                                            <div class="col-md-6">
+                                                <input type="text" min="11" maxlength="13" ng-model="MeritConfig.SortSerialByName" class="form-control" placeholder="Name" name="Name" required>
+                                                <div class="form-control-focus"> </div>
+                                                <span ng-show="submitted &&  frmMeritConfig.Name.$error.required" class="help-block">Name Required</span>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group" ng-class="{ 'has-error' : submitted && frmMeritConfig.Subject1.$invalid}">
+
+                                            <label class="col-md-5 control-label">
+                                                Subject1:
+                                                <span class="required">*</span>
+                                            </label>
+
+                                            <div class="col-md-3">
+                                                <select class="form-control" name="Subject1" ng-model="MeritConfig.SubjectId1" ng-options="item.SubID as item.SubjectName for item in Subjects" required>
+                                                    <option value="" selected="selected">Subject</option>
+                                                </select>
+
+                                                <span ng-show="submitted && frmMeritConfig.Subject1.$error.required" class="help-block">Subject1 Required</span>
+
+                                            </div>
+
+
+                                            <div class="col-md-3">
+                                                <input type="number" maxlength="1" ng-model="MeritConfig.SortSerialBySubjectId1" class="form-control" placeholder="Order" name="SubjectMark1" required>
+                                                <span ng-show="submitted && frmMeritConfig.SubjectMark1.$error.required" class="help-block">Order Required</span>
+                                            </div>
+                                        </div>
+                                        <div class="form-group" ng-class="{ 'has-error' : submitted && frmMeritConfig.Subject2.$invalid}">
+                                            <label class="col-md-5 control-label">
+                                                Subject2:
+                                                <span class="required">*</span>
+                                            </label>
+
+                                            <div class="col-md-3">
+                                                <select class="form-control" name="Subject2" ng-model="MeritConfig.SubjectId2" ng-options="item.SubID as item.SubjectName for item in Subjects" required>
+                                                    <option value="" selected="selected">Subject</option>
+                                                </select>
+                                                <span ng-show="submitted && frmMeritConfig.Subject2.$error.required" class="help-block">Subject2 Required</span>
+
+                                            </div>
+
+
+                                            <div class="col-md-3">
+                                                <input type="number" maxlength="1" ng-model="MeritConfig.SortSerialBySubjectId2" class="form-control" placeholder="Order" name="SubjectMark2" required>
+                                                <span ng-show="submitted && frmMeritConfig.SubjectMark2.$error.required" class="help-block">Order Required</span>
+                                            </div>
+                                        </div>
+                                        <div class="form-group" ng-class="{ 'has-error' : submitted && frmMeritConfig.Subject3.$invalid}">
+                                            <label class="col-md-5 control-label">
+                                                Subject3:
+                                                <span class="required">*</span>
+                                            </label>
+
+                                            <div class="col-md-3">
+                                                <select class="form-control" name="Subject3" ng-model="MeritConfig.SubjectId3" ng-options="item.SubID as item.SubjectName for item in Subjects" required>
+                                                    <option value="" selected="selected">Subject</option>
+                                                </select>
+                                                <span ng-show="submitted && frmMeritConfig.Subject3.$error.required" class="help-block">Subject3 Required</span>
+
+                                            </div>
+
+
+                                            <div class="col-md-3">
+                                                <input type="number" maxlength="1" ng-model="MeritConfig.SortSerialBySubjectId3" class="form-control" placeholder="Order" name="SubjectMark3" required>
+                                                <span ng-show="submitted && frmMeritConfig.SubjectMark3.$error.required" class="help-block">Order Required</span>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-md-5 control-label">
+                                                Total Mark Same Merit :
+                                                @*<span class="required">*</span>*@
+                                            </label>
+                                            <div class="col-md-2">
+                                                <input type="checkbox" class="form-control" ng-model="MeritConfig.TotalMarkSameMerit" ng-checked="MeritConfig.TotalMarkSameMerit==true" style="background-color:#ff6a00" />
+
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-md-5 control-label">
+                                                Total Is Fraction:
+                                                @*<span class="required">*</span>*@
+                                            </label>
+                                            <div class="col-md-2">
+                                                <input type="checkbox" class="form-control" ng-model="MeritConfig.TotalIsFraction" ng-checked="MeritConfig.TotalIsFraction==true" />
+
+                                            </div>
+                                        </div>
+                                    </fieldset>
+
+
+                                </div>
+
+
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" ng-hide="MeritConfig.Clone==true" ng-click="submitted=true" class="btn green-haze" ng-disabled="btnDis">Save <i ng-show="spin" class="fa fa-spinner fa-spin" style="font-size:20px"></i></button>
+                        <button type="button" data-dismiss="modal" class="btn dark btn-outline" ng-click="resetForm();submitted=false">Cancel</button>
+                        <button ng-show="MeritConfig.Clone==true && MeritConfig.NewSessionId!=null" type="button" ng-click="Clone();" class="btn green-haze">Clone</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!--Modal Area End-->
+
+</div>
+
+@section Scripts{
+
+    <script type="text/javascript">
+
+        OEMSApp.controller("cltrMeritList", ["$scope", "$http", "SweetAlert", "$window",
+              function ($scope, $http, SweetAlert, $window) {
+
+                  init();
+                  function init() {
+                      initialize();
+                      getAllDropdowns();
+                      getAllCommons();
+                      getCloneSession();
+                      getAllMeritConfig();
+
+                  }
+                  function initialize() {
+                      $scope.modalTitle = "Add Merit Config";
+                      $scope.MeritConfig = {};
+                      $scope.MeritConfigs = [];
+                      $scope.CommonFeild = {};
+
+                      $scope.res = {};
+                      $scope.data = {};
+                      $scope.resetForm = resetForm;
+
+                      $scope.btnDis = false;
+                      $scope.spin = false;
+                      $scope.getMeritConfig = getMeritConfig;
+                      $scope.MeritConfig.MeritListConfigId = 0;
+
+                  }
+                  //for class ways report ........  CommonFeild.VersionID
+                  $scope.generateReport = function generateReport() {
+                 
+                       if ($scope.CommonFeild.SessionId == null) {
+                          toastr["info"]("Select a Session.");
+                      }
+                      else {
+                          $scope.uri = "@Url.Action("MeritListConfigReport", "Report")?SessionID=" + $scope.CommonFeild.SessionId;
+                          $window.open($scope.uri, '_blank');
+                      }
+
+                  }
+                  function setProgress(s) {
+                      $scope.btnDis = s;
+                      $scope.spin = s;
+                  }
+                  function resetForm() {
+                      $scope.modalTitle = "Add Merit Config";
+                      $scope.MeritConfig = {};
+                      $scope.MeritConfig.MeritListConfigId = 0;
+                      $scope.submitted = false;
+                      $scope.submitted1 = false;
+                      $scope.Id = '';
+                      setProgress(false);
+                  }
+                  function reset() {
+                      $scope.modalTitle = "Add Merit Config";
+                      $scope.MeritConfig.BranchWise = null;
+                      $scope.MeritConfig.SortSerialByGPAWith4th = null;
+                      $scope.MeritConfig.SortSerialByGPAWithout4th = null;
+                      $scope.MeritConfig.SortSerialByTotalMark = null;
+                      $scope.MeritConfig.SortSerialByRoll = null;
+                      $scope.MeritConfig.SortSerialByName = null;
+                      $scope.MeritConfig.SubjectId1 = null;
+                      $scope.MeritConfig.SubjectId2 = null;
+                      $scope.MeritConfig.SortSerialBySubjectId1 = null;
+                      $scope.MeritConfig.SortSerialBySubjectId2 = null;
+                      $scope.MeritConfig.SortSerialBySubjectId3 = null;
+                      $scope.MeritConfig.TotalMarkSameMerit = null;
+                      $scope.MeritConfig.TotalIsFraction = null;
+                      $scope.submitted = false;
+                      $scope.submitted1 = false;
+                      setProgress(false);
+
+                  }
+           
+                  $scope.filterSession = function filterSession() {
+                      var keepGoing1 = true;
+                      angular.forEach($scope.CloneSession.Session, function (value, key) {
+                          if (keepGoing1) {
+                              if (value.SessionId == $scope.MeritConfig.SessionId) {
+                                  var index = $scope.CloneSession.Session.indexOf(value);
+                                  $scope.CloneSession.Session.splice(index, 1);
+                                  keepGoing1 = false;
+                              }
+                          }
+                      });
+                  }
+                  function getAllDropdowns() {
+                      $scope.Dropdowns = [];
+
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Common/GetAllDropDown/'
+                      }).then(function successCallback(response) {
+                          $scope.Dropdowns = response.data.results;
+                      }, function errorCallback(response) {
+                          toastr["error"](response.data.Message);
+                      });
+                  }
+
+                  function getAllCommons() {
+                      $scope.CommonFeilds = [];
+
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Common/GetCommonItem/'
+                      }).then(function successCallback(response) {
+                          $scope.CommonFeilds = response.data.results;
+                      }, function errorCallback(response) {
+                          toastr["error"](response.data.Message);
+                      });
+                  }
+                  function getCloneSession() {//for clone
+                      $scope.CloneSession = [];
+
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Common/GetCommonItem/'
+                      }).then(function successCallback(response) {
+                          $scope.CloneSession = response.data.results;
+
+                      }, function errorCallback(response) {
+                          toastr["error"](response.data.Message);
+                      });
+                  }
+                  function getMeritConfig() {
+                      $scope.MeritConfigs = [];
+
+                      $http({
+                          method: 'POST',
+                          url: baseUrl + 'Result/GetMeritListConfig/',
+                          data: $scope.CommonFeild
+                      }).then(function successCallback(response) {
+                          $scope.MeritConfigs = response.data.results;
+                          toastr["success"](response.data.message);
+                      }, function errorCallback(response) {
+                          toastr["error"](response.data.Message);
+                      });
+
+                  };
+
+                  function getAllMeritConfig() {
+                      $scope.MeritConfigs = [];
+
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Result/GetAllMeritListConfig/'
+                      }).then(function successCallback(response) {
+                          $scope.MeritConfigs = response.data.results;
+                          toastr["success"](response.data.message);
+                      }, function errorCallback(response) {
+                          toastr["error"](response.data.Message);
+                      });
+
+                  };
+
+                  $scope.searchData = function () {
+                      getBranchs(1);
+                  };
+
+                  $scope.edit = function (n) {
+                      $scope.modalTitle = "Update Merit";
+                      $scope.MeritConfig = n;
+                      $scope.GetGroup(n.ClassId);
+                      getSubjectsWhenEdit(n.VersionId, n.ClassId, n.SessionId, n.GroupId);
+                      $scope.Id = n.Id;
+                  };
+
+                  $scope.Clone = function () {
+                      if ($scope.MeritConfig.Clone == true) {
+                          $http({
+                              method: 'GET',
+                              url: baseUrl + 'Result/CloneMeritListMarkSetup/' + $scope.MeritConfig.Clone + '/' + $scope.MeritConfig.NewSessionId + '/' + $scope.MeritConfig.SessionId
+                          }).then(function successCallback(response) {
+                              toastr["info"](response.data.message);
+                              $scope.MeritConfigs = response.data.results;
+                              reset();
+                          }, function errorCallback(response) {
+                              toastr["error"](response.data.Message);
+
+                          });
+                      }
+                  };
+                  $scope.save = function save() {
+
+                      if ($scope.frmMeritConfig.$invalid)
+                          return;
+                      if ($scope.MeritConfig.SortSerialByGPAWith4th == $scope.MeritConfig.SortSerialByGPAWithout4th ||
+                           $scope.MeritConfig.SortSerialByGPAWith4th == $scope.MeritConfig.SortSerialByTotalMark ||
+                           $scope.MeritConfig.SortSerialByGPAWith4th == $scope.MeritConfig.SortSerialByRoll ||
+                           $scope.MeritConfig.SortSerialByGPAWith4th == $scope.MeritConfig.SortSerialByName ||
+                           $scope.MeritConfig.SortSerialByGPAWith4th == $scope.MeritConfig.SortSerialBySubjectId1 ||
+                           $scope.MeritConfig.SortSerialByGPAWith4th == $scope.MeritConfig.SortSerialBySubjectId2 ||
+                           $scope.MeritConfig.SortSerialByGPAWith4th == $scope.MeritConfig.SortSerialBySubjectId3 ||
+
+                          $scope.MeritConfig.SortSerialByGPAWithout4th == $scope.MeritConfig.SortSerialByTotalMark ||
+                          $scope.MeritConfig.SortSerialByGPAWithout4th == $scope.MeritConfig.SortSerialByRoll ||
+                          $scope.MeritConfig.SortSerialByGPAWithout4th == $scope.MeritConfig.SortSerialByName ||
+                          $scope.MeritConfig.SortSerialByGPAWithout4th == $scope.MeritConfig.SortSerialBySubjectId1 ||
+                          $scope.MeritConfig.SortSerialByGPAWithout4th == $scope.MeritConfig.SortSerialBySubjectId2 ||
+                          $scope.MeritConfig.SortSerialByGPAWithout4th == $scope.MeritConfig.SortSerialBySubjectId3 ||
+
+                           $scope.MeritConfig.SortSerialByTotalMark == $scope.MeritConfig.SortSerialByRoll ||
+                           $scope.MeritConfig.SortSerialByTotalMark == $scope.MeritConfig.SortSerialByName ||
+                           $scope.MeritConfig.SortSerialByTotalMark == $scope.MeritConfig.SortSerialBySubjectId1 ||
+                           $scope.MeritConfig.SortSerialByTotalMark == $scope.MeritConfig.SortSerialBySubjectId2 ||
+                           $scope.MeritConfig.SortSerialByTotalMark == $scope.MeritConfig.SortSerialBySubjectId3 ||
+
+                           $scope.MeritConfig.SortSerialByRoll == $scope.MeritConfig.SortSerialByName ||
+                          $scope.MeritConfig.SortSerialByRoll == $scope.MeritConfig.SortSerialBySubjectId1 ||
+                          $scope.MeritConfig.SortSerialByRoll == $scope.MeritConfig.SortSerialBySubjectId2 ||
+                          $scope.MeritConfig.SortSerialByRoll == $scope.MeritConfig.SortSerialBySubjectId3 ||
+
+                           $scope.MeritConfig.SortSerialByName == $scope.MeritConfig.SortSerialBySubjectId1 ||
+                           $scope.MeritConfig.SortSerialByName == $scope.MeritConfig.SortSerialBySubjectId2 ||
+                           $scope.MeritConfig.SortSerialByName == $scope.MeritConfig.SortSerialBySubjectId3 ||
+
+                          $scope.MeritConfig.SortSerialBySubjectId1 == $scope.MeritConfig.SortSerialBySubjectId2 ||
+                          $scope.MeritConfig.SortSerialBySubjectId1 == $scope.MeritConfig.SortSerialBySubjectId3 ||
+
+                          $scope.MeritConfig.SortSerialBySubjectId2 == $scope.MeritConfig.SortSerialBySubjectId3
+
+
+
+                          ) {
+                          toastr["warning"]("You Enter same order by");
+                          return;
+                      }
+
+                      setProgress(true);
+                      if ($scope.MeritConfig.MeritListConfigId != 0) /// For Update
+                      {
+                          if ($scope.MeritConfig != '') {
+                              $http({
+                                  method: 'PUT',
+                                  url: baseUrl + 'Result/UpdateMeritListConfig/',
+                                  data: $scope.MeritConfig
+                              }).then(function successCallback(response) {
+                                  $scope.MeritConfigs = response.data.results;
+                                  toastr["info"](response.data.message);
+                                  reset();
+                              }, function errorCallback(response) {
+                                  toastr["error"](response.data.Message);
+                              });
+                          }
+                      } else {  //  For Add
+                          if ($scope.MeritConfig != {}) {
+                              $http({
+                                  method: 'POST',
+                                  url: baseUrl + '/Result/AddMeritListConfig/',
+                                  data: $scope.MeritConfig
+                              }).then(function successCallback(response) {
+                                  $scope.MeritConfigs = response.data.results;
+                                  toastr["success"](response.data.message);
+                                  reset();
+                              }, function errorCallback(response) {
+                                  toastr["error"](response.data.Message);
+                              });
+                          }
+                      }
+
+                  };
+
+                  $scope.deleteMeritConfig = function deleteMeritConfig(n) {
+
+                      // SweetAlert.swal("Good job!", "You clicked the button!", "success");
+                      SweetAlert.swal({
+                          title: "Are you sure to delete it ?", type: "warning", showCancelButton: true, confirmButtonColor: "#DD6B55",
+                          confirmButtonText: "Yes, delete it!",
+                          closeOnConfirm: false
+                      },
+                      function (isConfirm) {
+
+
+                          if (isConfirm) {
+                              $http({
+                                  method: 'DELETE',
+                                  url: baseUrl + 'Result/DeleteMeritListConfig/' + n.MeritListConfigId
+                              }).then(function successCallback(response) {
+                                  SweetAlert.swal("Deleted!", "Your data has been deleted.", "success");
+                                  $scope.MeritConfigs = response.data.results;
+                                  getMeritConfig();
+                              }, function errorCallback(response) {
+                                  toastr["error"](response.data.Message);
+
+                              });
+
+                          }
+                      });
+
+
+                  };
+
+                  $scope.getSubjects = function getSubjects() {
+                      $scope.Subjects = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'SubjectSetup/GetAllSubject/' + $scope.MeritConfig.VersionId + '/' + $scope.MeritConfig.ClassId + '/' + $scope.MeritConfig.SessionId + '/' + $scope.MeritConfig.GroupId
+                      }).then(function successCallback(response) {
+
+
+                          $scope.Subjects = response.data.results;
+                      }, function errorCallback(response) {
+                          toastr["error"](response.data.Message);
+                      });
+                  }
+
+                  function getSubjectsWhenEdit(vid, sid, seid, gid) {
+                      $scope.Subjects = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'SubjectSetup/GetAllSubject/' + vid + '/' + sid + '/' + seid + '/' + gid
+                      }).then(function successCallback(response) {
+
+
+                          $scope.Subjects = response.data.results;
+                      }, function errorCallback(response) {
+                          toastr["error"](response.data.Message);
+                      });
+                  }
+
+              }]);
+    </script>
+
+}

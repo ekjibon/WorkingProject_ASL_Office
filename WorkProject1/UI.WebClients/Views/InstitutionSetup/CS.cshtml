@@ -1,0 +1,157 @@
+﻿@{
+    ViewBag.Title = "CS List";
+}
+
+<style>
+    .btn-set {
+        float: right !important;
+        margin-left: 5px;
+    }
+</style>
+<div ng-controller="CSCtrl">
+    <!-- Begin: life time stats -->
+    <div class="portlet light bordered">
+        <div class="portlet-title">
+            <div class="caption">
+                <i class="icon-settings font-green"></i>
+                <span class="caption-subject font-green sbold uppercase">@ViewBag.Title</span>
+            </div>
+        </div>
+
+        <div class="form-body" style="padding: 10px;">
+            <div class="row">
+                <form name="addform" class="form-horizontal" id="form_sample_1" novalidate>
+                    <div class="modal-body">
+                        <div class="form-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group" ng-class="{ 'has-error' : submitted && addform.SessionId.$invalid}">
+                                        <label class="col-md-3 control-label">
+                                            CS Type :
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-9">
+                                            <select class="form-control"  ng-model="cstype"  >
+                                                <option value="" selected="selected">Choose Option</option>
+                                                <option value="1" selected="selected">Employee</option>
+                                                <option value="2" selected="selected">Student</option>
+                                            </select>
+
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted && addform.SessionId.$error.required" class="help-block">Session Required</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <button type="reset" ng-click="reSetForm()" class="btn btn-danger">Reset</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="portlet-body">
+            <div class="table-container">
+                <div id="sample_3_wrapper" class="dataTables_wrapper no-footer">
+                    <div class="row">
+                        <div class="col-md-4 col-sm-5 col-xs-6">
+                            <div class="form-group">
+                                <div class="col-lg-3 col-md-5 col-sm-4 col-xs-8" style="padding-left:0px">
+                                    <select class="form-control" ng-model="pageSize" ng-options="P.value as P.text for P in pageSizeArray"></select>
+                                </div>
+                                <div class="col-md-7  col-sm-8  col-xs-4">
+                                    @*<label for="search" class="control-label" style="padding-top:5px">Items</label>*@
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 col-sm-3 col-xs-1">
+                        </div>
+                        <div class="col-md-4 col-sm-4 col-xs-5">
+                            <div id="sample_3_filter" class="pull-right">
+                                <input ng-model="q" id="search" class="form-control" placeholder="Filter text">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="table-scrollable"> </div>
+                    <table class="table table-bordered table-hover">
+                        <thead>
+                            <tr class="btn-primary">
+                                <th>From</th>
+                                <th class="text-center">Person Type</th>
+
+                                <th class="text-center">Request Type</th>
+                                <th class="text-center">Donation Type</th>
+                                <th class="text-center">Volunteer Name</th>
+                                <th style="text-align:center">Visit Date</th>
+                                <th style="text-align:center">Volunteer Date</th>
+                                <th style="text-align:center">Relation</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr dir-paginate="item in PortalCSList | filter:{RefTypeId:cstype} | filter:q  | itemsPerPage:pageSize" current-page="currentPage">
+                                <td ng-show="item.FullName!=null">{{item.FullName}}</td>
+                                <td ng-show="item.EmpName!=null">{{item.EmpName}}</td>
+                                <td ng-show="item.RefTypeId==1">Employee</td>
+                                <td ng-show="item.RefTypeId==2">Student</td>
+                                <td class="text-center">{{item.CSType}}</td>
+                                <td class="text-center">{{item.DonateItem}}</td>
+                                <td class="text-center">{{item.VolunteerName}}</td>
+                                <td class="text-center">{{item.CSVisitDateTime | date:"dd/MM/yyyy"}}</td>
+                                <td class="text-center">{{item.VolunteerDate | date:"dd/MM/yyyy"}}</td>
+                                <td class="text-center">{{item.Relation}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="row">
+                        <dir-pagination-controls boundary-links="true" template-url="~/assets/angular/lib/dirPagination.tpl.html"></dir-pagination-controls>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- End: life time stats -->
+</div>
+@section Scripts{
+    <script type="text/javascript">
+    OEMSApp.controller("CSCtrl", ["$scope", "$http", "SweetAlert", "$window",
+      function ($scope, $http, SweetAlert, $window) {
+          init();
+          function init() {
+              initialize();
+              GetPortalCSList();
+          }
+          function initialize() {
+              $scope.currentPage = 1;
+              $scope.pageno = 1;
+              $scope.pagesize = 10;
+              $scope.total_count = 12;
+              $scope.txtsearch = '';
+             
+              $scope.pageSizeArray = [];
+              $scope.pageSizeArray.push({ value: 5, text: 5 });
+              $scope.pageSizeArray.push({ value: 10, text: 10 });
+              $scope.pageSizeArray.push({ value: 20, text: 20 });
+              $scope.pageSizeArray.push({ value: 50, text: 50 });
+              $scope.currentPage = 1;
+              $scope.pageSize = 10;
+          };
+          $scope.reSetForm = function reSetForm() {
+              $scope.cstype = '';
+              GetPortalCSList();
+          }
+       function GetPortalCSList() {
+           $scope.PortalCSList = [];
+           $http({
+               method: 'GET',
+               url: baseUrl + 'SetupInstitution/GetCSList/'
+           }).then(function successCallback(response) {
+               $scope.PortalCSList = response.data.results;
+
+           }, function errorCallback(response) {
+               toastr["error"](response.data.Message);
+           });
+       };
+      }]);
+    </script>
+}

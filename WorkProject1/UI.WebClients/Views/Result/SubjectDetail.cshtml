@@ -1,0 +1,273 @@
+﻿
+@{
+    ViewBag.Title = "Subject Detail Report";
+}
+<style type="text/css">
+    .portlet.light.bordered {
+        border: 1px solid #e7ecf1 !important;
+        background-color: wheat !important;
+    }
+</style>
+<div class="portlet box" style="background-color:#678069" ng-controller="SubListReportCntrl">
+    <div class="portlet-title">
+        <div class="caption">
+            <i class="fa fa-user-plus" style="color:#ffffff"></i>Subject List
+        </div>
+    </div>
+    <div class="portlet-body form">
+        <!-- BEGIN FORM-->
+        <form class="form-horizontal" ng-submit="getSubject()" id="frmCommon" name="formCommonFeilds" novalidate>
+            <div class="form-body">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group" ng-class="{ 'has-error' : !sid && submitted1 && formCommonFeilds.Branch.$invalid}">
+                            <label class="col-md-5 control-label">
+                                Branch :
+                                <span class="required">*</span>
+                            </label>
+                            <div class="col-md-7">
+                                <select class="form-control" ng-disabled="sid" ng-model="Subjectlist.BranchID" ng-required="!sid" name="Branch" ng-options="Subjectlist.BranchId as Subjectlist.BranchName for Subjectlist in CommonFeilds.Branch">
+                                    <option value="" selected="selected">Select</option>
+                                </select>
+                                <div class="form-control-focus"> </div>
+                                <span ng-show="!sid &&submitted1 && formCommonFeilds.Branch.$error.required" class="help-block">Branch Name Required</span>
+                            </div>
+                        </div>
+                        <div class="form-group" ng-class="{ 'has-error' : !sid && submitted1 && formCommonFeilds.Session.$invalid}">
+                            <label class="col-md-5 control-label">
+                                Session :
+                                <span class="required">*</span>
+                            </label>
+                            <div class="col-md-7">
+                                <select class="form-control" ng-disabled="sid" ng-model="Subjectlist.SessionId" ng-required="!sid" name="Session" ng-options="Subjectlist.SessionId as Subjectlist.SessionName for Subjectlist in CommonFeilds.Session">
+                                    <option value="" selected="selected">Select</option>
+                                </select>
+                                <div class="form-control-focus"> </div>
+                                <span ng-show="!sid && submitted1 && formCommonFeilds.Session.$error.required" class="help-block">Session Required</span>
+                            </div>
+                        </div>
+                 
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group" ng-class="{ 'has-error' : !sid && submitted1 && formCommonFeilds.Shift.$invalid}">
+                            <label class="col-md-5 control-label">
+                                Shift :
+                                <span class="required">*</span>
+                            </label>
+                            <div class="col-md-7">
+                                <select class="form-control" ng-disabled="sid" ng-model="Subjectlist.ShiftID" ng-required="!sid" name="Shift" ng-options="Subjectlist.ShiftId as Subjectlist.ShiftName for Subjectlist in CommonFeilds.Shift | filter:{BranchId:Subjectlist.BranchID}:true">
+                                    <option value="" selected="selected">Select</option>
+                                </select>
+                                <div class="form-control-focus"> </div>
+                                <span ng-show="!sid && submitted1 && formCommonFeilds.Shift.$error.required" class="help-block">Shift Name Required</span>
+                            </div>
+                        </div>
+                        <div class="form-group" ng-class="{ 'has-error' : !sid && submitted1 && formCommonFeilds.Class.$invalid}">
+                            <label class="col-md-5 control-label">
+                                Class :
+                                <span class="required">*</span>
+                            </label>
+                            <div class="col-md-7">
+                                <select class="form-control" ng-disabled="sid" ng-model="Subjectlist.ClassId" ng-change="FilterSection()"  name="Class" ng-required="!sid" ng-options="Subjectlist.ClassId as Subjectlist.ClassName for Subjectlist in CommonFeilds.ClassInfo">
+                                    <option value="" selected="selected">Select</option>
+                                </select>
+                                <div class="form-control-focus"> </div>
+                                <span ng-show="!sid && submitted1 && formCommonFeilds.Class.$error.required" class="help-block">Class Required</span>
+                            </div>
+                        </div>
+                       </div>
+               <div class="col-md-4">
+                        <div class="form-group" ng-class="{ 'has-error' : !sid && submitted1 && formCommonFeilds.Section.$invalid}">
+                            <label class="col-md-5 control-label">
+                                Section :
+                                <span class="required">*</span>
+                            </label>
+                            <div class="col-md-7">
+                                <select class="form-control" ng-disabled="sid || Subjectlist.ClassId==null" ng-model="Subjectlist.SectionId" ng-required="!sid" name="Section" ng-options="S.SectionId as S.SectionName for S in Sections">
+                                    <option value="" selected="selected">Select</option>
+                                </select>
+                                <div class="form-control-focus"> </div>
+                                <span ng-show="!sid && submitted1 && formCommonFeilds.Section.$error.required" class="help-block">Section Name Required</span>
+                            </div>
+                        </div>
+                 
+                        <div class="form-group" ng-class="{ 'has-error' : sid && submitted1 && formCommonFeilds.studentID.$invalid}">
+                            <label class="col-md-5 control-label">
+                                Student ID &nbsp;
+                                <span><input type="checkbox" ng-click="reset();" ng-change="Subjectlist.SID = sid ? '' : undefined" ng-model="sid" ng-true-value="true" ng-false-value="false" /></span>
+                            </label>
+                            <div class="col-md-7" ng-show="sid">
+                                <input type="text" ng-model="Student" typeahead-on-select="onSelect($item, $model, $label)" name="StudentInsID" ng-required="sid" placeholder="Search Student." uib-typeahead="i  as i.Text for i in Searc($viewValue)" typeahead-loading="loadingLocations" typeahead-no-results="noResults" class="form-control">
+                                <i ng-show="loadingLocations" class="glyphicon glyphicon-refresh"></i>
+                                <div ng-show="noResults"><i class="glyphicon glyphicon-remove"></i> No Results Found</div>
+                                <span ng-show="sid && submitted && formCommonFeilds.studentID.$error.required" class="help-block">Student ID Required</span>
+                                @*<input type="text" ng-model="Subjectlist.SID" class="form-control" placeholder="Student ID" name="studentID" ng-required="sid" />
+                                <div class="form-control-focus"> </div>
+                                <span ng-show="sid && submitted1 && formCommonFeilds.studentID.$error.required" class="help-block">Student ID Required</span>*@
+                            </div>
+                        </div>
+                        <div class="btn-group btn-group-solid pull-right" style="margin-bottom:5px">
+                            <button type="button" class="btn btn-primary" ng-click="StudentWiseSubList()">Subject List</button>
+                            <button style="margin-left:10px" type="button" class="btn btn-primary" ng-click="SubWiseStudentList()">Student List</button>
+                        </div>
+                    </div>
+
+
+                </div>
+
+
+            </div>
+        </form>
+
+    </div>
+    <!-- END FORM-->
+</div>
+
+@section Scripts{
+
+    <script type="text/javascript">
+
+        OEMSApp.controller("SubListReportCntrl", ["$scope", "$http", "SweetAlert", "$window",
+          function ($scope, $http, SweetAlert, $window) {
+              init();
+              function init() {
+                  initialize();
+                  getAllCommons();
+              }
+              function initialize() {
+                  $scope.CommonFeilds = [];
+                  $scope.txtsearch = '';
+                  $scope.getAllCommons = getAllCommons;
+                  $scope.Student = {};
+                  $scope.Value = null;
+                  $scope.Text = null;
+              };
+              //for Student Search for auto complit text box ......
+              $scope.Searc = function (val) {
+                  if (val.length >= 3)
+                      return $http.get(baseUrl + 'Student/SearchStudent/' + val, {
+                          params: {}
+                      }).then(function (response) {
+                          return response.data.results.map(function (item) {
+                              return item;
+                          });
+                      });
+              };
+              //for StudentWiseSubList report ........
+              $scope.StudentWiseSubList = function StudentWiseSubList() {
+                  if (!$scope.sid) {
+                    
+                       if ($scope.Subjectlist.SessionId == null) {
+                          toastr["info"]("Select a Session.");
+                      }
+                      else if ($scope.Subjectlist.BranchID == null) {
+                          toastr["info"]("Select a Branch.");
+                      }
+                      else if ($scope.Subjectlist.ShiftID == null) {
+                          toastr["info"]("Select a Shift.");
+                      }
+
+                      else if ($scope.Subjectlist.ClassId == null) {
+                          toastr["info"]("Select a Class.");
+                      } else {
+                         // $scope.Student.Value = null;
+                          $scope.uri = "@Url.Action("StudentWiseSubListReport", "Report")?StudentID=" + $scope.Student.Value + "&BranchId=" + $scope.Subjectlist.BranchID +  "&ShiftID=" + $scope.Subjectlist.ShiftID + "&SessionId=" + $scope.Subjectlist.SessionId + "&ClassId=" + $scope.Subjectlist.ClassId + "&SectionId=" + $scope.Subjectlist.SectionId;
+                          $window.open($scope.uri, '_blank');
+                      }
+
+                  }
+                  else {
+                      if ($scope.Student.Value == null) {
+                          toastr["info"]("Enter a Student Id.");
+                      } else {
+                          $scope.Subjectlist.BranchID = null;
+                         
+                          $scope.Subjectlist.ShiftID = null;
+                          $scope.Subjectlist.SessionId = null;
+                          $scope.Subjectlist.ClassId = null;
+                          $scope.Subjectlist.SectionId = null;
+                       
+                          $scope.uri = "@Url.Action("StudentWiseSubListReport", "Report")?StudentID=" + $scope.Student.Value + "&BranchId=" + $scope.Subjectlist.BranchID + "&ShiftID=" + $scope.Subjectlist.ShiftID +
+                          "&SessionId=" + $scope.Subjectlist.SessionId + "&ClassId=" + $scope.Subjectlist.ClassId + "&SectionId=" + $scope.Subjectlist.SectionId;
+                          $window.open($scope.uri, '_blank');
+                      }
+                  }
+
+              }
+              //for SubWiseStudentList ways report ........
+              $scope.SubWiseStudentList = function SubWiseStudentList() {
+                  if (!$scope.sid) {
+                      if ($scope.Subjectlist.BranchID == null) {
+                          toastr["info"]("Select a Branch.");
+                      }
+                     
+                      else if ($scope.Subjectlist.ShiftID == null) {
+                          toastr["info"]("Select a Shift.");
+                      }
+                      else if ($scope.Subjectlist.SessionId == null) {
+                          toastr["info"]("Select a Session.");
+                      }
+                      else if ($scope.Subjectlist.ClassId == null) {
+                          toastr["info"]("Select a Class.");
+                      } else {
+                          //$scope.Student.Value = null;
+                          $scope.uri = "@Url.Action("SubWiseStudentListReport", "Report")?SID=" + $scope.Student.Value + "&BranchId=" + $scope.Subjectlist.BranchID + "&ShiftID=" + $scope.Subjectlist.ShiftID + "&SessionId=" + $scope.Subjectlist.SessionId + "&ClassId=" + $scope.Subjectlist.ClassId + "&SectionId=" + $scope.Subjectlist.SectionId;
+                          $window.open($scope.uri, '_blank');
+                      }
+
+                  }
+                  else {
+                      if ($scope.Student.Value == null) {
+                          toastr["info"]("Enter a Student Id.");
+                      } else {
+                          $scope.Subjectlist.BranchID = null;
+                          $scope.Subjectlist.ShiftID = null;
+                          $scope.Subjectlist.SessionId = null;
+                          $scope.Subjectlist.ClassId = null;
+                          $scope.Subjectlist.SectionId = null;
+                          $scope.uri = "@Url.Action("SubWiseStudentListReport", "Report")?SID=" + $scope.Student.Value + "&BranchId=" + $scope.Subjectlist.BranchID +  "&ShiftID=" + $scope.Subjectlist.ShiftID +
+                          "&SessionId=" + $scope.Subjectlist.SessionId + "&ClassId=" + $scope.Subjectlist.ClassId + "&SectionId=" + $scope.Subjectlist.SectionId +"&SubjectId=" + $scope.Subjectlist.SubjectId;
+                          $window.open($scope.uri, '_blank');
+                      }
+                  }
+
+              }
+              $scope.reset = function reset() {
+                  $scope.Subjectlist = [];
+              }
+         
+            $scope.FilterSection = function FilterSection() {
+                  $scope.Sections = [];
+                  $http({
+                      method: 'GET',
+                      url: baseUrl + 'Common/GetSection/' + $scope.Subjectlist.SessionId + "/" + $scope.Subjectlist.ShiftID + "/" + $scope.Subjectlist.ClassId 
+                  }).then(function successCallback(response) {
+                      $scope.Sections = response.data.results;
+                  }, function errorCallback(response) {
+                      toastr["info"](response.data.message);
+                  });
+
+              }
+              function getAllCommons() {
+                  $scope.CommonFeilds = [];
+
+                  $http({
+                      method: 'GET',
+                      url: baseUrl + 'Common/GetCommonItem/'
+                  }).then(function successCallback(response) {
+                      $scope.CommonFeilds = response.data.results;
+                  }, function errorCallback(response) {
+                  });
+              }
+
+              //$scope.ResetSource = function ResetSource() {
+
+              //}
+
+              //$scope.ShowReport = function ShowReport() {
+              //         var w = window.open("","_blank");
+              //         w.location = baseUrl + 'Report/GetAllSubListByStutId?StudentInsID=' + $scope.Subjectlist.StudentInsID
+              //}
+          }]);
+    </script>
+}

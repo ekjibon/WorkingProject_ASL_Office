@@ -1,0 +1,315 @@
+﻿
+@{
+    ViewBag.Title = "Account Branch Setup";
+}
+
+<div class="kt-container  kt-container--fluid  kt-grid__item kt-grid__item--fluid" ng-controller="AcBranchCtrl">
+    <!-- Begin: life time stats -->
+    <div class="row">
+        <div class="kt-portlet kt-portlet--mobile">
+            <div class="kt-portlet__head kt-portlet__head--lg">
+                <div class="kt-portlet__head-label">
+                    <span class="kt-portlet__head-icon">
+                        @*<i class="kt-font-brand flaticon2-line-chart"></i>*@
+                    </span>
+                    <h3 class="kt-portlet__head-title">
+                        <!----Titel Text-->
+                        <span class="caption-subject font-green sbold uppercase">@ViewBag.Title</span>
+                        <!----Titel Text -->
+                    </h3>
+                </div>
+                <div class="kt-portlet__head-toolbar">
+                    <div class="kt-portlet__head-wrapper">
+                        <div class="dropdown dropdown-inline">
+                            <button type="button" class="btn btn-brand btn-icon-sm" ng-click="resetForm()" data-target="#addmodal" data-toggle="modal" aria-haspopup="true" aria-expanded="false">
+                                <!----Add Button -->
+                                <i class="flaticon2-plus"></i> Add New
+                                <!----Add Button -->
+                            </button>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="kt-portlet__body">
+
+                <div class="row">
+                    <div class="col-md-4 col-sm-5 col-xs-6">
+                        <div class="form-group">
+                            <div class="col-lg-3 col-md-5 col-sm-4 col-xs-8" style="padding-left:0px">
+                                <select class="form-control" ng-model="pageSize" ng-options="P.value as P.text for P in pageSizeArray"></select>
+                            </div>                           
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-sm-3 col-xs-1">
+                    </div>
+                    <div class="col-md-4 col-sm-4 col-xs-5">
+                        <div id="sample_3_filter" class="pull-right">
+                            <input ng-model="q" id="search" class="form-control" placeholder="Filter text">
+                        </div>
+                    </div>
+                </div>
+                <div class="table-scrollable"> </div>
+                <table class="table table-bordered table-hover rounded">
+                    <thead>
+                        <tr class="btn-primary">
+                            <th>Account Branch Name</th>
+                            <th>Status</th>
+                            <th style="text-align:center">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-show="AcBranchs.results.length <= 0"><td colspan="3" style="text-align:center;"><i class="fa fa-refresh"></i> No Data Exists!!</td></tr>
+                        <tr dir-paginate="item in AcBranchs.results| filter:q  | itemsPerPage: pageSize" current-page="currentPage">
+                            <td>{{item.Name}}</td>
+                            <td ng-show="item.Status=='A'">Active</td>
+                            <td ng-show="item.Status=='I'">Inactive</td>
+                            <td align="center">
+                                <div class="input-group-btn">
+                                    <button type="button" class="btn btn-label-success" data-toggle="dropdown">
+                                        Options
+                                        <span class="caret"></span>
+                                    </button>
+                                    <ul class="dropdown-menu pull-right">
+                                        <li>
+                                            <a ng-show="item.Status=='A'" ng-click="inactive(item)"><i class="fa fa-ban"></i> Inactive</a>
+                                        </li>
+                                        <li>
+                                            <a ng-show="item.Status=='I'" ng-click="active(item)"><i class="fa fa-check"></i> Active</a>
+                                        </li>
+                                        <li>
+                                            <a ng-click="edit(item)" data-target="#addmodal" data-toggle="modal"><i class="fa fa-edit"></i> Edit</a>
+                                        </li>
+                                        <li>
+                                            <a ng-click="deleteAcBranch(item)"><i class="fa fa-trash"></i> Delete</a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="row">
+                    <dir-pagination-controls boundary-links="true" template-url="~/assets/angular/lib/dirPagination.tpl.html"></dir-pagination-controls>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- End: life time stats -->
+    <!--Modal Area Start-->
+    <div id="addmodal" class="modal fade" tabindex="-1" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form name="addform" ng-submit="save()" class="form-horizontal" id="form_sample_1" novalidate autocomplete="off">
+                    <div class="modal-header">
+                        <h4 class="modal-title">{{modalTitle}}</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-body">
+                            <div class="row">
+                                <div class="col-md-12">
+
+                                    <div class="form-group row" ng-class="{ 'has-error' : submitted && addform.name.$invalid}">
+                                        <label class="col-md-5 control-label"style="text-align:right">
+                                            Account Branch Name:
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-7">
+                                            <input type="text" ng-model="AcBranch.Name" class="form-control" placeholder="Branch Name" name="name" required>
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted &&  addform.name.$error.required" class="help-block">Name Required</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" data-dismiss="modal" class="btn  btn-secondary" ng-click="getAcBranch();resetForm();submitted=false">Cancel</button>
+                        <button type="submit" ng-click="submitted=true" class="btn btn-success">Save</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!--Modal Area End-->
+
+</div>
+
+@section Scripts{
+
+    <script type="text/javascript">
+        OEMSApp.controller("AcBranchCtrl", ["$scope", "$http", "SweetAlert", "$filter",
+              function ($scope, $http, SweetAlert, $filter) {
+
+                  init();
+                  function init() {
+                      initialize();
+                      getAcBranch();
+                  }
+                  function initialize() {
+                      $scope.modalTitle = "Add Account Branch";
+                      $scope.AcBranch = {};
+                      $scope.AcBranch.Id = 0;
+                      $scope.AcBranchs = [];
+                      $scope.currentPage = 1;
+                      $scope.pageno = 1;
+                      $scope.pagesize = 10;
+                      $scope.total_count = 12;
+                      $scope.search = '';
+                      $scope.Id = '';
+                      $scope.getAcBranch = getAcBranch;
+                      $scope.res = {};
+                      $scope.data = {};
+                      $scope.resetForm = resetForm;
+                      $scope.hstep = 1;
+                      $scope.mstep = 15;
+
+                      $scope.pageSizeArray = [];
+                      $scope.pageSizeArray.push({ value: 5, text: 5 });
+                      $scope.pageSizeArray.push({ value: 10, text: 10 });
+                      $scope.pageSizeArray.push({ value: 20, text: 20 });
+                      $scope.pageSizeArray.push({ value: 50, text: 50 });
+                      $scope.currentPage = 1;
+                      $scope.pageSize = 10;
+
+                  }
+                  function resetForm() {
+                      $scope.modalTitle = "Add Account Branch";
+
+                      $scope.AcBranch = {};
+                      $scope.AcBranch.Id = 0;
+                      $scope.addform.$setUntouched();
+                      $scope.addform.$setPristine();
+                      $scope.submitted = false;
+                  }
+
+                  function getAcBranch() {
+                      $scope.AcBranchs = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Accounts/GetAllAccountBranch/'
+                      }).then(function successCallback(response) {
+                          $scope.AcBranchs = response.data;
+                      }, function errorCallback(response) {
+                          toastr["warning"](response.data.Message);
+                      });
+                  }
+
+                  $scope.inactive = function (item) {
+
+                      if (item.Id != 0) {
+                          item.Status = 'I';
+                          $http({
+                              method: 'PUT',
+                              url: baseUrl + 'Accounts/UpdateAcBranch/',
+                              data: item
+                          }).then(function successCallback(response) {
+                              getAcBranch();
+                              toastr["info"]("Successfully Inactivated!");
+                              resetForm();
+                          }, function errorCallback(response) {
+                              toastr["warning"](response.data.Message);
+                              resetForm();
+                              getAcBranch();
+                          });
+                      }
+                  }
+                  $scope.active = function (item) {
+
+                      if (item.Id != 0) {
+                          item.Status = 'A';
+                          $http({
+                              method: 'PUT',
+                              url: baseUrl + 'Accounts/UpdateAcBranch/',
+                              data: item
+                          }).then(function successCallback(response) {
+                              getAcBranch();
+                              toastr["info"]("Successfully Activated!");
+                              resetForm();
+                          }, function errorCallback(response) {
+                              toastr["warning"](response.data.Message);
+                              resetForm();
+                              getAcBranch();
+                          });
+                      }
+                  }
+
+
+                  $scope.edit = function (n) {
+                      $scope.modalTitle = "Edit Account Branch";
+                      $scope.AcBranch = n;
+                      $scope.Id = n.Id;
+                  };
+                  $scope.save = function save() {
+                      if ($scope.addform.$invalid)
+                          return;
+                      if ($scope.AcBranch.Id != 0) /// For Update
+                      {
+                          if ($scope.AcBranch != '') {
+                              $http({
+                                  method: 'PUT',
+                                  url: baseUrl + 'Accounts/UpdateAcBranch/',
+                                  data: $scope.AcBranch
+                              }).then(function successCallback(response) {
+
+                                  $('#addmodal').modal('toggle');
+                                  getAcBranch();
+                                  toastr["info"](response.data.message);
+                                  resetForm();
+                              }, function errorCallback(response) {
+                                  toastr["warning"](response.data.Message);
+                                  $('#addmodal').modal('toggle');
+                                  resetForm();
+                                  getAcBranch();
+                              });
+                          }
+                      }else {  //  For Add
+                          if ($scope.AcBranch != {}) {
+                              $http({
+                                  method: 'POST',
+                                  url: baseUrl + 'Accounts/AddAcBranch/',
+                                  data: $scope.AcBranch
+                              }).then(function successCallback(response) {
+
+                                  $('#addmodal').modal('toggle');
+                                  getAcBranch();
+                                  toastr["info"](response.data.message);
+                                  resetForm();
+                              }, function errorCallback(response) {
+                                  toastr["warning"](response.data.Message);
+                              });
+                          }
+                      }
+                  };
+                  $scope.deleteAcBranch = function deleteAcBranch(n) {
+                      SweetAlert.swal({
+                          title: "Are you sure to delete it ?", type: "warning", showCancelButton: true, confirmButtonColor: "#DD6B55",
+                          confirmButtonText: "Yes, delete it!",
+                          closeOnConfirm: false
+                      },
+                      function (isConfirm) {
+                          if (isConfirm) {
+                              if (n.Id != 0) {
+                                  n.IsDeleted = true;
+                                  $http({
+                                      method: 'PUT',
+                                      url: baseUrl + 'Accounts/UpdateAcBranch/',
+                                      data: n
+                                  }).then(function successCallback(response) {
+                                      getAcBranch();
+                                      SweetAlert.swal("Deleted!", "Your data has been deleted.", "success");
+                                  }, function errorCallback(response) {
+                                      toastr["warning"](response.data.Message);
+                                      getAcBranch();
+                                  });
+                              }
+                          }
+                      });
+                  };
+              }]);
+    </script>
+}

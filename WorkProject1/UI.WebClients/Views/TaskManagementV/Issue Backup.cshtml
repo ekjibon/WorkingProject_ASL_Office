@@ -1,0 +1,715 @@
+﻿
+@{
+    ViewBag.Title = "Issue";
+}
+
+<div class="portlet box blue-hoki" style="width: 100%" ng-controller="issueCtrl">
+    <!-- Begin: life time stats -->
+    <div class="portlet light bordered">
+        <div class="portlet-title">
+            <div class="caption">
+                <i class="icon-settings font-green"></i>
+                <span class="caption-subject font-green sbold uppercase">All issue</span>
+            </div>
+            <div class="actions">
+                <div class="btn-group btn-group-solid">
+                    <button ng-click="submitted=false" class="btn green" data-target="#addmodal" data-toggle="modal"> <i class="fa fa-plus"></i> Add New issue</button>
+                </div>
+            </div>
+        </div>
+        <div class="portlet-body">
+            <div class="table-container">
+                <div id="sample_3_wrapper" class="dataTables_wrapper no-footer">
+                    <div class="row">
+                        <div class="col-md-4 col-sm-5 col-xs-6">
+                            <div class="form-group">
+                                <div class="col-lg-3 col-md-5 col-sm-4 col-xs-8" style="padding-left:0px">
+                                    <select class="form-control" ng-model="pageSize" ng-options="P.value as P.text for P in pageSizeArray"></select>
+                                </div>
+                                <div class="col-md-7  col-sm-8  col-xs-4">
+                                    @*<label for="search" class="control-label" style="padding-top:5px">Items</label>*@
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 col-sm-3 col-xs-1">
+                        </div>
+                        <div class="col-md-4 col-sm-4 col-xs-5">
+                            <div id="sample_3_filter" class="pull-right">
+                                <input ng-model="q" id="search" class="form-control" placeholder="Filter text">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="table-scrollable"> </div>
+                    <table class="table table-bordered table-hover">
+                        <thead>
+                            <tr class="btn-primary">
+                                <th>SL</th>
+                                <th>Project</th>
+                                <th>Client</th>
+                                <th>Issue Type</th>
+                                <th>Issue Title</th>
+                                <th>Description</th>
+                                <th>Assignee</th>
+                                <th>Priority</th>
+                                <th>Sprint</th>
+                                <th>Parent Issue</th>
+                                <th style="text-align:center">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-show="issueList.length <= 0"><td colspan="5" style="text-align:center;"><i class="fa fa-refresh"></i> No data Found!!</td></tr>
+                            <tr dir-paginate="item in issueList| filter:q  | itemsPerPage: pageSize" current-page="currentPage" ng-class="{ 'alert alert-warning' : item.ParentId != null}">
+                                <td>{{$index+1}}</td>
+                                <td>{{item.ProjectName}}</td>
+                                <td>{{item.FullName}}</td>
+                                <td>{{item.IssueTypeName}}</td>
+                                <td>{{item.Title}}</td>
+                                <td>{{item.Description}}</td>
+                                <td>{{item.AssigneeId}}</td>
+                                <td>{{item.Priority}}</td>
+                                <td>{{item.SprintTitle}}</td>
+                                <td><span ng-show="item.ParentId != null">{{item.ParentId}}</span></td>
+
+                                <td>
+
+                                    <a class="btn btn-icon-only green" ng-click="editIssue(item)" data-target="#addmodal" data-toggle="modal">
+                                        <i class="fa fa-edit"></i>
+                                    </a>
+                                    <a ng-click="deleteIssue(item.Id)" href="javascript:;" class="btn btn-icon-only red">
+                                        <i class="fa fa-trash"></i>
+                                    </a>
+                                    <a class="btn btn-info" ng-click="saveSubIssue(item)" data-target="#addmodalSub" data-toggle="modal" ng-hide="item.ParentId != null">
+                                        <i class="fa fa-plus"> Sub Issue</i>
+                                    </a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="row">
+                        <dir-pagination-controls boundary-links="true" template-url="~/assets/angular/lib/dirPagination.tpl.html"></dir-pagination-controls>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- End: life time stats -->
+    <!--Modal Area Start ISSUE-->
+    <div id="addmodal" class="modal fade" tabindex="-1" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form name="addBasic" ng-submit="save()" class="form-horizontal" id="form_sample_1" novalidate autocomplete="off">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true" ng-click="resetForm();submitted=false">X</button>
+                        <h4 class="modal-title">{{modalTitle}}</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-body">
+                            <div class="row">
+                                <div class="col-md-12">
+
+                                    <div class="form-group" ng-class="{ 'has-error' : submitted && addBasic.ProjectId.$invalid}">
+                                        <label class="col-md-4 control-label">
+                                            Project :
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-8">
+                                            <select ng-model="issueInfo.ProjectId" class="form-control" placeholder="ProjectId" name="ProjectId" required ng-options="project.Id as project.ProjectName for project in ProjectList">
+                                                <option value='' selected="selected">Choose Option</option>
+                                            </select>
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted &&  addBasic.ProjectId.$error.required" class="help-block">Project Required</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group" ng-class="{ 'has-error' : submitted && addBasic.ClientId.$invalid}">
+                                        <label class="col-md-4 control-label">
+                                            Client :
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-8">
+                                            <select ng-model="issueInfo.ClientId" class="form-control" placeholder="ClientId" name="ClientId" required ng-options="client.Id as client.FullName for client in ClientList">
+                                                <option value='' selected="selected">Choose Option</option>
+                                            </select>
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted &&  addBasic.ClientId.$error.required" class="help-block">Client Required</span>
+                                        </div>
+                                    </div>
+
+                                    @*<div class="form-group" ng-class="{ 'has-error' : submitted && addBasic.DueDate.$invalid}">
+                                            <label class="col-md-4 control-label">
+                                                Due Date :
+                                                <span class="required">*</span>
+                                            </label>
+                                            <div class="col-md-8">
+                                                <input type="text" class="form-control" uib-datepicker-popup="dd/MM/yyyy" placeholder="Due Date" name="DueDate" ng-model="issueInfo.DueDate"  is-open="popup2.opened" ng-click="popup2.opened=true" ng-required="true" close-text="Close" readonly="readonly" />
+                                                <div class="form-control-focus"> </div>
+                                                <span ng-show="submitted &&  addBasic.DueDate.$error.required" class="help-block">Due Date Required</span>
+                                            </div>
+                                        </div>*@
+
+                                    <div class="form-group" ng-class="{ 'has-error' : submitted && addBasic.IssueTypeId.$invalid}">
+                                        <label class="col-md-4 control-label">
+                                            Issue Type :
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-8">
+                                            <select ng-model="issueInfo.IssueTypeId" class="form-control" placeholder="Issue Type" name="IssueTypeId" required ng-options="issueType.Id as issueType.IssueTypeName for issueType in issueTypeList">
+                                                <option value=''>Choose Option</option>
+                                            </select>
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted &&  addBasic.IssueTypeId.$error.required" class="help-block">Issue Type Required</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group" ng-class="{ 'has-error' : submitted && addBasic.Title.$invalid}">
+                                        <label class="col-md-4 control-label">
+                                            Title :
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-8">
+                                            <input type="text" ng-model="issueInfo.Title" class="form-control" name="Title" placeholder="Issue Title" required>
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted &&  addBasic.Title.$error.required" class="help-block">Title Required</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group" ng-class="{ 'has-error' : submitted && addBasic.Description.$invalid}">
+                                        <label class="col-md-4 control-label">
+                                            Description :
+                                        </label>
+                                        <div class="col-md-8">
+                                            <textarea ng-model="issueInfo.Description" class="form-control" name="Description" placeholder="Description"></textarea>
+                                            <div class="form-control-focus"> </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group" ng-class="{ 'has-error' : submitted && addBasic.AssigneeId.$invalid}">
+                                        <label class="col-md-4 control-label">
+                                            Assignee :
+                                        </label>
+                                        <div class="col-md-8">
+                                            <select ng-model="issueInfo.AssigneeId" class="form-control" placeholder="Assignee" name="AssigneeId">
+                                                <option value=''>Choose Option</option>
+                                                <option value=1>Assignee 1</option>
+                                                <option value=2>Assignee 2</option>
+                                            </select>
+                                            <div class="form-control-focus"> </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group" ng-class="{ 'has-error' : submitted && addBasic.Priority.$invalid}">
+                                        <label class="col-md-4 control-label">
+                                            Priority :
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-8">
+                                            <select ng-model="issueInfo.Priority" class="form-control" placeholder="Priority" name="Priority" required>
+                                                @*<option value=''>Choose Option</option>*@
+                                                <option value='Highest'>Highest</option>
+                                                <option value='High'>High</option>
+                                                <option value='Medium'>Medium</option>
+                                                <option value='Low'>Low</option>
+                                                <option value='Lowest'>Lowest</option>
+                                            </select>
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted &&  addBasic.Priority.$error.required" class="help-block">Priority Required</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group" ng-class="{ 'has-error' : submitted && addBasic.SprintId.$invalid}">
+                                        <label class="col-md-4 control-label">
+                                            Sprint :
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-8">
+                                            <select ng-model="issueInfo.SprintId" class="form-control" placeholder="Sprint" name="SprintId" required ng-options="sprint.Id as sprint.SprintTitle for sprint in SprintList">
+                                                <option value=''>Choose Option</option>
+                                            </select>
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted &&  addBasic.SprintId.$error.required" class="help-block">Sprint Required</span>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" data-dismiss="modal" class="btn dark btn-outline" ng-click="resetForm();submitted=false">Cancel</button>
+                        <button type="submit" ng-click="save();submitted=true" class="btn green-haze">{{modalbutton}}</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!--Modal Area End-->
+    <!--Modal Area Start SUBISSUE-->
+    <div id="addmodalSub" class="modal fade" tabindex="-1" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form name="addBasicSub" ng-submit="saveSub()" class="form-horizontal" id="form_sample_2" novalidate autocomplete="off">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true" ng-click="resetForm();submitted=false">X</button>
+                        <h4 class="modal-title">{{modalTitleSub}}</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-body">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label class="col-md-5 control-label">
+                                            Create Sub Issue For :
+                                        </label>
+                                        <div class="col-md-5">
+                                            <input type="text" value="{{CreateSubIssuefor}}" class="form-control" disabled style="text-align:center">
+                                            <div class="form-control-focus"> </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group" ng-class="{ 'has-error' : submitted && addBasicSub.ProjectId.$invalid}">
+                                        <label class="col-md-4 control-label">
+                                            Project :
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-8">
+                                            <select ng-model="issueInfo.ProjectId" class="form-control" placeholder="ProjectId" name="ProjectId" required ng-options="project.Id as project.ProjectName for project in ProjectList">
+                                                <option value='' selected="selected">Choose Option</option>
+                                            </select>
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted &&  addBasicSub.ProjectId.$error.required" class="help-block">Project Required</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group" ng-class="{ 'has-error' : submitted && addBasicSub.ClientId.$invalid}">
+                                        <label class="col-md-4 control-label">
+                                            Client :
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-8">
+                                            <select ng-model="issueInfo.ClientId" class="form-control" placeholder="ClientId" name="ClientId" required ng-options="client.Id as client.FullName for client in ClientList">
+                                                <option value='' selected="selected">Choose Option</option>
+                                            </select>
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted &&  addBasicSub.ClientId.$error.required" class="help-block">Client Required</span>
+                                        </div>
+                                    </div>
+
+                                    @*<div class="form-group" ng-class="{ 'has-error' : submitted && addBasic.DueDate.$invalid}">
+                                            <label class="col-md-4 control-label">
+                                                Due Date :
+                                                <span class="required">*</span>
+                                            </label>
+                                            <div class="col-md-8">
+                                                <input type="text" class="form-control" uib-datepicker-popup="dd/MM/yyyy" placeholder="Due Date" name="DueDate" ng-model="issueInfo.DueDate"  is-open="popup2.opened" ng-click="popup2.opened=true" ng-required="true" close-text="Close" readonly="readonly" />
+                                                <div class="form-control-focus"> </div>
+                                                <span ng-show="submitted &&  addBasic.DueDate.$error.required" class="help-block">Due Date Required</span>
+                                            </div>
+                                        </div>*@
+
+                                    <div class="form-group" ng-class="{ 'has-error' : submitted && addBasicSub.IssueTypeId.$invalid}">
+                                        <label class="col-md-4 control-label">
+                                            Issue Type :
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-8">
+                                            <select ng-model="issueInfo.IssueTypeId" class="form-control" placeholder="Issue Type" name="IssueTypeId" required ng-options="issueType.Id as issueType.IssueTypeName for issueType in issueTypeList">
+                                                <option value=''>Choose Option</option>
+                                            </select>
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted &&  addBasicSub.IssueTypeId.$error.required" class="help-block">Issue Type Required</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group" ng-class="{ 'has-error' : submitted && addBasicSub.Title.$invalid}">
+                                        <label class="col-md-4 control-label">
+                                            Sub Issue Title :
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-8">
+                                            <input type="text" ng-model="issueInfo.Title" class="form-control" name="Title" placeholder="Sub Issue Title" required>
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted &&  addBasicSub.Title.$error.required" class="help-block">Sub Issue Title Required</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group" ng-class="{ 'has-error' : submitted && addBasicSub.Description.$invalid}">
+                                        <label class="col-md-4 control-label">
+                                            Description :
+                                        </label>
+                                        <div class="col-md-8">
+                                            <textarea ng-model="issueInfo.Description" class="form-control" name="Description" placeholder="Description"></textarea>
+                                            <div class="form-control-focus"> </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group" ng-class="{ 'has-error' : submitted && addBasicSub.AssigneeId.$invalid}">
+                                        <label class="col-md-4 control-label">
+                                            Assignee :
+                                        </label>
+                                        <div class="col-md-8">
+                                            <select ng-model="issueInfo.AssigneeId" class="form-control" placeholder="Assignee" name="AssigneeId">
+                                                <option value=''>Choose Option</option>
+                                                <option value=1>Assignee 1</option>
+                                                <option value=2>Assignee 2</option>
+                                            </select>
+                                            <div class="form-control-focus"> </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group" ng-class="{ 'has-error' : submitted && addBasicSub.Priority.$invalid}">
+                                        <label class="col-md-4 control-label">
+                                            Priority :
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-8">
+                                            <select ng-model="issueInfo.Priority" class="form-control" placeholder="Priority" name="Priority" required>
+                                                @*<option value=''>Choose Option</option>*@
+                                                <option value='Highest'>Highest</option>
+                                                <option value='High'>High</option>
+                                                <option value='Medium'>Medium</option>
+                                                <option value='Low'>Low</option>
+                                                <option value='Lowest'>Lowest</option>
+                                            </select>
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted &&  addBasicSub.Priority.$error.required" class="help-block">Priority Required</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group" ng-class="{ 'has-error' : submitted && addBasicSub.SprintId.$invalid}">
+                                        <label class="col-md-4 control-label">
+                                            Sprint :
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-8">
+                                            <select ng-model="issueInfo.SprintId" class="form-control" placeholder="Sprint" name="SprintId" required ng-options="sprint.Id as sprint.SprintTitle for sprint in SprintList">
+                                                <option value=''>Choose Option</option>
+                                            </select>
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted &&  addBasicSub.SprintId.$error.required" class="help-block">Sprint Required</span>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" data-dismiss="modal" class="btn dark btn-outline" ng-click="resetFormSub();submitted=false">Cancel</button>
+                        <button type="submit" ng-click="submitted=true" class="btn green-haze">{{modalbuttonSub}}</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!--Modal Area End-->
+
+</div>
+<!-- END FORM-->
+@section Scripts{
+
+    <script type="text/javascript">
+        OEMSApp.controller("issueCtrl", ["$scope", "$http", "SweetAlert",
+              function ($scope, $http, SweetAlert) {
+                  init();
+                  function init() {
+                      initialize();
+                      getAllissue();
+                      getAllIssueType();
+                      getAllProject();
+                      getAllClient();
+                      getAllSprint();
+                  }
+
+                  function initialize() {
+                      $scope.modalbutton = 'Save';
+                      $scope.modalTitle = 'Add New issue';
+
+                      $scope.modalbuttonSub = 'Save Sub';
+                      $scope.modalTitleSub = 'Add New Sub issue';
+
+                      $scope.issueInfo = {};
+                      $scope.issueInfos = [];
+                      $scope.issueList = [];
+                      $scope.issueInfo.Priority = 'Medium';
+                      $scope.resetForm = resetForm;
+
+                      $scope.checkUpdateId = 0;
+                      $scope.pagesize = 10;
+                      $scope.pageSizeArray = [];
+                      $scope.pageSizeArray.push({ value: 5, text: 5 });
+                      $scope.pageSizeArray.push({ value: 10, text: 10 });
+                      $scope.pageSizeArray.push({ value: 20, text: 20 });
+                      $scope.pageSizeArray.push({ value: 50, text: 50 });
+                      $scope.currentPage = 1;
+                      $scope.pageSize = 10;
+                  }
+
+                  function resetForm() {
+                      $scope.modalTitle = "Add New Issue";
+                      $scope.issueInfo = {};
+                      $scope.Id = '';
+                      $scope.checkUpdateId = 0;
+                      $scope.addBasic.$setUntouched();
+                      $scope.addBasic.$setPristine();
+                      //$scope.submitted = false;
+                      $scope.modalbutton = 'Save';
+                  }
+
+                  function resetFormSub() {
+                      $scope.modalTitle = "Add New Sub Issue";
+                      $scope.issueInfo = {};
+                      $scope.Id = '';
+                      $scope.checkIsSubEdit = 0;
+                      $scope.addBasic.$setUntouched();
+                      $scope.addBasic.$setPristine();
+                      //$scope.submitted = false;
+                      $scope.modalbutton = 'Save Sub';
+                  }
+
+                  $scope.save = function save() {
+                      if ($scope.addBasic.$invalid)
+                          return;
+                      else {
+                          var result = validation();
+                          if (result) {
+                              if ($scope.checkUpdateId != 10002) {
+                                  $http({
+                                      method: 'POST',
+                                      url: baseUrl + 'TaskManagement/AddIssue',
+                                      data: $scope.issueInfo
+                                  }).then(function successCallback(response) {
+                                      $('#addmodal').modal('toggle');
+                                      toastr["info"](response.data.message);
+                                      getAllissue();
+                                      resetForm();
+                                  }, function errorCallback(response) {
+                                      toastr["warning"](response.data.Message);
+                                  });
+                              }
+                              if ($scope.checkUpdateId == 10002) {
+                                  $http({
+                                      method: 'PUT',
+                                      url: baseUrl + 'TaskManagement/UpdateIssue',
+                                      data: $scope.issueInfo
+                                  }).then(function successCallback(response) {
+                                      toastr["info"](response.data.message);
+                                      if (response.data.httpStatusCode != 305) {
+                                          $('#addmodal').modal('toggle');
+                                          getAllissue();
+                                          resetForm();
+                                      }
+
+                                  }, function errorCallback(response) {
+                                      toastr["warning"](response.data.Message);
+                                  });
+                              }
+                          }
+                      }
+                  }
+
+                  $scope.deleteIssue = function deleteIssue(id) {
+                      SweetAlert.swal({
+                          title: "Are you sure to delete it ?", type: "warning", showCancelButton: true, confirmButtonColor: "#DD6B55",
+                          confirmButtonText: "Yes, delete it!",
+                          closeOnConfirm: false
+                      },
+                        function (isConfirm) {
+                            if (isConfirm) {
+                                $http({
+                                    method: 'DELETE',
+                                    url: baseUrl + 'TaskManagement/DeleteIssue/' + id,
+                                }).then(function successCallback(response) {
+                                    SweetAlert.swal("Deleted!", "Your data has been deleted.", "success");
+                                    getAllissue();
+                                }, function errorCallback(response) {
+                                    toastr["error"](response.data.Message);
+                                });
+                            }
+                        });
+                  }
+
+                  $scope.editIssue = function editIssue(item) {
+                      $scope.modalTitle = "Update Issue";
+                      $scope.modalbutton = 'Update';
+                      $scope.issueInfo.Id = item.Id;
+                      $scope.issueInfo.Title = item.Title;
+                      $scope.issueInfo.Description = item.Description;
+                      $scope.issueInfo.ProjectId = item.ProjectId;
+                      $scope.issueInfo.ClientId = item.ClientId;
+                      $scope.issueInfo.IssueTypeId = item.IssueTypeId;
+                      $scope.issueInfo.AssigneeId = item.AssigneeId.toString();
+                      $scope.issueInfo.Priority = item.Priority;
+                      $scope.issueInfo.SprintId = item.SprintId;
+
+                      $scope.checkUpdateId = 10002;
+                  }
+
+                  function getAllissue() {
+                      $scope.issueList = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'TaskManagement/GetAllIssue/'
+                      }).then(function successCallback(response) {
+                          $scope.issueList = response.data.results;
+                      }, function errorCallback(response) {
+                          toastr["info"](response.data.Message);
+                      });
+                  }
+
+                  function getAllIssueType() {
+                      $scope.issueTypeList = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'TaskManagement/GetAllIssueType/'
+                      }).then(function successCallback(response) {
+                          $scope.issueTypeList = response.data.results;
+                      }, function errorCallback(response) {
+                          toastr["info"](response.data.Message);
+                      });
+                  }
+
+                  function getAllProject() {
+                      $scope.ProjectList = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'TaskManagement/GetAllProject/'
+                      }).then(function successCallback(response) {
+                          $scope.ProjectList = response.data.results;
+                      }, function errorCallback(response) {
+                          toastr["warning"](response.data.Message);
+                      });
+                  }
+
+                  function getAllClient() {
+                      $scope.ClientList = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Client/GetAllClient/'
+                      }).then(function successCallback(response) {
+                          $scope.ClientList = response.data.results;
+                      }, function errorCallback(response) {
+                          toastr["info"](response.data.Message);
+                      });
+                  }
+
+
+                  function getAllSprint() {
+                      $scope.SprintList = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'TaskManagement/GetAllSprint/'
+                      }).then(function successCallback(response) {
+                          $scope.SprintList = response.data.results;
+                      }, function errorCallback(response) {
+                          toastr["warning"](response.data.Message);
+                      });
+                  }
+
+
+
+
+
+
+                  $scope.saveSub = function saveSub() {
+                      if ($scope.addBasic.$invalid)
+                          return;
+                      else {
+                          var result = validation();
+                          if (result) {
+                              if ($scope.checkIsSubEdit == 0) {
+                                  $http({
+                                      method: 'POST',
+                                      url: baseUrl + 'TaskManagement/AddSubIssue',
+                                      data: $scope.issueInfo
+                                  }).then(function successCallback(response) {
+                                      $('#addmodalSub').modal('toggle');
+                                      toastr["info"](response.data.message);
+                                      getAllissue();
+                                      resetFormSub();
+                                  }, function errorCallback(response) {
+                                      toastr["warning"](response.data.Message);
+                                  });
+                              }
+
+                              if ($scope.checkIsSubEdit == 1) {
+                                  $http({
+                                      method: 'PUT',
+                                      url: baseUrl + 'TaskManagement/UpdateIssue',
+                                      data: $scope.issueInfo
+                                  }).then(function successCallback(response) {
+                                      toastr["info"](response.data.message);
+                                      if (response.data.httpStatusCode != 305) {
+                                          $('#addmodal').modal('toggle');
+                                          getAllissue();
+                                          resetForm();
+                                      }
+
+                                  }, function errorCallback(response) {
+                                      toastr["warning"](response.data.Message);
+                                  });
+                              }
+                          }
+                      }
+                  }
+
+
+
+
+                 $scope.saveSubIssue = function saveSubIssue(item) {
+                     $scope.CreateSubIssuefor = item.Title;
+                     $scope.checkIsSubEdit = 0;
+                      //$scope.issueInfo.Id = item.Id;
+                      //$scope.issueInfo.Title = item.Title;
+                      //$scope.issueInfo.Description = item.Description;
+                      //$scope.issueInfo.ProjectId = item.ProjectId;
+                      //$scope.issueInfo.ClientId = item.ClientId;
+                      //$scope.issueInfo.IssueTypeId = item.IssueTypeId;
+                      //$scope.issueInfo.AssigneeId = item.AssigneeId.toString();
+                      //$scope.issueInfo.Priority = item.Priority;
+                      //$scope.issueInfo.SprintId = item.SprintId;
+                      $scope.issueInfo.ParentId = item.Id;
+
+                 }
+
+                  $scope.editSubIssue = function editSubIssue(item) {
+                      $scope.modalTitle = "Update Sub Issue";
+                      $scope.modalbutton = 'Update Sub';
+                      //$scope.issueInfo.Id = item.Id;
+                      //$scope.issueInfo.Title = item.Title;
+                      $scope.issueInfo.Description = item.Description;
+                      $scope.issueInfo.ProjectId = item.ProjectId;
+                      $scope.issueInfo.ClientId = item.ClientId;
+                      $scope.issueInfo.IssueTypeId = item.IssueTypeId;
+                      $scope.issueInfo.AssigneeId = item.AssigneeId.toString();
+                      $scope.issueInfo.Priority = item.Priority;
+                      $scope.issueInfo.SprintId = item.SprintId;
+                      $scope.issueInfo.ParentId = item.Id;
+
+                      $scope.checkIsSubEdit = 1;
+                  }
+
+
+
+
+                  function validation() {
+
+                      if ($scope.issueInfo.Id == undefined) {
+                          return true;
+                      }
+                      else {
+                          if ($scope.issueInfo.ProjectId == null) {
+                              toastr["info"]("Please Select any option..!");
+                              return false;
+                          }
+
+                          else {
+                              //$scope.issueInfo.ActivityStatus = $scope.issueInfo.ActivityStatus;
+                              return true;
+                          }
+                      }
+                  }
+              }]);
+
+    </script>
+}
+

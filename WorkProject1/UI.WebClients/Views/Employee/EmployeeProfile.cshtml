@@ -1,0 +1,861 @@
+﻿@{
+    ViewBag.Title = "My Profile";
+}
+<style type="text/css">
+    /*Profile pic style*/
+    .preview {
+        padding: 10px;
+        position: relative;
+    }
+
+        .preview i {
+            color: white;
+            font-size: 25px;
+            transform: translate(20px,75px);
+        }
+
+    .preview-img {
+        border-radius: 100%;
+        box-shadow: 0px 0px 5px 2px rgba(0,0,0,0.7);
+        width: 100px;
+        height: 100px;
+    }
+
+    .browse-button {
+        width: 100px;
+        height: 100px;
+        border-radius: 100%;
+        position: absolute;
+        top: 10px;
+        left: 37px;
+        background: linear-gradient(180deg, transparent, black);
+        opacity: 0;
+        transition: 0.3s ease;
+    }
+
+        .browse-button:hover {
+            opacity: 1;
+        }
+
+    .browse-input {
+        width: 100px;
+        height: 100px;
+        border-radius: 100%;
+        transform: translate(-1px,-26px);
+        opacity: 0;
+        cursor: pointer;
+    }
+
+    .nameText {
+        margin-bottom: 20px;
+    }
+
+        .nameText p {
+            margin-bottom: 0px;
+        }
+
+    /*End profile pic*/
+
+    .tabs-left > .nav-tabs {
+        border-bottom: 0;
+    }
+
+    div#MyAccountsTab {
+        width: 99%;
+        overflow: hidden;
+    }
+
+    .tab-content > .tab-pane {
+        display: none;
+    }
+
+    .tab-content > .active {
+        display: block;
+    }
+
+    .tabs-left > .nav-tabs > li {
+        float: none;
+        width: 100%;
+    }
+
+        .tabs-left > .nav-tabs > li > a,
+        .tabs-left > .nav-tabs > li > div {
+            margin-right: 0;
+            margin-bottom: 3px;
+        }
+
+    .tabs-left > .nav-tabs {
+        float: right;
+        margin-right: 19px;
+        border-right: 1px solid #ddd;
+    }
+
+        .tabs-left > .nav-tabs > li > a,
+        .tabs-left > .nav-tabs > li > div {
+            margin-right: -1px;
+            -webkit-border-radius: 4px 0 0 4px;
+            -moz-border-radius: 4px 0 0 4px;
+            border-radius: 4px 0 0 4px;
+        }
+
+        .tabs-left > .nav-tabs > li > div {
+            background-color: #F2F6F9;
+        }
+
+            .tabs-left > .nav-tabs > li > a:hover,
+            .tabs-left > .nav-tabs > li > a:focus,
+            .tabs-left > .nav-tabs > li > div:hover,
+            .tabs-left > .nav-tabs > li > div:focus {
+                border-color: #eeeeee #dddddd #eeeeee #eeeeee;
+                background-color: #eeeeee;
+            }
+
+        .tabs-left > .nav-tabs .active > a,
+        .tabs-left > .nav-tabs .active > a:hover,
+        .tabs-left > .nav-tabs .active > a:focus,
+        .tabs-left > .nav-tabs .active > div,
+        .tabs-left > .nav-tabs .active > div:hover,
+        .tabs-left > .nav-tabs .active > div:focus {
+            border-color: #ddd transparent #ddd #ddd;
+            *border-right-color: #ffffff;
+        }
+    /** Let tabls-left class be available in bootstrap 3.3.7 - F **/
+
+    .account-type {
+        font-family: 'Roboto', sans-serif;
+        color: #A0AEB6;
+        font-size: 18px;
+        font-weight: bold;
+        line-height: 18px;
+    }
+
+    .account-amount {
+        font-family: 'Roboto', sans-serif;
+        color: #A0AEB6;
+        font-size: 14px;
+        line-height: 16px;
+    }
+
+    /* TABS */
+    .tabs-left > .nav-tabs {
+        margin-right: 0px;
+        padding: 0;
+        height: 700px; /* Debe ser el mismo height que el que tenga .tab-content */
+    }
+
+    /* CONTENIDO DE LOS TABS */
+    .tab-content {
+        border: solid 1px #DCE1E5;
+        border-left-style: none;
+        border-top-style: none;
+        border-bottom-style: none;
+        min-height: 700px;
+        padding-left: 0px;
+        border-radius: 0px 4px 4px 4px;
+        -moz-border-radius: 0px 4px 4px 4px;
+        -webkit-border-radius: 0px 4px 4px 4px;
+        -webkit-box-shadow: 0px 0px 18px 2px rgba(0,0,0,0.05);
+        -moz-box-shadow: 0px 0px 18px 2px rgba(0,0,0,0.05);
+        box-shadow: 0px 0px 18px 2px rgba(0,0,0,0.05);
+        overflow: hidden;
+    }
+
+        .tab-content > div {
+            margin-top: 26px;
+        }
+
+    /* Formato del tab activo */
+    .tabs-left > .nav-tabs .active > a,
+    .tabs-left > .nav-tabs .active > a:hover,
+    .tabs-left > .nav-tabs .active > a:focus,
+    .tabs-left > .nav-tabs .active div,
+    .tabs-left > .nav-tabs .active div:hover,
+    .tabs-left > .nav-tabs .active div:focus {
+        background-color: #FFFFFF;
+        border-bottom-style: none;
+        border-left-style: none;
+        /*border-bottom: 1px solid #DCE1E5;*/
+        /*border-left: 1px solid #DCE1E5;*/
+        border-bottom-left-radius: 0px;
+        border-right-style: none;
+        margin-right: -1px;
+        -webkit-box-shadow: -4px 0px 18px -1px rgba(0,0,0,0.05);
+        -moz-box-shadow: -4px 0px 18px -1px rgba(0,0,0,0.05);
+        box-shadow: -4px 0px 18px -1px rgba(0,0,0,0.05);
+    }
+
+    /* Formato de los tabs en general */
+    .tabs-left > .nav-tabs > li:nth-child(1) > a,
+    .tabs-left > .nav-tabs > li:nth-child(1) > a:hover,
+    .tabs-left > .nav-tabs > li:nth-child(1) > a:focus,
+    .tabs-left > .nav-tabs > li:nth-child(1) > div,
+    .tabs-left > .nav-tabs > li:nth-child(1) > div:hover,
+    .tabs-left > .nav-tabs > li:nth-child(1) > div:focus {
+        cursor: pointer;
+        border-top-left-radius: 4px;
+        width: 100%;
+    }
+
+    .tabs-left > .nav-tabs > li.active:nth-child(1) > a,
+    .tabs-left > .nav-tabs > li.active:nth-child(1) > a:hover,
+    .tabs-left > .nav-tabs > li.active:nth-child(1) > a:focus,
+    .tabs-left > .nav-tabs > li.active:nth-child(1) > div,
+    .tabs-left > .nav-tabs > li.active:nth-child(1) > div:hover,
+    .tabs-left > .nav-tabs > li.active:nth-child(1) > div:focus {
+        border-top-left-radius: 4px;
+        border-bottom-style: none;
+        border-left: 1px solid #DCE1E5;
+    }
+
+    .tabs-left > .nav-tabs > li > a,
+    .tabs-left > .nav-tabs > li > div {
+        display: table;
+        /*border: solid 1px transparent;*/
+        margin-right: -1px;
+        margin-bottom: 0;
+        padding-bottom: 0;
+        height: 50px;
+        border: solid 1px #DCE1E5;
+        border-radius: 0px;
+        width: 100%;
+        cursor: pointer;
+    }
+
+    /* Style of the div element acting as tab content */
+    .tabbable.tabs-left > .nav-tabs > li > div > div {
+        display: table-cell;
+        vertical-align: middle;
+        padding: 0px 12px 0px 12px;
+        min-width: 105px;
+        max-width: 105px;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        overflow: hidden;
+    }
+
+    .emppropfilesideNAv {
+        margin-top: -35px !important;
+        height: 66px !important;
+    }
+</style>
+
+<div class="kt-container  kt-container--fluid  kt-grid__item kt-grid__item--fluid" ng-controller="MyProfile">
+    <div class="row">
+        <div class="kt-portlet kt-portlet--mobile">
+            <div class="kt-portlet__head kt-portlet__head--lg">
+                <div class="kt-portlet__head-label">
+                    <h3 class="kt-portlet__head-title">
+                        <!----Titel Text-->
+                        @ViewBag.Title
+                        <!----Titel Text -->
+                    </h3>
+                </div>
+            </div>
+
+            <div class="kt-portlet__body">
+
+
+                <div class="row">
+                    <div id="MyAccountsTab" class="tabbable tabs-left">
+                        <ul class="nav nav-tabs col-md-2">
+                            <div class="profileImage">
+                                <div class="preview text-center">
+                                    <img ng-show="Employee.EmpBasicInfo.Image!=null" class="preview-img" data-ng-src="@String.Format("data:image/jpg;base64,{0}", "{{Employee.EmpBasicInfo.Image}}")" alt="" width="200" height="200" />
+                                    <img ng-show="Employee.EmpBasicInfo.Image==null" class="preview-img" src="~/assets/global/no image.jpg" alt="Preview Image" width="200" height="200" />
+                                </div>
+                                <div class="nameText text-center">
+                                    <p class="sbold font-green">{{Employee.EmpBasicInfo.FullName}}</p>
+                                    <p>{{Employee.EmpBasicInfo.EmpID}}</p>
+                                    <p>{{Employee.EmpBasicInfo.DesignationName}}</p>
+                                </div>
+                            </div>
+
+                            <li class="active">
+                                <div data-target="#lA" data-toggle="tab" class="emppropfilesideNAv">
+                                    <div>
+                                        <span class="account-type">Basic Info</span>
+                                    </div>
+                                </div>
+                            </li>
+                            <li>
+                                <div data-target="#lB" data-toggle="tab" class="emppropfilesideNAv">
+                                    <div>
+                                        <span class="account-type">Contact Info</span>
+                                    </div>
+                                </div>
+                            </li>
+                            <li>
+                                <div data-target="#Education" data-toggle="tab" class="emppropfilesideNAv">
+                                    <div>
+                                        <span class="account-type">Education</span><br />
+                                    </div>
+                                </div>
+                            </li>
+                            <li ng-show="'@ViewBag.UserName' == 'admin' || '@ViewBag.UserName' == '55006' || '@ViewBag.UserName' == '6738' || '@ViewBag.UserName' == '6740'">
+                                <div data-target="#PayrollBlock" data-toggle="tab" class="emppropfilesideNAv">
+                                    <div>
+                                        <span class="account-type">Payroll Info</span>
+                                    </div>
+                                </div>
+                            </li>
+                            <li>
+                                <div data-target="#JobHistory" data-toggle="tab" class="emppropfilesideNAv">
+                                    <div>
+                                        <span class="account-type">Job History</span>
+                                    </div>
+                                </div>
+                            </li>
+                            <li>
+                                <div data-target="#Training" data-toggle="tab" class="emppropfilesideNAv">
+                                    <div>
+                                        <span class="account-type">Training</span>
+                                    </div>
+                                </div>
+                            </li>
+                            <li>
+                                <div data-target="#Atten" data-toggle="tab" class="emppropfilesideNAv">
+                                    <div>
+                                        <span class="account-type">HRM</span>
+                                    </div>
+                                </div>
+                            </li>
+                            <li>
+                                <div data-target="#Nominee" data-toggle="tab" class="emppropfilesideNAv">
+                                    <div>
+                                        <span class="account-type">Nominee</span>
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                        <div class="tab-content col-md-10">
+                            <div class="tab-pane active" id="lA">
+                                <div>
+                                    <div class="col-md-12 col-sm-12 col-xs-12">
+                                        <div class="row" style="margin-right:5px">
+                                            <div class="col-md-12 col-sm-12">
+                                                <div style="background-color:#1ddbdb" class="success form-control">Institute Information</div>
+                                                <div class="table-scrollable">
+                                                    <table class="table table-striped">
+                                                        <tbody>
+                                                            <tr>
+
+                                                                <td class="warning" width="20%"> Branch </td>
+                                                                <td class="">{{Employee.EmpBasicInfo.BranchName}}  </td>
+                                                                <td class="danger" width="20%"> Shift </td>
+                                                                <td class="">{{Employee.EmpBasicInfo.ShiftName}} </td>
+
+                                                            </tr>
+                                                            <tr>
+                                                                <td class="success" width="20%"> Section </td>
+                                                                <td class="">{{Employee.EmpBasicInfo.SectionName}}  </td>
+                                                                <td class="warning" width="20%"> Status </td>
+                                                                <td class="" ng-show="Employee.EmpBasicInfo.Status=='A'">Active</td>
+                                                                <td class="" ng-hide="Employee.EmpBasicInfo.Status=='A'">In-Active</td>
+                                                                <td class="danger" width="20%"> Subject</td>
+                                                                <td class="">{{Employee.EmpBasicInfo.SubjectName}}  </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td class="success" width="20%"> Department </td>
+                                                                <td class="">{{Employee.EmpBasicInfo.DepartmentName}}  </td>
+                                                                <td class="warning" width="20%"> Designation </td>
+                                                                <td class="">{{Employee.EmpBasicInfo.DesignationName}} </td>
+                                                                <td class="danger" width="20%"> Category </td>
+                                                                <td class="">{{Employee.EmpBasicInfo.CategoryName}}</td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-12 col-sm-12 col-xs-12" style="padding:0">
+                                                <div style="background-color:#1ddbdb" class="success form-control">Employee Information</div>
+                                                <div class="row">
+                                                    <div class="col-md-6 col-sm-6 col-xs-6">
+
+                                                        <table class="table table-hover">
+
+                                                            <tr class="">
+                                                                <th> Name</th>
+                                                                <td>{{Employee.EmpBasicInfo.FullName}}</td>
+                                                            </tr>
+                                                            <tr class="">
+                                                                <th> Gender</th>
+                                                                <td>{{Employee.EmpBasicInfo.Gender}}  </td>
+                                                            </tr>
+                                                            <tr class="">
+                                                                <th>Blood Group</th>
+                                                                <td>{{Employee.EmpBasicInfo.BloodGroup}} </td>
+                                                            </tr>
+                                                            <tr class="">
+                                                                <th> Date Of Birth</th>
+                                                                <td> {{Employee.EmpBasicInfo.DateOfBirth | date:'dd/MM/yyyy'}}</td>
+                                                            </tr>
+                                                            <tr class="">
+                                                                <th>Father's Name </th>
+                                                                <td>{{Employee.EmpBasicInfo.FatherName}}</td>
+                                                            </tr>
+                                                            <tr class="">
+                                                                <th> Mother's Name </th>
+                                                                <td> {{Employee.EmpBasicInfo.MotherName}}</td>
+                                                            </tr>
+                                                            <tr class="">
+                                                                <th> Merital Status</th>
+                                                                <td>{{Employee.EmpBasicInfo.MaritalStatus}}  </td>
+                                                            </tr>
+                                                            <tr class="">
+                                                                <th> Spouse Name</th>
+                                                                <td>{{Employee.EmpBasicInfo.SpouseName}}  </td>
+                                                            </tr>
+                                                            <tr class="">
+                                                                <th> Spouse Mobile</th>
+                                                                <td>{{Employee.EmpBasicInfo.SpouseMobile}}  </td>
+                                                            </tr>
+
+                                                            <tr class="">
+                                                                <th> Nationality</th>
+                                                                <td>{{Employee.EmpBasicInfo.Nationality}}  </td>
+                                                            </tr>
+                                                            <tr class="">
+                                                                <th> Joining Date</th>
+                                                                <td>{{Employee.EmpBasicInfo.JoiningDate | date:'dd/MM/yyyy'}} </td>
+                                                            </tr>
+
+                                                        </table>
+                                                    </div>
+
+                                                    <div class="col-md-6 col-sm-6 col-xs-6">
+
+                                                        <table class="table table-hover">
+
+                                                            <tr class="">
+                                                                <th> Probation End Date</th>
+                                                                <td>{{Employee.EmpBasicInfo.ProbationPeriodEndDate | date:'dd/MM/yyyy'}}</td>
+                                                            </tr>
+                                                            <tr class="">
+                                                                <th> Confirmation Date</th>
+                                                                <td>{{Employee.EmpBasicInfo.ConfirmationDate | date:'dd/MM/yyyy'}}  </td>
+                                                            </tr>
+                                                            <tr class="">
+                                                                <th>Religion</th>
+                                                                <td>{{Employee.EmpBasicInfo.Religion}}</td>
+                                                            </tr>
+                                                            <tr class="">
+                                                                <th> National ID</th>
+                                                                <td>{{Employee.EmpBasicInfo.NationalID}} </td>
+                                                            </tr>
+                                                            <tr class="">
+                                                                <th> Passport No</th>
+                                                                <td> {{Employee.EmpBasicInfo.PassportNo}}</td>
+                                                            </tr>
+                                                            <tr class="">
+                                                                <th>Expire Date</th>
+                                                                <td> {{Employee.EmpBasicInfo.PPExpireDate | date:'dd/MM/yyyy'}}</td>
+                                                            </tr>
+                                                            <tr class="">
+                                                                <th> Index No</th>
+                                                                <td> {{Employee.EmpBasicInfo.MPOIndexNo}}</td>
+                                                            </tr>
+                                                            <tr class="">
+                                                                <th> Birth Certificate</th>
+                                                                <td> {{Employee.EmpBasicInfo.BirthCertificate}}</td>
+                                                            </tr>
+                                                            <tr class="">
+                                                                <th> Child/Children in CGSD</th>
+                                                                <td> {{Employee.EmpBasicInfo.Child}}</td>
+                                                            </tr>
+                                                            <tr class="">
+                                                                <th> Medical Advice/Medicine</th>
+                                                                <td> {{Employee.EmpBasicInfo.DrawbackMedicine}}</td>
+                                                            </tr>
+                                                            @*<tr class="">
+                                                                    <th> Re</th>
+                                                                    <td> {{Employee.EmpBasicInfo.Description}}</td>
+                                                                </tr>*@
+
+                                                            <tr>
+                                                                <th>Reason of Leaving</th>
+                                                                <td ng-show="Employee.EmpBasicInfo.Status=='D'">{{Employee.EmpBasicInfo.Reason}} </td>
+                                                            </tr>
+
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div><!--End first tab-->
+                            <div class="tab-pane" id="lB">
+                                <div>
+                                    <div class="col-md-12 col-sm-12 col-xs-12">
+                                        <div class="row" style="margin-right:5px">
+                                            <div class="col-md-12 col-sm-12">
+                                                <div style="background-color:#1ddbdb" class="success form-control">Contact Information</div>
+                                                <div class="table-scrollable">
+                                                    <table class="table table-striped">
+                                                        <tbody>
+                                                            <tr>
+                                                                <td class="success" width="25%"> Emergency Contact No </td>
+                                                                <td width="25%">{{Employee.EmpBasicInfo.EmergencyContactNo}}</td>
+
+                                                                <td class="success" width="25%"> SMS Notification No </td>
+                                                                <td class="" width="25%">{{Employee.EmpBasicInfo.SMSNotificationNo}}  </td>
+
+
+                                                            </tr>
+                                                            <tr>
+                                                                <td class="warning" width="20%"> Home Phone No </td>
+                                                                <td class="">{{Employee.EmpBasicInfo.ContactHomeNo}}  </td>
+                                                                <td class="success" width="25%"> Personal Contact No </td>
+                                                                <td class="" width="25%">{{Employee.EmpBasicInfo.MobileNo}}  </td>
+
+                                                            </tr>
+                                                            <tr>
+                                                                <td class="success" width="25%"> Email </td>
+                                                                <td width="25%">{{Employee.EmpBasicInfo.Email}}</td>
+                                                                <td class="warning">E.C. Relation: </td>
+                                                                <td class="" width="20%">{{Employee.EmpBasicInfo.EmergencyContactRelation}}  </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td class="warning" width="20%"> Office Phone No </td>
+                                                                <td class="">{{Employee.EmpBasicInfo.ContactOfficeNo}}  </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-12 col-sm-12 col-xs-12" style="padding:0">
+                                                <div class="col-md-6 col-sm-6 col-xs-6">
+
+                                                    <table class="table table-hover">
+                                                        <div style="background-color:#1ddbdb;margin-top:10px" class="success form-control">Present Address</div>
+                                                        <tr class="">
+                                                            <th> House/Road</th>
+                                                            <td>{{Employee.EmpBasicInfo.PresentAddress}} </td>
+                                                        </tr>
+                                                        <tr class="">
+                                                            <th>Post Office</th>
+                                                            <td>{{Employee.EmpBasicInfo.PresentPost}} </td>
+                                                        </tr>
+                                                        <tr class="">
+                                                            <th> Thana</th>
+                                                            <td> {{Employee.EmpBasicInfo.PresentThana}}</td>
+                                                        </tr>
+                                                        <tr class="">
+                                                            <th>District </th>
+                                                            <td>{{Employee.EmpBasicInfo.PresentDistrict}}</td>
+                                                        </tr>
+                                                    </table>
+                                                </div>
+
+                                                <div class="col-md-6 col-sm-6 col-xs-6">
+                                                    <table class="table table-hover">
+                                                        <div style="background-color:#1ddbdb;margin-top:10px" class="success form-control">Permanent Address</div>
+                                                        <tr class="">
+                                                            <th> House/Road</th>
+                                                            <td>{{Employee.EmpBasicInfo.PermanentAddress}}</td>
+                                                        </tr>
+                                                        <tr class="">
+                                                            <th>Post Office</th>
+                                                            <td>{{Employee.EmpBasicInfo.PermanentPost}} </td>
+                                                        </tr>
+                                                        <tr class="">
+                                                            <th> Thana</th>
+                                                            <td> {{Employee.EmpBasicInfo.PermanentThana}}</td>
+                                                        </tr>
+                                                        <tr class="">
+                                                            <th>District </th>
+                                                            <td>{{Employee.EmpBasicInfo.PermanentDistrict}}</td>
+                                                        </tr>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div><!--End 2nd tab-->
+                            <div class="tab-pane" id="Education">
+                                <div class="col-md-12 col-sm-12 col-xs-12">
+                                    <div class="row" style="margin-right:5px">
+                                        <div class="col-md-12 col-sm-12 col-xs-12" style="padding:0">
+                                            <table class="table table-hover">
+                                                <div style="background-color:#1ddbdb;margin-top:10px" class="success form-control">Education Information</div>
+                                                <thead>
+                                                    <tr>
+                                                        <th>Exam Name</th>
+                                                        <th>Institute Name</th>
+                                                        <th>Year</th>
+                                                        <th>GPA/Division</th>
+                                                        <th>Board</th>
+                                                        <th>Group</th>
+
+
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr ng-repeat="item in Employee.EmployeeEducationalInfo">
+                                                        <td>{{item.ExamName}}</td>
+                                                        <td>{{item.ExamInstituteName}}</td>
+                                                        <td>{{item.ExamPasYear}}</td>
+                                                        <td>{{item.ExamTotal}}</td>
+                                                        <td>{{item.ExamBoard}}</td>
+                                                        <td>{{item.ExamGroupName}}</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>  <!--End 3rd tab-->
+                            <div class="tab-pane" id="PayrollBlock">
+                                <div class="col-md-12 col-sm-12 col-xs-12">
+                                    <div class="row" style="margin-right:5px">
+                                        <div class="col-md-12 col-sm-12 col-xs-12" style="padding:0">
+                                            <table class="table table-hover">
+                                                <div style="background-color:#1ddbdb;margin-top:10px" class="success form-control">Payroll Information</div>
+                                                <tbody>
+                                                    <tr>
+                                                        <th>Salary A/C No</th>
+                                                        <td>{{Employee.EmpBasicInfo.SalaryACNo}}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>Bank Name</th>
+                                                        <td>{{Employee.EmpBasicInfo.BankName}}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>Bank Branch</th>
+                                                        <td>{{Employee.EmpBasicInfo.BranchName}}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>PF A/C No</th>
+                                                        <td>{{Employee.EmpBasicInfo.PFACNo}}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>PF Bank Name</th>
+                                                        <td>{{Employee.EmpBasicInfo.PFBankName}}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>PF Bank Branch</th>
+                                                        <td>{{Employee.EmpBasicInfo.PFBankBranch}}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>Welfare A/C NO</th>
+                                                        <td>{{Employee.EmpBasicInfo.WelfareACNo}}</td>
+
+                                                    </tr>
+                                                    <tr>
+                                                        <th>MemberShip No.</th>
+                                                        <td>{{Employee.EmpBasicInfo.MembershipNo}}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>Tin No.</th>
+                                                        <td>{{Employee.EmpBasicInfo.TINNo}}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>Joining Salary</th>
+                                                        <td>{{Employee.EmpBasicInfo.JoiningSalary}}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>Confirmation Salary</th>
+                                                        <td>{{Employee.EmpBasicInfo.ConfirmationSalary}}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th>Current Salary/Gross Salary</th>
+                                                        <td>{{Employee.EmpBasicInfo.CurrentSalary}}</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>  <!--End 4th tab-->
+                            <div class="tab-pane" id="JobHistory">
+                                <div class="col-md-12 col-sm-12 col-xs-12">
+                                    <div class="row" style="margin-right:5px">
+                                        <div class="col-md-12 col-sm-12 col-xs-12" style="padding:0">
+                                            <table class="table table-hover">
+                                                <div style="background-color:#1ddbdb;margin-top:10px" class="success form-control">Job History</div>
+                                                <thead>
+                                                    <tr>
+                                                        <th>Company Name</th>
+                                                        <th>Designation</th>
+                                                        <th>Area Of Experiance</th>
+                                                        <th>From</th>
+                                                        <th>To</th>
+                                                        <th>Year Of Experiance</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr ng-repeat="item in Employee.EmpJobHistory">
+                                                        <td>{{item.Companyname}}</td>
+                                                        <td>{{item.Designation}}</td>
+                                                        <td>{{item.AreaOfExperiance}}</td>
+                                                        <td>{{item.From | date:'dd/MM/yyyy'}}</td>
+                                                        <td>{{item.To | date:'dd/MM/yyyy'}}</td>
+                                                        <td>{{item.YearOfExperiance}}</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>  <!--End 5th tab-->
+                            <div class="tab-pane" id="Training">
+                                <div class="col-md-12 col-sm-12 col-xs-12">
+                                    <div class="row" style="margin-right:5px">
+                                        <div class="col-md-12 col-sm-12 col-xs-12" style="padding:0">
+                                            <table class="table table-hover">
+                                                <div style="background-color:#1ddbdb;margin-top:10px" class="success form-control">Training Information</div>
+                                                <thead>
+                                                    <tr>
+                                                        <th>Title</th>
+                                                        <th>Topics</th>
+                                                        <th>Institution </th>
+                                                        <th>Country</th>
+                                                        <th>Location</th>
+                                                        <th>From Date</th>
+                                                        <th>To Date</th>
+                                                        <th>Running</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr ng-repeat="item in Employee.EmpTraining">
+                                                        <td>{{item.Title}}</td>
+                                                        <td>{{item.TopicsCovered}}</td>
+                                                        <td>{{item.InstituteName}}</td>
+                                                        <td>{{item.TrainingCountry}}</td>
+                                                        <td>{{item.TrainingLocation}}</td>
+                                                        <td>{{item.FromDate | date:'dd/MM/yyyy'}}</td>
+                                                        <td>{{item.ToDate | date:'dd/MM/yyyy' }}</td>
+                                                        <td ng-show="item.EmpTraining_IsContinued==false">No</td>
+                                                        <td ng-show="item.EmpTraining_IsContinued==true">Yes</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div><!--End 6th tab-->
+                            <div class="tab-pane" id="Atten">
+                                <div>
+                                    <table class="table table-no-bordered table-hover">
+                                        <div style="background-color:#1ddbdb;margin-top:10px" class="success form-control">HRM</div>
+
+                                        <thead style="font-weight:bold">
+                                            <tr>
+                                                <td>Card No</td>
+                                                <td>Leave Type</td>
+                                                <td>Device ID</td>
+                                            </tr>
+                                        </thead>
+                                        <tr>
+                                            <td>{{Employee.EmpBasicInfo.CardNo}}</td>
+                                            <td>{{Employee.EmpBasicInfo.TypeName}}</td>
+                                            <td>{{Employee.EmpBasicInfo.DeviceUserID}}</td>
+
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="tab-pane" id="Nominee">
+                                <div class="col-md-12 col-sm-12 col-xs-12">
+                                    <div class="row" style="margin-right:5px">
+                                        <div class="col-md-12 col-sm-12 col-xs-12" style="padding:0">
+                                            <table class="table table-no-bordered table-hover">
+                                                <div style="background-color:#1ddbdb;margin-top:10px" class="success form-control">Nominee Details</div>
+                                                <thead style="font-weight:bold">
+                                                    <tr>
+                                                        <td>Photo</td>
+                                                        <td>Name</td>
+                                                        <td>Relation</td>
+                                                        <td>NID</td>
+                                                        <td>Address</td>
+                                                    </tr>
+                                                </thead>
+                                                <tr ng-repeat="item in Employee.EmpNominee">
+                                                    <td>
+                                                        <img data-ng-src="@String.Format("data:image/jpg;base64,{0}", "{{item.Picture}}")" alt="Preview Image" width="50" height="50" />
+                                                    </td>
+                                                    <td>{{item.NomineeName}}</td>
+                                                    <td>{{item.Relation}}</td>
+                                                    <td>{{item.NationalID}}</td>
+                                                    <td>{{item.PresentAddress}}</td>
+                                                </tr>
+                                            </table>
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+
+    <script type="text/javascript">
+        OEMSApp.controller("MyProfile", ["$scope", "$http", "SweetAlert", "$window",
+              function ($scope, $http, SweetAlert, $window) {
+
+                  init();
+                  function init() {
+                      initialize();
+                      getEmpInfoData();
+                  }
+                  function initialize() {
+                      $scope.res = {};
+                      $scope.data = {};
+                      $scope.Employee = {};
+
+                      $scope.Employee.EmpBasicInfo = [];
+                      $scope.Employee.EmployeeEducationalInfo = [];
+                      $scope.Employee.EmpJobHistory = [];
+                      $scope.Employee.EmpTraining = [];
+                      $scope.Employee.EmpNominee = [];
+
+                      $scope.resetForm = resetForm;
+                  }
+
+                  function resetForm() {
+                      $scope.submitted = false;
+                  }
+
+                  function getEmpInfoData() {
+                      $scope.Dropdowns = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Employee/GetEmployeeInfo/' + '@ViewBag.EmpId'
+                      }).then(function successCallback(response) {
+                          $scope.Employee = response.data.results;
+                          //console.log(response.data.results);
+                      }, function errorCallback(response) {
+                          toastr["info"](response.data.message);
+                      });
+                  }
+
+
+              }]);
+    </script>
+    <script>
+
+        $('.browse-button').bind("click", function () {
+            $('#UploadedFile').click();
+        });
+
+        function readURL(input) {
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+
+                reader.onload = function (e) {
+                    $('.preview-img')
+                        .attr('src', e.target.result);
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+    </script>
+
+}

@@ -1,0 +1,386 @@
+﻿
+
+<div class="portlet box blue-hoki" ng-controller="TabHeaderCltr">
+    <div class="portlet-title">
+        <div class="caption">
+            <i class="fa fa-user-plus"></i>Tabulation Header Setup
+        </div>
+
+    </div>
+    <div class="portlet-body form">
+        <!-- BEGIN FORM-->
+        <form class="form-horizontal" name="formCommonFeilds" ng-submit="SaveHeaderName()" novalidate>
+            <div class="form-body">
+                
+
+                <div class="row">
+                    <div class="col-md-4">
+
+                        
+
+                        <div class="form-group" ng-class="{ 'has-error' : submitted && formCommonFeilds.Version.$invalid}">
+                            <label class="col-md-5 control-label">
+                                Version :
+                                <span class="required">*</span>
+                            </label>
+                            <div class="col-md-7">
+                                <select class="form-control" ng-model="TabHeader.VersionID" required name="Version" ng-options="TabHeader.VersionId as TabHeader.VersionName for TabHeader in CommonFeilds.Version">
+                                    <option value="" selected="selected">Choose Option</option>
+                                </select>
+                                <div class="form-control-focus"> </div>
+                                <span ng-show="submitted && formCommonFeilds.Version.$error.required" class="help-block">Version Required</span>
+                            </div>
+                        </div>
+                        <div class="form-group" ng-class="{ 'has-error' : submitted && formCommonFeilds.Session.$invalid}">
+                            <label class="col-md-5 control-label">
+                                Session :
+                                <span class="required">*</span>
+                            </label>
+                            <div class="col-md-7">
+                                <select class="form-control" ng-model="TabHeader.SessionId" required name="Session" ng-options="TabHeader.SessionId as TabHeader.SessionName for TabHeader in CommonFeilds.Session">
+                                    <option value="" selected="selected">Choose Option</option>
+                                </select>
+
+                                <div class="form-control-focus"> </div>
+                                <span ng-show="submitted && formCommonFeilds.Session.$error.required" class="help-block">Session Required</span>
+                            </div>
+                        </div>
+
+                        <div class="form-group" ng-class="{ 'has-error' : submitted && formCommonFeilds.Branch.$invalid}">
+                            <label class="col-md-5 control-label">
+                                Branch :
+                                <span class="required">*</span>
+                            </label>
+                            <div class="col-md-7">
+                                <select class="form-control" ng-model="TabHeader.BranchID" required name="Branch" ng-options="TabHeader.BranchId as TabHeader.BranchName for TabHeader in CommonFeilds.Branch">
+                                    <option value="" selected="selected">Choose Option</option>
+                                </select>
+                                <div class="form-control-focus"> </div>
+                                <span ng-show="submitted && formCommonFeilds.Branch.$error.required" class="help-block">Branch Name Required</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+
+                        
+                        <div class="form-group" ng-class="{ 'has-error' : submitted && formCommonFeilds.Shift.$invalid}">
+                            <label class="col-md-5 control-label">
+                                Shift :
+                                <span class="required">*</span>
+                            </label>
+                            <div class="col-md-7">
+                                <select class="form-control" ng-model="TabHeader.ShiftID" required name="Shift" ng-options="TabHeader.ShiftId as TabHeader.ShiftName for TabHeader in CommonFeilds.Shift | filter:{BranchId:TabHeader.BranchID}:true">
+                                    <option value="" selected="selected">Choose Option</option>
+                                </select>
+                                <div class="form-control-focus"> </div>
+                                <span ng-show="submitted && formCommonFeilds.Shift.$error.required" class="help-block">Shift Name Required</span>
+                            </div>
+                        </div>
+
+                        <div class="form-group" ng-class="{ 'has-error' : submitted && formCommonFeilds.Class.$invalid}">
+                            <label class="col-md-5 control-label">
+                                Class :
+                                <span class="required">*</span>
+                            </label>
+                            <div class="col-md-7">
+                                <select class="form-control" ng-model="TabHeader.ClassId" name="Class" ng-change="GetGroup(TabHeader.ClassId)" required ng-options="TabHeader.ClassId as TabHeader.ClassName for TabHeader in CommonFeilds.ClassInfo | filter:{VersionId:TabHeader.VersionID}:true">
+                                    <option value="" selected="selected">Choose Option</option>
+                                </select>
+                                <div class="form-control-focus"> </div>
+                                <span ng-show="submitted && formCommonFeilds.Class.$error.required" class="help-block">Class Required</span>
+                            </div>
+                        </div>
+                        <div class="form-group" ng-class="{ 'has-error' : submitted && formCommonFeilds.IsGrand.$invalid}">
+                            <label class="col-md-5 control-label">
+                                Is Grand :
+                            </label>
+                            <div class="col-md-7">
+                                <input type="checkbox" width="150" height="150" ng-model="TabHeader.IsGrand" style="width:20px;height:20px;" />
+
+                                <div class="form-control-focus"> </div>
+                                <span ng-show="submitted && formCommonFeilds.IsGrand.$error.required" class="help-block">Main Exam Name Required</span>
+
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-5 control-label">
+                                Group :
+                            </label>
+                            <div class="col-md-7">
+                                <select class="form-control" ng-disabled="Groups.length <= 0" ng-change="getMainExam();" ng-model="TabHeader.GroupId" name="Group" ng-options="G.GroupId as G.GroupName for G in Groups">
+                                    <option value="" selected>Choose Option</option>
+                                </select>
+                                <div class="form-control-focus"> </div>
+
+                            </div>
+                        </div>
+                        
+                    </div>
+
+                    <div class="col-md-4">        
+                                               
+
+                        <div class="form-group" ng-class="{ 'has-error' : submitted && formCommonFeilds.mainExam.$invalid}" ng-hide="TabHeader.IsGrand==true">
+                            <label class="col-md-5 control-label">
+                                Exam Name :
+                            </label>
+                            <div class="col-md-7">
+                                <select class="form-control" ng-model="TabHeader.ExamId" required ng-change="GetTabHeaderName()" name="mainExam" ng-options="mainexam.MainExamId as mainexam.MainExamName for mainexam in MainExams">
+                                    <option value="" selected="selected">Choose Option</option>
+                                </select>
+                                <div class="form-control-focus"> </div>
+                                <span ng-show="submitted && formCommonFeilds.mainExam.$error.required" class="help-block">Exam Name Required</span>
+
+                            </div>
+                        </div>
+                        <div class="form-group" ng-class="{ 'has-error' : submitted && formCommonFeilds.GrandExam.$invalid}" ng-show="TabHeader.IsGrand==true">
+                            <label class="col-md-5 control-label">
+                                Exam Name :
+                            </label>
+                            <div class="col-md-7">
+                                <select class="form-control" ng-model="TabHeader.ExamId" ng-change="GetTabHeaderName()" required name="GrandExam" ng-options="GrandExam.GrandExamId as GrandExam.GrandExamName for GrandExam in GrandExams">
+                                    <option value="" selected="selected">Choose Option</option>
+                                </select>
+                                <div class="form-control-focus"> </div>
+                                <span ng-show="submitted && formCommonFeilds.GrandExam.$error.required" class="help-block">Exam Name Required</span>
+
+                            </div>
+                        </div>
+                        <div class="form-group" ng-class="{ 'has-error' : submitted && formCommonFeilds.HeaderName.$invalid}">
+                            <label class="col-md-5 control-label">
+                                Header Name :
+                            </label>
+                            <div class="col-md-7">
+                                <select class="form-control" ng-model="TabHeader.OldExam" required name="HeaderName" ng-options="TabHeader.Text as TabHeader.Value for TabHeader in HeaderNames ">
+                                    <option value="" selected="selected">Choose Option</option>
+                                </select>
+                                <div class="form-control-focus"> </div>
+                                <span ng-show="submitted && formCommonFeilds.HeaderName.$error.required" class="help-block">Header Name Required</span>
+
+                            </div>
+                        </div>
+                        <div class="form-group" ng-class="{ 'has-error' : submited && formCommonFeilds.mainExamName.$invalid}">
+                            <label class="col-md-5 control-label" style="padding-left:2px">
+                                Report Header:
+                                <span class="required">*</span>
+                            </label>
+                            <div class="col-md-7">
+                                <input type="text" ng-model="TabHeader.NewExamName" class="form-control" placeholder="Report Header Name" name="mainExamName" required>
+                                <div class="form-control-focus"> </div>
+                                <span ng-show="submited && formCommonFeilds.mainExamName.$error.required" class="help-block">Exam Name Required</span>
+                            </div>
+                        </div>
+
+                        <div class="pull-right">
+                            <button ng-click="submitted=true" class="btn green">Save</button>
+                            
+                            <button ng-click="Reset()" class="btn info">Reset</button>
+                        </div>
+
+
+                    </div>
+
+                </div>
+
+                   
+
+                </div>
+
+        </form>
+        
+    </div>
+
+    
+
+
+</div>
+
+@section Scripts{
+    <script type="text/javascript">
+        OEMSApp.controller("TabHeaderCltr", ["$scope", "$http", "SweetAlert",
+          function ($scope, $http, SweetAlert) {
+
+                  init();
+                  function init() {
+                      initialize();
+                      getAllCommons();
+                    
+                     // getMainExam();
+                  }
+                  function initialize() {
+                      $scope.TabHeader = {};
+                      $scope.GrandExam = {};
+                      $scope.TabHeader.IsGrand = false;
+                      $scope.TabHeader.VersionID = 0;
+                      $scope.TabHeader.SessionId = 0;
+                      $scope.TabHeader.BranchID = 0;
+                      $scope.TabHeader.ShiftID = 0;
+                      $scope.TabHeader.ClassId = 0;
+                      $scope.TabHeader.GroupId = 0;
+                      $scope.TabHeader.SectionId = 0;
+                      $scope.TabHeader.HouseId = 0;
+                      $scope.TabHeader.StudentType = 0;
+                     // $scope.TabHeader.IsGrand = false;
+                     
+                      //$scope.TabHeader = {};
+                      $scope.studentAttendanceInfos = [];
+                      $scope.SaveHeaderName = SaveHeaderName;
+
+                      $scope.StudentInfos = [];
+                      $scope.Dropdowns = [];
+                      $scope.CommonFeilds = [];
+                      $scope.currentPage = 1;
+                      $scope.pageno = 1;
+                      $scope.pagesize = 10;
+                      $scope.total_count = 12;
+                      $scope.txtsearch = '';
+
+                  
+                      $scope.getMainExam = getMainExam;
+
+                  };
+                  function resetForm() {
+                      $scope.submitted = false;
+
+                  };
+
+                  $scope.Reset = function Reset() {
+
+                      //initialize();
+                      //getAllDropdowns();
+                      //getAllCommons();
+                      $scope.submitted = false;
+                      $scope.selectedAll = false;
+                      $scope.StudentInfos = [];
+                  };
+
+
+                  
+
+                  function SaveHeaderName() {
+                      if ($scope.formCommonFeilds.$invalid)
+                          return;
+
+                      $scope.tabObj = {};
+                      $scope.tabObj.ExamId =$scope.TabHeader.ExamId;
+                      $scope.tabObj.IsGrand = $scope.TabHeader.IsGrand;
+                      $scope.tabObj.OldExam = $scope.TabHeader.OldExam;
+                      $scope.tabObj.NewExamName = $scope.TabHeader.NewExamName;
+
+                      $http({
+                          method: 'POST',
+                          url: baseUrl + 'Result/UpdateTabHeader/', // + $scope.TabHeader.MainExamId + "/" + $scope.IsGrand + "/" + $scope.TabHeader.Value + "/" + $scope.TabHeader.ExamName,
+                                                  
+
+                          data: $scope.tabObj
+                      }).then(function successCallback(response) {
+                          toastr["success"](response.data.message);
+                      }, function errorCallback(response) {
+                          toastr["info"](response.data.message);
+                      });
+
+                  };
+
+                  $scope.GetGroup = function GetGroup(classid) {
+                      $scope.Groups = [];
+
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Common/GetGroup/' + classid
+                      }).then(function successCallback(response) {
+                          $scope.TabHeader.GroupId = -1;
+                          $scope.Groups = response.data.results;
+
+
+                      }, function errorCallback(response) {
+                          toastr["error"](response.data.message);
+                      });
+
+                  }
+                  $scope.GetTabHeaderName = function GetTabHeaderName() {
+                      $scope.HeaderNames = [];
+
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Result/GetTabHeaderName/' + $scope.TabHeader.ExamId + "/" + $scope.TabHeader.IsGrand
+                      }).then(function successCallback(response) {
+                          $scope.HeaderNames = response.data.results;
+
+
+                      }, function errorCallback(response) {
+                          toastr["error"](response.data.message);
+                      });
+
+                  }
+
+                  $scope.GetSection = function GetSection() {
+                      $scope.Sections = [];
+
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Common/GetSection/' + $scope.TabHeader.SessionId + "/" + $scope.TabHeader.ShiftID + "/" + $scope.TabHeader.ClassId + "/" + $scope.TabHeader.GroupId
+                      }).then(function successCallback(response) {
+                          $scope.Sections = response.data.results;
+
+
+                      }, function errorCallback(response) {
+                          toastr["error"](response.data.message);
+                      });
+
+                  }
+
+                  function getMainExam() {
+
+                      $scope.MainExams = [];
+                      $scope.GrandExams = [];
+
+                      if ($scope.TabHeader.IsGrand == true) {
+                          $http({
+                              method: 'GET',
+                              url: baseUrl + 'ExamSetup/GetGrandExam/' + $scope.TabHeader.VersionID + '/' + $scope.TabHeader.SessionId + '/' + $scope.TabHeader.ClassId + '/' + $scope.TabHeader.GroupId
+                          }).then(function successCallback(response) {
+                              
+                              $scope.GrandExams = response.data.results;
+                          }, function errorCallback(response) {
+                          });
+                      }
+                      else {
+                          $http({
+                              method: 'GET',
+                              url: baseUrl + 'ExamSetup/GetMainExamBySession/' + $scope.TabHeader.VersionID + '/' + $scope.TabHeader.SessionId + '/' + $scope.TabHeader.ClassId + '/' + $scope.TabHeader.GroupId
+                          }).then(function successCallback(response) {
+                              $scope.MainExams = response.data.results;
+                          }, function errorCallback(response) {
+                              toastr["error"](response.data.message);
+                          });
+                      }
+                     
+                  }
+
+                  
+
+
+                 
+
+
+
+                  function getAllCommons() {
+                      $scope.CommonFeilds = [];
+
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Common/GetCommonItem/'
+                      }).then(function successCallback(response) {
+                          $scope.CommonFeilds = response.data.results;
+                      }, function errorCallback(response) {
+                          toastr["error"](response.data.message);
+                      });
+                  }
+
+
+
+              }]);
+    </script>
+
+} 

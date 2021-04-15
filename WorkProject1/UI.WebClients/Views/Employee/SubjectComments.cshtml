@@ -1,0 +1,379 @@
+﻿@{
+    ViewBag.Title = "Subject Comments";
+    Layout = "~/Views/Shared/_EmpLayout.cshtml";
+    var SessionId = Request.QueryString["SessionId"];
+    var BranchID = Request.QueryString["BranchID"];
+    var ShiftID = Request.QueryString["ShiftID"];
+    var ClassId = Request.QueryString["ClassId"];
+
+    var SectionId = Request.QueryString["SectionId"];
+    var SubjectID = Request.QueryString["SubjectID"];
+    var MainExamId = Request.QueryString["MainExamId"];
+    var TermId = Request.QueryString["TermId"];
+    var SubExamId = Request.QueryString["SubExamId"];
+
+    var SessionName = Request.QueryString["SessionName"];
+    var BranchName = Request.QueryString["BranchName"];
+    var ShiftName = Request.QueryString["ShiftName"];
+    var ClassName = Request.QueryString["ClassName"];
+
+    var SectionName = Request.QueryString["SectionName"];
+    var SubjectName = Request.QueryString["SubjectName"];
+    var MainExamName = Request.QueryString["MainExamName"];
+    var TermName = Request.QueryString["TermName"];
+}
+<div class="card box blue-hoki" ng-controller="SWC">
+            <div class="emp-header">
+                @ViewBag.Title
+            </div>
+    <div class="portlet-body form">
+        <div class="form-body">
+            <form name="frmFilter" novalidate>
+                <table class="table table-bordered table-inverse fixed-table-toolbar">
+                    <tr>
+                        <td style="color:#ff6a00">Session</td>
+                        <td>@SessionName</td>
+                        <td style="color:#ff6a00">Branch</td>
+                        <td>@BranchName</td>
+                        <td style="color:#ff6a00">Shift</td>
+                        <td>@ShiftName</td>
+                    </tr>
+                    <tr>
+                        <td style="color:#ff6a00">Class</td>
+                        <td>@ClassName</td>
+                        <td style="color:#ff6a00">Term Name</td>
+                        <td> @TermName</td>
+                        <td style="color:#ff6a00">Subject Name</td>
+                        <td> @SubjectName</td>
+                    </tr>
+                    <tr>
+                        <td style="color:#ff6a00">Main Exam Name</td>
+                        <td>@MainExamName</td>
+                        <td style="color:#ff6a00">Section :</td>
+                        <td>
+                            <div ng-class="{ 'has-error' :isSubmitted && frmFilter.SectionId.$invalid }">
+                                <select class="form-control" name="SectionId" ng-model="FilterSubWise.SectionId" ng-options="S.SectionId as S.SectionName for S in Sections" required>
+
+                                    <option value="" selected="selected">Please Select</option>
+                                </select>
+                                <span ng-show="isSubmitted && frmFilter.SectionId.$error.required" class="help-block">Section Required</span>
+                            </div>
+                        </td>
+                        <td colspan="2" style="text-align:right">
+                            <button ng-click="submitted=true;Search()" class="btn btn-info green">Show</button>
+                            <button type="reset" ng-click="Reset()" class="btn btn-danger red">Clear</button>
+                        </td>
+                    </tr>
+                </table>
+            </form>
+            <div class="row" style="margin-right:0 !important">
+
+            </div>
+        </div>
+
+        <!-- BEGIN FORM-->
+
+    </div>
+    <div class="panel">
+        <div class="panel-body">
+            <form novalidate>
+                <table class="table table-bordered table-inverse">
+                    <thead class="btn-primary">
+                        <tr>
+                            @*  <th><input type="checkbox" ng-model="selectedAll" ng-click="selectAll()" />  All</th>*@
+                            <th>SL</th>
+                            <th> ID </th>
+                            <th> Name </th>
+                            <th> Roll</th>
+                            <th> Grade Letter</th>
+                            <th> Comments</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="item in StudentInfos | orderBy:'FullName' ">
+                            @*<td> <input type="checkbox" ng-model="item.Selected" value="false" ng-click="checkIfAllSelected()" /> </td>*@
+                            <td>{{$index + 1}}</td>
+                            <td> {{item.StudentInsID}} </td>
+                            <td> {{item.FullName}}</td>
+                            <td> {{item.RollNo}} </td>
+                            <td> {{item.SubjectGL}} </td>
+                            <td>
+                                <select class="form-control" ng-model="item.Comments">
+                                    <option value="" selected>Choose Options</option>
+                                    <option value="Due to effort">Due to effort</option>
+                                    <option value="Due to absenteeism">Due to absenteeism</option>
+                                    <option value="Due to lack of effort">Due to lack of effort</option>
+                                    <option value="Due to lack of effort and absenteeism">Due to lack of effort and absenteeism</option>
+                                </select>
+                            </td>
+                            <td width="10%" ng-show="item.Id==null">
+                                <button type="submit" ng-click="Save(item)" class="btn green">Save</button>
+
+                            </td>
+                            <td width="10%" ng-hide="item.Id==null">
+                                <button type="submit" ng-click="Update(item)" class="btn blue">Update</button>
+
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts{
+    <script type="text/javascript">
+        OEMSApp.controller("SWC", ["$scope", "$http", "SweetAlert",
+          function ($scope, $http, SweetAlert) {
+
+              init();
+              function init() {
+                  initialize();
+                  getAllCommons();
+                  getTerms(1);
+                  getMainExam(1);
+                  // getMainExam();
+              }
+              function initialize() {
+                  $scope.FilterSubWise = {};
+
+                  $scope.FilterSubWise.SessionId = 0;
+                  $scope.FilterSubWise.BranchID = 0;
+                  $scope.FilterSubWise.ShiftID = 0;
+                  $scope.FilterSubWise.ClassId = 0;
+
+                  $scope.FilterSubWise.SectionId = 0;
+                  $scope.FilterSubWise.HouseId = 0;
+                  $scope.FilterSubWise.StudentType = 0;
+
+                  //$scope.GenerateResult = {};
+
+                  $scope.StudentInfos = [];
+                  $scope.Dropdowns = [];
+                  $scope.CommonFeilds = [];
+                  $scope.currentPage = 1;
+                  $scope.pageno = 1;
+                  $scope.pagesize = 10;
+                  $scope.total_count = 12;
+                  $scope.txtsearch = '';
+
+                  $scope.FilterSubWise = {};
+                  $scope.FilterSubWise.SessionId =@SessionId;
+                  $scope.FilterSubWise.TermId =@TermId;
+                  $scope.FilterSubWise.SubjectId =@SubjectID;
+                  $scope.FilterSubWise.ClassId =@ClassId;
+                  $scope.FilterSubWise.MainExamId =@MainExamId;
+                  $scope.FilterSubWise.ShiftID=@ShiftID;
+                  $scope.FilterSubWise.BranchID=@BranchID;
+                  GetSection();
+              };
+              function resetForm() {
+                  $scope.submitted = false;
+              };
+
+              $scope.Reset = function Reset() {
+                  $scope.FilterSubWise = {};
+                  $scope.submitted = false;
+                  $scope.selectedAll = false;
+                  $scope.StudentInfos = [];
+              };
+              function getTerms() {
+                  $scope.Terms = [];
+                  $http({
+                      method: 'GET',
+                      url: baseUrl + 'SetupInstitution/GetAllTerm/'
+                  }).then(function successCallback(response) {
+                      // this callback will be called asynchronously
+                      // when the response is available
+                      $scope.Terms = response.data.results;
+                      $scope.total_count = response.data.totalcount;
+                      //console.log(response.data);
+                  }, function errorCallback(response) {
+                      toastr["warning"](response.data.Message);
+                  });
+
+              }
+
+               function GetSection() {
+                  $scope.Sections = [];
+                  $http({
+                      method: 'GET',
+                      url: baseUrl + 'Common/GetSection/' + $scope.FilterSubWise.SessionId + "/" + $scope.FilterSubWise.ShiftID + "/" + $scope.FilterSubWise.ClassId
+                  }).then(function successCallback(response) {
+                      $scope.Sections = response.data.results;
+                  }, function errorCallback(response) {
+                      toastr["error"](response.data.message);
+                  });
+              }
+              function getMainExam() {
+                  $scope.MainExams = [];
+                  $http({
+                      method: 'GET',
+                      url: baseUrl + 'ExamSetup/GetAllMainExam/'
+                  }).then(function successCallback(response) {
+                      $scope.MainExams = response.data.results;
+                      //console.log($scope.mainExams);
+                      // $scope.AspNetRoles = response.data;
+                      $scope.total_count = response.data.totalcount;
+                      //console.log(response.data);
+                  }, function errorCallback(response) {
+                      toastr["warning"](response.data.Message);
+                  });
+              }
+              $scope.getSubject = function getSubject() { // Get Subject List By VSCG
+                  //if ($scope.mform.$invalid)
+                  //    return;
+                  //blockUI.start(); // spinning Start
+                  $scope.SubjectSetups = [];
+                  var searchtxt = $scope.search;
+                  if ($scope.search == 'undefined' || $scope.search == '') {
+                      searchtxt = 'null';
+                  }
+                  $http({
+                      method: 'GET',
+                      url: baseUrl + 'SubjectSetup/GetAllSubject/' + $scope.FilterSubWise.ClassId + '/' + $scope.FilterSubWise.SessionId
+                  }).then(function successCallback(response) {
+                      $scope.SubjectSetups = response.data;
+                      $scope.total_count = response.data.totalcount;
+                      if ($scope.pagesize == -1)
+                          $scope.pagesize = 500;
+                      //blockUI.stop();  // spinning Finished
+                  }, function errorCallback(response) {
+                      toastr["info"](response.data.message);
+                      blockUI.stop();
+                  });
+              }
+              $scope.selectAll = function () {
+                  angular.forEach($scope.StudentInfos, function (item) {
+                      item.Selected = $scope.selectedAll;
+                  });
+
+              };
+              $scope.GetSelects = function GetSelects() {
+                  var res = '';
+                  angular.forEach($scope.StudentInfos, function (item) {
+                      if (item.Selected) {
+                          res = res + ',' + item.StudentIID
+                      }
+                  });
+
+                  return res.trim()
+
+              };
+
+
+              $scope.checkIfAllSelected = function () {
+                  $scope.selectedAll = $scope.StudentInfos.every(function (item) {
+                      return item.Selected == true
+                  })
+              };
+              $scope.Search = function Search() {
+                  if ($scope.frmFilter.$invalid)
+                      return;
+
+                  $scope.StudentInfos = [];
+                  $http({
+                      method: 'POST',
+                      url: baseUrl + 'Result/GetSubjectWiseComments/' + $scope.FilterSubWise.BranchID + '/' + $scope.FilterSubWise.SessionId + '/' + $scope.FilterSubWise.ShiftID + '/' + $scope.FilterSubWise.ClassId + '/' + $scope.FilterSubWise.SectionId + '/' + $scope.FilterSubWise.TermId + '/' + $scope.FilterSubWise.MainExamId + '/' + $scope.FilterSubWise.SubjectId
+
+                  }).then(function successCallback(response) {
+                      $scope.StudentInfos = response.data.results;
+                      $scope.selectedAll = true;
+                      angular.forEach($scope.StudentInfos, function (item) {
+                          item.Selected = $scope.selectedAll;
+                      });
+                      toastr["success"](response.data.message);
+                  }, function errorCallback(response) {
+                      toastr["error"](response.data.message);
+                  });
+
+              };
+              function GetSubWiseComments(n) {
+                  $http({
+                      method: 'POST',
+                      url: baseUrl + 'Result/GetSubjectWiseComments/' + $scope.FilterSubWise.BranchID + '/' + $scope.FilterSubWise.SessionId + '/' + $scope.FilterSubWise.ShiftID + '/' + $scope.FilterSubWise.ClassId + '/' + $scope.FilterSubWise.SectionId + '/' + $scope.FilterSubWise.TermId + '/' + $scope.FilterSubWise.MainExamId + '/' + $scope.FilterSubWise.SubjectId
+
+                  }).then(function successCallback(response) {
+                      $scope.StudentInfos = response.data.results;
+                      //angular.forEach( n, function (item) {
+                      //    angular.forEach($scope.SubjectWiseComments, function (item2) {
+                      //        if (item2.StudentId == item.StudentIID) {
+                      //            item.Comments = item2.Comments;
+                      //            //console.log(item);
+                      //            //console.log(item2);
+                      //        } else {
+                      //            item.Comments = 'No Comment';
+                      //        }
+                      //        //$scope.StudentInfos = n;
+                      //        //console.log(item2);
+                      //    });
+                      //  });
+                      console.log($scope.StudentInfos);
+
+                  }, function errorCallback() { });
+              }
+              $scope.Save = function Save(n) {
+                  n.MainExamId = $scope.FilterSubWise.MainExamId;
+                  n.SubjectId = $scope.FilterSubWise.SubjectId;
+                  n.StudentId = n.StudentIID;
+                  n.TermId = $scope.FilterSubWise.TermId;
+                  //console.log(n);
+                  if (n.Id == null) {
+                      $http(
+                     {
+                         method: 'POST',
+                         url: baseUrl + 'Result/SubjectWiseCommentsAdd/',
+                         data: n
+                     }).then(function successCallback(response) {
+                         toastr["success"](response.data.message);
+                         $scope.Search();
+                     }, function errorCallback(response) {
+                         toastr["error"](response.data.Message);
+                     })
+                  }
+
+              }
+
+              $scope.Update = function (n) {
+                  n.MainExamId = $scope.FilterSubWise.MainExamId;
+                  n.SubjectId = $scope.FilterSubWise.SubjectId;
+                  n.StudentId = n.StudentIID;
+                  n.TermId = $scope.FilterSubWise.TermId;
+                  $http(
+                   {
+                       method: 'PUT',
+                       url: baseUrl + 'Result/SubjectWiseCommentsUpdate/',
+                       data: n
+                   }).then(function successCallback(response) {
+                       toastr["success"](response.data.message);
+                       $scope.Search();
+                   }, function errorCallback(response) {
+                       toastr["error"](response.data.Message);
+                   });
+              }
+
+              function getAllCommons() {
+                  $scope.CommonFeilds = [];
+
+                  $http({
+                      method: 'GET',
+                      url: baseUrl + 'Common/GetCommonItem/'
+                  }).then(function successCallback(response) {
+                      $scope.CommonFeilds = response.data.results;
+                  }, function errorCallback(response) {
+                      toastr["error"](response.data.message);
+                  });
+              }
+
+
+
+          }]);
+    </script>
+}
+
+
+
+

@@ -1,0 +1,425 @@
+﻿@using Microsoft.AspNet.Identity
+@{
+    ViewBag.Title = "Employee Profile";
+    Layout = "~/Views/Shared/_EmpLayout.cshtml";
+}
+<link href="//cdn.odhyyon.com/employee-portal/css/style.css" rel="stylesheet" type="text/css" />
+
+<div ng-controller="IndexClt">
+    <div class="row main-row">
+        <div class="col-lg-4 p-0">
+            <div class="studebt-main-details">
+                <h3>Employee Profile</h3>
+                <div class="row">
+                    <div class="col-lg-4">
+                        <div class="student-profil" style="width: 100px!important;height: 100px!important;border-radius: 32%!important;overflow: hidden!important;">
+                            <img src="@Url.Action("GetImage","Account")" class="img-fulid" style="height: 100px;width: 100px;" alt="">
+                        </div>
+                    </div>
+                    <div class="col-lg-8">
+                        <div class="student-profil-main">
+                            <h4>@ViewBag.EmpBasicInfo.FullName</h4>
+                            <h5>Id: @ViewBag.EmpBasicInfo.EmpID</h5>
+                            @*<h5>Class: Six</h5>*@
+                        </div>
+                    </div>
+
+                </div>
+                <div class="button text-center">
+                    <a href="@Url.Action("EmpProfileView","Employee")" class="btn btn-primary btn-lg active" role="button" title="View Profile" aria-pressed="true">View Profile</a>
+                    @*<a href="@Url.Action("UpdateProfile","Student")" class="btn btn-secondary edite-button btn-lg active" role="button" aria-pressed="true">Edit</a>*@
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4 ">
+            <div class="sms-list-main">
+                <div class="sms-list">
+                    <h3>
+                        SMS List
+                        <span>View All</span>
+                    </h3>
+                </div>
+                <div class="sms-iteams" id="smslst">
+                </div>
+            </div>
+
+        </div>
+
+        <div class="col-lg-4 p-0">
+            <div class="attendence-main">
+                <h3>Attendance</h3>
+                <div class="progressbar">
+                    <div class="second circle" id="prePercent" data-percent="5">
+                        <strong></strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <!---------calender part start-------------->
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="calender" style="height:102%">
+                <div class="row">
+                    <div class="col-lg-5">
+                        <h3>Academic Calender</h3>
+                    </div>
+                    <div class="col-lg-7">
+                        <div class="calender-titels">
+                            <span class="cal-present">Present</span>
+                            <span class="cal-absent">Absent</span>
+                            <span class="cal-leave">Leave</span>
+                            <span class="cal-holiday">Holiday</span>
+                        </div>
+                    </div>
+                </div>
+                <ul class="month">
+                    <li>
+                        <h1><span id="mon">January</span>-<span id="year">2016</span> </h1>
+
+                    </li>
+                   
+                    <span class="prev">&#10094;</span>
+                    <span class="next">&#10095;</span>
+                </ul>
+                <ul class="weeks">
+                    <li>Sa</li>
+                    <li>Su</li>
+                    <li>Mo</li>
+                    <li>Tu</li>
+                    <li>We</li>
+                    <li>Th</li>
+                    <li>Fr</li>
+                </ul>
+                <ul class="days"></ul>
+            </div>
+        </div>
+    </div>
+
+    <!---------calender part End-------------->
+    <div class="row" style="padding-top: 7%; padding-bottom: 3%; ">
+        <div class="col-lg-12">
+            <canvas id="lineChart" width="749" height="200"></canvas>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts{
+
+    <script src="//cdn.odhyyon.com/studentportal/js/progress.js"></script>
+    <script src="//cdn.odhyyon.com/admin/assets/global/plugins/Chart.min.js" type="text/javascript"></script>
+
+    <script>
+        //progress
+        $(document).ready(function ($) {
+
+        });
+    </script>
+
+    <script type="text/javascript">
+
+        function DownloadDocument(DocumentId) {
+            console.log(DocumentId);
+            var strMethodUrl = '@Url.Action("Download", "Request")?DocumentId=' + DocumentId
+            //window.location = strMethodUrl;
+            window.open(strMethodUrl, '_blank');
+            //$.ajax({
+            //    url: '<%= Url.Action("NoticeDocumentDownload", "Home") %>',
+            //    success: function (data) {
+            //        console.log(data);
+            //    }
+            //});
+        }
+      $(document).ready(function ($) {
+
+            $(document).on("click", "#MakePayment", function () {
+                alert("You Don't Have Pay2Fee Account. Please Contact With School Authority.");
+            })
+            function animateElements() {
+                $('.progressbar').each(function () {
+                    var elementPos = $(this).offset().top;
+                    var topOfWindow = $(window).scrollTop();
+                    var percent = $(this).find('.circle').attr('data-percent');
+                    var animate = $(this).data('animate');
+                    if (elementPos < topOfWindow + $(window).height() - 30 && !animate) {
+                        $(this).data('animate', true);
+                        $(this).find('.circle').circleProgress({
+                            // startAngle: -Math.PI / 2,
+                            value: percent / 100,
+                            size: 300,
+                            thickness: 25,
+                            fill: {
+                                color: '#F4D03F'
+                            }
+                        }).on('circle-animation-progress', function (event, progress, stepValue) {
+                            $(this).find('strong').text((stepValue * 100).toFixed(0) + "%");
+                        }).stop();
+                    }
+                });
+            }
+            var attn = [];
+            var AttPreDay = [];
+            var AttAbsentDay = [];
+            var AttWorkingDay = [];
+            var albl = [];
+
+            $.get("@Url.Action("GetEmpPortalDashBoardData", "Employee")", function (data) {
+                console.log(data);
+                attn = data.CurrMonthAttendance;
+                days(0);
+                smsShow(data.SMSList);
+                $("#prePercent").attr("data-percent", parseInt(data.PeresentPercent));
+                animateElements();
+                $(window).scroll(animateElements);
+                noticeShow(data.EmpNoticeList);
+                AttPreDay = data.AttPreDay;
+                AttAbsentDay = data.AttAbsentDay;
+                AttWorkingDay = data.AttWorkingDay;
+                albl = data.Attlabel;
+                drawchart();
+            });
+
+        
+            function noticeShow(data) {
+
+                $("#noticelist").innerHTML = '';
+                for (var i = 0; i < data.length; i++) {
+
+                    $("#noticelist").append("<div class='row assignment-main'><div class='col-lg-9'><div class='assigment-programing'><a href='javascript:DownloadDocument(" + data[i].DocumentId + ");'  title=" + data[i].FileName + " style='font-size: large;'>" + data[i].Title + "</a></div></div><div class='col-lg-3 text-right'><div class='assiment-detils'><p>" + data[i].AddDate + "</p></div></div></div>");
+
+                    //$("#noticelist").append("<div class='row'><div class='col-lg-2'><div class='notice-iteams text-center' style='background:" + data[i].ColorCode + "'><p>" + data[i].Letter + "</p></div></div><div class='col-lg-10'><div class='notice-contents'><span>" + data[i].Title + "</span><span id='notice-date'>" + new Date(data[i].PublishDate).toLocaleDateString('en-GB')  + "</span><p>" + data[i].Description + "</p></div></div></div> ");
+                }
+
+
+            }
+
+            function smsShow(data) {
+
+                $("#smslst").innerHTML = '';
+                for (var i = 0; i < data.length; i++) {
+                    $("#smslst").append(" <h4>" + data[i].SMSBody + "<span>" + new Date(data[i].SendDateTime).toLocaleDateString() + " <br>" + new Date(data[i].SendDateTime).toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true }) + "</span></h4>");
+                }
+
+
+            }
+
+            function formatMoney(n, c, d, t) {
+                var c = isNaN(c = Math.abs(c)) ? 2 : c,
+                  d = d == undefined ? "." : d,
+                  t = t == undefined ? "," : t,
+                  s = n < 0 ? "-" : "",
+                  i = String(parseInt(n = Math.abs(Number(n) || 0).toFixed(c))),
+                  j = (j = i.length) > 3 ? j % 3 : 0;
+
+                return s + (j ? i.substr(0, j) + t : "") + i.substr(j).replace(/(\d{3})(?=\d)/g, "$1" + t) + (c ? d + Math.abs(n - i).toFixed(c).slice(2) : "");
+            };
+
+
+            //public variables
+            var calender = document.querySelector(".calender"),//container of calender
+                topDiv = document.querySelector('.month'),
+                monthDiv = document.querySelector("#mon"),//h1 of monthes
+                yearDiv = document.querySelector('#year'),//h2 for years
+                weekDiv = calender.querySelector(".weeks"),//week container
+                dayNames = weekDiv.querySelectorAll("li"),//dayes name
+                dayItems = calender.querySelector(".days"),//date of day container
+                prev = calender.querySelector(".prev"),
+                next = calender.querySelector(".next"),
+
+                // date variables
+                years = new Date().getFullYear(),
+                monthes = new Date(new Date().setFullYear(years)).getMonth(),
+                lastDayOfMonth = new Date(new Date(new Date().setMonth(monthes +1 )).setDate(0)).getDate(),
+                dayOfFirstDateOfMonth = new Date(new Date(new Date().setMonth(monthes)).setDate(1)).getDay(),
+
+                // array to define name of monthes
+                monthNames = ["January", "February", "March", "April", "May", "June",
+                              "July", "August", "September", "October", "November", "December"],
+
+                i,//counter for day before month first day in week
+                x,//counter for prev , next
+                counter;//counter for day of month  days;
+
+
+            //display dayes of month in items
+            function days(x) {
+                'use strict';
+                dayItems.innerHTML = "";
+                monthes = monthes + x;
+
+
+
+                /////////////////////////////////////////////////
+                //test for last month useful while prev ,max prevent go over array
+                if (monthes > 11) {
+                    years = years + 1;
+                    monthes = new Date(new Date(new Date().setFullYear(years)).setMonth(0)).getMonth();
+                }
+                if (monthes < 0) {
+                    years = years - 1;
+                    monthes = new Date(new Date(new Date().setFullYear(years)).setMonth(11)).getMonth();
+                }
+
+                //lastDayOfMonth = new Date(new Date(new Date(new Date().setFullYear(years)).setMonth(monthes + 1)).setDate(0)).getDate();
+                lastDayOfMonth = new Date(new Date(new Date(new Date().setFullYear(years)).setMonth(monthes +1)).setDate(0)).getDate();
+                dayOfFirstDateOfMonth = new Date(new Date(new Date(new Date().setFullYear(years)).setMonth(monthes)).setDate(1)).getDay();
+
+                var curMonth = monthes+1
+
+
+                /////////////////////////////////////////////////
+                yearDiv.innerHTML = years;
+                monthDiv.innerHTML = monthNames[monthes];
+                for (i = 0; i <= dayOfFirstDateOfMonth; i = i + 1) {
+                    if (dayOfFirstDateOfMonth === 6) { break; }
+                    dayItems.innerHTML += "<li> - </li>";
+                }
+                for (counter = 1; counter <= lastDayOfMonth; counter = counter + 1) {
+                    dayItems.innerHTML += "<li class='" + getattClass(counter, monthes, years) + "'><h6> " + (counter) + "</h6><p>" + getattStatus(counter, monthes, years) + "</p> </li>";
+
+
+                }
+                //topDiv.style.background = colors[monthes];
+                //dayItems.style.backgroundColor = 'red';
+                //تمييز اليوم الحالى
+                if (monthes === new Date().getMonth() && years === new Date().getFullYear()) {
+                    //فى حالة التاريخ الحالى =الخلفيه خضراء
+                    dayItems.children[new Date().getDate() + dayOfFirstDateOfMonth].style.background = "";
+                }
+            }
+            prev.onclick = function () {
+                'use strict';
+                days(-1);//decrement monthes
+            };
+            next.onclick = function () {
+                'use strict';
+                days(1);//increment monthes
+            };
+
+
+
+            function getattClass(day, month, year) {
+                for (var i = 0; i < attn.length; i++) {
+                    var sDate = new Date(attn[i].CalendarDate);
+                    var sM = sDate.getMonth()
+                    if (sDate.getMonth() == 2 && day == 5) {
+                        // console.log(sDate.getMonth());
+                    }
+
+                    if (sM == month && sDate.getFullYear() == year && sDate.getDate() == day)
+                        return attn[i].ClassName;
+
+                }
+            }
+
+            function getattStatus(day, month, year) {
+                var Status = '';
+                for (var i = 0; i < attn.length; i++) {
+                    var sDate = new Date(attn[i].CalendarDate);
+                    var sM = sDate.getMonth()
+                    if (sDate.getMonth() == 2 && day == 5) {
+                        // console.log(sDate.getMonth());
+                    }
+
+                    if (sM == month && sDate.getFullYear() == year && sDate.getDate() == day) {
+                        if (attn[i].DayStaus == 'A')
+                            Status = 'Absent'
+                        else if (attn[i].DayStaus == 'P')
+                            Status = 'Present'
+                        else if (attn[i].DayStaus == 'H')
+                            Status = attn[i].HolidayName;
+                        else if (attn[i].DayStaus == 'W')
+                            Status = attn[i].DayType;
+                    }
+
+                  }
+
+                return Status;
+            }
+
+
+            //end
+
+
+            function drawchart() {
+                var ctx = document.getElementById("lineChart");
+                var lineChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: albl,
+                        datasets: [{
+                            label: 'Present',
+                            data: AttPreDay,
+                            backgroundColor: 'transparent',
+                            borderColor: '#58CF91',
+                            borderWidth: 4
+                        },{
+                            label: 'Absent',
+                            data: AttAbsentDay,
+                            backgroundColor: 'transparent',
+                            borderColor: '#f2071e',
+                            borderWidth: 4
+                        },{
+                            label: 'Working Days',
+                            data: AttWorkingDay,
+                            backgroundColor: 'transparent',
+                            borderColor: '#0a06e8',
+                            borderWidth: 4
+                        }
+                        ]
+                    },
+                    options: {
+                        legend: {
+                            display: true,
+                            labels: {
+                                usePointStyle: true
+                            }
+                        },
+                        responsive: false,
+                        scales: {
+                            xAxes: [{
+                                ticks: {
+                                    display: true,
+                                },
+                                gridLines: {
+                                    drawOnChartArea: false
+                                },
+                                display: true,
+                                scaleLabel: {
+                                    display: true,
+                                    labelString: 'Month'
+                                }
+                            }],
+                            yAxes: [{
+                                ticks: {
+                                    display: true,
+                                },
+                                gridLines: {
+                                    drawOnChartArea: false
+                                },
+                                display: true,
+                                scaleLabel: {
+                                    display: true,
+                                    labelString: 'Days'
+                                }
+                            }]
+                        }
+                    }
+                });
+
+            }
+
+        });
+
+        OEMSApp.controller("IndexClt", ["$scope", "$http", "SweetAlert", "blockUI", "$window", "$filter",
+           function ($scope, $http, SweetAlert, blockUI, $window, $filter) {
+
+           }]);
+    </script>
+
+
+}
+
+

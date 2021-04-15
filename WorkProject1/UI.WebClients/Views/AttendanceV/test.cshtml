@@ -1,0 +1,458 @@
+﻿
+@{
+    ViewBag.Title = "test";
+}
+<style>
+    /*
+jQuery MultiFreezer - scrollable tables with freezed thead and (n) first columns.
+(c) 2017 Jan Renner (http://janrenner.cz, jan.renner@gmail.com)
+https://jsfiddle.net/2oj9c5q2/7/ - layout final
+https://jsfiddle.net/2oj9c5q2/10/ - JS scrolling
+https://jsfiddle.net/2oj9c5q2/19/ - before cloning
+https://jsfiddle.net/2oj9c5q2/21
+*/
+/*common*/
+#freezer-example { width: 600px; max-height: 300px; overflow: hidden; margin: 1em auto; }
+#freezer-example .table th,#freezer-example .table td { white-space: nowrap; }
+#freezer-example .table th { outline: 1px solid crimson; background: #eee; }
+#freezer-example .table thead th { outline: 1px solid gold; }
+#freezer-example .table col { width: 120px; }
+/*freezer*/
+/*
+-------------------- (#freezer-example) - common wrapper, not a part of freezer
+    -------------------- .freeze-multi-scroll-wrapper = wrapper
+        -------------------- .freeze-multi-scroll-table
+            -------------------- .freeze-multi-scroll-table-head
+                -------------------- .freeze-multi-scroll-table-head-inner = headblock
+                    <table><thead> .table-freeze-multi-clone
+                --------------------|
+            --------------------|
+            -------------------- .freeze-multi-scroll-table-body = scroller
+                <table> .table-freeze-multi (original table) = table
+                ====================================================
+            --------------------|
+        --------------------|
+        -------------------- .freeze-multi-scroll-left
+            -------------------- .freeze-multi-scroll-left-head = topblock
+                <table><thead> .table-freeze-multi-clone
+            --------------------|
+            -------------------- .freeze-multi-scroll-left-body
+                -------------------- .freeze-multi-scroll-left-body-inner = leftblock
+                    <table><thead> .table-freeze-multi-clone
+                --------------------|
+            --------------------|
+        --------------------|
+    --------------------|
+--------------------|
+*/
+.table-freeze-multi,
+.table-freeze-multi-clone {
+    table-layout: fixed;
+    width: 100%;
+}
+.freeze-multi-scroll-wrapper {
+    position: relative;
+    clear: both;
+}
+.freeze-multi-scroll-table {}
+.freeze-multi-scroll-table-head {
+    width: 100%;
+    position: relative;
+    overflow: hidden;
+}
+.freeze-multi-scroll-table-head-inner {
+    box-sizing: content-box;
+}
+.freeze-multi-scroll-table-body {
+    position: relative;
+    overflow: auto;
+    width: 100%;
+}
+.freeze-multi-scroll-left {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 1px;
+}
+.freeze-multi-scroll-left-head {
+    position: relative;
+    top: 0;
+    left: 0;
+    overflow: hidden;
+}
+.freeze-multi-scroll-left-body,
+.freeze-multi-scroll-left-body-inner {
+    position: relative;
+    top: 0;
+    left: 0;
+    overflow: hidden;
+}
+.freeze-multi-scroll-left-body-inner {
+    overflow-y: scroll;
+}
+/* see https://davidwalsh.name/detect-scrollbar-width */
+/* way the hell off screen */
+.freezer-scrollbar-measure {
+    width: 100px;
+    height: 100px;
+    overflow: scroll;
+    position: absolute;
+    top: -9999px;
+}
+
+</style>
+<div id="freezer-example">
+    <!--
+    jQuery MultiFreezer - scrollable tables with freezed thead and (n) first columns.
+    (c) 2017 Jan Renner (http://janrenner.cz, jan.renner@gmail.com)
+    Bootstrap 3 compatible, demands <THEAD> and <TBODY>
+    ***
+    data-scroll-height = scroller height, if null, common wrapper height() will be used
+    data-cols-number = number of columns to freeze, if null, will be autodetected from <TH>
+    -->
+    <table class="table table-condensed table-freeze-multi"
+           data-scroll-height="300"
+           data-cols-number="2">
+        <colgroup>
+            <col>
+            <col>
+            <col>
+            <col>
+            <col>
+            <col>
+            <col>
+            <col>
+            <col>
+            <col>
+        </colgroup>
+        <thead>
+            <tr>
+                <th rowspan="4">TH 1/1</th>
+                <th rowspan="4">TH 1/2</th>
+                <th>TH 1/3</th>
+                <th>TH 1/4</th>
+                <th>TH 1/5</th>
+                <th>TH 1/6</th>
+                <th>TH 1/7</th>
+                <th>TH 1/8</th>
+                <th>TH 1/9</th>
+                <th>TH 1/10</th>
+            </tr>
+            <tr>
+                <th>TH 2/3</th>
+                <th>TH 2/4</th>
+                <th>TH 2/5</th>
+                <th>TH 2/6</th>
+                <th>TH 2/7</th>
+                <th>TH 2/8</th>
+                <th>TH 2/9</th>
+                <th>TH 2/10</th>
+            </tr>
+            <tr>
+                <th>TH 3/3</th>
+                <th>TH 3/4</th>
+                <th>TH 3/5</th>
+                <th>TH 3/6</th>
+                <th>TH 3/7</th>
+                <th>TH 3/8</th>
+                <th>TH 3/9</th>
+                <th>TH 3/10</th>
+            </tr>
+            <tr>
+                <th>TH 4/3</th>
+                <th>TH 4/4</th>
+                <th>TH 4/5</th>
+                <th>TH 4/6</th>
+                <th>TH 4/7</th>
+                <th>TH 4/8</th>
+                <th>TH 4/9</th>
+                <th>TH 4/10</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <th>TH 1/1</th>
+                <th>TH 1/2</th>
+                <td>TD 1/3</td>
+                <td>TD 1/4</td>
+                <td>TD 1/5</td>
+                <td>TD 1/6</td>
+                <td>TD 1/7</td>
+                <td>TD 1/8</td>
+                <td>TD 1/9</td>
+                <td>TD 1/10</td>
+            </tr>
+            <tr>
+                <th>TH 2/1</th>
+                <th>TH 2/2</th>
+                <td>TD 2/3</td>
+                <td>TD 2/4</td>
+                <td>TD 2/5</td>
+                <td>TD 2/6</td>
+                <td>TD 2/7</td>
+                <td>TD 2/8</td>
+                <td>TD 2/9</td>
+                <td>TD 2/10</td>
+            </tr>
+            <tr>
+                <th>TH 3/1</th>
+                <th>TH 3/2</th>
+                <td>TD 3/3</td>
+                <td>TD 3/4</td>
+                <td>TD 3/5</td>
+                <td>TD 3/6</td>
+                <td>TD 3/7</td>
+                <td>TD 3/8</td>
+                <td>TD 3/9</td>
+                <td>TD 3/10</td>
+            </tr>
+            <tr>
+                <th>TH 4/1</th>
+                <th>TH 4/2</th>
+                <td>TD 4/3</td>
+                <td>TD 4/4</td>
+                <td>TD 4/5</td>
+                <td>TD 4/6</td>
+                <td>TD 4/7</td>
+                <td>TD 4/8</td>
+                <td>TD 4/9</td>
+                <td>TD 4/10</td>
+            </tr>
+            <tr>
+                <th>TH 5/1</th>
+                <th>TH 5/2</th>
+                <td>TD 5/3</td>
+                <td>TD 5/4</td>
+                <td>TD 5/5</td>
+                <td>TD 5/6</td>
+                <td>TD 5/7</td>
+                <td>TD 5/8</td>
+                <td>TD 5/9</td>
+                <td>TD 5/10</td>
+            </tr>
+            <tr>
+                <th>TH 6/1</th>
+                <th>TH 6/2</th>
+                <td>TD 6/3</td>
+                <td>TD 6/4</td>
+                <td>TD 6/5</td>
+                <td>TD 6/6</td>
+                <td>TD 6/7</td>
+                <td>TD 6/8</td>
+                <td>TD 6/9</td>
+                <td>TD 6/10</td>
+            </tr>
+            <tr>
+                <th>TH 7/1</th>
+                <th>TH 7/2</th>
+                <td>TD 7/3</td>
+                <td>TD 7/4</td>
+                <td>TD 7/5</td>
+                <td>TD 7/6</td>
+                <td>TD 7/7</td>
+                <td>TD 7/8</td>
+                <td>TD 7/9</td>
+                <td>TD 7/10</td>
+            </tr>
+            <tr>
+                <th>TH 8/1</th>
+                <th>TH 8/2</th>
+                <td>TD 8/3</td>
+                <td>TD 8/4</td>
+                <td>TD 8/5</td>
+                <td>TD 8/6</td>
+                <td>TD 8/7</td>
+                <td>TD 8/8</td>
+                <td>TD 8/9</td>
+                <td>TD 8/10</td>
+            </tr>
+            <tr>
+                <th>TH 9/1</th>
+                <th>TH 9/2</th>
+                <td>TD 9/3</td>
+                <td>TD 9/4</td>
+                <td>TD 9/5</td>
+                <td>TD 9/6</td>
+                <td>TD 9/7</td>
+                <td>TD 9/8</td>
+                <td>TD 9/9</td>
+                <td>TD 9/10</td>
+            </tr>
+            <tr>
+                <th>TH 10/1</th>
+                <th>TH 10/2</th>
+                <td>TD 10/3</td>
+                <td>TD 10/4</td>
+                <td>TD 10/5</td>
+                <td>TD 10/6</td>
+                <td>TD 10/7</td>
+                <td>TD 10/8</td>
+                <td>TD 10/9</td>
+                <td>TD 10/10</td>
+            </tr>
+            <tr>
+                <th>TH 11/1</th>
+                <th>TH 11/2</th>
+                <td>TD 11/3</td>
+                <td>TD 11/4</td>
+                <td>TD 11/5</td>
+                <td>TD 11/6</td>
+                <td>TD 11/7</td>
+                <td>TD 11/8</td>
+                <td>TD 11/9</td>
+                <td>TD 11/10</td>
+            </tr>
+            <tr>
+                <th>TH 12/1</th>
+                <th>TH 12/2</th>
+                <td>TD 12/3</td>
+                <td>TD 12/4</td>
+                <td>TD 12/5</td>
+                <td>TD 12/6</td>
+                <td>TD 12/7</td>
+                <td>TD 12/8</td>
+                <td>TD 12/9</td>
+                <td>TD 12/10</td>
+            </tr>
+            <tr>
+                <th>TH 13/1</th>
+                <th>TH 13/2</th>
+                <td>TD 13/3</td>
+                <td>TD 13/4</td>
+                <td>TD 13/5</td>
+                <td>TD 13/6</td>
+                <td>TD 13/7</td>
+                <td>TD 13/8</td>
+                <td>TD 13/9</td>
+                <td>TD 13/10</td>
+            </tr>
+            <tr>
+                <th>TH 14/1</th>
+                <th>TH 14/2</th>
+                <td>TD 14/3</td>
+                <td>TD 14/4</td>
+                <td>TD 14/5</td>
+                <td>TD 14/6</td>
+                <td>TD 14/7</td>
+                <td>TD 14/8</td>
+                <td>TD 14/9</td>
+                <td>TD 14/10</td>
+            </tr>
+            <tr>
+                <th>TH 15/1</th>
+                <th>TH 15/2</th>
+                <td>TD 15/3</td>
+                <td>TD 15/4</td>
+                <td>TD 15/5</td>
+                <td>TD 15/6</td>
+                <td>TD 15/7</td>
+                <td>TD 15/8</td>
+                <td>TD 15/9</td>
+                <td>TD 15/10</td>
+            </tr>
+        </tbody>
+    </table>
+
+</div>
+@section Scripts{
+<script>
+    $(document).ready(function () {
+        /*
+        jQuery MultiFreezer - scrollable tables with freezed thead and (n) first columns.
+        (c) 2017 Jan Renner (http://janrenner.cz, jan.renner@gmail.com)
+        */
+        $('.table-freeze-multi').each(function () {
+
+            var table = $(this),
+                scrollbarWidth = freezerGetScrollbarWidth();
+
+            //prepare
+            table.css({
+                margin: 0
+            }).addClass('table-freeze-multi-original').find('tfoot').remove();
+
+            //wrap
+            table.wrap('<div class="freeze-multi-scroll-wrapper" />');
+            var wrapper = table.closest('.freeze-multi-scroll-wrapper');
+            table.wrap('<div class="freeze-multi-scroll-table" />');
+            table.wrap('<div class="freeze-multi-scroll-table-body" />');
+            var scroller = wrapper.find('.freeze-multi-scroll-table-body');
+
+            //layout
+            var headblock = $('<div class="freeze-multi-scroll-table-head-inner" />');
+            scroller.before($('<div class="freeze-multi-scroll-table-head" />').append(headblock));
+            var topblock = $('<div class="freeze-multi-scroll-left-head" />');
+            var leftblock = $('<div class="freeze-multi-scroll-left-body-inner" />');
+            wrapper.append(
+                $('<div class="freeze-multi-scroll-left" />')
+                    .append(topblock)
+                    .append($('<div class="freeze-multi-scroll-left-body" />').append(leftblock))
+            );
+
+            //cloning
+            var clone = table.clone(true);
+            clone.addClass('table-freeze-multi-clone').removeClass('table-freeze-multi-original');
+            var colsNumber = table.data('colsNumber') || table.find('tbody tr:first th').length;
+            //head
+            var cloneHead = clone.clone(true);
+            cloneHead.find('tbody').remove();
+            headblock.append(cloneHead);
+            //top
+            var cloneTop = cloneHead.clone(true);
+            topblock.append(cloneTop);
+            //left
+            var cloneLeft = clone.clone(true);
+            cloneLeft.find('thead').remove();
+            leftblock.append(cloneLeft);
+
+            //sizing
+            var scrollHeight = table.data('scrollHeight') || wrapper.parent().closest('*').height();
+            var headerHeight = table.find('thead').height();
+            var leftWidth = (function () {
+                var w = 0;
+                table.find('tbody tr:first > *').slice(0, colsNumber).each(function () {
+                    w = w + $(this).outerWidth();
+                });
+                return w + 1;
+            }());
+            wrapper.css('height', scrollHeight);
+            scroller.css('max-height', scrollHeight - headblock.height());
+            headblock.width(table.width()).css('padding-right', scrollbarWidth);
+            leftblock.add(leftblock.parent()).height(scrollHeight - scrollbarWidth - headerHeight);
+            leftblock.width(leftWidth + scrollbarWidth);
+            wrapper.find('.freeze-multi-scroll-left').width(leftWidth);
+
+            //postprocess
+            wrapper.find('.table-freeze-multi-original thead').hide();
+
+            //scrolling
+            scroller.on('scroll', function () {
+                var s = $(this),
+                    left = s.scrollLeft(),
+                    top = s.scrollTop();
+                headblock.css('transform', 'translate(' + (-1 * left) + 'px, 0)');
+                leftblock.scrollTop(top);
+            });
+            leftblock.on('mousewheel', false);
+
+        });
+    });
+
+    // see https://davidwalsh.name/detect-scrollbar-width
+    function freezerGetScrollbarWidth() {
+        // Create the measurement node
+        var scrollDiv = document.createElement("div");
+        scrollDiv.className = "freezer-scrollbar-measure";
+        document.body.appendChild(scrollDiv);
+
+        // Get the scrollbar width
+        var scrollbarWidth = scrollDiv.offsetWidth - scrollDiv.clientWidth;
+        //console.warn(scrollbarWidth); // Mac: 15, Win: 17
+
+        // Delete the DIV 
+        document.body.removeChild(scrollDiv);
+
+        return scrollbarWidth;
+    }
+    </script>
+}

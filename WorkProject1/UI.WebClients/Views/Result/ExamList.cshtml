@@ -1,0 +1,273 @@
+﻿@{
+    ViewBag.Title = "Exam List";
+}
+<style type="text/css">
+    .table thead tr th {
+        font-size: 12px !important;
+        color: white !important;
+        font-weight: 600 !important;
+    }
+</style>
+<div ng-controller="ctrlExamList">
+    <!-- Begin: life time stats -->
+    <div class="portlet light bordered">
+        <div class="portlet-title">
+            <div class="caption">
+                <i class="icon-settings font-green"></i>
+                <span class="caption-subject font-green sbold uppercase">@ViewBag.Title</span>
+            </div>
+            <div class="actions">
+                <div class="btn-group btn-group-solid">
+                    <a href="~/Result/ExamAddWizard" class="btn green"> <i class="fa fa-plus"></i> Add Exam</a>
+                </div>
+            </div>
+        </div>
+        <div class="portlet-body">
+            <form class="form-horizontal" ng-submit="getMainExam()" id="formCommonFeilds" name="formCommonFeilds" novalidate>
+                <div class="form-body">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="form-group" ng-class="{ 'has-error' : submitted1 && formCommonFeilds.Version.$invalid}">
+                                <label class="col-md-5 control-label">
+                                    Version :
+                                    <span class="required">*</span>
+                                </label>
+                                <div class="col-md-7">
+                                    <select class="form-control" ng-model="SubjectSetup.VersionID" required name="Version" ng-options="SubjectSetup.VersionId as SubjectSetup.VersionName for SubjectSetup in CommonFeilds.Version">
+                                        <option value="" selected="selected">Choose an Option</option>
+                                    </select>
+                                    <div class="form-control-focus"> </div>
+                                    <span ng-show="submitted1 && formCommonFeilds.Version.$error.required" class="help-block">Version Required</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">  
+                            <div class="form-group" ng-class="{ 'has-error' : submitted1 && formCommonFeilds.Session.$invalid}">
+                                <label class="col-md-5 control-label">
+                                    Session :
+                                    <span class="required">*</span>
+                                </label>
+                                <div class="col-md-7">
+                                    <select class="form-control" ng-model="SubjectSetup.SessionId" required name="Session" ng-options="SubjectSetup.SessionId as SubjectSetup.SessionName for SubjectSetup in CommonFeilds.Session">
+                                        <option value="" selected="selected">Choose an Option</option>
+                                    </select>
+                                    <div class="form-control-focus"> </div>
+                                    <span ng-show="submitted1 && formCommonFeilds.Session.$error.required" class="help-block">Session Required</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group" ng-class="{ 'has-error' : submitted1 && formCommonFeilds.Class.$invalid}">
+                                <label class="col-md-5 control-label">
+                                    Class :
+                                </label>
+                                <div class="col-md-7">
+                                    <select class="form-control" ng-model="SubjectSetup.ClassId" ng-change="GetGroup(SubjectSetup.ClassId)" name="Class"  ng-options="SubjectSetup.ClassId as SubjectSetup.ClassName for SubjectSetup in CommonFeilds.ClassInfo | filter:{VersionId:SubjectSetup.VersionID}:true">
+                                        <option value="" selected="selected">Choose an Option</option>
+                                    </select>
+                                    <span ng-show="submitted1 && formCommonFeilds.Class.$error.required" class="help-block">Class Required</span>*
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label class="col-md-5 control-label">
+                                    Group :
+                                </label>
+                                <div class="col-md-7">
+                                    <select id="grp" class="form-control" ng-model="SubjectSetup.GroupId"  name="Group" ng-disabled="Groups.length <= 0" ng-options="G.GroupId as G.GroupName for G in Groups" >
+                                        <option value="" selected="selected">Choose an Option</option>
+                                    </select>
+                                    <div class="form-control-focus"> </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="btn-group btn-group-solid pull-right" style="margin-bottom:5px">
+                        <button ng-click="submitted1=true" class="btn btn-primary btn-large">&nbsp;&nbsp; <i class="fa fa-search"></i> Show &nbsp;&nbsp;&nbsp;&nbsp;</button>
+                        <a ng-click="generateReport()" style="margin-left:3px;" class="btn btn-primary">Report</a>
+                    </div>
+
+                </div>
+            </form>
+            <div class="table-container">
+                <div id="sample_3_wrapper" class="dataTables_wrapper no-footer">
+                    <div class="table-scrollable"> </div>
+                    <table class="table table-bordered table-hover">
+                        <thead>
+                            <tr class="bg-primary">
+                                <th width="22%">Main Exam Name</th>                              
+                                <th width="10%">Session</th>
+                                <th width="10%">Class</th>
+                                <th width="12%">Efect On Grand </th>
+                                <th width="12%">Enable For MarkEntry</th>  
+                                <th width="12%">Grand Show Order</th>
+                                <th width="12%">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-show="MainExams.length <= 0"><td colspan="5" style="text-align:center;"><i class="fa fa-refresh"></i> Data not found!</td></tr>
+                            <tr dir-paginate="item in MainExams|itemsPerPage:pagesize" total-items="total_count">
+                                <td>{{item.MainExamName}}</td>
+                                <td>{{item.Session.SessionName}}</td>
+                                <td>{{item.ClassInfo.ClassName}}</td>                               
+                                <td><input type="checkbox" id="MainExamIsGrand" ng-model="item.MainExamIsGrand" ng-checked="item.MainExamIsGrand==true" /></td>
+                                <td><input type="checkbox" id="IsEnableForMakrsEntry" ng-disabled="item.IsDisableForMakrsEntry==true" ng-change="UpdateMainEexam(item)" ng-model="item.IsEnableForMakrsEntry" ng-checked="item.IsEnableForMakrsEntry==true" /></td>
+                                <td>{{item.MainExamGrandShowOrder}}</td>
+                                <td>
+                                    <a href="~/Result/ExamEditWizard?MainExamId={{item.MainExamId}}" class="btn btn-icon-only green"  target="_blank">
+                                        <i class="fa fa-edit"></i>
+                                    </a>
+                                    <a ng-click="deleteMainExam(item)" href="javascript:;" class="btn btn-icon-only red">
+                                        <i class="fa fa-trash"></i>
+                                    </a>
+                                </td>
+                            </tr>                           
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+  <script type="text/javascript">
+      OEMSApp.controller("ctrlExamList", ["$scope", "$http", "SweetAlert", "$window",
+              function ($scope, $http, SweetAlert, $window) {
+                  init();
+                  function init() {
+                      initialize();
+                      getAllCommons();
+                      GetAllMainExam();  //for subExam
+                  }
+                  function initialize() {
+                      $scope.MainExam = {};
+                      $scope.Mainexam = {};
+                      $scope.MainExam.MainExamId = 0;
+                      $scope.MainExams = [];
+
+                      $scope.CommonFeilds = [];
+                      $scope.res = {};
+                      $scope.data = {};
+                      $scope.resetForm = resetForm;
+                      $scope.getAllCommons = getAllCommons;
+                      $scope.GetAllMainExam = GetAllMainExam;                        
+                      $scope.getMainExam = getMainExam;
+                  }
+                  //for class ways report ........ SubjectSetup.VersionID  SessionId
+                  $scope.generateReport = function generateReport() {
+                      if ($scope.SubjectSetup.VersionID == null) {
+                          toastr["info"]("Select a Version.");
+                      }
+                      else if ($scope.SubjectSetup.SessionId == null) {
+                          toastr["info"]("Select a Session.");
+                      }
+                      else {
+                          $scope.uri = "@Url.Action("MainExamListReport", "Report")?VersionID=" + $scope.SubjectSetup.VersionID + "&SessionID=" + $scope.SubjectSetup.SessionId;
+                          $window.open($scope.uri, '_blank');
+                      }
+                  }
+                  function resetForm() {               
+                      $scope.MainExam = {};
+                      $scope.MainExam.MainExamId = 0;  
+                      $scope.submited1 = false;
+                  }
+                  function getAllCommons() {
+                      $scope.CommonFeilds = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Common/GetCommonItem/'
+                      }).then(function successCallback(response) {
+                          $scope.CommonFeilds = response.data.results;
+                      }, function errorCallback(response) {
+                          toastr["info"](response.data.message);
+                      });
+                  }
+                  $scope.GetGroup = function GetGroup(classid) {
+                      $scope.Groups = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Common/GetGroup/' + classid
+                      }).then(function successCallback(response) {
+                          $scope.Groups = response.data.results;
+                      }, function errorCallback(response) {
+                          toastr["info"](response.data.message);
+                      });
+                  }
+                  //mainExam
+                  function getMainExam() {
+                      if ($scope.formCommonFeilds.$invalid)
+                          return;
+                      $scope.MainExams = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'ExamSetup/GetMainExamBySession/' + $scope.SubjectSetup.VersionID + '/' + $scope.SubjectSetup.SessionId + '/' + $scope.SubjectSetup.ClassId + '/' + $scope.SubjectSetup.GroupId
+                      }).then(function successCallback(response) {
+                          $scope.MainExams = response.data.results;
+                          $scope.total_count = response.data.totalcount;
+                          if ($scope.pagesize == -1)
+                              $scope.pagesize = 500;
+                      }, function errorCallback(response) {
+                          toastr["info"](response.data.message);
+                      });
+                  };
+                  function GetAllMainExam() {
+                      $scope.MainExams = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'ExamSetup/GetAllMainExam/'
+                      }).then(function successCallback(response) {
+                          $scope.MainExams = response.data.results;
+                          $scope.total_count = response.data.totalcount;
+                          if ($scope.pagesize == -1)
+                              $scope.pagesize = 500;
+                      }, function errorCallback(response) {
+                          toastr["info"](response.data.message);
+                      });
+                  };
+                  $scope.UpdateMainEexam = function UpdateMainEexam(item) {
+
+                      $http({
+                          method: 'PUT',
+                          url: baseUrl + 'ExamSetup/UpdateMainExam/',
+                          data: item
+                      }).then(function successCallback(response) {
+                          if ($scope.SubjectSetup == null) {
+                              GetAllMainExam();
+                          } else {
+                              getMainExam();
+                          }
+                          toastr["info"](response.data.message);
+                      }, function errorCallback(response) {
+                          toastr["error"](response.data.Message);
+                      });
+
+                  };
+                  $scope.deleteMainExam = function (mainExam) {
+                      $scope.MainExam = mainExam;
+                      SweetAlert.swal({
+                          title: "Are you sure to delete it ?", type: "warning", showCancelButton: true, confirmButtonColor: "#DD6B55",
+                          confirmButtonText: "Yes, delete it!",
+                          closeOnConfirm: false
+                      },
+                      function (isConfirm) {
+                          if (isConfirm) {
+                              $http({
+                                  method: 'PUT',
+                                  url: baseUrl + '/ExamSetup/DeleteMainExam/', // + dividedExam
+                                  data: mainExam
+                              }).then(function successCallback(response) {
+                                  SweetAlert.swal("Deleted!", "Your data has been deleted.", "success");
+                                  $scope.MainExams = response.data.results;                                  
+                              }, function errorCallback(response) {
+                                  toastr["error"](response.data.Message);
+                              });
+                          }
+                      });
+                  };
+                  //mainExam
+              }]);
+</script>
+
+}

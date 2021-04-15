@@ -1,0 +1,264 @@
+﻿
+@{
+    ViewBag.Title = "Attendance Summary";
+}
+
+
+<div class="portlet box" style="background-color:#18979b" ng-controller="BSU">
+    <div class="portlet-title">
+        <div class="caption">
+            <i class="fa fa-bar-chart-o" style="color:white"></i> Attendance Summary (Date Range wise)
+        </div>
+
+    </div>
+    <div class="portlet-body form">
+        <!-- BEGIN First FORM-->
+        <form class="form-horizontal" ng-submit="Search(formCommonFeilds.$valid)" id="formCommonFeilds" name="formCommonFeilds" novalidate>
+            <div class="form-body">
+                <div class="row">
+                    <div class="col-md-4">
+                     
+                        <div class="form-group" ng-class="{ 'has-error' : submitted && formCommonFeilds.Session.$invalid}">
+                            <label class="col-md-5 control-label">
+                                Session :
+                                <span class="required">*</span>
+                            </label>
+                            <div class="col-md-7">
+                                <select class="form-control" ng-model="StdDailyAtteneance.SessionId" required name="Session" ng-options="StdDailyAtteneance.SessionId as StdDailyAtteneance.SessionName for StdDailyAtteneance in CommonFeilds.Session">
+                                    <option value="" selected="selected">Choose Option</option>
+                                </select>
+
+                                <div class="form-control-focus"> </div>
+                                <span ng-show="submitted && formCommonFeilds.Session.$error.required" class="help-block">Session Required</span>
+                            </div>
+                        </div>
+                        <div class="form-group" ng-class="{ 'has-error' : submitted && formCommonFeilds.Branch.$invalid}">
+                            <label class="col-md-5 control-label">
+                                Branch :
+                                <span class="required">*</span>
+                            </label>
+                            <div class="col-md-7">
+                                <select class="form-control" ng-model="StdDailyAtteneance.BranchId" required name="Branch" ng-options="StdDailyAtteneance.BranchId as StdDailyAtteneance.BranchName for StdDailyAtteneance in CommonFeilds.Branch">
+                                    <option value="" selected="selected">Choose Option</option>
+                                </select>
+                                <div class="form-control-focus"> </div>
+                                <span ng-show="submitted && formCommonFeilds.Branch.$error.required" class="help-block">Branch Name Required</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group" ng-class="{ 'has-error' : submitted && formCommonFeilds.Shift.$invalid}">
+                            <label class="col-md-5 control-label">
+                                Shift :
+                                <span class="required">*</span>
+                            </label>
+                            <div class="col-md-7">
+                                <select class="form-control" ng-model="StdDailyAtteneance.ShiftId" required name="Shift" ng-options="StdDailyAtteneance.ShiftId as StdDailyAtteneance.ShiftName for StdDailyAtteneance in CommonFeilds.Shift | filter:{BranchId:StdDailyAtteneance.BranchId}:true">
+                                    <option value="" selected="selected">Choose Option</option>
+                                </select>
+                                <div class="form-control-focus"> </div>
+                                <span ng-show="submitted && formCommonFeilds.Shift.$error.required" class="help-block">Shift Name Required</span>
+                            </div>
+                        </div>
+                        <div class="form-group" ng-class="{ 'has-error' : submitted && formCommonFeilds.Class.$invalid}">
+                            <label class="col-md-5 control-label">
+                                Class :
+                                <span class="required">*</span>
+                            </label>
+                            <div class="col-md-7">
+                                <select class="form-control" ng-model="StdDailyAtteneance.ClassId" ng-disabled="sid" required name="Class" ng-change="getExam();GetSection()" ng-options="StdDailyAtteneance.ClassId as StdDailyAtteneance.ClassName for StdDailyAtteneance in CommonFeilds.ClassInfo">
+                                    <option value="" selected="selected">Choose Option</option>
+                                </select>
+                                <div class="form-control-focus"> </div>
+                                <span ng-show="submitted && formCommonFeilds.Class.$error.required" class="help-block">Class Required</span>
+                            </div>
+                        </div>
+                   
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group" ng-class="{ 'has-error' : submitted && formCommonFeilds.Section.$invalid}">
+                            <label class="col-md-5 control-label">
+                                Section :
+                                <span class="required">*</span>
+                            </label>
+                            <div class="col-md-7">
+                                <select class="form-control" ng-disabled="StdDailyAtteneance.ClassId==null" ng-model="StdDailyAtteneance.SectionId" required name="Section" ng-options="S.SectionId as S.SectionName for S in Sections">
+                                    <option value="" selected="selected">Choose Option</option>
+                                </select>
+                                <div class="form-control-focus"> </div>
+                                <span ng-show="submitted && formCommonFeilds.Section.$error.required" class="help-block">Section Name Required</span>
+                            </div>
+                        </div>
+                        <div class="form-group" ng-class="{ 'has-error' : submitted && formCommonFeilds.FromDate.$invalid}">
+                            <label class="col-md-5 control-label">
+                                From Date :
+                                <span class="required">*</span>
+                            </label>
+                            <div class="col-md-7">
+                                <input  class="form-control" name="FromDate" required type="datetime" placeholder="From Date" readonly  ng-click="p1=true" is-open="p1" uib-datepicker-popup="dd-MM-yyyy" ng-model="StdDailyAtteneance.From" />
+                                <div class="form-control-focus"> </div>
+                                <span ng-show="submitted && formCommonFeilds.FromDate.$error.required" class="help-block">Type Required</span>
+                            </div>
+                        </div>
+                        <div class="form-group" ng-class="{ 'has-error' : submitted && formCommonFeilds.ToDate.$invalid}">
+                            <label class="col-md-5 control-label">
+                                To Date :
+                                <span class="required">*</span>
+                            </label>
+                            <div class="col-md-7">
+                                <input class="form-control" name="ToDate" required type="datetime" placeholder="To Date" readonly  ng-click="p2=true" is-open="p2" uib-datepicker-popup="dd-MM-yyyy" ng-model="StdDailyAtteneance.To" />
+                                <div class="form-control-focus"> </div>
+                                <span ng-show="submitted && formCommonFeilds.ToDate.$error.required" class="help-block">Type Required</span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-4 control-label">
+                            </label>
+                            <div class="col-md-6 pull-right">
+                                <button ng-click="submitted=true;" class="btn green">Show</button>
+                                <button type="button" ng-click="Report()" class="btn info">Report</button>
+                                <button type="button" ng-click="Reset()" class="btn info">Reset</button>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </form>
+        <!-- End First Form-->
+
+    </div>
+    <!-- BEGIN TABLE-->
+    <div class="portlet-body">
+        <div class="table-container">
+            <div id="sample_3_wrapper" class="dataTables_wrapper no-footer">
+                <table class="table table-bordered table-hover">
+                    <thead style="background-color:#18979b">
+                        <tr>
+                            <th>Student ID</th>
+                            <th>Name</th>
+                            <th>Roll</th>
+                            <th>Working Days</th>
+                            <th>Present</th>
+                            <th>Absent</th>
+                            <th>Leave</th>
+                            <th>Percentage</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-show="AspNetusers.results.length <= 0"><td colspan="5" style="text-align:center;"><i class="fa fa-refresh"></i> Loading new data!!</td></tr>
+                        <tr ng-repeat="item in StudentAttendentInfos">
+                            <td>{{item.StudentInsID}}</td>
+                            <td>{{item.FullName}}</td>
+                            <td>{{item.RollNo}}</td>
+                            <td>{{item.WorkingDays}}</td>
+                            <td>{{item.Present}}</td>
+                            <td>{{item.Absent}}</td>
+                            <td>{{item.IsLeave}}</td>
+                            <td>{{(item.Present*100)/item.WorkingDays| number : 2}}%</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <!-- END TALE-->
+</div>
+
+
+@section Scripts{
+    <script type="text/javascript">
+        OEMSApp.controller("BSU", ["$scope", "$http", "SweetAlert", "$filter", "$window",
+          function ($scope, $http, SweetAlert, $filter, $window) {
+
+              init();
+              function init() {
+                  initialize();
+                  getAllCommons();
+              }
+              function initialize() {
+                  $scope.StdDailyAtteneance = [];
+
+              };
+              $scope.Reset = function Reset()
+              {
+
+                  $scope.submitted = false;
+                  $scope.StdDailyAtteneance = [];
+              };
+              function getAllCommons() {//for First form
+                  $scope.CommonFeilds = [];
+
+                  $http({
+                      method: 'GET',
+                      url: baseUrl + 'Common/GetCommonItem/'
+                  }).then(function successCallback(response) {
+                      $scope.CommonFeilds = response.data.results;
+
+                  }, function errorCallback(response) {
+                      if (response.data.message!=null)
+                      toastr["error"](response.data.message);
+                  });
+              }
+           
+              $scope.GetSection = function GetSection() {//Section droupdown lood for first form
+                  $scope.Sections = []; // ShiID BranchId
+                  $http({
+                      method: 'GET',
+                      url: baseUrl + 'Common/GetSection/' + $scope.StdDailyAtteneance.SessionId + "/" + $scope.StdDailyAtteneance.ShiftId + "/" + $scope.StdDailyAtteneance.ClassId
+                  }).then(function successCallback(response) {
+                      $scope.Sections = response.data.results;
+                  }, function errorCallback(response) {
+                      if (response.data.message != null)
+                      toastr["error"](response.data.message);
+                  });
+              }
+              $scope.Search = function Search(formCommonFeilds) {
+                  if (formCommonFeilds) {
+                      $scope.StudentAttendentInfos = [];
+                      var FromDate = $filter('date')($scope.StdDailyAtteneance.From, "MM/dd/yyyy");
+                      var ToDate = $filter('date')($scope.StdDailyAtteneance.To, "MM/dd/yyyy");
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Attendance/StudentAttendanceSummaryRange?VersionId=' + $scope.StdDailyAtteneance.VersionId + '&SessionId=' + $scope.StdDailyAtteneance.SessionId + '&BranchId=' + $scope.StdDailyAtteneance.BranchId + '&ShiftId=' + $scope.StdDailyAtteneance.ShiftId + '&ClassId=' + $scope.StdDailyAtteneance.ClassId + '&GroupId=' + $scope.StdDailyAtteneance.GroupId + '&SectionId=' + $scope.StdDailyAtteneance.SectionId + '&FromDate=' + FromDate + '&ToDate=' + ToDate
+                          
+                      }).then(function successCallback(response) {
+                          $scope.StudentAttendentInfos = response.data.results;
+                          if (response.data.message != null)
+                          toastr["success"](response.data.message);
+                      }, function errorCallback(response) {
+                          if (response.data.message != null)
+                          toastr["error"](response.data.message);
+                      });
+                  }
+              };
+              $scope.Report = function Report() {
+               if ($scope.StdDailyAtteneance.SessionId == null) {
+                      toastr["info"]("Session is Required.");
+                  }
+                  else if ($scope.StdDailyAtteneance.BranchId == null) {
+                      toastr["info"]("Branch is Required.");
+                  } else if ($scope.StdDailyAtteneance.ShiftId == null) {
+                      toastr["info"]("Shift is Required.");
+                  }
+                  else if ($scope.StdDailyAtteneance.ClassId == null) {
+                      toastr["info"]("Class is Required.");
+                  }
+                  else if ($scope.StdDailyAtteneance.SectionId == null) {
+                      toastr["info"]("Section is Required.");
+                  } 
+                  else if ($scope.StdDailyAtteneance.From == null) {
+                      toastr["info"]("From Date is Required.");
+                  } else if ($scope.StdDailyAtteneance.To == null) {
+                      toastr["info"]("To Date is Required.");
+                  } else {
+                      var FromDate = $filter('date')($scope.StdDailyAtteneance.From, "MM/dd/yyyy");
+                      var ToDate = $filter('date')($scope.StdDailyAtteneance.To, "MM/dd/yyyy");
+                      $scope.uri = "@Url.Action("StudentAttendanceSummaryRange", "Report")?SessionID=" + $scope.StdDailyAtteneance.SessionId + "&BranchId=" + $scope.StdDailyAtteneance.BranchId + "&ShiftId=" + $scope.StdDailyAtteneance.ShiftId + "&ClassId=" + $scope.StdDailyAtteneance.ClassId + "&SectionId=" + $scope.StdDailyAtteneance.SectionId + '&FromDate=' + FromDate + '&ToDate=' + ToDate;
+                      $window.open($scope.uri, '_blank');
+                  }
+              };
+          }]);
+    </script>
+}
+

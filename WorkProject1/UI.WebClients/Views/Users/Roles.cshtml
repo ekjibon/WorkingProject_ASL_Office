@@ -1,0 +1,488 @@
+﻿
+@{
+    ViewBag.Title = "Roles";
+}
+
+<div class="kt-container  kt-container--fluid  kt-grid__item kt-grid__item--fluid" ng-controller="roles"> 
+
+    <div class="row">
+        <div class="kt-portlet kt-portlet--mobile">
+            <div class="kt-portlet__head kt-portlet__head--lg">
+                <div class="kt-portlet__head-label">
+                    <h3 class="kt-portlet__head-title">
+                        All Roles
+                    </h3>
+                </div>
+                <div class="kt-portlet__head-toolbar">
+                    <div class="kt-portlet__head-wrapper">
+                        <div class="dropdown dropdown-inline">
+                            <button type="button" ng-click="resetForm()" class="btn btn-brand btn-icon-sm" data-toggle="modal" data-target="#addmodal" aria-haspopup="true" aria-expanded="false">
+                                <i class="flaticon2-plus"></i> Add New Roles
+                            </button>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="kt-portlet__body">
+
+                <div class="row">
+                    <div class="col-md-4 col-sm-5 col-xs-6">
+                        <div class="form-group">
+                            <div class="col-lg-3 col-md-5 col-sm-4 col-xs-8" style="padding-left:0px">
+
+                                <select class="form-control kt-font-brand" ng-model="pageSize" ng-options="P.value as P.text for P in pageSizeArray"></select>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="col-md-4 col-sm-3 col-xs-1">
+                    </div>
+                    <div class="col-md-4 col-sm-4 col-xs-5">
+                        <div id="sample_3_filter" class="pull-right">
+                            <input ng-model="q" id="search" class="form-control" placeholder="Filter text">
+                        </div>
+                    </div>
+                </div>
+                <table class="table table-bordered table-hover rounded">
+                    <thead>
+                        <tr class="btn-primary">
+                            <th>Role Name</th>
+                            <th>Permission</th>
+
+                            <th>Action</th>
+
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-show="AspNetRoles.results.length <= 0">
+                            <td colspan="5" style="text-align:center;">
+                                <i class="fa fa-refresh"></i> Loading new data!!
+                            </td>
+                        </tr>
+                        <tr dir-paginate="item in AspNetRoles.results| filter:q  |itemsPerPage:pageSize" total-items="total_count">
+
+                            <td>{{item.Name}}</td>
+                            <td><a href="~/Users/RolePermission?R={{item.Id}}" class="label label-sm label-info"> View </a></td>
+
+                            <td>
+                                <a href="javascript:;" class="btn btn-outline-brand btn-elevate btn-icon" ng-click="edit(item)" data-target="#addmodal" data-toggle="modal">
+                                    <i class="fa fa-edit"></i>
+                                </a>
+                                <a ng-click="deleterole(item)" class="btn btn-outline-danger btn-elevate btn-icon" id="kt_sweetalert_demo_9" href="javascript:;" >
+                                    <i class="fa fa-trash"></i>
+                                </a>
+
+
+                            </td>
+
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="row">
+                    <dir-pagination-controls boundary-links="true" template-url="~/assets/angular/lib/dirPagination.tpl.html"></dir-pagination-controls>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+    <!-- Begin: life time stats -->
+    @*<div class="portlet light bordered">
+        <div class="portlet-title">
+            <div class="caption">
+                <i class="icon-settings font-green"></i>
+                <span class="caption-subject font-green sbold uppercase">@ViewBag.Title</span>
+            </div>
+            <div class="actions">
+                <div class="btn-group btn-group-solid">
+                    <button ng-click="resetForm()" class="btn green" data-target="#addmodal" data-toggle="modal"> <i class="fa fa-plus"></i> Add New</button>
+                </div>
+
+            </div>
+        </div>
+        <div class="portlet-body">
+            <div class="table-container">
+                <div class="row">
+                    <div class="col-md-4 pull-left">
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-md-2">
+                                    <label for="search" class="control-label">Items:</label>
+                                </div>
+                                <div class="col-md-3">
+                                    <select ng-model="pagesize" ng-change="searchData()" aria-controls="sample_3" class="form-control input-sm input-xsmall input-inline">
+                                        <option value="10" selected="selected">10</option>
+                                        <option value="15">15</option>
+                                        <option value="20">20</option>
+                                        <option value="-1">All</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-7">
+
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="col-md-4 pull-right">
+
+                    </div>
+                    <div class="col-md-4 pull-right">
+                        <div class="form-group">
+                            <div class="row">
+                                <div class="col-md-2">
+                                    <label for="search" class="control-label">Search:</label>
+                                </div>
+                                <div class="col-md-10 form-group">
+                                    <input ng-change="searchData()" type="text" ng-model="search" class="form-control input-sm input-small input-inline" placeholder="Filter text" aria-controls="sample_3">
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+                <div id="sample_3_wrapper" class="dataTables_wrapper no-footer">
+                  <div class="table-scrollable"> </div>
+                    <table class="table table-bordered table-hover">
+                        <thead>
+                            <tr class="btn-primary">
+                                <th>Role Name</th>
+                                <th>Permission</th>
+                                
+                                <th>Action</th>
+
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-show="AspNetRoles.results.length <= 0">
+                              <td colspan="5" style="text-align:center;">
+                                <i class="fa fa-refresh"></i> Loading new data!!
+                              </td>
+                            </tr>
+                            <tr dir-paginate="item in AspNetRoles.results|itemsPerPage:pagesize" total-items="total_count">
+
+                                <td>{{item.Name}}</td>
+                                <td><a href="~/Users/RolePermission?R={{item.Id}}" class="label label-sm label-info"> View </a></td>
+                               
+                                <td>
+                                    <a href="javascript:;" class="btn btn-icon-only green" ng-click="edit(item)" data-target="#addmodal" data-toggle="modal">
+                                        <i class="fa fa-edit"></i>
+                                    </a>
+                                    <a  ng-click="deleterole(item)" href="javascript:;" class="btn btn-icon-only red">
+                                        <i class="fa fa-trash"></i>
+                                    </a>
+                                   
+                                   
+                                </td>
+
+                            </tr>
+                        </tbody>
+
+                    </table>
+                    
+                    
+                    <div class="row">
+                        <div class="col-sm-6 pull-right">
+                            <dir-pagination-controls max-size="8"
+                                                     direction-links="true"
+                                                     boundary-links="true"
+                                                     on-page-change="getRoles(newPageNumber)">
+                            </dir-pagination-controls>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>*@
+    <!-- End: life time stats -->
+
+    <!--Modal Area Start-->
+    <div id="addmodal" class="modal fade" tabindex="-1" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form name="addform" ng-submit="save()" class="form-horizontal" id="form_sample_1" novalidate>
+                    <div class="modal-header">
+                        <h4 class="modal-title">{{aemodalTitle}}</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                       
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-body">
+                            
+                            <div class="form-group row form-md-line-input" ng-class="{ 'has-error' : submitted && addform.name.$invalid}">
+                                <label class="col-md-3 control-label" for="form_control_1">
+                                   Role Name
+                                    <span class="required">*</span>
+                                </label>
+                                <div class="col-md-9">
+                                    <input type="text" ng-model="rolename" class="form-control" placeholder="Role Name" name="name" required>
+                                    <div class="form-control-focus"> </div>
+                                    <span ng-show="submitted && addform.name.$error.required" class="help-block">Role Name Required;</span>
+                                </div>
+                            </div>
+                            
+                            
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" data-dismiss="modal" class="btn btn-secondary" ng-click="resetForm();submitted=false">Cancel</button>
+                        <button type="submit"  ng-click="submitted=true" class="btn btn-success">Save</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!--Modal Area End-->
+
+</div>
+
+@section Scripts{
+   
+
+   <script type="text/javascript" >
+       OEMSApp.controller("roles", ["$scope", "$http", "SweetAlert",
+          function ($scope, $http, SweetAlert) {
+
+              init();
+              function init() {
+                  initialize();
+                  getRoles(1);
+
+              }
+              function initialize() {
+                  $scope.aemodalTitle = "Add Roles";
+                  $scope.rolename = '';
+                  $scope.currentPage = 1;
+                  $scope.pageno = 1;
+                  $scope.pagesize = 10;
+                  $scope.total_count = 12;
+                  $scope.search = '';
+                  $scope.AspNetRole = {};
+                  $scope.AspNetRoles = [];
+                  $scope.Id = '';
+                  $scope.getRoles = getRoles;
+                  $scope.res = {};
+                  $scope.data = {};
+                  $scope.resetForm = resetForm;
+
+                  $scope.pagesize = 10;
+                  $scope.pageSizeArray = [];
+                  $scope.pageSizeArray.push({ value: 5, text: 5 });
+                  $scope.pageSizeArray.push({ value: 10, text: 10 });
+                  $scope.pageSizeArray.push({ value: 20, text: 20 });
+                  $scope.pageSizeArray.push({ value: 50, text: 50 });
+                  $scope.currentPage = 1;
+                  $scope.pageSize = 10;
+              }
+              function resetForm() {
+                  $scope.aemodalTitle = "Add Roles";
+                  $scope.rolename = '';
+                  $scope.addform.$setUntouched();
+                  $scope.addform.$setPristine();
+                  $scope.submitted = false;
+                  $scope.Id = '';
+              }
+
+              function getRoles(pageno) {
+                  $scope.AspNetRoles = [];
+                  var searchtxt = $scope.search;
+                  if ($scope.search == 'undefined' || $scope.search == '') {
+                      searchtxt = 'null';
+                  }
+                  $scope.pageno = pageno;
+                  $http({
+                      method: 'GET',
+                      url: baseUrl + 'user/roles/' + $scope.pageno + '/' + $scope.pagesize + '/' + searchtxt
+                  }).then(function successCallback(response) {
+                      // this callback will be called asynchronously
+                      // when the response is available
+                      $scope.AspNetRoles = response.data;
+                      // $scope.AspNetRoles = response.data;
+                      $scope.total_count = response.data.totalcount;
+                      //console.log(response.data);
+
+                  }, function errorCallback(response) {
+                      // called asynchronously if an error occurs
+                      // or server returns response with an error status.
+                  });
+
+
+
+                  //$scope.AspNetRoles = $scope.data;
+                  //console.log($scope.data.totalcount);
+                  // $scope.totalcount = 3; //$scope.data.totalcount;
+              }
+              $scope.searchData = function () {
+                  getRoles(1);
+                  // $scope.total_count = 88;
+              };
+              $scope.edit = function (n) {
+                  $scope.aemodalTitle = "Update Roles";
+                  $scope.rolename = n.Name;
+                  $scope.Id = n.Id;
+              };
+              $scope.save = function save() {
+
+                  if ($scope.Id != '') /// For Update
+                  {
+                      if ($scope.rolename != '') {
+                          $http({
+                              method: 'PUT',
+                              url: baseUrl + 'user/UpdateRole/' + $scope.rolename + '/' + $scope.Id
+                          }).then(function successCallback(response) {
+
+                              $('#addmodal').modal('toggle');
+                              getRoles(1);
+                              toastr["info"](response.data.message);
+                              resetForm();
+                          }, function errorCallback(response) {
+
+                          });
+                      }
+                  } else {  //  For Add
+                      if ($scope.rolename != '') {
+                          $http({
+                              method: 'POST',
+                              url: baseUrl + 'user/AddRole/' + $scope.rolename
+                          }).then(function successCallback(response) {
+
+                              $('#addmodal').modal('toggle');
+                              getRoles(1);
+                              toastr["info"](response.data.message);
+                              resetForm();
+                          }, function errorCallback(response) {
+
+                          });
+                      }
+                  }
+
+              };
+              $scope.deleterole = function deleterole(n) {
+
+                  // SweetAlert.swal("Good job!", "You clicked the button!", "success");
+                  SweetAlert.swal({
+                      title: "Are you sure to delete it ?", type: "warning", showCancelButton: true, confirmButtonColor: "#DD6B55",
+                      confirmButtonText: "Yes, delete it!",
+                      closeOnConfirm: false
+                  },
+                  function (isConfirm) {
+
+
+                      if (isConfirm) {
+                          $http({
+                              method: 'DELETE',
+                              url: baseUrl + 'user/DeleteRoles/' + n.Id
+                          }).then(function successCallback(response) {
+                              SweetAlert.swal("Deleted!", "Your data has been deleted.", "success");
+                              getRoles(1);
+                          }, function errorCallback(response) {
+
+                          });
+
+                      }
+                  });
+
+
+              };
+
+          }]);
+    </script>
+
+   <script type="text/javascript">
+        $(document).ready(function () {
+        
+
+            //$('.bs_confirmation_demo_1').on('confirmed.bs.confirmation', function () {
+            //    alert('You confirmed action #1');
+            //});
+            //$(document).on('click','.ff', function () {
+            //    //$('[data-toggle=confirmation]').confirmation({ rootSelector: '[data-toggle=confirmation]', btnOkClass: 'btn btn-sm btn-success', btnCancelClass: 'btn btn-sm btn-danger' });
+            //    var sa_title = $(this).data('title');
+            //    var sa_message = $(this).data('message');
+            //    var sa_type = $(this).data('type');
+            //    var sa_allowOutsideClick = $(this).data('allow-outside-click');
+            //    var sa_showConfirmButton = $(this).data('show-confirm-button');
+            //    var sa_showCancelButton = $(this).data('show-cancel-button');
+            //    var sa_closeOnConfirm = $(this).data('close-on-confirm');
+            //    var sa_closeOnCancel = $(this).data('close-on-cancel');
+            //    var sa_confirmButtonText = $(this).data('confirm-button-text');
+            //    var sa_cancelButtonText = $(this).data('cancel-button-text');
+            //    var sa_popupTitleSuccess = $(this).data('popup-title-success');
+            //    var sa_popupMessageSuccess = $(this).data('popup-message-success');
+            //    var sa_popupTitleCancel = $(this).data('popup-title-cancel');
+            //    var sa_popupMessageCancel = $(this).data('popup-message-cancel');
+            //    var sa_confirmButtonClass = $(this).data('confirm-button-class');
+            //    var sa_cancelButtonClass = $(this).data('cancel-button-class');
+            //    swal({
+            //        title: sa_title,
+            //        text: sa_message,
+            //        type: sa_type,
+            //        allowOutsideClick: sa_allowOutsideClick,
+            //        showConfirmButton: sa_showConfirmButton,
+            //        showCancelButton: sa_showCancelButton,
+            //        confirmButtonClass: sa_confirmButtonClass,
+            //        cancelButtonClass: sa_cancelButtonClass,
+            //        closeOnConfirm: sa_closeOnConfirm,
+            //        closeOnCancel: sa_closeOnCancel,
+            //        confirmButtonText: sa_confirmButtonText,
+            //        cancelButtonText: sa_cancelButtonText,
+            //    },
+            //    function (isConfirm) {
+            //        if (isConfirm) {
+            //            swal(sa_popupTitleSuccess, sa_popupMessageSuccess, "success");
+            //        } else {
+            //            swal(sa_popupTitleCancel, sa_popupMessageCancel, "error");
+            //        }
+            //    });
+            //});
+            //$('.mt-sweetalert').each(function () {
+            //    var sa_title = $(this).data('title');
+            //    var sa_message = $(this).data('message');
+            //    var sa_type = $(this).data('type');
+            //    var sa_allowOutsideClick = $(this).data('allow-outside-click');
+            //    var sa_showConfirmButton = $(this).data('show-confirm-button');
+            //    var sa_showCancelButton = $(this).data('show-cancel-button');
+            //    var sa_closeOnConfirm = $(this).data('close-on-confirm');
+            //    var sa_closeOnCancel = $(this).data('close-on-cancel');
+            //    var sa_confirmButtonText = $(this).data('confirm-button-text');
+            //    var sa_cancelButtonText = $(this).data('cancel-button-text');
+            //    var sa_popupTitleSuccess = $(this).data('popup-title-success');
+            //    var sa_popupMessageSuccess = $(this).data('popup-message-success');
+            //    var sa_popupTitleCancel = $(this).data('popup-title-cancel');
+            //    var sa_popupMessageCancel = $(this).data('popup-message-cancel');
+            //    var sa_confirmButtonClass = $(this).data('confirm-button-class');
+            //    var sa_cancelButtonClass = $(this).data('cancel-button-class');
+
+            //    $(this).click(function () {
+            //        //console.log(sa_btnClass);
+            //        swal({
+            //            title: sa_title,
+            //            text: sa_message,
+            //            type: sa_type,
+            //            allowOutsideClick: sa_allowOutsideClick,
+            //            showConfirmButton: sa_showConfirmButton,
+            //            showCancelButton: sa_showCancelButton,
+            //            confirmButtonClass: sa_confirmButtonClass,
+            //            cancelButtonClass: sa_cancelButtonClass,
+            //            closeOnConfirm: sa_closeOnConfirm,
+            //            closeOnCancel: sa_closeOnCancel,
+            //            confirmButtonText: sa_confirmButtonText,
+            //            cancelButtonText: sa_cancelButtonText,
+            //        },
+			//		function (isConfirm) {
+			//		    if (isConfirm) {
+			//		        swal(sa_popupTitleSuccess, sa_popupMessageSuccess, "success");
+			//		    } else {
+			//		        swal(sa_popupTitleCancel, sa_popupMessageCancel, "error");
+			//		    }
+			//		});
+            //    });
+            //});
+            
+        });
+    </script>
+
+}

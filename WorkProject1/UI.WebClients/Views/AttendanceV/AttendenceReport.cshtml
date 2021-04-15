@@ -1,0 +1,354 @@
+﻿@{
+    ViewBag.Title = "Attendence Report";
+}
+<div ng-controller="ctrlAttReport">
+    <!-- Begin: life time stats -->
+    <div class="portlet light bordered">
+        <div class="portlet-title">
+            <div class="caption">
+                <i class="icon-settings font-green"></i>
+                <span class="caption-subject font-green sbold uppercase">@ViewBag.Title</span>
+            </div>
+            <div class="actions">
+                <a title="" class="btn btn-circle btn-icon-only btn-default fullscreen" href="javascript:;" data-original-title=""> </a>
+            </div>
+        </div>
+        <div class="portlet-body">
+            <form class="form-horizontal" ng-submit="SearchAttReport()" id="frmCommon" name="formCommonFeilds" novalidate>
+                <div class="form-body">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="form-group" ng-class="{ 'has-error' : submitted && formCommonFeilds.Version.$invalid}">
+                                <label class="col-md-5 control-label">
+                                    Version :
+                                    <span class="required">*</span>
+                                </label>
+                                <div class="col-md-7">
+                                    <select class="form-control" ng-model="AttReport.VersionId" required name="Version" ng-options="AttReport.VersionId as AttReport.VersionName for AttReport in CommonFeilds.Version">
+                                        <option value="" selected="selected">Choose Option</option>
+                                    </select>
+                                    <div class="form-control-focus"> </div>
+                                    <span ng-show="submitted && formCommonFeilds.Version.$error.required" class="help-block">Version Required</span>
+                                </div>
+                            </div>
+                            <div class="form-group" ng-class="{ 'has-error' : submitted && formCommonFeilds.Session.$invalid}">
+                                <label class="col-md-5 control-label">
+                                    Session :
+                                    <span class="required">*</span>
+                                </label>
+                                <div class="col-md-7">
+                                    <select class="form-control" ng-model="AttReport.SessionId" required name="Session" ng-options="AttReport.SessionId as AttReport.SessionName for AttReport in CommonFeilds.Session">
+                                        <option value="" selected="selected">Choose Option</option>
+                                    </select>
+
+                                    <div class="form-control-focus"> </div>
+                                    <span ng-show="submitted && formCommonFeilds.Session.$error.required" class="help-block">Session Required</span>
+                                </div>
+                            </div>
+                            <div class="form-group" ng-class="{ 'has-error' : submitted && formCommonFeilds.Class.$invalid}">
+                                <label class="col-md-5 control-label">
+                                    Branch :
+                                    <span class="required">*</span>
+                                </label>
+                                <div class="col-md-7">
+                                    <select class="form-control" ng-model="AttReport.BranchId" name="Branch" required ng-options="AttReport.BranchId as AttReport.BranchName for AttReport in CommonFeilds.Branch">
+                                        <option value="" selected="selected">Choose Option</option>
+                                    </select>
+                                    <div class="form-control-focus"> </div>
+                                    <span ng-show="submitted && formCommonFeilds.Branch.$error.required" class="help-block">Branch Required</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group" ng-class="{ 'has-error' : submitted && formCommonFeilds.Shift.$invalid}">
+                                <label class="col-md-5 control-label">
+                                    Shift :
+                                    <span class="required">*</span>
+                                </label>
+                                <div class="col-md-7">
+                                    <select class="form-control" ng-model="AttReport.ShiftId" required name="Shift" ng-options="AttReport.ShiftId as AttReport.ShiftName for AttReport in CommonFeilds.Shift | filter:{BranchId:AttReport.BranchID}:true">
+                                        <option value="" selected="selected">Choose Option</option>
+                                    </select>
+                                    <div class="form-control-focus"> </div>
+                                    <span ng-show="submitted && formCommonFeilds.Shift.$error.required" class="help-block">Shift Name Required</span>
+                                </div>
+                            </div>
+                            <div class="form-group" ng-class="{ 'has-error' : submitted && formCommonFeilds.Class.$invalid}">
+                                <label class="col-md-5 control-label">
+                                    Class :
+                                    <span class="required">*</span>
+                                </label>
+                                <div class="col-md-7">
+                                    <select class="form-control" ng-model="AttReport.ClassId" name="Class" ng-change="GetGroup(AttReport.ClassId)" required ng-options="AttReport.ClassId as AttReport.ClassName for AttReport in CommonFeilds.ClassInfo | filter:{VersionId:AttReport.VersionId}:true">
+                                        <option value="" selected="selected">Choose Option</option>
+                                    </select>
+                                    <div class="form-control-focus"> </div>
+                                    <span ng-show="submitted && formCommonFeilds.Class.$error.required" class="help-block">Class Required</span>
+                                </div>
+                            </div>
+                            <div class="form-group" ng-class="{ 'has-error' : submitted && formCommonFeilds.Group.$invalid}">
+                                <label class="col-md-5 control-label">
+                                    Group :
+                                </label>
+                                <div class="col-md-7">
+                                    <select class="form-control" ng-disabled="Groups.length <= 0" ng-change="GetSection();getMainExam()" ng-model="AttReport.GroupId" name="Group" ng-options="G.GroupId as G.GroupName for G in Groups">
+                                        <option value="" selected>Choose Option</option>
+                                    </select>
+                                    <div class="form-control-focus"> </div>
+                                    <span ng-show="submitted && formCommonFeilds.Group.$error.required" class="help-block">Group Required</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group" ng-class="{ 'has-error' : submitted && formCommonFeilds.Section.$invalid}">
+                                <label class="col-md-5 control-label">
+                                    Section :
+                                    <span class="required">*</span>
+                                </label>
+                                <div class="col-md-7">
+                                    <select class="form-control" ng-model="AttReport.SectionId" required name="Section" ng-options="S.SectionId as S.SectionName for S in Sections">
+                                        <option value="" selected="selected">Choose Option</option>
+                                    </select>
+                                    <div class="form-control-focus"> </div>
+                                    <span ng-show="submitted && formCommonFeilds.Section.$error.required" class="help-block">Section Name Required</span>
+                                </div>
+                            </div>
+                            <div class="form-group" ng-class="{ 'has-error' : submitted && formCommonFeilds.Wise.$invalid}">
+                                <label class="col-md-5 control-label">
+                                    Wise :
+                                    <span class="required">*</span>
+                                </label>
+                                <div class="col-md-7">
+                                    <select class="form-control" ng-model="AttReport.Wise" required name="Wise">
+                                        <option value="" selected="selected">Choose Option</option>
+                                        <option value="1">Version</option>
+                                        <option value="2">Session</option>
+                                        <option value="3">Branch</option>
+                                        <option value="4">Shift</option>
+                                        <option value="5">Class</option>
+                                        <option value="6">Group</option>
+                                        <option value="7">Section</option>
+                                    </select>
+                                    <div class="form-control-focus"> </div>
+                                    <span ng-show="submitted && formCommonFeilds.Section.$error.required" class="help-block">Section Name Required</span>
+                                </div>
+                            </div>
+                            <div class="form-group" ng-class="{ 'has-error' : submitted && formCommonFeilds.Type.$invalid}">
+                                <label class="col-md-5 control-label">
+                                    Type :
+                                    <span class="required">*</span>
+                                </label>
+
+                                <div class="col-md-7">
+                                    <select class="form-control" ng-model="AttReport.Type" required name="Type">
+                                        <option value="0" selected="selected">All</option>
+                                        <option value="1">Present</option>
+                                        <option value="2">Leave</option>
+                                        <option value="3">Absent</option>
+                                        <option value="4">Absconding</option>
+                                        <option value="5">Late In</option>
+                                        <option value="6">Early Out</option>
+                                        <option value="7">Late In Early Out</option>
+                                    </select>
+                                    <div class="form-control-focus"> </div>
+                                    <span ng-show="submitted && formCommonFeilds.Type.$error.required" class="help-block">Type Required</span>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="row">
+                        <div class="col-md-9">
+                            <div class="col-md-2">
+                                Filter : <input type="radio" ng-model="radio" value="1" /> Daily
+                            </div>
+                            <div class="col-md-2">
+                                <input type="radio" ng-model="radio" value="2" /> Date Range
+                            </div>
+                            <div class="col-md-2">
+                                <input type="radio" ng-model="radio" value="3" /> Monthly
+                            </div>
+                            <div class="col-md-2">
+                                <input type="radio" ng-model="radio" value="4" /> Half Yearly
+                            </div>
+                            <div class="col-md-2">
+                                <input type="radio" ng-model="radio" value="5" ng-click="Yearatt(AttReport.Year)" /> Yearly
+                            </div>
+                            <div class="row">
+                                <div class="col-md-2" ng-show="radio==1">
+                                    <input type="text" class="form-control" uib-datepicker-popup="{{Dateformat}}" placeholder="Start Date" uib-datepicker-popup="{{format}}"
+                                           ng-model="AttReport.Day" ng-change="Dailyatt(AttReport.Day)" is-open="popup3.opened" ng-click="popup3.opened=true" datepicker-options="dateOptions" ng-required="true" close-text="Close" alt-input-formats="altInputFormats" readonly="readonly" />
+                                    <div class="form-control-focus"> </div>
+                                </div>
+                                <div class="col-md-6" ng-show="radio==2">
+                                    <div class="col-md-6">
+                                        <input type="text" class="form-control" uib-datepicker-popup="{{Dateformat}}" placeholder="Start Date" uib-datepicker-popup="{{format}}" ng-model="AttReport.startDate" is-open="popup3.opened" ng-click="popup3.opened=true" datepicker-options="dateOptions" ng-required="true" close-text="Close" alt-input-formats="altInputFormats" readonly="readonly" />
+                                        <div class="form-control-focus"> </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <input type="text" class="form-control" uib-datepicker-popup="{{Dateformat}}" placeholder="End Date" uib-datepicker-popup="{{format}}" ng-model="AttReport.endDate" is-open="popup4.opened" min-date="AttReport.startDate" ng-click="popup4.opened=true" datepicker-options="dateOptions" ng-required="true" close-text="Close" alt-input-formats="altInputFormats" readonly="readonly" />
+                                        <div class="form-control-focus"> </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-2" ng-show="radio==3">
+                                    <input class="form-control" name="Date" type="datetime" placeholder="Month" readonly ng-click="p3=true" is-open="p3"
+                                           datepicker-options="{minMode: 'month'}" datepicker-mode="'month'" ng-change="Monthlyatt(AttReport.Monthly)" uib-datepicker-popup="MM/yyyy"
+                                           ng-model="AttReport.Monthly" />
+                                </div>
+                                <div class="col-md-6" ng-show="radio==4">
+                                    <div class="col-md-6">
+                                        <input class="form-control" readonly="readonly" ng-init="AttReport.Year=Year" ng-change=""
+                                               ng-model="AttReport.Year" ng-checked="" name="Year" />
+                                    </div>
+                                    <div class="col-md-6">
+                                        <select class="form-control" ng-model="AttReport.Monthly" ng-change="HalfYearlyatt(AttReport.Monthly)">
+                                            <option value="" selected="selected">Choose Option</option>
+                                            <option value="6">Half Year</option>
+                                            <option value="12">Year End</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-2" ng-show="radio==5">
+                                    <input class="form-control" readonly="readonly" ng-init="AttReport.Year=Year" ng-model="AttReport.Year" name="Year" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="pull-right">
+                                <button ng-click="submitted=true;" type="submit" class="btn green">Show</button>
+                                <button ng-click="resetForm()" class="btn info">Reset</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+               
+            </form>
+        </div>
+    </div>
+</div>
+@section Scripts{
+    <script type="text/javascript">
+
+        OEMSApp.controller("ctrlAttReport", ["$scope", "$http", "SweetAlert", "$window","filterFilter","$filter",
+              function ($scope, $http, SweetAlert, $window, filterFilter, $filter) {
+                  init();
+                  function init() {
+                      initialize();
+                      getAllCommons();
+                      TotalDay();
+                  }
+                  function initialize() {
+                      $scope.CommonFeilds = [];
+                      $scope.getAllCommons = getAllCommons;
+                      $scope.Month = new Date().getMonth() + 1;
+                      $scope.Year = new Date().getFullYear();
+                      $scope.DayCount = new Date($scope.Year, $scope.Month, 0).getDate();
+                      $scope.Days = [];
+                      $scope.TotalDay = TotalDay;
+                      $scope.submited = false;
+                      $scope.format = 'dd/MM/yyyy';
+                      $scope.totalSum =0// Total Student
+                      $scope.totalcount = 0 // Total Present
+                      $scope.months = [{ Value: 1, Text: "January" }, { Value: 2, Text: "February" }, { Value: 3, Text: "March" },
+                      { Value: 4, Text: "April" }, { Value: 5, Text: "May" }, { Value: 6, Text: "Jun" }, { Value: 7, Text: "July" },
+                      { Value: 8, Text: "August" }, { Value: 9, Text: "Septomber" }, { Value: 10, Text: "October" }, { Value: 11, Text: "November" }, , { Value: 12, Text: "December" }]
+                  }
+                  $scope.Dailyatt = function Dailyatt(dt){
+                      $scope.AttReport.StartDate = dt;
+                      $scope.AttReport.EndDate = dt;
+                  }
+                  $scope.Monthlyatt = function Monthlyatt(dt) {
+                      var d = new Date(dt.getFullYear(), dt.getMonth() + 1, 0);
+                      $scope.AttReport.StartDate = dt;
+                      $scope.AttReport.EndDate = new Date(dt.getFullYear(), dt.getMonth() + 1, d.getDate());
+                  }
+                  $scope.HalfYearlyatt = function HalfYearlyatt(dt) {
+                      var m = parseInt(dt);
+                      var d = new Date($scope.AttReport.Year, m, 0);
+                      $scope.AttReport.StartDate = new Date($scope.AttReport.Year, m - 1, 1);
+                      $scope.AttReport.EndDate = new Date($scope.AttReport.Year, m, $scope.StartDate.getDate() - 1);
+                  }
+                  $scope.Yearatt = function Yearatt(dt) {
+                      var d = new Date(dt,12, 0);
+                      $scope.AttReport.StartDate = new Date(dt, 0, 1);
+                      $scope.AttReport.EndDate = d;
+                  }
+                  function TotalDay() {
+                      for (var i = 0; i <= $scope.DayCount - 1; i++) {
+                          $scope.Days.push({ 'Text': 1 + i, 'Value': 1 + i });
+                      }
+                  }
+                  $scope.resetForm = function resetForm() {
+                      $scope.AttReports = [];
+                      $scope.AttReport = [];
+                      $scope.submited = false;
+                      $scope.submited1 = false;
+                  }
+                  function getAllCommons() {
+                      $scope.CommonFeilds = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Common/GetCommonItem/'
+                      }).then(function successCallback(response) {
+                          $scope.CommonFeilds = response.data.results;
+                      }, function errorCallback(response) {
+                          toastr["info"](response.data.message);
+                      });
+                  }
+                  $scope.GetGroup = function GetGroup(classid) {
+                      $scope.Groups = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Common/GetGroup/' + classid
+                      }).then(function successCallback(response) {
+                          $scope.Groups = response.data.results;
+                      }, function errorCallback(response) {
+                          toastr["info"](response.data.message);
+                      });
+                  }
+                  $scope.GetSection = function GetSection() {
+                      $scope.Sections = [];
+                      if ($scope.AttReport.GroupId == null)
+                          return;
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Common/GetSection/' + $scope.AttReport.SessionId + "/" + $scope.AttReport.ShiftId + "/" + $scope.AttReport.ClassId + "/" + $scope.AttReport.GroupId
+                      }).then(function successCallback(response) {
+                          $scope.Sections = response.data.results;
+                      }, function errorCallback(response) {
+                          toastr["info"](response.data.message);
+                      });
+                  }
+                  $scope.SearchAttReport = function SearchAttReport(item) {
+                      var aa = '';
+                      $scope.AttReport.StartDate = $filter('date')($scope.AttReport.StartDate, 'dd/MM/yyyy');
+                      $scope.AttReport.EndDate = $filter('date')($scope.AttReport.EndDate, 'dd/MM/yyyy');
+                      var url = '/Report/AttendanceReport?VersionId=' + $scope.AttReport.VersionId+ '&SessionId=' + $scope.AttReport.SessionId + '&BranchId=' + $scope.AttReport.BranchId + '&ShiftId='
+                            + $scope.AttReport.ShiftId + '&ClassId=' + $scope.AttReport.ClassId + '&GroupId=' + $scope.AttReport.GroupId + '&SectionId=' + $scope.AttReport.SectionId + '&Wise=' + $scope.AttReport.Wise +
+                            '&Type=' + $scope.AttReport.Type + '&StartDay=' + $scope.AttReport.StartDate.toString() + '&EndDay=' + $scope.AttReport.EndDate.toString();
+                      window.open(window.location.origin + url, "_blank");
+                      //$http({
+                      //    method: 'POST',
+                      //    url: baseUrl + 'Attendance/SaveDailyAtte/' + $scope.Attendance.VersionId + '/' + $scope.Attendance.SessionId + '/' + $scope.Attendance.BranchId + '/' + $scope.Attendance.ShiftId + '/' + $scope.Attendance.SectionId + '/' + $scope.Attendance.Year + '/' + $scope.Attendance.Month,
+                      //}).then(function successCallback(response) {
+                      //    $scope.totalcount = Ispresent == true ? $scope.totalcount + 1 : $scope.totalcount - 1
+                      //}, function errorCallback(response) {
+                      //    item.checked = false;
+                      //    toastr["warning"](response.data.message);
+                      //});
+                  };
+                  function datatimes() {
+                      $scope.Dateformat = 'dd/MM/yyyy';
+                      $scope.$watch('AttReport.startDate', function (niu) {
+                          if (niu) {
+                              $scope.dateOptions.minDate = niu
+                          }
+                      });
+
+                  }
+              }]);
+    </script>
+}
+
+
+

@@ -1,0 +1,251 @@
+﻿@{
+    ViewBag.Title = "Student Type";
+}
+<div ng-controller="StudentType">
+    <!-- Begin: life time stats -->
+    <div class="portlet light bordered">
+        <div class="portlet-title">
+            <div class="caption">
+                <i class="icon-settings font-green"></i>
+                <span class="caption-subject font-green sbold">@ViewBag.Title</span>
+            </div>
+            <div class="actions">
+                <div class="btn-group btn-group-solid">
+                    <button ng-click="resetForm()" class="btn green" data-target="#addmodal" data-toggle="modal"> <i class="fa fa-plus"></i> Add StudentType</button>
+                </div>
+
+            </div>
+        </div>
+        <div class="portlet-body">
+            <div class="table-container">
+                <div id="sample_3_wrapper" class="dataTables_wrapper no-footer">
+                <div class="row">
+                    <div class="col-md-4 col-sm-4">
+                        <div class="form-group">
+                            <div class="col-md-4">
+                                <select class="form-control" ng-model="pageSize" ng-options="P.value as P.text for P in pageSizeArray"></select>
+                            </div>
+                            <div class="col-md-6 col-md-pull-1">
+                                <label for="search" class="control-label">Items per page</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-sm-4">
+                    </div>
+                    <div class="col-md-4 col-sm-4">
+                        <div id="sample_3_filter" class="pull-right">
+                            <input ng-model="q" id="search" class="form-control" placeholder="Filter text">
+                        </div>
+                    </div>
+                </div>
+                    <div class="table-scrollable"> </div>
+                    <table class="table table-bordered table-hover">
+                        <thead>
+                            <tr class="btn-primary">
+                                <th>StudentType Name</th>
+                                <th>StudentType Code</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-show="StudentTypes.results.length <= 0"><td colspan="5" style="text-align:center;"><i class="fa fa-refresh"></i> Loading new data!!</td></tr>
+                            <tr dir-paginate="item in StudentTypes.results| filter:q  | itemsPerPage: pageSize" current-page="currentPage">
+                                <td>{{item.StudentTypeName}}</td>
+                                <td>{{item.StudentTypeCode}}</td>
+                                <td>
+                                    <a href="javascript:;" class="btn btn-icon-only green" ng-click="edit(item)" data-target="#addmodal" data-toggle="modal">
+                                        <i class="fa fa-edit"></i>
+                                    </a>
+                                    <a ng-click="deleteStudentType(item)" href="javascript:;" class="btn btn-icon-only red">
+                                        <i class="fa fa-trash"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="row">
+                        <div class="col-sm-12 pull-right">
+                            <dir-pagination-controls boundary-links="true" template-url="~/assets/angular/lib/dirPagination.tpl.html"></dir-pagination-controls>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- End: life time stats -->
+    <!--Modal Area Start-->
+    <div id="addmodal" class="modal fade" tabindex="-1" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form name="addform" ng-submit="save()" class="form-horizontal" id="form_sample_1" novalidate>
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                        <h4 class="modal-title">{{modalTitle}}</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-body">
+                            <div class="row">
+                                <div class="col-md-12">
+                                   
+                                    <div class="form-group" ng-class="{ 'has-error' : submitted && addform.name.$invalid}">
+                                        <label class="col-md-4 control-label">
+                                            Name:
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-8">
+                                            <input type="text" ng-model="StudentType.StudentTypeName" class="form-control" placeholder="StudentType Name" name="name" required>
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted &&  addform.name.$error.required" class="help-block">Name Required</span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group" ng-class="{ 'has-error' : submitted && addform.code.$invalid}">
+                                        <label class="col-md-4 control-label">
+                                            Code:
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-8">
+                                            <input type="text" ng-model="StudentType.StudentTypeCode" ng-pattern="/^\S{0,50}$/" 
+                                                   class="form-control" placeholder="Code" name="code" required>
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted &&  addform.code.$error.required" class="help-block">Code Required</span>
+                                            <span style="color:red" class="help-block" ng-if="submitted && addform.code.$invalid">No Space Allow</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" data-dismiss="modal" class="btn dark btn-outline" ng-click="resetForm();submitted=false">Cancel</button>
+                        <button type="submit" ng-click="submitted=true" class="btn green-haze">Save</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!--Modal Area End-->
+</div>
+@section Scripts{
+    <script type="text/javascript">
+        OEMSApp.controller("StudentType", ["$scope", "$http", "SweetAlert",
+              function ($scope, $http, SweetAlert) {
+                  init();
+                  function init() {
+                      initialize();
+                      getStudentTypes();
+                  }
+                  function initialize() {
+                      $scope.modalTitle = "Add StudentType";
+                      $scope.StudentType = {};
+                      $scope.StudentType.StudentTypeId = 0;
+                      $scope.StudentTypes = [];
+                      $scope.currentPage = 1;
+                      $scope.pageno = 1;
+                      $scope.pagesize = 10;
+                      $scope.total_count = 12;
+                      $scope.search = '';
+                      $scope.Id = '';
+                      $scope.getStudentTypes = getStudentTypes;
+                      $scope.res = {};
+                      $scope.data = {};
+                      $scope.resetForm = resetForm;
+                      $scope.pageSizeArray = [];
+                      $scope.pageSizeArray.push({ value: 5, text: 5 });
+                      $scope.pageSizeArray.push({ value: 10, text: 10 });
+                      $scope.pageSizeArray.push({ value: 20, text: 20 });
+                      $scope.pageSizeArray.push({ value: 50, text: 50 });
+                      $scope.currentPage = 1;
+                      $scope.pageSize = 10;
+                  }
+                  function resetForm() {
+                      $scope.modalTitle = "Add StudentType";
+                      $scope.StudentType = {};
+                      $scope.StudentType.StudentTypeId = 0;
+                      $scope.addform.$setUntouched();
+                      $scope.addform.$setPristine();
+                      $scope.submitted = false;
+                      $scope.Id = '';
+                      getStudentTypes(1);
+                  }
+                  function getStudentTypes() {
+                      $scope.StudentTypes = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'SetupInstitution/GetAllStudentType/'
+                      }).then(function successCallback(response) {
+                          $scope.StudentTypes = response.data;
+                      }, function errorCallback(response) {
+                          toastr["warning"](response.data.Message);
+                      });
+                  }
+                  $scope.searchData = function () {
+                      getStudentTypes(1);
+                  };
+                  $scope.edit = function (n) {
+                      $scope.modalTitle = "Update StudentType";
+                      $scope.StudentType = n;
+                      $scope.Id = n.Id;
+                  };
+                  $scope.save = function save() {
+                      if ($scope.addform.$invalid)
+                          return;
+                      if ($scope.StudentType.StudentTypeId != 0) /// For Update
+                      {
+                          if ($scope.StudentType != '') {
+                              $http({
+                                  method: 'PUT',
+                                  url: baseUrl + 'SetupInstitution/UpdateStudentType/',
+                                  data: $scope.StudentType
+                              }).then(function successCallback(response) {
+                                  $('#addmodal').modal('toggle');
+                                  getStudentTypes(1);
+                                  toastr["info"](response.data.message);
+                                  resetForm();
+                              }, function errorCallback(response) {
+                                  toastr["warning"](response.data.Message);
+                              });
+                          }
+                      }else {  //  For Add
+                          if ($scope.StudentType != {}) {
+                              $http({
+                                  method: 'POST',
+                                  url: baseUrl + 'SetupInstitution/AddStudentType/',
+                                  data: $scope.StudentType
+                              }).then(function successCallback(response) {
+                                  $('#addmodal').modal('toggle');
+                                  getStudentTypes();
+                                  toastr["info"](response.data.message);
+                                  resetForm();
+                              }, function errorCallback(response) {
+                                  toastr["warning"](response.data.Message);
+                              });
+                          }
+                      }
+                  };
+                  $scope.deleteStudentType = function deleteStudentType(n) {
+                      SweetAlert.swal({
+                          title: "Are you sure to delete it ?", type: "warning", showCancelButton: true, confirmButtonColor: "#DD6B55",
+                          confirmButtonText: "Yes, delete it!",
+                          closeOnConfirm: false
+                      },
+                      function (isConfirm) {
+                          if (isConfirm) {
+                              $http({
+                                  method: 'DELETE',
+                                  url: baseUrl + 'SetupInstitution/DeleteStudentType/' + n.StudentTypeId
+                              }).then(function successCallback(response) {
+                                  SweetAlert.swal("Deleted!", "Your data has been deleted.", "success");
+                                  getStudentTypes(1);
+                              }, function errorCallback(response) {
+                                  toastr["warning"](response.data.Message);
+                              });
+                          }
+                      });
+                  };
+              }]);
+    </script>
+}
+
+
+
+

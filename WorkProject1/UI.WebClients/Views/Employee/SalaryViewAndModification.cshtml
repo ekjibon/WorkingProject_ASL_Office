@@ -1,0 +1,453 @@
+﻿
+@{
+    ViewBag.Title = "Salary View And Modification";
+}
+
+<div class="kt-container  kt-container--fluid  kt-grid__item kt-grid__item--fluid" ng-controller="SalaryViewModification">
+
+    <div class="row">
+        <div class="kt-portlet kt-portlet--mobile">
+            <div class="kt-portlet__head kt-portlet__head--lg">
+                <div class="kt-portlet__head-label">
+                    <h3 class="kt-portlet__head-title">
+                        Salary View And Modification
+                    </h3>
+                </div>
+            </div>
+            <div class="kt-portlet__body">
+                <!-- BEGIN FORM-->
+                <form class="form-horizontal" name="addBasic" novalidate>
+                    <div class="form-body">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group row" ng-class="{ 'has-error' : submitted && addBasic.Class.$invalid}">
+                                    <label class="col-md-5 control-label text-right">
+                                        Category
+                                        <span class="required">*</span>
+                                    </label>
+                                    <div class="col-md-7">
+                                        <select class="form-control" ng-model="SalaryViewModification.CategoryID" name="Class" required ng-options="c.CategoryID as c.CategoryName for c in CommonFeilds.Category">
+                                            <option value="" selected="selected">Choose Option</option>
+                                        </select>
+                                        <div class="form-control-focus"> </div>
+                                        <span ng-show="submitted &&  addBasic.Class.$error.required" class="help-block">Category Required</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group row" ng-class="{ 'has-error' : submitted && addBasic.Branch.$invalid}">
+                                    <label class="col-md-5 control-label text-right">
+                                        Branch
+                                        <span class="required">*</span>
+                                    </label>
+                                    <div class="col-md-7">
+                                        <select class="form-control" ng-model="SalaryViewModification.BranchID" name="Branch" required ng-options="b.BranchId as b.BranchName for b in CommonFeilds.Branch">
+                                            <option value="" selected="selected">Choose Option</option>
+                                        </select>
+                                        <div class="form-control-focus"> </div>
+                                        <span ng-show="submitted &&  addBasic.Branch.$error.required" class="help-block">Branch Required</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <div class="form-group row" ng-class="{ 'has-error' : submitted && addBasic.PeriodId.$invalid}">
+                                    <label class="col-md-5 control-label">
+                                        Salary Period :
+                                        <span class="required">*</span>
+                                    </label>
+                                    <div class="col-md-7">
+                                        <select class="form-control" ng-model="SalaryViewModification.PeriodId" name="PeriodId" required ng-options="sp.Id as sp.PeriodName  for sp in salaryPeriodList">
+                                            <option value="" selected="selected">Choose Options</option>
+                                        </select>
+                                        <span ng-show="submitted &&  addBasic.PeriodId.$error.required" class="help-block">Salary Period Required</span>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <div class="col-md-12 text-right">
+                                        <button ng-click="submitted=true;Search()" class="btn btn-primary">Show</button>
+                                        <button ng-click="Reset()" class="btn btn-danger">Reset</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+                <!-- END FORM-->
+                <div class="row">
+                    <div class="col-md-4 col-sm-5 col-xs-6">
+                        <div class="form-group">
+                            <div class="col-lg-3 col-md-5 col-sm-4 col-xs-8" style="padding-left:0px">
+
+                                <select class="form-control kt-font-brand" ng-model="pageSize" ng-options="P.value as P.text for P in pageSizeArray"></select>
+                            </div>
+
+                        </div>
+
+                    </div>
+                    <div class="col-md-4 col-sm-3 col-xs-1">
+                    </div>
+                    <div class="col-md-4 col-sm-4 col-xs-5">
+                        <div id="sample_3_filter" class="pull-right">
+                            <input ng-model="q" id="search" class="form-control" placeholder="Filter text">
+                        </div>
+                    </div>
+                </div>
+                <table class="table table-bordered table-hover rounded">
+                    <thead class="btn-primary">
+                        <tr>
+                            <th>SL</th>
+                            <th>Name</th>
+                            <th>ID</th>
+                            <th>Gross Salary</th>
+                            <th>Arrear</th>
+                            <th>Deduction</th>
+                            <th>Net Salary </th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="item in EmployeeInfos">
+                            <td> {{$index + 1}} </td>
+                            <td> {{item.FullName}} </td>
+                            <td> {{item.EmployeeId}} </td>
+                            <td> {{item.GrossAmount}} </td>
+                            <td> {{item.Arrear}} </td>
+                            <td> {{item.Deduction}} </td>
+                            <td> {{item.NetAmount}} </td>
+                            <td class="btn-group">
+                                <button class="btn btn-xs green dropdown-toggle" type="button" data-toggle="dropdown" aria-expanded="false">
+                                    Options
+                                    <i class="fa fa-angle-down"></i>
+                                </button>
+                                <ul class="dropdown-menu" role="menu" style="left: -10%;">
+
+                                    <li>
+                                        <a ng-click="modifySalary(item.Id)" data-toggle="modal" data-target="#modifySalary">
+                                            <i aria-hidden="true"></i> Modify
+                                        </a>
+                                    </li>
+                                </ul>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="8">
+                                <button ng-click="Confrim()" class="btn btn-success btn-sm pull-right">Confrim </button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="row">
+                    <dir-pagination-controls boundary-links="true" template-url="~/assets/angular/lib/dirPagination.tpl.html"></dir-pagination-controls>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Start Modal-->
+    <div id="modifySalary" class="modal fade" tabindex="-1" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog">
+            <div class="modal-content" style="width:1000px;">
+                <div class="modal-header">
+
+                    <h4 class="modal-title">Salary modify</h4>
+                </div>
+
+                <div class="modal-body">
+
+                    <div class="row">
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-body">
+
+                            <table class="table table-bordered table-inverse">
+                                <thead>
+                                    <tr><td colspan="2">Employee Name : {{SalaryModification.FullName}}</td></tr>
+                                    <tr class="btn-primary">
+                                        <th> Salary Haed </th>
+                                        <th> Amount </th>
+
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="item in detailsList | filter:{Category:1}:true ">
+                                        <td> {{item.HeadName}} </td>
+                                        <td ng-hide="item.HeadName=='Arrear'"> {{item.Amount}} </td>
+                                        <td ng-show="item.HeadName=='Arrear'"><input type="number" ng-model="item.Amount" class="form-control ng-pristine ng-valid ng-empty ng-touched" ng-change="TotalAddition()" /></td>
+                                    </tr>
+                                </tbody>
+                                <tfoot class="text-center">
+                                    <tr>
+
+                                        <td colspan="1">Total Addition</td>
+                                        <td>{{SalaryModification.TotalAddition}}</td>
+
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-body">
+                            <table class="table table-bordered table-inverse">
+                                <thead>
+                                    <tr>  <td colspan="2">Empolyee ID : {{SalaryModification.EmpoyeeId}}</td>  </tr>
+                                    <tr class="btn-primary">
+
+                                        <th> Salary Head </th>
+                                        <th> Amount </th>
+                                        <th> Remarks </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="item in detailsList | filter:{Category:2}:true">
+
+                                        <td> {{item.HeadName}} </td>
+                                        <td><input type="number" ng-model="item.Amount" class="form-control ng-pristine ng-valid ng-empty ng-touched" ng-change="TotalDeduction()" /></td>
+                                        <td><input type="text" ng-model="item.Remarks" class="form-control ng-pristine ng-valid ng-empty ng-touched" /></td>
+                                    </tr>
+                                </tbody>
+                                <tfoot class="text-center">
+                                    <tr>
+
+                                        <td colspan="1">Net Salary</td>
+                                        <td>{{SalaryModification.NetAmount}}</td>
+
+                                    </tr>
+                                </tfoot>
+                                <tfoot class="text-center">
+                                    <tr>
+
+                                        <td colspan="1">Total Deduction</td>
+                                        <td>{{SalaryModification.TotalDeduction}}</td>
+
+                                    </tr>
+                                </tfoot>
+
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" ng-click="ResetS()" data-dismiss="modal" class="btn btn-secondary">Close</button>
+                    <button type="button" ng-click="Save()" data-dismiss="modal" class="btn btn-success ">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- END Modal-->
+</div>
+@section Scripts{
+    <script type="text/javascript">
+        OEMSApp.controller("SalaryViewModification", ["$scope", "$http", "SweetAlert", "blockUI", "$filter",
+          function ($scope, $http, SweetAlert, blockUI, $filter) {
+
+              init();
+              function init() {
+                  initialize();
+                  getAllCommons();
+                  getAllSalaryPeriod();
+              }
+              function initialize() {
+                  $scope.SalaryViewModification = {};
+                  $scope.SalaryDetails = {};
+                  $scope.SalaryModification = {};
+                  $scope.Dropdowns = [];
+                  $scope.CommonFeilds = [];
+                  $scope.currentPage = 1;
+                  $scope.pageno = 1;
+                  $scope.pagesize = 10;
+                  $scope.total_count = 12;
+                  $scope.detailsList = [];
+                  $scope.TotalAddition = TotalAddition;
+                  $scope.TotalDeduction = TotalDeduction;
+
+              };
+
+
+
+              $scope.Reset = function Reset() {
+                  $scope.SalaryViewModification = {};
+                  $scope.submitted = false;
+                  $scope.EmployeeInfos = [];
+              };
+              $scope.ResetS = function ResetS() {
+                  $scope.SalaryModification = {};
+              };
+
+              $scope.Search = function Search() {
+
+                  $scope.EmployeeInfos = [];
+                  $http({
+                      method: 'POST',
+                      url: baseUrl + 'Employee/SearchSalaryViewNEW/',
+                      data: $scope.SalaryViewModification
+                  }).then(function successCallback(response) {
+                      $scope.EmployeeInfos = response.data.results;
+                      TotalAmount();
+                      toastr["info"](response.data.message);
+                  }, function errorCallback(response) {
+                      toastr["error"](response.data.Message);
+                  });
+
+              };
+
+              function TotalAmount() {
+
+
+                  var totalamount = 0;
+
+                  angular.forEach($scope.EmployeeInfos, function (item) {
+
+
+                      totalamount += item.NetAmount
+                      $scope.SalaryViewModification.TotalSalary = totalamount
+
+
+                  });
+
+              }
+
+              $scope.Confrim = function Confrim() {
+
+                  SweetAlert.swal({
+                      title: "Are you sure to Confirm it ?", type: "info", showCancelButton: true, confirmButtonColor: "#DD6B55",
+                      confirmButtonText: "Yes",
+                      closeOnConfirm: false
+                  },
+                  function (isConfirm) {
+                      if (isConfirm) {
+                          $http({
+                              method: 'POST',
+                              url: baseUrl + 'Employee/ConfrimSalary/',
+                              data: $scope.SalaryViewModification
+                          }).then(function successCallback(response) {
+                              toastr["info"](response.data.message);
+                              window.location.reload();
+                          }, function errorCallback(response) {
+                              toastr["error"](response.data.Message);
+                          });
+                      }
+                  });
+              };
+              function getAllCommons() {
+                  $scope.CommonFeilds = [];
+                  $http({
+                      method: 'GET',
+                      url: baseUrl + 'Common/GetCommonItemEmp/'
+                  }).then(function successCallback(response) {
+                      $scope.CommonFeilds = response.data.results;
+
+                      //console.log($scope.CommonFeilds);
+                  }, function errorCallback(response) {
+                  });
+              }
+              function getAllSalaryPeriod() {
+                  $scope.salaryHeadList = [];
+                  $http({
+                      method: 'GET',
+                      url: baseUrl + 'Employee/GetAllSalaryPeriod/'
+                  }).then(function successCallback(response) {
+                      $scope.salaryPeriodList = response.data.results;
+
+                  }, function errorCallback(response) {
+                      toastr["info"](response.data.Message);
+                  });
+              }
+
+              $scope.modifySalary = function modifySalary(Id) {
+
+                  $scope.SalaryDetails.Id = Id
+                  $scope.SalaryModification.Id = $scope.SalaryDetails.Id;
+                  $http({
+                      method: 'POST',
+                      url: baseUrl + 'Employee/SalaryDetailsEmpWise/',
+                      data: $scope.SalaryDetails //+ Id
+                  }).then(function successCallback(response) {
+
+                      $scope.detailsList = response.data.results;
+
+                      $scope.SalaryModification.FullName = response.data.results[0].FullName;
+                      $scope.SalaryModification.EmpoyeeId = response.data.results[0].EmployeeId;
+                      $scope.SalaryModification.CategoryID = response.data.results[0].CategoryID;
+                      $scope.SalaryModification.SalaryPeriodId = response.data.results[0].SalaryPeriodId;
+                      $scope.SalaryModification.EmpId = response.data.results[0].EmpId;
+                      $scope.SalaryModification.GrossAmount = response.data.results[0].GrossAmount;
+                      TotalAddition();
+                      TotalDeduction();
+
+                  }, function errorCallback(response) {
+
+                      // toastr["error"](response.data.message);
+                  });
+
+              }
+
+              function TotalAddition() {
+
+
+                  var totalamount = 0;
+
+                  angular.forEach($scope.detailsList, function (item) {
+
+                      if (item.Category == 1) {
+                          totalamount += item.Amount
+                          $scope.SalaryModification.TotalAddition = totalamount
+                      }
+
+                  });
+
+                  $scope.SalaryModification.NetAmount = $scope.SalaryModification.TotalAddition - $scope.SalaryModification.TotalDeduction;
+
+              }
+
+              function TotalDeduction() {
+                  var totalamount = 0;
+
+                  angular.forEach($scope.detailsList, function (item) {
+
+                      if (item.Category == 2) {
+                          totalamount += item.Amount
+                          $scope.SalaryModification.TotalDeduction = totalamount;
+                      }
+
+                  });
+                  $scope.SalaryModification.NetAmount = $scope.SalaryModification.TotalAddition - $scope.SalaryModification.TotalDeduction;
+              }
+
+              $scope.Save = function Save() {
+                  if ($scope.SalaryModification.NetAmount < 0) {
+                      toastr["warning"]('Invalid Net Salary');
+                      return;
+                  }
+
+                  $scope.SalaryModification.AdditionDeductionVm = [];
+                  $scope.AddtionDeductionList = [];
+                  for (var i = 0 ; i < $scope.detailsList.length; i++) {
+                      $scope.AddtionDeductionList.push($scope.detailsList[i]);
+                  }
+                  $scope.SalaryModification.AdditionDeductionVm = $scope.AddtionDeductionList;
+
+
+                  $http({
+                      method: 'POST',
+                      url: baseUrl + 'Employee/SalaryModify/',
+                      data: $scope.SalaryModification
+                  }).then(function successCallback(response) {
+                      //  ResetS();
+                      window.location.reload();
+
+                  }, function errorCallback(response) {
+                      toastr["error"](response.data.Message);
+                  });
+
+              };
+
+
+          }]);
+    </script>
+}
+

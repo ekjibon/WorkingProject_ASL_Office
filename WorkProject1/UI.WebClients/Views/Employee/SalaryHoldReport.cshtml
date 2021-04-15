@@ -1,0 +1,238 @@
+﻿@*<h2>SalaryHoldReport</h2>*@
+
+
+@{
+    ViewBag.Title = "Salary Hold";
+}
+
+<div class="kt-container  kt-container--fluid  kt-grid__item kt-grid__item--fluid" ng-controller="GenerateSalaryHoldCtrl">
+    <div class="row">
+        <div class="kt-portlet kt-portlet--mobile">
+            <div class="kt-portlet__head kt-portlet__head--lg">
+                <div class="kt-portlet__head-label">
+                    <h3 class="kt-portlet__head-title">
+                        <!----Title Text-->
+                        @ViewBag.Title
+                        <!----Title Text -->
+                    </h3>
+                </div>
+            </div>
+
+            <div class="kt-portlet__body">
+
+
+                <form class="form-horizontal" name="addBasic" novalidate>
+                    <div class="form-body">
+                        <div class="row">
+
+                            <div class="col-md-4">
+                                <div class="form-group" ng-class="{ 'has-error' : submitted && addBasic.Branch.$invalid}">
+                                    <label class="col-md-5 control-label">
+                                        Branch
+                                        <span class="required">*</span>
+                                    </label>
+                                    <div class="col-md-7">
+                                        <select class="form-control" ng-model="GenerateSalaryHold.BranchID" name="Branch" ng-options="b.BranchId as b.BranchName for b in CommonFeilds.Branch" required>
+                                            <option value="" selected="selected">Choose Option</option>
+                                        </select>
+                                        @*<div class="form-control-focus">Branch Required</div>*@
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group" ng-class="{ 'has-error' : submitted && addBasic.Class.$invalid}">
+                                    <label class="col-md-5 control-label">
+                                        Category
+                                        <span class="required">*</span>
+                                    </label>
+                                    <div class="col-md-7">
+                                        <select class="form-control" ng-model="GenerateSalaryHold.CategoryID" name="Class" ng-options="c.CategoryID as c.CategoryName for c in CommonFeilds.Category" required>
+                                            <option value="" selected="selected">Choose Option</option>
+                                        </select>
+                                        @*<div class="form-control-focus">Category Required</div>*@
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mt-4">
+
+                                <button ng-click="submitted=true;Search()" class="btn btn-primary col-lg-3">Show</button>
+                                <button ng-click="Reset()" class="btn btn-danger col-lg-3">Reset</button>
+
+                            </div>
+                        </div>
+                    </div>
+                </form>
+                <table class="table table-bordered table-hover rounded">
+                    <thead class="btn-primary">
+                        <tr>
+                            <th width="5%"><input type="checkbox" ng-model="selectedAll" ng-click="selectAll()" />  All</th>
+                            <th width="10%"> ID </th>
+                            <th> Name </th>
+                            <th width="10%">Mobile No </th>
+                            <th width="10%"> Gross Salary </th>
+                            <th width="10%"> No Of Installment </th>
+                            <th width="10%">Hold Per Month</th>
+                            <th width="10%">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="item in EmployeeInfos">
+                            <td width="5%"> <input type="checkbox" ng-model="item.Selected" value="false" ng-click="checkIfAllSelected()" /> </td>
+                            <td width="10%"> {{item.EmpID}} </td>
+                            <td> {{item.FullName}} </td>
+                            <td width="10%"> {{item.SMSNotificationNo}} </td>
+                            <td width="10%"> {{item.GrossSalary}} </td>
+                            <td width="10%"> {{item.NoOfInstallment}} </td>
+                            <td width="10%"> {{item.HoldPerMonthAmount}} </td>
+                            <td width="10%">
+                                <a href="@Url.Action("ReportGenerateSalaryHold","Report")?EmpId={{item.EmpBasicInfoID}}" class="btn btn-icon-only btn-primary" target="_blank"><i class="fa fa-download" aria-hidden="true"></i></a>
+                            </td>
+                        </tr>
+                        <tr ng-show="EmployeeInfos.length>0">
+                            <td colspan="8">
+                                <a href="@Url.Action("ReportGenerateSalaryHold","Report")?EmpId={{GetSelects()}}" class="btn btn-info btn-sm pull-right" target="_blank">View All</a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    <script type="text/javascript">
+        OEMSApp.controller("GenerateSalaryHoldCtrl", ["$scope", "$http", "SweetAlert",
+          function ($scope, $http, SweetAlert) {
+
+              init();
+              function init() {
+                  initialize();
+
+                  getAllCommons();
+              }
+              function initialize() {
+                  $scope.GenerateSalaryHold = {};
+
+                  $scope.StudentInfos = [];
+                  $scope.GrandExams = [];
+                  $scope.Dropdowns = [];
+                  $scope.CommonFeilds = [];
+                  $scope.currentPage = 1;
+                  $scope.pageno = 1;
+                  $scope.pagesize = 10;
+                  $scope.total_count = 12;
+                  $scope.txtsearch = '';
+
+              };
+
+
+              function resetForm() {
+                  $scope.submitted = false;
+              };
+
+              $scope.Reset = function Reset() {
+
+                  $scope.GenerateSalaryHold = {};
+                  $scope.submitted = false;
+                  $scope.EmployeeInfos = [];
+              };
+
+              function getAllSalaryYear() {
+                  $scope.SalaryYearList = [];
+                  $http({
+                      method: 'GET',
+                      url: baseUrl + 'Employee/GetAllSalaryYear/'
+                  }).then(function successCallback(response) {
+                      $scope.SalaryYearList = response.data.results;
+                  }, function errorCallback(response) {
+                      toastr["info"](response.data.Message);
+                  });
+              }
+              function getAllEmployeeList() {
+                  $http({
+                      method: 'GET',
+                      url: baseUrl + 'Employee/GetAllEmployeeList/'
+                  }).then(function successCallback(response) {
+                      $scope.employeelist = response.data.results;
+                  }, function errorCallback(response) {
+                      toastr["info"](response.data.Message);
+                  });
+              }
+
+
+              $scope.selectAll = function () {
+                  angular.forEach($scope.EmployeeInfos, function (item) {
+                      item.Selected = $scope.selectedAll;
+                  });
+              };
+              $scope.GetSelects = function GetSelects() {
+                  var res = '';
+                  angular.forEach($scope.EmployeeInfos, function (item) {
+                      if (item.Selected) {
+                          res = res + ',' + item.EmpBasicInfoID
+                      }
+                  });
+                  return res.trim()
+              };
+              $scope.checkIfAllSelected = function () {
+                  $scope.selectedAll = $scope.EmployeeInfos.every(function (item) {
+                      return item.Selected == true
+                  })
+              };
+              $scope.Search = function Search() {
+                  //debugger;
+                  if ($scope.addBasic.$invalid)
+                      return;
+                  $scope.EmployeeInfos = [];
+                  $http({
+                      method: 'POST',
+                      url: baseUrl + 'Employee/SearchGenerateSalaryHold/',
+                      data: $scope.GenerateSalaryHold
+                  }).then(function successCallback(response) {
+                      $scope.EmployeeInfos = response.data.results;
+                      //console.log($scope.EmployeeInfos);
+                      $scope.selectedAll = true;
+                      angular.forEach($scope.EmployeeInfos, function (item) {
+                          item.Selected = $scope.selectedAll;
+                      });
+
+                      toastr["success"](response.data.message);
+                  }, function errorCallback(response) {
+                      toastr["error"](response.data.Message);
+                  });
+              };
+              function getAllCommons() {
+                  $scope.CommonFeilds = [];
+                  $http({
+                      method: 'GET',
+                      url: baseUrl + 'Common/GetCommonItemEmp/'
+                  }).then(function successCallback(response) {
+                      $scope.CommonFeilds = response.data.results;
+                      console.log($scope.CommonFeilds);
+                  }, function errorCallback(response) {
+                  });
+              }
+              function getAllSalaryPeriod() {
+                  $scope.salaryHeadList = [];
+                  $http({
+                      method: 'GET',
+                      url: baseUrl + 'Employee/GetAllSalaryPeriod/'
+                  }).then(function successCallback(response) {
+                      $scope.salaryPeriodList = response.data.results;
+
+                  }, function errorCallback(response) {
+                      toastr["info"](response.data.Message);
+                  });
+              }
+          }]);
+    </script>
+}
+
+
+
+
+
+
+
+

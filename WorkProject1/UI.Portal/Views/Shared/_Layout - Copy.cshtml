@@ -1,0 +1,55 @@
+﻿<!DOCTYPE html >
+<html ng-app="OEMS">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title </title>
+    @Styles.Render("~/Content/css")
+    @Scripts.Render("~/bundles/modernizr")
+    @Html.Partial("_css")
+    @RenderSection("Styles", false)
+    <link runat="server" rel="icon" href="@Url.Content("~/Content/faviconv.ico")" type="image/x-icon" />
+</head>
+    <body class="page-container-bg-solid page-sidebar-fixed" style="width:98.9%">
+        @using (Html.BeginForm("LogOff", "Account", FormMethod.Post, new { id = "logoutForm", @class = "navbar-right" }))
+        {
+            @Html.AntiForgeryToken()
+        }
+        <div class="page-wrapper">
+            <div class="page-wrapper-row">
+                <div class="page-wrapper-top">
+                    <div class="page-header">
+
+                        @Html.Partial("_header")
+
+                        <div class="page-header-menu">
+                            <div class="container">
+                                @Html.Partial("_nav")
+                                <!-- END MEGA MENU -->
+                            </div>
+                        </div>
+                    </div>
+                    </div>
+                </div>
+                <div class="page-wrapper-row full-height">
+                    <div class="page-wrapper-middle">
+                        <div class="page-container row-fluid">
+                            @RenderBody()
+                        </div>
+                    </div>
+                </div>
+
+                <div class="page-wrapper-row">
+                    <div class="page-wrapper-bottom  ">
+                        @Html.Partial("_footer")
+                    </div>
+                </div>
+
+            </div>
+                    @Scripts.Render("~/bundles/jquery")
+                    @Scripts.Render("~/bundles/bootstrap")
+                    @Html.Partial("_script")
+                    @RenderSection("scripts", required: false)
+
+</body>
+</html>

@@ -1,0 +1,235 @@
+﻿
+@{
+    ViewBag.Title = "Module";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2 class="SetUpHead">Module List</h2>
+<div ng-controller="moduleClt">
+    <div class="text-right">
+        <a data-toggle="modal" ng-click="ResetFrm()" title="Add Project" href="#draggable" class="btn btn-primary fa-item" 
+           style="margin-right: 1.5%;margin-top: -75px;">
+            @*<i class="fa fa-plus"></i>*@ <i class="fa fa-plus-square"></i> Add Module
+        </a>
+    </div>
+
+    <div class="panel-body">
+        <div class="row" style="margin-bottom:10px;margin-top: -3%;">
+            <div class="col-md-4 col-sm-5 col-xs-6">
+                <div class="form-group">
+                    <div class="col-lg-3 col-md-5 col-sm-4 col-xs-8" style="padding-left:0px;width:35%">
+                        <select class="form-control" ng-model="pageSize" ng-options="P.value as P.text for P in pageSizeArray"></select>
+                    </div>
+                    <div class="col-md-7  col-sm-8  col-xs-4">
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 col-sm-3 col-xs-1">
+            </div>
+            <div class="col-md-4 col-sm-4 col-xs-5">
+                <div id="sample_3_filter" class="pull-right">
+                    <input ng-model="q" id="search" class="form-control" placeholder="Filter text">
+                </div>
+            </div>
+        </div>
+        <table class="table table-bordered table-inverse table-hover active">
+            <thead class="btn-primary">
+                <tr>
+                    @*<th><input type="checkbox" ng-model="selectedAll" ng-click="selectAll()" />  All</th>*@
+                    <th class="text-center">Module Name </th>
+                    <th class="text-center">Product Name</th>
+                    <th class="text-center">Status</th>
+                    <th class="text-center">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-show="ModuleList.length <= 0"><td colspan="7" style="text-align:center;"><i class="fa fa-refresh"></i> Loading new data!!</td></tr>
+                <tr dir-paginate="item in ModuleList| filter:q | itemsPerPage: pageSize" current-page="currentPage">
+                    @*<tr ng-repeat="item in ApplicantList track by $index">*@
+                    @*<td> <input type="checkbox" ng-model="item.Selected" value="false" ng-click="checkIfAllSelected()" /> </td>*@
+                    <td class="text-left"> {{item.ModuleName}} </td>
+                    <td class="text-center">{{item.ProductName}}</td>
+                    <td class="text-center statusG" ng-show="item.Status=='A'"> Active</td>
+                    <td class="text-center statusR" ng-show="item.Status=='I'"> Inactive</td>
+                    <td class="text-center">
+                        <button type="button" data-toggle="modal" class="btn btn-success" ng-click="EditModule(item)" title="Edit" data-target="#draggable"><i class="fa fa-edit"></i> Edit</button>
+                        <button type="button" class="btn btn-danger fa-item" title="Delete" ng-click="Delete(item)"><i class="fa fa-trash-o"></i></button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <div class="row" ng-show="ModuleList.length>1">
+            <dir-pagination-controls boundary-links="true" template-url="~/assets/dirPagination.tpl.html"></dir-pagination-controls>
+        </div>
+    </div>
+    <!-- Table -->
+    <div class="modal fade draggable-modal" id="draggable" tabindex="-1" role="basic" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                    <h4 class="modal-title">Add Module</h4>
+                </div>
+                <form name="frm" class="form-horizontal" ng-submit="Submit()" role="form" novalidate>
+                    <div class="portlet-body form" style="display: block;">
+                        <div class="form-body TopLeftMargin3">
+                            <div class="form-group" ng-class="{ 'has-error' : submitted && frm.ModuleName.$invalid}">
+                                <label class="col-md-3 control-label">Module Name</label>
+                                <div class="col-md-9">
+                                    <input type="text" ng-model="Module.Id" hidden />
+                                    <input type="text" name="ModuleName" ng-model="Module.ModuleName" class="form-control input-lg" placeholder="Module Name" required>
+                                    <span ng-show="submitted &&  frm.ModuleName.$error.required" class="text-danger">Module Name is Required</span>
+                                </div>
+                            </div>
+
+                            <div class="form-group" ng-class="{ 'has-error' : submitted && frm.ProductName.$invalid}">
+                                <label class="col-md-3 control-label">Product Name</label>
+                                <div class="col-md-9">
+                         
+                                    <input type="text" name="ProductName" ng-model="Module.ProductName" class="form-control input-lg" placeholder="Product Name" required>
+                                    <span ng-show="submitted &&  frm.ProductName.$error.required" class="text-danger">Product Name is Required</span>
+                                </div>
+                            </div>
+                            <div class="form-group" ng-class="{ 'has-error' : submitted && frm.Status.$invalid}">
+                                <label class="col-md-3 control-label">Status</label>
+                                <div class="col-md-9">
+                                    <select class="form-control input-lg" required name="Status" ng-model="Module.Status">
+                                        <option value="">Select Please</option>
+                                        <option value="A">Active</option>
+                                        <option value="I">Inactive</option>
+                                    </select>
+                                    <span ng-show="submitted &&  frm.Status.$error.required" class="text-danger">Status is Required</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="reset" class="btn btn-danger" data-dismiss="modal">Close</button>
+                        <input type="submit" class="btn btn-success" ng-click="submitted=true" value="{{btnTitle}}" />
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    AddieApp.controller("moduleClt", ["$scope", "$http", "SweetAlert",
+          function ($scope, $http,  SweetAlert) {
+                  init();
+                  function init() {
+                      initialize();
+                  }
+                  function initialize() {
+                      $scope.pageSizeArray = [];
+                      $scope.pageSizeArray.push({ value: 5, text: 5 });
+                      $scope.pageSizeArray.push({ value: 10, text: 10 });
+                      $scope.pageSizeArray.push({ value: 20, text: 20 });
+                      $scope.pageSizeArray.push({ value: 50, text: 50 });
+                      $scope.currentPage = 1;
+                      $scope.pageSize = 10;
+                      $scope.IsEdit = 0;
+                      $scope.btnTitle = 'Save';
+                      LoadModuleList();
+                  };
+                  $scope.Submit = function () {
+                      if ($scope.frm.$invalid)
+                          return;
+                      if ($scope.IsEdit == 0) {
+                          $scope.Add();
+                          $('#draggable').modal('hide');
+                          $scope.Module = {};
+                      }
+                      else {
+                          $scope.UpdateModule();
+                          $('#draggable').modal('hide');
+                      }
+                  }
+                  $scope.Add = function () {
+                      console.log($scope.Module);
+                            $http.post(baseUrl + 'Setup/AddModule',$scope.Module).
+                        then(function (response) {
+                            if (response.data == '0') {
+                                toastr.error('Not Saved.');
+                                $scope.Project = {};
+                                LoadModuleList();
+                            }
+                            else {
+                                toastr.success('Saved Successfully');
+                                $scope.Module = {};
+                                LoadModuleList();
+                            }
+                        });
+                  }
+                  $scope.Delete= function(module)
+                  {
+                      swal({
+                          title: "Are you sure?",
+                          text: "Once deleted, you will not be able to recover this data!",
+                          icon: "warning",
+                          buttons: true,
+                          dangerMode: true,
+                      })
+                        .then((willDelete) => {
+                            if (willDelete) {
+                                $http.post(baseUrl + 'Setup/DeleteModule', module).
+                                  then(function (response) {
+                                      if (response.data == '0') {
+                                          toastr.warning('Not found');
+                                          LoadModuleList();
+                                          return;
+                                      }
+                                      toastr.success('Deleted Successfully');
+                                      LoadModuleList();
+                                  });
+
+                            } else {
+
+                            }
+                        });
+
+                  }
+                  $scope.ResetFrm=function()
+                  {
+                      $scope.Module = {};
+                      $scope.btnTitle = 'Save';
+                      $scope.IsEdit = 0;
+                      $scope.submitted = false;
+                  }
+
+                  $scope.UpdateModule = function () {
+                      $http.post(baseUrl + 'Setup/UpdateModule',$scope.Module).
+                        then(function (response) {
+                            if (response.data != '0')
+                            {
+                                toastr.success('Update Successfully');
+                                LoadModuleList();
+                                return;
+                            }
+                            toastr.error('Update Error');
+                        });
+                  }
+                  $scope.EditModule = function (item) {
+                      $scope.Module = item;
+                     
+                      $scope.IsEdit = 1;
+                   
+                      $scope.btnTitle = 'Update';
+                      LoadModuleList();
+                  }
+                   $scope.selectAll = function () {
+                       angular.forEach($scope.ModuleList, function (item) {
+                          item.Selected = $scope.selectedAll;
+                      });
+                  };
+
+                  function LoadModuleList()
+                  {
+                      $http.post(baseUrl + 'Setup/LoadModuleList').
+                        then(function (response) {
+                            $scope.ModuleList = response.data;
+                            toastr.success($scope.ModuleList.length + ' Module found');
+                        });
+                  }
+              }]);
+</script>
+

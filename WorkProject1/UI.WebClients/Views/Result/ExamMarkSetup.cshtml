@@ -1,0 +1,668 @@
+﻿@{
+    ViewBag.Title = "Exam Setup Widget";
+}
+
+
+<div class="row" ng-controller="CltrExamSetup">
+    <div class="col-md-12">
+        <div class="portlet light bordered" id="form_wizard_1">
+            <div class="portlet-title">
+                <div class="caption">
+                    <i class=" icon-layers font-red"></i>
+                    <span class="caption-subject font-red bold uppercase">
+                        Exam Setup-
+                        <span class="step-title"> Step 1 of 3 </span>
+                    </span>
+                </div>
+                <div class="actions">
+                    <a class="btn btn-circle btn-icon-only btn-default" href="javascript:;">
+                        <i class="icon-cloud-upload"></i>
+                    </a>
+                    <a class="btn btn-circle btn-icon-only btn-default" href="javascript:;">
+                        <i class="icon-wrench"></i>
+                    </a>
+                    <a class="btn btn-circle btn-icon-only btn-default" href="javascript:;">
+                        <i class="icon-trash"></i>
+                    </a>
+                </div>
+            </div>
+            <div class="portlet-body form">
+                @*<form class="form-horizontal" action="#" id="submit_form" method="POST">*@
+                    <div class="form-wizard">
+                        <div class="form-body">
+                            <ul class="nav nav-pills nav-justified steps">
+                                <li>
+                                    <a href="#tab1" data-toggle="tab" class="step">
+                                        <span class="number"> 1 </span>
+                                        <span class="desc">
+                                            <i class="fa fa-check"></i> Main Exam Setup
+                                        </span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="#tab2" data-toggle="tab" class="step">
+                                        <span class="number"> 2 </span>
+                                        <span class="desc">
+                                            <i class="fa fa-check"></i> Sub Exam Setup
+                                        </span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="#tab3" data-toggle="tab" class="step active">
+                                        <span class="number"> 3 </span>
+                                        <span class="desc">
+                                            <i class="fa fa-check"></i> Divided Exam Setup
+                                        </span>
+                                    </a>
+                                </li>                               
+                            </ul>
+                            <div id="bar" class="progress progress-striped" role="progressbar">
+                                <div class="progress-bar progress-bar-success"> </div>
+                            </div>
+                            <div class="tab-content">
+                                <div class="alert alert-danger display-none">
+                                    <button class="close" data-dismiss="alert"></button> You have some form errors. Please check below.
+                                </div>
+                                <div class="alert alert-success display-none">
+                                    <button class="close" data-dismiss="alert"></button> Your form validation is successful!
+                                </div>
+                                <div class="tab-pane active" id="tab1">
+                                    <form name="mainForm" ng-submit="mainExamSave()" class="form-horizontal" id="form_sample_1" novalidate>
+                                        <h3 class="block">Main Exam details</h3>
+                                        <div class="form-group" ng-class="{ 'has-error' : submited && mainForm.mainExamName.$invalid}">
+                                            <label class="col-md-3 control-label">
+                                                Main Exam Name :
+                                                <span class="required">*</span>
+                                            </label>
+                                            <div class="col-md-4">
+                                                <input type="text" ng-model="MainExam.MainExamName" class="form-control" placeholder="Main ExamName Name" name="mainExamName" required>
+                                                <div class="form-control-focus"> </div>
+                                                <span ng-show="submited && mainForm.mainExamName.$error.required" class="help-block">Main Exam Name Required</span>
+                                            </div>
+                                        </div>
+                                        <div class="form-group" ng-class="{ 'has-error' : submited && mainForm.Version.$invalid}">
+                                            <label class="col-md-3 control-label">
+                                                Version :
+                                                <span class="required">*</span>
+                                            </label>
+                                            <div class="col-md-4">
+                                                <select class="form-control" ng-model="MainExam.VersionID" required name="Version" ng-options="ExamSetup.VersionId as ExamSetup.VersionName for ExamSetup in CommonFeilds.Version">
+                                                    <option value="" selected="selected">Choose an Option</option>
+                                                </select>
+                                                <div class="form-control-focus"> </div>
+                                                <span ng-show="submited && mainForm.Version.$error.required" class="help-block">Version Required</span>
+                                            </div>
+                                        </div>
+                                        <div class="form-group" ng-class="{ 'has-error' : submited && mainForm.Session.$invalid}">
+                                            <label class="col-md-3 control-label">
+                                                Session :
+                                                <span class="required">*</span>
+                                            </label>
+                                            <div class="col-md-4">
+                                                <select class="form-control" ng-model="MainExam.SessionId" required name="Session" ng-options="ExamSetup.SessionId as ExamSetup.SessionName for ExamSetup in CommonFeilds.Session">
+                                                    <option value="" selected="selected">Choose an Option</option>
+                                                </select>
+                                                <div class="form-control-focus"> </div>
+                                                <span ng-show="submited && mainForm.Session.$error.required" class="help-block">Session Required</span>
+                                            </div>
+                                        </div>
+                                        <div class="form-group" ng-class="{ 'has-error' : submited && mainForm.Class.$invalid}">
+                                            <label class="col-md-3 control-label">
+                                                Class :
+                                                <span class="required">*</span>
+                                            </label>
+                                            <div class="col-md-4">
+                                                <select class="form-control" ng-model="MainExam.ClassId" name="Class" ng-change="GetGroup(MainExam.ClassId)" required ng-options="ExamSetup.ClassId as ExamSetup.ClassName for ExamSetup in CommonFeilds.ClassInfo | filter:{VersionId:SubjectSetup.VersionID}:true">
+                                                    <option value="" selected="selected">Choose an Option</option>
+                                                </select>
+                                                <div class="form-control-focus"> </div>
+                                                <span ng-show="submited && mainForm.Class.$error.required" class="help-block">Class Required</span>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-md-3 control-label">
+                                                Group :
+                                            </label>
+                                            <div class="col-md-4">
+                                                <select class="form-control" ng-model="MainExam.GroupId" name="Group" ng-disabled="Groups.length <= 0" ng-options="G.GroupId as G.GroupName for G in Groups">
+                                                    <option value="" selected="selected">Choose an Option</option>
+                                                </select>
+                                                <div class="form-control-focus"> </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group" ng-class="{ 'has-error' : submited && mainForm.mainExamGrandShowOrder.$invalid}">
+                                            <label class="col-md-3 control-label">
+                                                Main Exam Show Order :
+                                                <span class="required">*</span>
+                                            </label>
+                                            <div class="col-md-4">
+                                                <input type="number" ng-model="MainExam.MainExamGrandShowOrder" class="form-control" placeholder="Main ExamGrand Show Order" name="mainExamGrandShowOrder" required>
+                                                <div class="form-control-focus"> </div>
+                                                <span ng-show="submited && mainForm.mainExamName.$error.required" class="help-block">Main Exam Name Required</span>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-md-3 control-label">
+                                                Efect On Grand :
+                                            </label>
+                                            <div class="col-md-4" style="margin-top: 8px;">
+                                                <input type="checkbox" id="IsPair" ng-model="MainExam.MainExamIsGrand" ng-checked="MainExam.MainExamIsGrand==true" />
+                                                <button ng-click="submited=true" class="btn btn-primary pull-right">&nbsp;<i class="fa fa-floppy-o"></i>Add Main Exam &nbsp;</button>
+                                            </div>
+                                        </div>                             
+                                        </form>
+                                    @*<div class="table-container col-md-6 col-lg-offset-1">
+                                        <div id="sample_3_wrapper" class="dataTables_wrapper no-footer">
+                                            <div class="table-scrollable"> </div>
+                                            <table class="table table-bordered table-hover">
+                                                <thead>
+                                                    <tr style="background-color: #83b3db;">
+                                                        <th width="22%">Main Exam Name</th>
+                                                        <th width="22%">Main Exam IsGrand</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    
+                                                    <tr>
+                                                        <td>{{Mainexam.MainExamName}}</td>                                                        
+                                                        <td><input type="checkbox" id="MainExamIsGrand" ng-show="Mainexam.MainExamName"  value="mainexam" ng-checked="Mainexam.MainExamIsGrand==true" /></td> 
+                                                    </tr>
+                                                </tbody>
+
+                                            </table>
+
+
+                                        </div>
+                                    </div>*@
+                            </div>
+                                <div class="tab-pane" id="tab2">    
+                                    <div id="addmodal" class="modal fade" tabindex="-1" data-backdrop="static" data-keyboard="false">
+                                        <div class="modal-dialog modal-lg">
+                                            <div class="modal-content">
+                                                <form name="subForm" ng-submit="subExamSave()" class="form-horizontal" id="form_sample_2" novalidate>
+                                                    <div class="modal-header">
+                                                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                                                        <h4 class="modal-title">{{modalTitle}}</h4>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <div class="form-body">
+                                                            <div class="row">
+                                                                <div class="form-group" ng-class="{ 'has-error' : submited1 && subForm.MainExamId.$invalid}">
+                                                                    <label class="col-md-3 control-label">
+                                                                        Main Exam :
+                                                                    </label>
+                                                                    <div class="col-md-4">
+                                                                        <label class="col-md-3 control-label">
+                                                                            {{Mainexam.MainExamName}}
+                                                                        </label>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group" ng-class="{ 'has-error' : submited1 && subForm.subExamName.$invalid}">
+                                                                    <label class="col-md-3 control-label">
+                                                                        Sub Exam Name :
+                                                                        <span class="required">*</span>
+                                                                    </label>
+                                                                    <div class="col-md-4">
+                                                                        <input type="text" ng-model="SubExam.SubExamName" class="form-control" placeholder="Sub ExamName Name" name="subExamName" required>
+                                                                        <div class="form-control-focus"> </div>
+                                                                        <span ng-show="submited1 && subForm.subExamName.$error.required" class="help-block">Sub Exam Name Required</span>
+                                                                    </div>
+                                                                </div>
+
+                                                                <div class="form-group">
+                                                                    <label class="col-md-3 control-label">
+                                                                    </label>
+                                                                    <div class="col-md-4">
+
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" data-dismiss="modal" class="btn dark btn-outline" ng-click="resetForm();submitted1=false">Cancel</button>
+                                                        <button ng-click="submited1=true" class="btn btn-primary pull-right">&nbsp;<i class="fa fa-floppy-o"></i>Add Sub Exam &nbsp;</button>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>  
+                                    <div class="col-md-11 btn-group btn-group-solid pull-right">
+                                        <button ng-click="resetForm()" class="btn green" data-target="#addmodal" data-toggle="modal"> <i class="fa fa-plus"></i> Add Subject</button>
+                                    </div>
+                                    <div class="table-container col-md-11 col-lg-offset-1">
+                                        <div id="sample_3_wrapper" class="dataTables_wrapper no-footer">
+                                            <div class="table-scrollable"> </div>
+                                            <table class="table table-bordered table-hover">
+                                                <thead>
+                                                    <tr class="bg-primary">
+                                                        <th width="22%">Main Exam Name</th>
+                                                        <th width="25%">Sub Exam Name</th> 
+                                                        <th width="15%">Action</th>                                                        
+                                                    </tr>
+                                                </thead>
+                                                <tbody>                                                   
+                                                    <tr ng-repeat="x in SubExams">
+                                                        <td>{{Mainexam.MainExamName}}</td>
+                                                        <td>{{x.SubExamName}}</td>
+                                                        <td>
+                                                            <a href="javascript:;" class="btn btn-icon-only green" ng-click="editSubExam(x)">
+                                                                <i class="fa fa-edit"></i>
+                                                            </a>
+                                                            <a ng-click="deleteSubExam(x)" href="javascript:;" class="btn btn-icon-only red">
+                                                                <i class="fa fa-trash"></i>
+                                                            </a>  
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+
+                                            </table>
+
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="tab-pane" id="tab3">
+                                    <form name="dividedForm" ng-submit="dividedExamSave()" class="form-horizontal" id="form_sample_3" novalidate>
+                                        <h3 class="block">Divided Exam details</h3>
+                                        <div class="form-group" ng-class="{ 'has-error' : submited2 && dividedForm.sumExamID.$invalid}">
+                                            <label class="col-md-3 control-label">
+                                                Sub Exam :
+                                                <span class="required">*</span>
+                                            </label>
+                                            <div class="col-md-4">
+                                                <select class="form-control" ng-model="DividedExam.SubExamId" required name="subExamID" ng-options="s.SubExamId as s.SubExamName for s in SubExams">
+                                                    <option value="" selected="selected">Choose an Option</option>
+
+                                                </select>
+                                                <div class="form-control-focus"> </div>
+                                                <span ng-show="submited2 && dividedForm.subExamID.$error.required" class="help-block">Sub Exam Id Required</span>
+                                            </div>
+                                        </div>
+                                        <div class="form-group" ng-class="{ 'has-error' : submited2 && dividedForm.dividedExamName.$invalid}">
+                                            <label class="col-md-3 control-label">
+                                                Divided Exam Name :
+                                                <span class="required">*</span>
+                                            </label>
+                                            <div class="col-md-4">
+                                                <input type="text" ng-model="DividedExam.DividedExamName" class="form-control" placeholder="Divided ExamName Name" name="dividedExamName" required>
+                                                <div class="form-control-focus"> </div>
+                                                <span ng-show="submited2 && dividedForm.dividedExamName.$error.required" class="help-block">Divided Exam Name Required</span>
+                                            </div>
+                                        </div>                                    
+                                        <div class="form-group" ng-class="{ 'has-error' : submited2 && dividedForm.type.$invalid}">
+                                            <label class="col-md-3 control-label">
+                                                Divided Exam Type :
+                                                <span class="required">*</span>
+                                            </label>
+                                            <div class="col-md-4">
+                                                <select class="form-control" ng-model="DividedExam.DividedExamType" required name="type">
+                                                    <option value="" selected="selected">Select</option>
+                                                    <option value="S">Subjective</option>
+                                                    <option value="O">Objective</option>
+                                                    <option value="P">Practical</option>
+                                                    <option value="W1">Writen-1</option>
+                                                    <option value="W2">writen-2</option>
+                                                    <option value="W3">writen-3</option>                                                          
+                                                </select>
+                                                <div class="form-control-focus"> </div>
+                                                <span ng-show="submited2 && dividedForm.type.$error.required" class="help-block">Divided Exam Type Required</span>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-md-3 control-label">
+                                            </label>
+                                            <div class="col-md-4">
+                                                <button ng-click="submited2=true" class="btn btn-primary pull-right">&nbsp;<i class="fa fa-floppy-o"></i>Add Divide Exam &nbsp;</button>
+                                            </div>
+                                        </div> 
+                                    </form>
+                                    <div class="table-container">
+                                        <div id="sample_3_wrapper" class="dataTables_wrapper no-footer">
+                                            <div class="table-scrollable"> </div>
+                                            <table class="table table-bordered table-hover">
+                                                <thead>
+                                                    <tr style="background-color: #83b3db;">                                                         
+                                                        <th width="20%">Sub Exam Name</th>
+                                                        <th width="20%">Divided Exam Name</th>
+                                                        <th width="20%">Divided Exam Type</th>
+                                                        <th width="18%">Efect On Grand</th>
+                                                        <th width="15%">Action</th>    
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    
+                                                    <tr ng-repeat="d in DividedExams">                                                         
+                                                        <td>{{d.SubExam.SubExamName}}</td>
+                                                        <td>{{d.DividedExamName}}</td>
+                                                        <td>{{d.DividedExamType}}</td>
+                                                        <td><input type="checkbox"  ng-checked="d.IsGrand==true" /></td>
+                                                        <td>
+                                                            <a href="javascript:;" class="btn btn-icon-only green" ng-click="editDividedExam(d)" data-target="#addmodal" data-toggle="modal">
+                                                                <i class="fa fa-edit"></i>
+                                                            </a>
+                                                            <a ng-click="deleteDividedExam(d)" href="javascript:;" class="btn btn-icon-only red">
+                                                                <i class="fa fa-trash"></i>
+                                                            </a>
+                                                        </td>                                                     
+
+                                                    </tr>                                                
+                                                </tbody>
+
+                                            </table>
+
+
+                                        </div>
+                                    </div>
+                                </div>                                 
+                            </div>
+                        </div>
+                        <div class="form-actions">
+                            <div class="row">
+                                <div class="col-md-offset-3 col-md-9">
+                                    <a href="javascript:;" class="btn default button-previous">
+                                        <i class="fa fa-angle-left"></i> Back
+                                    </a>
+                                    <a href="javascript:;" class="btn btn-outline green button-next">
+                                        Continue
+                                        <i class="fa fa-angle-right"></i>
+                                    </a>
+                                    <a href="javascript:;" class="btn green button-submit">
+                                        Submit
+                                        <i class="fa fa-check"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                @*</form>*@
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+<script src="~/assets/global/plugins/bootstrap-wizard/jquery.bootstrap.wizard.js"></script>
+<script src="~/assets/global/scripts/app.min.js" type="text/javascript"></script>
+<script src="~/assets/pages/scripts/form-wizard.min.js" type="text/javascript"></script>
+    <script type="text/javascript">
+        OEMSApp.controller("CltrExamSetup", ["$scope", "$http", "SweetAlert", "blockUI",
+              function ($scope, $http, SweetAlert, blockUI) {
+
+                  init();
+                  function init() {
+                      initialize();
+                      getAllCommons();                     
+                      //getMainExam();  //for subExam
+                      
+
+                  }
+                  function initialize() {
+                      $scope.MainExam = {};
+                      $scope.Mainexam = {};
+                      $scope.MainExam.MainExamId = 0;
+                      $scope.MainExams = [];
+
+                      $scope.SubExam = {};
+                      $scope.Subexam = {};
+                      $scope.SubExam.SubExamId = 0;
+                      $scope.SubExams = [];
+
+                      $scope.DividedExam = {};
+                      $scope.Dividedexam = {};
+                      $scope.DividedExam.DividedExamId = 0;                       
+                      $scope.DividedExams = [];
+                 
+                      $scope.CommonFeilds = [];
+
+                     
+                      $scope.res = {};
+                      $scope.data = {};
+                      $scope.resetForm = resetForm;
+                      $scope.getAllCommons = getAllCommons;
+
+                  }
+                  function resetForm() {
+                      $scope.modalTitle = "Sub Exam Details";
+                      $scope.MainExam = {};
+                      $scope.MainExam.MainExamId = 0;
+
+                      $scope.SubExam = {};
+                      $scope.SubExam.SubExamId = 0;
+
+                      $scope.DividedExam = {};
+                      $scope.DividedExam.DividedExamId = 0;
+
+                      $scope.submited2 = false;
+                      $scope.submited1 = false;
+                      $scope.submited = false;
+                      
+                  }
+                  function getAllCommons() {
+                      $scope.CommonFeilds = [];
+
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Common/GetCommonItem/'
+                      }).then(function successCallback(response) {
+                          $scope.CommonFeilds = response.data.results;
+                      }, function errorCallback(response) {
+                          toastr["info"](response.data.message);
+                      });
+                  }
+                  $scope.GetGroup = function GetGroup(classid) {
+                      $scope.Groups = [];
+
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Common/GetGroup/' + classid
+                      }).then(function successCallback(response) {
+                          $scope.Groups = response.data.results;
+
+
+                      }, function errorCallback(response) {
+                          toastr["info"](response.data.message);
+                      });
+
+                  }
+                  //mainExam
+                  
+                  $scope.mainExamSave = function mainExamSave() {
+
+                      if ($scope.mainForm.$invalid)
+                          return;
+
+                          if ($scope.MainExam != {}) {
+                              $http({
+                                  method: 'POST',
+                                  url: baseUrl + 'ExamSetup/AddMainExam/',
+                                  data: $scope.MainExam
+                              }).then(function successCallback(response) {
+                                  $scope.Mainexam = response.data.results;
+                                  toastr["info"](response.data.message);
+                                  //getMainExam($scope.Mainexam.MainExamId);
+                                  resetForm();
+                              }, function errorCallback(response) {
+                                  toastr["info"](response.data.message);
+                              });
+                          }
+                      
+
+                  };
+
+                  //function getMainExam(mainexamid) {
+                  //    $scope.MainExams = [];
+                  //    $http({
+                  //        method: 'GET',
+                  //        url: baseUrl + 'ExamSetup/GetMainExam/'+ mainexamid
+                  //    }).then(function successCallback(response) {
+                  //        $scope.ExamSetups = response.data;
+                  //        $scope.total_count = response.data.totalcount;
+                  //        if ($scope.pagesize == -1)
+                  //            $scope.pagesize = 500;
+
+                  //    }, function errorCallback(response) {
+                  //        toastr["info"](response.data.message);
+                  //    });
+
+                  //};
+
+                  //mainExam
+
+                  //subExam
+
+
+                  $scope.subExamSave = function subExamSave() {
+
+                      if ($scope.subForm.$invalid)
+                          return;
+                      $scope.SubExam.MainExamId = $scope.Mainexam.MainExamId;
+                      if ($scope.SubExam != {}) {
+                          if ($scope.SubExam.SubExamId != 0) /// For Update
+                          {
+                              if ($scope.SubExam.SubexamName != '') {
+                                  $http({
+                                      method: 'PUT',
+                                      url: baseUrl + '/ExamSetup/UpdateSubExam/',
+                                      data: $scope.SubExam
+                                  }).then(function successCallback(response) {
+                                      $scope.SubExams = response.data.results;
+                                      toastr["info"](response.data.message);
+                                      resetForm();
+                                  }, function errorCallback(response) {
+                                      toastr["info"](response.data.message);
+                                  });
+                              }
+                          }
+                          else {
+                              $http({
+                                  method: 'POST',
+                                  url: baseUrl + '/ExamSetup/AddSubExam/',
+                                  data: $scope.SubExam
+                              }).then(function successCallback(response) {
+                                  $scope.SubExams = response.data.results;
+                                  toastr["info"](response.data.message);
+                                  resetForm();
+                              }, function errorCallback(response) {
+                                  toastr["info"](response.data.message);
+                              });
+                          }
+                      }
+
+                  };
+                  
+                  $scope.editSubExam = function (sube) {
+                      $scope.SubExam = sube;
+                  };
+
+
+                  $scope.deleteSubExam = function (sube) {
+                      SweetAlert.swal({
+                          title: "Are you sure to delete it ?", type: "warning", showCancelButton: true, confirmButtonColor: "#DD6B55",
+                          confirmButtonText: "Yes, delete it!",
+                          closeOnConfirm: false
+                      },
+                      function (isConfirm) {
+                          if (isConfirm) {
+                              $http({
+                                  method: 'DELETE',
+                                  url: baseUrl + '/ExamSetup/DeleteSubExam/' + sube.SubExamId                                  
+                              }).then(function successCallback(response) {
+                                  SweetAlert.swal("Deleted!", "Your data has been deleted.", "success");
+                                  $scope.SubExams = response.data.results;
+                                  resetForm();
+                              }, function errorCallback(response) {
+                                  toastr["info"](response.data.message);
+                              });
+
+                          }
+                      });
+
+
+                  };
+
+                  //subExam
+
+                  //Divided Exam
+
+                  $scope.dividedExamSave = function dividedExamSave() {
+
+                      if ($scope.dividedForm.$invalid)
+                          return;
+
+                      if ($scope.DividedExam != {}) {
+                          if ($scope.DividedExam.DividedExamId != 0) /// For Update
+                          {
+                              if ($scope.DividedExam.DividedExamName != '') {
+                                  $http({
+                                      method: 'PUT',
+                                      url: baseUrl + '/ExamSetup/UpdateDividedExam/',
+                                      data: $scope.DividedExam
+                                  }).then(function successCallback(response) {
+                                      $scope.DividedExams = response.data.results;
+                                      toastr["info"](response.data.message);
+                                      resetForm();
+                                  }, function errorCallback(response) {
+                                      toastr["info"](response.data.message);
+                                  });
+                              }
+                          }
+                          else {
+                              $http({
+                                  method: 'POST',
+                                  url: baseUrl + 'ExamSetup/AddDividedExam/',
+                                  data: $scope.DividedExam
+                              }).then(function successCallback(response) {
+                                  $scope.DividedExams = response.data.results;
+                                  toastr["info"](response.data.message);
+                                  resetForm();
+                              }, function errorCallback(response) {
+                                  toastr["info"](response.data.message);
+                              });
+                          }
+                      }
+
+
+                  };
+
+                  $scope.editDividedExam = function (dividedExam) {
+                      $scope.DividedExam = dividedExam;
+                  };
+             
+
+                  $scope.deleteDividedExam = function (dividedExam) {
+                      $scope.DividedExam = dividedExam;
+                      SweetAlert.swal({
+                          title: "Are you sure to delete it ?", type: "warning", showCancelButton: true, confirmButtonColor: "#DD6B55",
+                          confirmButtonText: "Yes, delete it!",
+                          closeOnConfirm: false
+                      },
+                      function (isConfirm) {
+                          if (isConfirm) {                               
+                              $http({
+                                  method: 'PUT',
+                                  url: baseUrl + '/ExamSetup/DeleteDividedExam/', // + dividedExam   
+                                  data: dividedExam
+                              }).then(function successCallback(response) {
+                                  SweetAlert.swal("Deleted!", "Your data has been deleted.", "success");
+                                  $scope.DividedExams = response.data.results;
+                                  resetForm();
+                              }, function errorCallback(response) {
+                                  toastr["info"](response.data.message);
+                              });
+
+                          }
+                      });
+
+
+                  };
+                  //Divided Exam
+           
+
+              }]);
+
+       
+    </script>
+
+}
+

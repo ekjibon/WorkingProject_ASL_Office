@@ -1,0 +1,82 @@
+﻿@{
+    ViewBag.Title = "Employee Profile";
+    Layout = "~/Views/Shared/_EmpLayout.cshtml";
+}
+@{
+    ViewBag.Title = "Routine";
+}
+<style>
+    .Approved {
+        background: rgba(0, 156, 184, 0.521);
+        color: #009DB8;
+        padding: 8px 16px;
+        border-radius: 27px;
+    }
+
+    .pending {
+        background: rgba(252, 122, 82, 0.5);
+        color: #FC7B52;
+        padding: 8px 16px;
+        border-radius: 27px;
+    }
+
+    .Rejected {
+        background: #dc3545;
+        color: white;
+        padding: 8px 16px;
+        border-radius: 27px;
+    }
+</style>
+<div class="row mt-3" ng-controller="RoutineCltr">
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="emp-header">
+                Routine
+            </div>
+            <div class="card-body">
+                 <div class="portlet-body">
+                    <div class="table-container">
+                        <div id="sample_3_wrapper" class="dataTables_wrapper no-footer">
+                            <div class="row">
+                               <div class="col-sm-12">
+                                   <iframe id="routineid" src = "/Employee/GetEmployeeRoutine" width="1100" height="800"></iframe>
+                               </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+             
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts{
+
+    <script type="text/javascript">
+       
+        OEMSApp.controller("RoutineCltr", ["$scope", "$http", "SweetAlert", "blockUI", "$window", "$filter", '$sce',
+                     function ($scope, $http, SweetAlert, blockUI, $window, $filter, $sce) {
+                         init();
+                         function init() {
+                             initialize();
+                         }
+                         function initialize() {
+                             $scope.pageSizeArray = [];
+                             $scope.pageSizeArray.push({ value: 5, text: 5 });
+                             $scope.pageSizeArray.push({ value: 10, text: 10 });
+                             $scope.pageSizeArray.push({ value: 20, text: 20 });
+                             $scope.pageSizeArray.push({ value: 50, text: 50 });
+                             $scope.currentPage = 1;
+                             $scope.pageSize = 10;
+                           $scope.oddColor = '#E4F4F7';
+                        
+                         };
+                        
+                     }]);
+    </script>
+}
+
+
+

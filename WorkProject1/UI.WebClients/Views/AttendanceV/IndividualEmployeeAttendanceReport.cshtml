@@ -1,0 +1,159 @@
+﻿
+@{
+    ViewBag.Title = "Individual Employee Attendance Report";
+}
+<style>
+    .DrpdwnWidth ul {
+        width: 320px;
+    }
+</style>
+<div class="kt-container  kt-container--fluid  kt-grid__item kt-grid__item--fluid" ng-controller="IER">
+    <div class="row">
+        <div class="kt-portlet kt-portlet--mobile">
+            <div class="kt-portlet__head kt-portlet__head--lg">
+                <div class="kt-portlet__head-label">
+                    <h3 class="kt-portlet__head-title">
+                        Individual Employee Attendance Report
+                    </h3>
+                </div>
+            </div>
+            <div class="kt-portlet__body">
+                <!-- BEGIN FORM-->
+                <form class="form-horizontal" ng-submit="Report(formCommonFeilds.$valid)" id="formCommonFeilds" name="formCommonFeilds" novalidate>
+                    <div class="form-body">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group row" ng-class="{ 'has-error' : submitted && formCommonFeilds.StudentId.$invalid}">
+                                    <label class="col-sm-5 control-label pull-left" style="text-align:right">
+                                        Employee ID :
+                                    </label>
+                                    <div class="col-md-6 DrpdwnWidth">
+                                        <input type="text"
+                                               name="StudentId"
+                                               ng-model="Std"
+                                               typeahead-on-select='onSelect($item, $model, $label)'
+                                               placeholder="Search name/ ID "
+                                               uib-typeahead="i  as i.Text for i in Search($viewValue)"
+                                               typeahead-loading="loadingLocations" typeahead-no-results="noResults" class="form-control">
+                                        <i ng-show="loadingLocations" class="glyphicon glyphicon-refresh"></i>
+                                        <div ng-show="noResults"><i class="glyphicon glyphicon-remove"></i> No Results Found</div>
+                                        <input type="hidden" name="StudentIID" ng-value="Std.Value" />
+                                        <div class="form-control-focus"> </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group row">
+                                    <label class="col-md-5 control-label" style="text-align:right">
+                                        From :
+                                        <span class="required">*</span>
+                                    </label>
+                                    <div class="col-md-6">
+                                        <input class="form-control" ng-change="check()" datepicker-options="dateOptions" name="FromDate" type="datetime" placeholder="From Date" readonly ng-click="p1=true" is-open="p1" uib-datepicker-popup="dd/MM/yyyy" ng-model="EmpIndiAtteneance.From" />
+
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group row">
+                                    <label class="col-md-5 control-label" style="text-align:right">
+                                        To :
+                                        <span class="required">*</span>
+                                    </label>
+                                    <div class="col-md-6">
+                                        <input class="form-control" datepicker-options="dateOptionsEnd" name="ToDate" type="datetime" placeholder="To Date" readonly ng-click="p2=true" is-open="p2" uib-datepicker-popup="dd/MM/yyyy" ng-model="EmpIndiAtteneance.To" />
+
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-md-5 control-label">
+                                    </label>
+                                    <div class="col-md-6 text-right">
+                                        <button ng-click="submitted=true" class="btn btn-primary">Report</button>
+                                        <button type="button" ng-click="Reset()" class="btn btn-danger">Reset</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+@section Scripts{
+    <script type="text/javascript">
+        OEMSApp.controller("IER", ["$scope", "$http", "SweetAlert", "$filter", "$window",
+          function ($scope, $http, SweetAlert, $filter, $window) {
+
+              init();
+              function init() {
+                  initialize();
+                  //  getAllCommons();
+              }
+              function initialize() {
+                  $scope.EmpIndiAtteneance = [];
+
+              };
+              $scope.Reset = function Reset() {
+
+                  $scope.submitted = false;
+                  $scope.EmpIndiAtteneance = [];
+              };
+
+
+              $scope.Search = function (val) {
+                  return $http.get(baseUrl + 'Employee/SearchEmployee/' + val, {
+                      params: {
+
+                      }
+                  }).then(function (response) {
+                      return response.data.results.map(function (item) {
+                          return item;
+                      });
+                  });
+              };
+              $scope.onSelect = function onSelect($item, $model, $label) {
+
+                  $scope.EmpIndiAtteneance.EmpBasicInfoID = $item.Value;
+                  //SearchEmployeeId($item.Value);
+              };
+
+              $scope.check = function () {
+                  $scope.dateOptionsEnd = { minDate: $scope.EmpIndiAtteneance.From };
+              }
+
+
+              $scope.Report = function Report(valid) {
+                  if (valid) {
+                      if ($scope.EmpIndiAtteneance.EmpBasicInfoID == null || $scope.EmpIndiAtteneance.EmpBasicInfoID == 0) {
+                          toastr["warning"]("Employee is Required.");
+                      }
+
+                      else if ($scope.EmpIndiAtteneance.From == null) {
+                          toastr["warning"]("From date is Required.");
+                      }
+                      else if ($scope.EmpIndiAtteneance.To == null) {
+                          toastr["warning"]("To date is Required.");
+                      }
+                      else if ($scope.EmpIndiAtteneance.From > $scope.EmpIndiAtteneance.To) {
+                          toastr["warning"]("To Date must be greater than From Date");
+                      }
+                      
+                      else {
+                          var FromDate = $filter('date')($scope.EmpIndiAtteneance.From, "MM/dd/yyyy");
+                          var ToDate = $filter('date')($scope.EmpIndiAtteneance.To, "MM/dd/yyyy");
+                          $scope.uri = "@Url.Action("IndiVidualEmployeeAttendanceDateRange", "Report")?EmpId=" + $scope.EmpIndiAtteneance.EmpBasicInfoID + "&FromDate=" + FromDate + '&ToDate=' + ToDate;
+                          $window.open($scope.uri, '_blank');
+                      }
+
+                  }
+              };
+          }]);
+    </script>
+}
+

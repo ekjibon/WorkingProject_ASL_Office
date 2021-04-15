@@ -1,0 +1,389 @@
+﻿
+@{
+    ViewBag.Title = "Money Receipt Generate Panel";
+}
+<style type="text/css">
+    input[type=number]::-webkit-inner-spin-button,
+    input[type=number]::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+
+    #ClientId {
+        width: 260px;
+    }
+
+    .DrpdwnWidth ul {
+        width: 350px;
+    }
+</style>
+
+<div class="kt-container  kt-container--fluid  kt-grid__item kt-grid__item--fluid" ng-controller="AdminCollectionCntrl">
+
+    <div class="row">
+        <div class="kt-portlet kt-portlet--mobile">
+            <div class="kt-portlet__head kt-portlet__head--lg">
+                <div class="kt-portlet__head-label">
+                    <h3 class="kt-portlet__head-title">
+                        Money Receipt Generate Panel
+                    </h3>
+                </div>
+            </div>
+            <div class="kt-portlet__body">
+                <!-- BEGIN FORM-->
+                <form class="form-horizontal" name="mainFilter" ng-submit="Search()" id="idmainFilter" method="post" enctype="multipart/form-data" novalidate>
+                    <div class="form-body">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group row" ng-class="{ 'has-error' : isSubmitted && mainFilter.Client.$invalid}">
+                                    <label class="col-md-4 control-label" style="text-align:right">
+                                        Client :
+                                    </label>
+                                    <div class="col-md-8 DrpdwnWidth">
+                                        <input type="text" ng-model="Client" typeahead-on-select='onSelect($item, $model, $label)'
+                                               placeholder="Enter client name or ID" uib-typeahead="i  as i.Text for i in Searchtext($viewValue)"
+                                               typeahead-loading="loadingLocations" typeahead-no-results="noResults" class="form-control">
+                                        <i ng-show="loadingLocations" class="glyphicon glyphicon-refresh"></i>
+                                        <div ng-show="noResults"><i class="glyphicon glyphicon-remove"></i> No Results Found</div>
+                                        <input type="hidden" name="Client" ng-model="mainFilter.Value" ng-value="Std.Value" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group row " ng-class="{ 'has-error' : submitted && mainFilter.FromDate.$invalid}">
+                                    <label class="col-md-4" style="text-align:right">
+                                        Form Date :
+                                        <span class="required">*</span>
+                                    </label>
+                                    <div class="col-md-8">
+                                        <input class="form-control" type="text" ng-click="p1=true" is-open="p1" readonly ng-model="mainFilter.FromDate" placeholder="Form Date" uib-datepicker-popup="dd/MM/yyyy" name="FromDate" required />
+                                        <span ng-show="submitted &&  mainFilter.FromDate.$error.required" class="help-block">Form Date Required</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group row " ng-class="{ 'has-error' : submitted && mainFilter.FromDate.$invalid}">
+                                    <label class="col-md-4 " style="text-align:right">
+                                        To Date :
+                                        <span class="required">*</span>
+                                    </label>
+                                    <div class="col-md-8">
+                                        <input class="form-control" type="text" readonly ng-click="p2=true" is-open="p2" ng-model="mainFilter.ToDate" placeholder="To Date" min-date="session.FromDate" uib-datepicker-popup="dd/MM/yyyy" name="ToDate" required />
+                                        <span ng-show="submitted &&  mainFilter.ToDate.$error.required" class="help-block">To Date Required</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                               
+                                <button type="submit" ng-click="submitted=true;" class="btn btn-success">Show</button>
+                                <button type="button" class="btn btn-danger" ng-click="resetFilterForm()">Reset</button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+              
+                <table class="table table-bordered table-hover rounded">
+                    <thead>
+                        <tr class="btn-primary">
+                            <th><input type="checkbox" ng-model="selectedAll" ng-click="selectAll()" /></th>
+                            <th>Client ID &amp; Name  </th>
+                            <th>Invoice No</th>
+                            <th>Invoice Amount</th>
+                            <th>CollectionAmount</th>
+                            <th>Collection Date</th>
+                            <th>Payment Method</th>
+                            <th>Cheque No</th>
+                            <th style="text-align:center">Action</th>   
+                        </tr>
+                    </thead>
+
+                    <tbody ng-repeat="x in InvoiceGeneratelist">
+                        <tr>
+                            <td> <input type="checkbox" ng-model="x.Selected" value="false" ng-click="checkIfAllSelected()" /> </td>
+                            <td>{{x.FullName}}</td>
+                            <td>{{x.InvoiceNo}}</td>
+                            <td>{{x.InvoiceAmount}}</td>
+                            <td>{{x.CollectionAmount}}</td>
+                            <td>{{x.CollectionDate | date : "dd-MM-yyyy"}}</td>
+                            <td>{{x.PaymentMethod}}</td>
+                            <td>{{x.ChequeNo}}</td>
+                            <td align="center" style="width:15%">
+                                <div class="btn-group ">
+                                    <button class="btn btn-label-success" type="button" data-toggle="dropdown" aria-expanded="false">
+                                        Options
+                                        <i class="fa fa-angle-down"></i>
+                                    </button>
+                                    <ul class="dropdown-menu" role="menu" style="left: -10%; width: 98px !important;">
+                                        <li style="margin-bottom: 5px">
+                                            <a ng-click="RollbackCollection(x)"  style="width:100px" class="btn btn-danger">Rollback</a>
+                                        </li>
+                                        
+                                    </ul>
+                                </div>
+                            </td> 
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="row">
+                    <div class="col-md-8">
+                        <div class="form-group row">
+
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group row">
+                            <div class="col-md-12 text-right">
+                                <button ng-click="Print()" class="btn btn-success" ng-hide="InvoiceGeneratelist.length <= 0">Print Money Receipt</button>
+                                
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts{
+    <script type="text/javascript">
+        OEMSApp.controller("AdminCollectionCntrl", ["$scope", "$http", "SweetAlert", "blockUI", "$window", "$filter",
+          function ($scope, $http, SweetAlert, blockUI, $window, $filter) {
+
+              init();
+              function init() {
+                  initialize();
+                 
+
+              }
+              function initialize() {
+
+                  $scope.pageSizeArray = [];
+                  $scope.pageSizeArray.push({ value: 5, text: 5 });
+                  $scope.pageSizeArray.push({ value: 10, text: 10 });
+                  $scope.pageSizeArray.push({ value: 20, text: 20 });
+                  $scope.pageSizeArray.push({ value: 50, text: 50 });
+                  $scope.currentPage = 1;
+                  $scope.pageSize = 10;
+                  $scope.pageno = 1;
+                  $scope.total_count = 12;
+
+                  $scope.InvoiceGeneratelist = [];
+                  $scope.Search = Search;
+                  $scope.resetFilterForm = resetFilterForm;
+                  $scope.mainFilter = {};
+                  //$scope.mainFilter.Year == 0;
+                  //$scope.mainFilter.Month == 0;
+              };
+              function getAllMonth() {
+                  $scope.MonthList = [];
+                  $http({
+                      method: 'GET',
+                      url: baseUrl + 'Common/GetAllMonth/'
+                  }).then(function successCallback(response) {
+                      $scope.MonthList = response.data.results.Table;
+                      angular.forEach($scope.MonthList, function (aMonth) {
+                          aMonth.IsChecked = false;
+                      });
+                  }, function errorCallback(response) {
+                      toastr["warning"](response.data.Message);
+                  });
+              }
+              function getAllYear() {
+                  $scope.YearList = [];
+                  $http({
+                      method: 'GET',
+                      url: baseUrl + 'Common/GetAllYear/'
+                  }).then(function successCallback(response) {
+                      $scope.YearList = response.data.results.Table;
+                  }, function errorCallback(response) {
+                      toastr["warning"](response.data.Message);
+                  });
+              }
+
+             
+
+              $scope.Searchtext = function (val) {
+                  return $http.get(baseUrl + 'Client/SearchClient/' + val, {
+                      params: {}
+                  }).then(function (response) {
+                      return response.data.results.map(function (item) {
+
+                          return item;
+                      });
+                  });
+              };
+
+              $scope.onSelect = function onSelect($item, $model, $label) {
+                  $scope.mainFilter.ClientId = $item.Value;
+              };
+
+              $scope.selectAll = function () {
+                  angular.forEach($scope.InvoiceGeneratelist, function (item) {
+                      item.Selected = $scope.selectedAll;
+                  });
+
+              };
+
+              $scope.checkIfAllSelected = function () {
+                  $scope.selectedAll = $scope.InvoiceGeneratelist.every(function (item) {
+                      return item.Selected == true
+                  })
+              };
+              function GetSelects() {
+                  var res = '';
+                  angular.forEach($scope.InvoiceGeneratelist, function (item) {
+                      if (item.Selected) {
+                          res += res == '' ? item.MasterID : ',' + item.MasterID;
+                      }
+                  });
+                  return res.trim()
+              };
+
+              function Search() {
+                
+                  var FromDate = $filter('date')($scope.mainFilter.FromDate, "yyyy-MM-dd");
+                  var ToDate = $filter('date')($scope.mainFilter.ToDate, "yyyy-MM-dd");
+                  if (FromDate == null) {
+                      toastr["info"]("From date is Required.");
+                      return;
+                  }
+                  else if (ToDate == null) {
+                      toastr["info"]("To date is Required.");
+                      return;
+                  }
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + '/Invoice/GetMoneyReceiptGenerate/' + FromDate + "/" + ToDate + "/" + $scope.mainFilter.ClientId
+
+                      }).then(function successCallback(response) {
+                          $scope.InvoiceGeneratelist = response.data.results;
+                          $scope.selectedAll = false;
+                      }, function errorCallback(response) {
+                          toastr["info"](response.data.Message);
+                      });
+              };
+
+              function resetFilterForm() {
+                  $scope.isisSubmitted = false;
+                  $scope.selectedAll = false;
+                  $scope.Client = "";
+                  $scope.mainFilter = {};
+                  $scope.InvoiceGeneratelist = [];
+              }
+              function chkInvoiceGenerateList() {
+                  $scope.count = 0;
+                  angular.forEach($scope.InvoiceGeneratelist, function (item) {
+                      if (item.Selected) {
+                          $scope.count ++;
+                      }
+                  });
+
+
+              }
+              $scope.Print = function Print() {
+                  chkInvoiceGenerateList();
+                  if ($scope.count < 1) {
+                      toastr["warning"]("Select at least one check box");
+                      return;
+                  }
+                  var uri = "@Url.Action("MoneyReceiptGenerate", "Report")?InvoiceNo="  + GetSelects();
+                  window.open(uri, '_blank');
+                 
+              };
+              $scope.PrintInvoiceExcel = function PrintInvoiceExcel() {
+                  chkInvoiceGenerateList();
+                  if ($scope.count < 1) {
+                      toastr["warning"]("Select at least one check box");
+                      return;
+                  }
+                  var uri = "@Url.Action("InvoiceExcelReport", "Report")?YearID=" + $scope.mainFilter.Year + "&MonthId=" + $scope.mainFilter.Month + "&ClientId=" + $scope.mainFilter.ClientId + "&InvoiceNo=" + GetSelects();
+                  window.open(uri, '_blank');
+                  
+              };
+              $scope.RollbackCollection = function RollbackCollection(itemData)
+              {
+                  SweetAlert.swal({
+                      title: "Are you sure to Rollback this Collection ?", type: "warning", showCancelButton: true, confirmButtonColor: "#DD6B55",
+                      confirmButtonText: "Yes, Rollback it!",
+                      closeOnConfirm: false
+                  },
+                  function (isConfirm) {
+                      if (isConfirm) {
+                          $http({
+                              method: 'POST',
+                              url: baseUrl + 'Invoice/RollbackCollection',
+                              data: itemData
+                          }).then(function successCallback(response) {
+                              SweetAlert.swal("", response.data.message, "success");
+                              Search();
+                          }, function errorCallback(response) {
+                              toastr["error"](response.data.Message);
+                          });
+                      }
+                  });
+              }
+
+              function createStringByArray(array) {
+                  var output = '';
+                  angular.forEach(array, function (value, key) {
+                      if (!isNaN(parseInt(value))) {
+                          output += value + ',';
+                      }
+                      else {
+                          output += "'" + value.toString() + '\',';
+                      }
+                  });
+                  return output;
+              }
+          }]).directive('multiSelect', function () {
+              function link(scope, element) {
+                  var options = {
+                      enableClickableOptGroups: true,
+                      onChange: function () {
+                          element.change();
+                      }
+                  };
+                  element.multiselect(options);
+              }
+              return {
+                  restrict: 'A',
+                  link: link
+              };
+          }).config(['$provide', function ($provide) {
+              $provide.decorator('selectDirective', ['$delegate', function ($delegate) {
+                  var directive = $delegate[0];
+                  directive.compile = function () {
+                      function post(scope, element, attrs, ctrls) {
+                          directive.link.post.apply(this, arguments);
+                          var ngModelController = ctrls[1];
+                          if (ngModelController && attrs.multiple == true) {
+                              originalRender = ngModelController.$render;
+                              ngModelController.$render = function () {
+                                  originalRender();
+                                  element.multiselect('rebuild');
+                              };
+                          }
+                      }
+                      return {
+                          pre: directive.link.pre,
+                          post: post
+                      };
+                  };
+                  return $delegate;
+              }]);
+
+          }]);
+    </script>
+
+}
+
+
+
+
+
+
+
+

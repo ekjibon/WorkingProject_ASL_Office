@@ -1,0 +1,556 @@
+﻿
+@{
+    ViewBag.Title = "Employee Attendance";
+
+    //Layout = "~/Views/Shared/_EmpLayout.cshtml";
+}
+
+<link href="//cdn.odhyyon.com/employee-portal/css/style.css" rel="stylesheet" type="text/css" />
+@*<link href="~/Content/calendar/calendar.css" rel="stylesheet" type="text/css"  />*@
+@*<link href="~/Content/calendar/calendar.css" rel="stylesheet" type="text/css" />*@
+
+
+
+<div class="kt-container  kt-container--fluid  kt-grid__item kt-grid__item--fluid" ng-controller="ModifyAttendance">
+    <div class="row">
+        <div class="kt-portlet kt-portlet--mobile">
+            <div class="kt-portlet__head kt-portlet__head--lg">
+                <div class="kt-portlet__head-label">
+                    <h3 class="kt-portlet__head-title">
+                        <b>Attendance</b>
+                    </h3>
+                </div>
+            </div>
+            <div class="kt-portlet__body">
+
+                <div class="row">
+                    <div class="col-lg-6">
+                        <div class="">
+                            <div class="row">
+                                <div class="col-lg-12">
+
+                                    <div class="tabbable-custom nav-justified">
+
+                                        <div class="tab-content">
+                                            <div class="tab-pane" id="guarInfo">
+                                                <div class="tab-pane" id="pills-contact" role="tabpanel" aria-labelledby="pills-contact-tab">
+                                                    <table class="table table-bordered yearlyatt">
+                                                        <thead class="Yearly-Attendance">
+                                                            <tr>
+                                                                <th scope="col">Months Name</th>
+                                                                <th scope="col">Total Class Days</th>
+                                                                <th scope="col">Total Presents</th>
+                                                                <th scope="col">Total Absent</th>
+                                                                <th scope="col">Total Late</th>
+                                                                <th scope="col">Total Yearly Leave</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody class="yearly"></tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                            <div class="tab-pane active" id="acaInfo">
+                                                <div>
+                                                    <div class="tab-pane show active" id="pills-profile" role="tabpanel" aria-labelledby="pills-profile-tab">
+                                                        <div class="calender">
+                                                            <div class="row">
+                                                                <div class="col-lg-8">
+                                                                    <h3>Academic Calender</h3>
+                                                                </div>
+                                                            </div>
+                                                            <ul class="month">
+                                                                <li>
+                                                                    <h1><span id="mon"></span>-<span id="year"></span> </h1>
+
+                                                                </li>
+                                                                <span class="prev">&#10094;</span>
+                                                                <span class="next">&#10095;</span>
+                                                            </ul>
+                                                            <ul class="weeks">
+                                                                <li>Sa</li>
+                                                                <li>Su</li>
+                                                                <li>Mo</li>
+                                                                <li>Tu</li>
+                                                                <li>We</li>
+                                                                <li>Th</li>
+                                                                <li>Fr</li>
+                                                            </ul>
+                                                            <ul class="days"></ul>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="row">
+                            <div class="col-lg-12 pl-0">
+                                <div class="card" @*style="width:100%;"*@>
+                                    <div class="card-body resent">
+                                        <h3>Recent Swipes</h3>
+                                        <table class="table table-striped rswipes">
+                                            <thead>
+                                                <tr>
+                                                    <th>Date</th>
+                                                    <th>In Time</th>
+                                                    <th>Out Time</th>
+                                                    <th>Action</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody class="Swipes">
+                                                <tr ng-repeat="item in EmpAttdList">
+                                                    <td>{{item.InTime | date: "dd/MM/yyyy"}}</td>
+                                                    <td>{{item.InTime | date: "shortTime"}}</td>
+                                                    <td>{{item.OutTime | date: "shortTime"}}</td>
+                                                    <td >
+                                                        <a class="kt-badge kt-badge--inline kt-badge--primary" style="height: 19px; width: 40px;" ng-click="addRequest(item)" data-target="#addmodal" data-toggle="modal" ng-hide="item.IsChangedStatus == 1 || item.IsValid == 0 || item.EmpRequestId != null">
+                                                            <i class="fa fa-paper-plane"></i>
+                                                        </a>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-12 mt-3 pl-0">
+                                <div class="card" style="width:100%;">
+                                    <div class="card-body resent">
+                                        <h3>Monthly Summary</h3>
+                                        <table class="table table-striped mSummary">
+                                            <thead>
+                                                <tr>
+                                                    <td class="recent-present">Present Days</td>
+                                                    <td class="Absent-present">Absent</td>
+                                                    @*<td class="Total-present">Total leaves</td>*@
+                                                    <td class="Holidays-present">Holidays</td>
+                                                </tr>
+                                            </thead>
+                                            <tbody class="summary"></tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!--Modal Area Start-->
+    <div id="addmodal" class="modal fade" tabindex="-1" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form name="addform" ng-submit="save()" class="form-horizontal" id="form_sample_1" novalidate>
+                    <div class="modal-header">
+                        <h5 class="modal-title">Add Modify Request</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-body">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group row" ng-class="{ 'has-error' : submitted && addform.Request.$invalid}">
+                                        <label class="col-md-4 control-label" style="text-align:right">
+                                            Modification Type :
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-8">
+                                            <select required class="form-control" ng-model="ModifyRequest.RequestId" name="Request" ng-options="mType.Id as mType.Title for mType in ModificationTypeList">
+                                                <option value="" selected="selected">Choose Option</option>
+                                            </select>
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted &&  addform.Request.$error.required" class="help-block">Request Type Required</span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group row" ng-class="{ 'has-error' : submitted && addform.Reason.$invalid}">
+                                        <label class="col-md-4 control-label" style="text-align:right">
+                                            Reason :
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-8">
+                                            @*<input type="text" ng-model="ModifyRequest.Reason" class="form-control" placeholder="Modification Reason" name="Reason" required>*@
+                                            <textarea type="text" ng-model="ModifyRequest.Reason" class="form-control" placeholder="Modification Reason" name="Reason" required></textarea>
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted &&  addform.Reason.$error.required" class="help-block">Modification Reason Required</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" data-dismiss="modal" class="btn  btn-secondary" ng-click="resetForm();submitted=false">Cancel</button>
+                        <button type="submit" ng-click="submitted=true" class="btn btn-success">Save</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!--Modal Area End-->
+
+</div>
+@section Scripts{
+
+    @*<script src="//cdn.addiesoft.com/studentportal/js/progress.js"></script>
+        <script src="//cdn.addiesoft.com/admin/assets/global/plugins/Chart.min.js" type="text/javascript"></script>*@
+    <script type="text/javascript">
+
+        $(document).ready(function ($) {
+            var attn = [];
+            var AttPreDay = [];
+            var AttAbsentDay = [];
+            var AttWorkingDay = [];
+            var StuAttendanceList = [];
+            var albl = [];
+
+            $.get("@Url.Action("GetEmpPortalDashBoardData", "Employee")", function (data) {
+                console.log(data);
+                attn = data.CurrMonthAttendance;
+                days(0);
+
+
+                //smsShow(data.SMSList);
+                $("#prePercent").attr("data-percent", parseInt(data.PeresentPercent));
+                //$("#totalDue").html('Taka ' + formatMoney( data.TotalDue))
+                // $("#dueMonth").html(data.FeesMonth);
+                //noticeShow(data.NoticeList);
+
+                AttPreDay = data.AttPreDay;
+                AttAbsentDay = data.AttAbsentDay;
+                AttWorkingDay = data.AttWorkingDay;
+                albl = data.Attlabel;
+                Holliday = data.Holliday;
+                EarlyOut = data.EarlyOut;
+                LateIN = data.LateIN;
+                yearlyAttandance(albl, AttPreDay, AttAbsentDay, AttWorkingDay);
+                MonthlySummary(albl, AttPreDay, AttAbsentDay, AttWorkingDay, Holliday);
+                EmpAttendanceList = data.EmpAttendanceList;
+                //StudntAttendance(EmpAttendanceList);
+                //console.log(data);
+                //drawchart();
+            });
+            var yearlyatt = document.querySelector(".yearlyatt"),
+              dayItems2 = yearlyatt.querySelector(".yearly");
+            var rswipes = document.querySelector(".rswipes"),
+           swipes = rswipes.querySelector(".Swipes");
+            var mSummary = document.querySelector(".mSummary"),
+               mSummary = mSummary.querySelector(".summary");
+            //public variables
+            var calender = document.querySelector(".calender"),//container of calender
+                topDiv = document.querySelector('.month'),
+                monthDiv = document.querySelector("#mon"),//h1 of monthes
+                yearDiv = document.querySelector('#year'),//h2 for years
+                weekDiv = calender.querySelector(".weeks"),//week container
+                dayNames = weekDiv.querySelectorAll("li"),//dayes name
+                dayItems = calender.querySelector(".days"),//date of day container
+                prev = calender.querySelector(".prev"),
+                next = calender.querySelector(".next"),
+
+
+                // date variables
+                years = new Date().getFullYear(),
+                monthes = new Date(new Date().setFullYear(years)).getMonth(),
+                lastDayOfMonth = new Date(new Date(new Date().setMonth(monthes + 1)).setDate(0)).getDate(),
+                dayOfFirstDateOfMonth = new Date(new Date(new Date().setMonth(monthes)).setDate(1)).getDay(),
+
+                // array to define name of monthes
+                monthNames = ["January", "February", "March", "April", "May", "June",
+                              "July", "August", "September", "October", "November", "December"],
+
+                i,//counter for day before month first day in week
+                x,//counter for prev , next
+                counter;//counter for day of month  days;
+            //function StudntAttendance(EmpAttendanceList) {
+            //    swipes.innerHTML = "";
+            //    for (var i = 0; i < EmpAttendanceList.length; i++) {
+
+            //        swipes.innerHTML += "<tr><td>" + getFormattedDate(EmpAttendanceList[i].InTime) + "</td><td>" + getFormattedTime(EmpAttendanceList[i].InTime) + "</td> <td>" + getFormattedTime(EmpAttendanceList[i].OutTime) + "</td><td><a class='btn btm-sm btn-primary' data-toggle='modal' data-target='#addmodal'>Modify Request</a></td></tr>";
+
+            //    }
+            //}
+            //console.log(new Date(new Date(new Date().setMonth(monthes )).setDate(0)).getDate());
+            function getFormattedTime(d) {
+                var date = new Date(d);
+                //console.log(date);
+                if (date == 'Invalid Date') {
+                    return '';
+                }
+                var hour = date.getHours();
+                var minute = date.getMinutes();
+                var timeP = "AM"
+                if (minute < 10) {
+                    minute = '0' + minute;
+                }
+                if (hour > 12) {
+                    hour = hour - 12;
+                    timeP = "PM"
+                }
+                //debugger;
+                return hour + ' : ' + minute + ' ' + timeP;
+            }
+            function getFormattedDate(d) {
+                var date = new Date(d);
+                //console.log(date);
+                if (date == 'Invalid Date') {
+                    return '';
+                }
+                var year = date.getFullYear();
+
+                var month = (1 + date.getMonth()).toString();
+                month = month.length > 1 ? month : '0' + month;
+
+                var day = date.getDate().toString();
+                day = day.length > 1 ? day : '0' + day;
+
+                return day + '/' + month + '/' + year;
+            }
+            function yearlyAttandance(albl, AttPreDay, AttAbsentDay, AttWorkingDay) {
+                dayItems2.innerHTML = "";
+                //console.log(albl);
+                for (var i = 0; i < albl.length; i++) {
+                    //console.log(albl[i].curMonth);
+                    dayItems2.innerHTML += "<tr><td> " + albl[i] + " (" + new Date().getFullYear() + " )</td><td>" + AttWorkingDay[i] + "</td><td>" + AttPreDay[i] + "</td><td>" + AttAbsentDay[i] + "</td><td>" + LateIN[i] + "</td><td>" + EarlyOut[i] + "</td></tr>";
+                }
+            }
+            function MonthlySummary(albl, AttPreDay, AttAbsentDay, AttWorkingDay, Holliday) {
+
+                var date = new Date();
+                //console.log()
+                mSummary.innerHTML = "";
+
+                for (var i = 0; i < albl.length; i++) {
+                    if (i == date.getMonth()) {
+
+                        mSummary.innerHTML += "<tr><td>" + AttPreDay[i] + "</td><td>" + AttAbsentDay[i] + "</td><td>" + Holliday[i] + "</td></tr>";
+                    }
+
+                }
+            }
+            //display dayes of month in items
+            function days(x) {
+                'use strict';
+                dayItems.innerHTML = "";
+                monthes = monthes + x;
+
+                //console.log(x);
+
+                /////////////////////////////////////////////////
+                //test for last month useful while prev ,max prevent go over array
+                if (monthes > 11) {
+                    years = years + 1;
+                    monthes = new Date(new Date(new Date().setFullYear(years)).setMonth(0)).getMonth();
+                }
+                if (monthes < 0) {
+                    years = years - 1;
+                    monthes = new Date(new Date(new Date().setFullYear(years)).setMonth(11)).getMonth();
+                }
+
+                lastDayOfMonth = new Date(new Date(new Date(new Date().setFullYear(years)).setMonth(monthes + 1)).setDate(0)).getDate();
+                dayOfFirstDateOfMonth = new Date(new Date(new Date(new Date().setFullYear(years)).setMonth(monthes)).setDate(1)).getDay();
+
+                var curMonth = monthes + 1
+
+                //console.log(lastDayOfMonth, dayOfFirstDateOfMonth, monthes, years);
+                /////////////////////////////////////////////////
+                yearDiv.innerHTML = years;
+                monthDiv.innerHTML = monthNames[monthes];
+                for (i = 0; i <= dayOfFirstDateOfMonth; i = i + 1) {
+                    if (dayOfFirstDateOfMonth === 6) { break; }
+                    dayItems.innerHTML += "<li> - </li>";
+                }
+                for (counter = 1; counter <= lastDayOfMonth; counter = counter + 1) {
+                    dayItems.innerHTML += "<li class='" + getattClass(counter, monthes, years) + "'><h6> " + (counter) + "</h6><p>" + getattStatus(counter, monthes, years) + "</p> </li>";
+
+
+                }
+                //topDiv.style.background = colors[monthes];
+                //dayItems.style.backgroundColor = 'red';
+                if (monthes === new Date().getMonth() && years === new Date().getFullYear()) {
+                    dayItems.children[new Date().getDate() + dayOfFirstDateOfMonth];
+                }
+            }
+            prev.onclick = function () {
+                'use strict';
+                days(-1);//decrement monthes
+            };
+            next.onclick = function () {
+                'use strict';
+                days(1);//increment monthes
+            };
+
+
+            debugger;
+            function getattClass(day, month, year) {
+                for (var i = 0; i < attn.length; i++) {
+                    var sDate = new Date(attn[i].CalendarDate);
+                    var sM = sDate.getMonth()
+                    if (sDate.getMonth() == 2 && day == 5) {
+                        // console.log(sDate.getMonth());
+                    }
+
+                    if (sM == month && sDate.getFullYear() == year && sDate.getDate() == day)
+                        return attn[i].ClassName;
+                }
+            }
+
+            function getattStatus(day, month, year) {
+                var Status = '';
+                for (var i = 0; i < attn.length; i++) {
+                    var sDate = new Date(attn[i].CalendarDate);
+                    var sM = sDate.getMonth()
+                    if (sDate.getMonth() == 2 && day == 5) {
+                        // console.log(sDate.getMonth());
+                    }
+
+                    if (sM == month && sDate.getFullYear() == year && sDate.getDate() == day) {
+                        if (attn[i].DayStaus == 'A')
+                            Status = 'Absent'
+                        else if (attn[i].DayStaus == 'P')
+                            Status = 'Present'
+                        else if (attn[i].DayStaus == 'H')
+                            Status = attn[i].HolidayName; //'Holiday'
+                        else if (attn[i].DayStaus == 'W')
+                            Status = attn[i].DayType;
+                    }
+
+                }
+
+                return Status;
+            }
+
+            //end
+        });
+
+    </script>
+
+
+    <script type="text/javascript">
+        OEMSApp.controller("ModifyAttendance", ["$scope", "$http", "SweetAlert", "$filter",
+              function ($scope, $http, SweetAlert, $filter) {
+
+                  init();
+                  function init() {
+                      initialize();
+                      //getAllCommons();
+                      getModificationTypes();
+                      getEmpDashboardData();
+                      getEmpAttendanceList();
+                  }
+                  function initialize() {
+                      // $scope.SearchDate = '';
+                      $scope.ModifyRequest = {};
+
+                      $scope.submitted = false;
+                      //getAllDropdowns();
+                      $scope.currentPage = 1;
+                      $scope.pageno = 1;
+                      $scope.pagesize = 10;
+                      $scope.total_count = 12;
+
+                      $scope.pageSizeArray = [];
+                      $scope.pageSizeArray.push({ value: 5, text: 5 });
+                      $scope.pageSizeArray.push({ value: 10, text: 10 });
+                      $scope.pageSizeArray.push({ value: 20, text: 20 });
+                      $scope.pageSizeArray.push({ value: 50, text: 50 });
+                      $scope.currentPage = 1;
+                      $scope.pageSize = 10;
+                      $scope.resetForm = resetForm;
+                      $scope.ModificationTypeList = [];
+                      $scope.getModificationTypes = getModificationTypes;
+                      $scope.DashboardData = [];
+                      $scope.getEmpDashboardData = getEmpDashboardData;
+                      $scope.getEmpAttendanceList = getEmpAttendanceList;
+                      $scope.EmpAttendanceList = [];
+                      $scope.EmpAttdList = [];
+
+                      $scope.StudntAttendance = {};
+                  }
+
+                  function resetForm() {
+                      $scope.submitted = false;
+                      $scope.ModifyRequest = {};
+                      $scope.addform.$setUntouched();
+                      $scope.addform.$setPristine();
+                  }
+
+                  @*$.get("@Url.Action("GetEmpPortalDashBoardData", "Employee")", function (data) {
+                      console.log(data);
+                      $scope.EmpAttendanceList = data.EmpAttendanceList;
+                  });*@
+
+                  $scope.save = function save() {
+                      if ($scope.addform.$invalid)
+                          return;
+                      else {
+                          $http({
+                              method: 'POST',
+                              url: baseUrl + 'Attendance/AddEmpAttModifyRequest/',
+                              data: $scope.ModifyRequest
+                          }).then(function successCallback(response) {
+                              $('#addmodal').modal('toggle');
+                              toastr["success"](response.data.message);
+                              getEmpAttendanceList();
+                              resetForm();
+                          }, function errorCallback(response) {
+                              toastr["error"](response.data.message);
+                          });
+                      }
+                  }
+
+                  $scope.addRequest = function addRequest(item) {
+                      $scope.ModifyRequest = {};
+                      $scope.ModifyRequest.AttendId = item.AttendId;
+                  }
+
+                  function getModificationTypes() {
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Attendance/GetAllModificationTypeForEmp/'
+                      }).then(function successCallback(response) {
+                          $scope.ModificationTypeList = response.data.results;
+                      }, function errorCallback(response) {
+                          toastr["error"](response.data.message);
+                      });
+                  }
+
+                  function getEmpAttendanceList() {
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Attendance/GetEmpAttendanceList/'
+                      }).then(function successCallback(response) {
+                          $scope.EmpAttdList = response.data.results;
+                          console.log($scope.EmpAttdList);
+                      }, function errorCallback(response) {
+                          toastr["error"](response.data.message);
+                      });
+                  }
+
+
+                  function getEmpDashboardData() {
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Employee/GetEmpPortalDashBoardData/'
+                      }).then(function successCallback(response) {
+                          $scope.DashboardData = response.data.results;
+                      }, function errorCallback(response) {
+                          toastr["error"](response.data.message);
+                      });
+                  }
+
+              }]);
+    </script>
+
+}
+

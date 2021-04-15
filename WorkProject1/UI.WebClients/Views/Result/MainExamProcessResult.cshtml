@@ -1,0 +1,387 @@
+﻿@{
+    ViewBag.Title = "Main Exam Process";
+}
+@section Styles{
+    <style>
+        .logtableStyle > tbody > tr > td {
+            padding: 0 10px;
+        }
+        div.scrollHeight {
+            overflow: hidden;
+            overflow-y: scroll;
+            height: 400px;
+        }
+    </style>
+}
+
+<div class="portlet box blue-hoki" ng-controller="MEGR">
+    <div class="portlet-title">
+        <div class="caption">
+            <i class="fa fa-user-plus"></i>@ViewBag.Title
+        </div>
+    </div>
+    <div class="portlet-body form">
+        <!-- BEGIN FORM-->
+        <form class="form-horizontal" name="formCommonFeilds" novalidate>
+            <div class="form-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group" ng-class="{ 'has-error' : submitted && formCommonFeilds.Version.$invalid}">
+                            <label class="col-md-5 control-label">
+                                Version :
+                                <span class="required">*</span>
+                            </label>
+                            <div class="col-md-7">
+                                <select class="form-control" ng-model="GenerateResult.VersionID" required name="Version" ng-options="GenerateResult.VersionId as GenerateResult.VersionName for GenerateResult in CommonFeilds.Version">
+                                    <option value="" selected="selected">Choose Option</option>
+                                </select>
+                                <div class="form-control-focus"> </div>
+                                <span ng-show="submitted && formCommonFeilds.Version.$error.required" class="help-block">Version Required</span>
+                            </div>
+                        </div>
+                        <div class="form-group" ng-class="{ 'has-error' : submitted && formCommonFeilds.Session.$invalid}">
+                            <label class="col-md-5 control-label">
+                                Session :
+                                <span class="required">*</span>
+                            </label>
+                            <div class="col-md-7">
+                                <select class="form-control" ng-model="GenerateResult.SessionId" required name="Session" ng-options="GenerateResult.SessionId as GenerateResult.SessionName for GenerateResult in CommonFeilds.Session">
+                                    <option value="" selected="selected">Choose Option</option>
+                                </select>
+
+                                <div class="form-control-focus"> </div>
+                                <span ng-show="submitted && formCommonFeilds.Session.$error.required" class="help-block">Session Required</span>
+                            </div>
+                        </div>
+                        <div class="form-group" ng-class="{ 'has-error' : submitted && formCommonFeilds.Branch.$invalid}">
+                            <label class="col-md-5 control-label">
+                                Branch :
+                                <span class="required">*</span>
+                            </label>
+                            <div class="col-md-7">
+                                <select class="form-control" ng-model="GenerateResult.BranchID" required name="Branch" ng-options="GenerateResult.BranchId as GenerateResult.BranchName for GenerateResult in CommonFeilds.Branch">
+                                    <option value="" selected="selected">Choose Option</option>
+                                </select>
+                                <div class="form-control-focus"> </div>
+                                <span ng-show="submitted && formCommonFeilds.Branch.$error.required" class="help-block">Branch Name Required</span>
+                            </div>
+                        </div>
+                        <div class="form-group" ng-class="{ 'has-error' : submitted && formCommonFeilds.Shift.$invalid}">
+                            <label class="col-md-5 control-label">
+                                Shift :
+                                <span class="required">*</span>
+                            </label>
+                            <div class="col-md-7">
+                                <select class="form-control" ng-model="GenerateResult.ShiftID" required name="Shift" ng-options="GenerateResult.ShiftId as GenerateResult.ShiftName for GenerateResult in CommonFeilds.Shift| filter:{BranchId:GenerateResult.BranchID}:true">
+                                    <option value="" selected="selected">Choose Option</option>
+                                </select>
+                                <div class="form-control-focus"> </div>
+                                <span ng-show="submitted && formCommonFeilds.Shift.$error.required" class="help-block">Shift Name Required</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group" ng-class="{ 'has-error' : submitted && formCommonFeilds.Class.$invalid}">
+                            <label class="col-md-5 control-label">
+                                Class :
+                                <span class="required">*</span>
+                            </label>
+                            <div class="col-md-7">
+                                <select class="form-control" ng-model="GenerateResult.ClassId" name="Class" ng-change="GetGroup(GenerateResult.ClassId)" required ng-options="GenerateResult.ClassId as GenerateResult.ClassName for GenerateResult in CommonFeilds.ClassInfo | filter:{VersionId:GenerateResult.VersionID}:true">
+                                    <option value="" selected="selected">Choose Option</option>
+                                </select>
+                                <div class="form-control-focus"> </div>
+                                <span ng-show="submitted && formCommonFeilds.Class.$error.required" class="help-block">Class Required</span>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-md-5 control-label">
+                                Group :
+                            </label>
+                            <div class="col-md-7">
+                                <select class="form-control" ng-change="GetMainExam()" ng-disabled="Groups.length <= 0" ng-model="GenerateResult.GroupId" name="Group" ng-options="G.GroupId as G.GroupName for G in Groups">
+                                    <option value="" selected>Choose Option</option>
+                                </select>
+                                <div class="form-control-focus"> </div>
+
+                            </div>
+                        </div>
+                        <div class="form-group" ng-class="{ 'has-error' : submitted && formCommonFeilds.mainExam.$invalid}">
+                            <label class="col-md-5 control-label">
+                                Main Exam :
+                            </label>
+                            <div class="col-md-7">
+                                <select class="form-control" ng-model="GenerateResult.MainExamId" required name="mainExam" ng-options="mainexam.MainExamId as mainexam.MainExamName for mainexam in MainExams | filter:{ClassId:GenerateResult.ClassId} ">
+                                    <option value="" selected="selected">Choose Option</option>
+                                </select>
+                                <div class="form-control-focus"> </div>
+                                <span ng-show="submitted && formCommonFeilds.mainExam.$error.required" class="help-block">Main Exam Name Required</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="pull-right" ng-disabled="pdis">
+                        <button ng-click="submitted=true;Proccess()" class="btn green">Process</button>
+                        <button ng-click="submitted=true;ProHighestMark()" class="btn blue">Process Highest Mark</button>
+                        <button ng-click="submitted=true;ProMerit()" class="btn red">Process Merit</button>
+                        <button ng-click="submitted=true;ProTabulation()" class="btn green-meadow">Process Tab</button>
+                        <button ng-click="submitted=true;CheckProccess()" class="btn yellow-soft">Check Procces </button>
+                        <button ng-click="submitted=true;isShowLog=true;GetLog()" class="btn blue">Log </button>
+                        <button ng-click="submitted=true;ClearProccess()" class="btn yellow-mint">Clear </button>
+                        <button ng-click="Reset()" class="btn info">Reset</button>
+                    </div>
+                </div>
+            </div>
+            <div class="panel" ng-show="isShowLog">
+                <div class="panel-body scrollHeight">
+                    <table class="table table-bordered table-inverse logtableStyle">
+                        <thead class="btn-primary">
+                            <tr>
+                                <th colspan="2" class="text-center" style="padding:5px 10px;text-transform:uppercase"> Logs </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="item in Logs">
+                                <td style="width:25%">{{item.LogTime | date:'medium'}}</td>
+                                <td>{{item.Msg}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </form>
+    </div>
+    <!-- END FORM-->
+</div>
+
+@section Scripts{
+    <script type="text/javascript">
+        OEMSApp.controller("MEGR", ["$scope", "$http", "SweetAlert", "blockUI",
+          function ($scope, $http, SweetAlert, blockUI) {
+
+              init();
+              function init() {
+                  initialize();
+                  getAllCommons();
+
+              }
+              function initialize() {
+                  $scope.GenerateResult = {};
+                  $scope.GenerateResult.VersionID = 0;
+                  $scope.GenerateResult.SessionId = 0;
+                  $scope.GenerateResult.BranchID = 0;
+                  $scope.GenerateResult.ShiftID = 0;
+                  $scope.GenerateResult.ClassId = 0;
+                  $scope.GenerateResult.GroupId = 0;
+                  $scope.GenerateResult.SectionId = 0;
+                  $scope.GenerateResult.HouseId = 0;
+                  $scope.GenerateResult.StudentType = 0;
+                  $scope.Logs = [];
+                  $scope.Dropdowns = [];
+                  $scope.CommonFeilds = [];
+                  $scope.currentPage = 1;
+                  $scope.pageno = 1;
+                  $scope.pagesize = 10;
+                  $scope.total_count = 12;
+                  $scope.txtProccess = '';
+              };
+              function resetForm() {
+                  $scope.submitted = false;
+                  $scope.isShowLog = false;
+                  $scope.Logs = [];
+              };
+
+              $scope.Reset = function Reset() {
+                  $scope.GenerateResult = {};
+                  $scope.submitted = false;
+                  $scope.isShowLog = false;
+                  $scope.selectedAll = false;
+                  $scope.StudentInfos = [];
+                  $scope.Logs = [];
+              };
+
+              $scope.GetGroup = function GetGroup(classid) {
+                  $scope.Groups = [];
+                  $http({
+                      method: 'GET',
+                      url: baseUrl + 'Common/GetGroup/' + classid
+                  }).then(function successCallback(response) {
+                      $scope.Groups = response.data.results;
+                  }, function errorCallback(response) {
+                      toastr["error"](response.data.Message);
+                  });
+              }
+              //===========================================================
+              $scope.Proccess = function Proccess() {
+                  // debugger;
+
+                  if ($scope.formCommonFeilds.$invalid)
+                      return;
+                  blockUI.start("Proccessing");
+                  $http({
+                      method: 'GET',
+                      url: baseUrl + 'Result/ProccessMainExam/' + $scope.GenerateResult.VersionID + "/" + $scope.GenerateResult.SessionId + "/" + $scope.GenerateResult.ShiftID + "/" + $scope.GenerateResult.ClassId + "/" + $scope.GenerateResult.GroupId + "/" + $scope.GenerateResult.MainExamId
+
+                  }).then(function successCallback(response) {
+                      toastr["success"](response.data.message);
+                      blockUI.stop();
+                  }, function errorCallback(response) {
+                      toastr["error"](response.data.Message);
+                      blockUI.stop();
+                  });
+
+              };
+              $scope.ProHighestMark = function ProHighestMark() {
+                  if ($scope.formCommonFeilds.$invalid)
+                      return;
+                  blockUI.start("Proccessing");
+                  $http({
+                      method: 'GET',
+                      url: baseUrl + 'Result/ProHighestMark/' + $scope.GenerateResult.VersionID + "/" + $scope.GenerateResult.SessionId + "/" + $scope.GenerateResult.ShiftID + "/" + $scope.GenerateResult.ClassId + "/" + $scope.GenerateResult.GroupId + "/" + $scope.GenerateResult.MainExamId
+
+                  }).then(function successCallback(response) {
+                      toastr["success"](response.data.message);
+                      blockUI.stop();
+                  }, function errorCallback(response) {
+                      toastr["error"](response.data.message);
+                      blockUI.stop();
+                  });
+
+              };
+
+              $scope.ProMerit = function ProMerit() {
+                  if ($scope.formCommonFeilds.$invalid)
+                      return;
+                  blockUI.start("Proccessing");
+                  $http({
+                      method: 'GET',
+                      url: baseUrl + 'Result/ProMerit/' + $scope.GenerateResult.VersionID + "/" + $scope.GenerateResult.SessionId + "/" + $scope.GenerateResult.ShiftID + "/" + $scope.GenerateResult.ClassId + "/" + $scope.GenerateResult.GroupId + "/" + $scope.GenerateResult.MainExamId
+
+                  }).then(function successCallback(response) {
+                      toastr["success"](response.data.message);
+                      blockUI.stop();
+                  }, function errorCallback(response) {
+                      toastr["error"](response.data.message);
+                      blockUI.stop();
+                  });
+
+              };
+
+
+              $scope.ProTabulation = function ProTabulation() {
+                  if ($scope.formCommonFeilds.$invalid)
+                      return;
+                  blockUI.start("Proccessing");
+                  $http({
+                      method: 'GET',
+                      url: baseUrl + 'Result/ProTabulation/' + $scope.GenerateResult.VersionID + "/" + $scope.GenerateResult.SessionId + "/" + $scope.GenerateResult.BranchID + "/" + $scope.GenerateResult.ShiftID + "/" + $scope.GenerateResult.ClassId + "/" + $scope.GenerateResult.GroupId + "/" + $scope.GenerateResult.MainExamId
+
+                  }).then(function successCallback(response) {
+                      toastr["success"](response.data.message);
+                      blockUI.stop();
+                  }, function errorCallback(response) {
+                      toastr["error"](response.data.message);
+                      blockUI.stop();
+                  });
+
+              };
+
+              $scope.ClearProccess = function ClearProccess() {
+                  if ($scope.formCommonFeilds.$invalid)
+                      return;
+                  blockUI.start("Proccessing");
+                  $http({
+                      method: 'GET',
+                      url: baseUrl + 'Result/ClearProccess/' + $scope.GenerateResult.MainExamId + "/" + $scope.GenerateResult.ShiftID
+
+                  }).then(function successCallback(response) {
+                      toastr["success"](response.data.message);
+                      blockUI.stop();
+                  }, function errorCallback(response) {
+                      toastr["error"](response.data.message);
+                      blockUI.stop();
+                  });
+
+              };
+              $scope.CheckProccess = function CheckProccess() {
+                  if ($scope.formCommonFeilds.$invalid)
+                      return;
+                  //   ,int ClassId, int , int , int
+                  var form = document.createElement("form");
+                  form.target = "_blank";
+                  form.method = "POST";
+                  form.action = window.location.origin + '/Report/ResultCheck';
+                  form.style.display = "none";
+
+
+                  for (var key in $scope.GenerateResult) {
+                      var input = document.createElement("input");
+                      input.type = "hidden";
+                      input.name = key;
+                      if ($scope.GenerateResult[key].toString() != "") {
+                          input.value = $scope.GenerateResult[key]
+                      }
+                      else {
+                          input.value = " "
+                      }
+                      form.appendChild(input);
+                  }
+
+
+                  document.body.appendChild(form);
+                  form.submit();
+                  document.body.removeChild(form);
+
+              };
+
+
+              $scope.GetLog = function GetLog() {
+                  if ($scope.formCommonFeilds.$invalid)
+                      return;
+                  $scope.Logs = [];
+                  blockUI.start("Getting Log");
+                  $http({
+                      method: 'GET',
+                      url: baseUrl + 'Result/GetProccesLog/' + $scope.GenerateResult.ShiftID + "/" + $scope.GenerateResult.MainExamId
+
+                  }).then(function successCallback(response) {
+                      $scope.Logs = response.data.results;
+                      toastr["success"](response.data.message);
+                      blockUI.stop();
+                  }, function errorCallback(response) {
+                      toastr["error"](response.data.message);
+                      blockUI.stop();
+                  });
+
+              };
+              $scope.GetMainExam = function getMainExam() {
+                  $scope.MainExams = [];
+                  $http({
+                      method: 'GET',
+                      url: baseUrl + 'ExamSetup/GetMainExam/' + $scope.GenerateResult.VersionID + "/" + $scope.GenerateResult.SessionId + "/" + $scope.GenerateResult.ClassId + "/" + $scope.GenerateResult.GroupId
+                  }).then(function successCallback(response) {
+                      $scope.MainExams = response.data.results;
+                  }, function errorCallback(response) {
+                      toastr["error"](response.data.message);
+                  });
+              }
+              function getAllCommons() {
+                  $scope.CommonFeilds = [];
+
+                  $http({
+                      method: 'GET',
+                      url: baseUrl + 'Common/GetCommonItem/'
+                  }).then(function successCallback(response) {
+                      $scope.CommonFeilds = response.data.results;
+                  }, function errorCallback(response) {
+                      toastr["error"](response.data.message);
+                  });
+              }
+
+
+
+          }]);
+    </script>
+} 

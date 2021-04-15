@@ -1,0 +1,153 @@
+﻿
+@{
+    ViewBag.Title = "Asset Tagging";
+}
+
+<div class="kt-container  kt-container--fluid  kt-grid__item kt-grid__item--fluid" ng-controller="requisitionEntryCrlt">
+    <div class="row">
+        <div class="kt-portlet kt-portlet--mobile">
+            <div class="kt-portlet__head kt-portlet__head--lg">
+                <div class="kt-portlet__head-label">
+                    <h3 class="kt-portlet__head-title">
+                        <!----Titel Text-->
+                        @ViewBag.Title
+                        <!----Titel Text -->
+                    </h3>
+                </div>
+            </div>
+
+            <div class="kt-portlet__body">
+                <form name="addform" novalidate class="form-horizontal">
+                    <div class="form-body">
+                        <div class="row">
+                            <div class="col-md-2">
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group row" ng-class="{ 'has-error' : submitted && addform.ProductId.$invalid}">
+                                    <label class="col-lg-4 control-label text-right">Asset <span class="required">*</span></label>
+                                    <div class="col-lg-8">
+                                        <input type="text" ng-model="Product"
+                                               typeahead-on-select='onSelect($item, $model, $label)' name="ProductId" required
+                                               placeholder="Search Asset By Name Or Code"
+                                               uib-typeahead="i  as i.Text for i in Search($viewValue)"
+                                               typeahead-loading="loading" typeahead-no-results="noResults" class="form-control">
+                                        <i ng-show="loading" class="glyphicon glyphicon-refresh"></i>
+                                        <div ng-show="noResults"><i class="glyphicon glyphicon-remove"></i> No Results Found</div>
+                                        <input type="hidden" ng-model="ProductId" ng-value="Product.Value" />
+                                        <span ng-show="submitted && addform.ProductId.$error.required" class="help-block">Asset Required</span>
+                                    </div>
+                                </div>
+                                <div class="form-group row" ng-class="{ 'has-error' : submitted && addform.Quantity.$invalid}">
+                                    <label class="col-md-4 control-label text-right">
+                                        Quantity:
+                                        <span class="required">*</span>
+                                    </label>
+                                    <div class="col-md-8">
+                                        <input class="form-control" type="text" ng-model="AssetTagging.Quantity" name="Quantity" placeholder="Quantity" required />
+                                        <div class="form-control-focus"> </div>
+                                        <span ng-show="submitted && addform.Quantity.$error.required" class="help-block">Quantity Required</span>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <div class="col-md-4 ">
+                                    </div>
+                                    <div class="col-md-8 text-right">
+                                        <a class="btn btn-success" ng-click="save();submitted=true">Print</a>
+                                        <a class="btn btn-danger" ng-click="Reset();submitted=false">Cancel</a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    <script type="text/javascript">
+        OEMSApp.controller("requisitionEntryCrlt", ["$scope", "$http", "SweetAlert", "filterFilter", "$filter",
+          function ($scope, $http, SweetAlert, filterFilter, $filter) {
+              init();
+              function init() {
+                  initialize();
+               
+
+              }
+              function initialize() {
+                  $scope.AssetTagging = {};
+                  $scope.PurchaseOrder = {};
+                  $scope.Suppliers = [];
+                  $scope.currentPage = 1;
+                  $scope.pageno = 1;
+                  $scope.pagesize = 10;
+                  $scope.total_count = 12;
+                  $scope.txtsearch = '';
+                  $scope.ProductId = 0;
+                  $scope.PurchaseList = [];
+                  $scope.AssetTagging.Product = '';
+                  /////
+                  $scope.pageSizeArray = [];
+                  $scope.pageSizeArray.push({ value: 5, text: 5 });
+                  $scope.pageSizeArray.push({ value: 10, text: 10 });
+                  $scope.pageSizeArray.push({ value: 20, text: 20 });
+                  $scope.pageSizeArray.push({ value: 50, text: 50 });
+                  $scope.currentPage = 1;
+                  $scope.pageSize = 10;
+              };
+              $scope.Reset = function Reset() {
+                  $scope.AssetTagging = {};
+                  $scope.PurchaseOrder = {};
+              };
+             
+     
+
+              $scope.save = function () {
+                  if ($scope.addform.$invalid) {
+                      return;
+                  }
+            
+                  var uri = '/Report/ReportAssestTagging?ProductId=' + $scope.AssetTagging.ProductId + '&Quantity=' + $scope.AssetTagging.Quantity;
+                  window.open(uri,'_target');
+                  //console.log($scope.Req);
+              }
+              // for droupdown select list event....
+              $scope.Search = function (val) {
+                  if (val.length >= 3)
+                      return $http.get(baseUrl + 'Inventory/SearchProduct/' + val, {
+                          params: {}
+                      }).then(function (response) {
+                          return response.data.results.map(function (item) {
+                              return item;
+                          });
+                      });
+              };
+
+              $scope.onSelect = function onSelect($item, $model, $label) {
+                  $scope.AssetTagging.ProductId = Number($item.Value);
+                  $scope.Product = $item.Text;
+                  $http({
+                      method: 'GET',
+                      url: baseUrl + '/Inventory/GetProductListById/' + $scope.AssetTagging.ProductId
+
+                  }).then(function successCallback(response) {
+                      $scope.Unit = response.data.results[0].UnitCode;
+                      //console.log($scope.Unit);
+                  }, function errorCallback(response) {
+                      toastr["warning"](response.data.Message);
+                  });
+
+              };
+              //This method is calling from dropDown
+              $scope.changePageSize = function () {
+                  $scope.studentSearch.pageIndex = 1;
+                  Search();
+              };
+
+          }]);
+    </script>
+}
+

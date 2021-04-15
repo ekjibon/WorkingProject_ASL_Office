@@ -1,0 +1,75 @@
+﻿
+@{
+    ViewBag.Title = "GrandExamTabArchive";
+}
+@section Styles{
+    <link href="~/assets/global/plugins/jstree/dist/themes/default/style.min.css" rel="stylesheet" type="text/css" />
+}
+<div>
+    <!-- Begin: life time stats -->
+    <div class="portlet light bordered">
+        <div class="portlet-title">
+            <div class="caption">
+                <i class="icon-settings font-green"></i>
+                <span class="caption-subject font-green sbold uppercase">@ViewBag.Title</span>
+            </div>
+        </div>
+        <div class="portlet-body">
+            <div id="tree_2" class="tree-demo"> </div>
+        </div>
+    </div>
+    <!-- End: life time stats -->
+</div>
+@section Scripts{
+    <script src="~/assets/global/plugins/jstree/dist/jstree.min.js" type="text/javascript"></script>
+    @*<script src="~/assets/pages/scripts/ui-tree.js" type="text/javascript"></script>*@
+    <script type="text/javascript">
+        function OpenPDF(FileName) {
+            var url = "@Url.Action("OpenPDF", "Archive")?FileName=" + FileName.toString();
+            window.open(url,"_blank")
+        }
+        $(document).ready(function () {
+            var selarray = [];
+            var marray = [];
+            $.ajax({
+                method: "GET",
+                url: baseUrl + "Archive/GetArchive/GT",
+                data: {}
+            })
+          .done(function (res) {
+              marray = res;
+              $('#tree_2').jstree({
+                  'plugins': ["wholerow", "types"],
+                  'core': {
+                      "themes": {
+                          "responsive": false
+                      },
+                      'data': res
+                  },
+                  "types": {
+                      "default": {
+                          "icon": "fa fa-folder icon-state-warning icon-lg"
+                      },
+                      "file": {
+                          "icon": "glyphicon glyphicon-file",
+                      }
+                  }
+              }).on('changed.jstree', function (e, data) {
+                 // console.log(data);
+                  var i, j, r = [];
+                  for (i = 0, j = data.selected.length; i < j; i++) {
+                      r.push(data.instance.get_node(data.selected[i]).id);
+                      //console.log(r);
+                  }
+                  selarray = r;
+              });
+              $("#tree_2").jstree().bind("select_node.jstree", function (e, data) {
+                  var href = data.node.a_attr.href;
+                  document.location.href = href;
+              });
+          });
+        });
+    </script>
+}
+
+

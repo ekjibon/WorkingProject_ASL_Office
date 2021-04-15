@@ -1,0 +1,370 @@
+﻿
+@{
+    ViewBag.Title = "Term";
+}
+<div ng-controller="termClt">
+    <!-- Begin: life time stats -->
+    <div class="portlet light bordered">
+        <div class="portlet-title">
+            <div class="caption">
+                <i class="icon-settings font-green"></i>
+                <span class="caption-subject font-green sbold uppercase">@ViewBag.Title</span>
+            </div>
+            <div class="actions">
+                <div class="btn-group btn-group-solid">
+                    <button ng-click="resetForm()" class="btn green" data-target="#addmodal" data-toggle="modal"> <i class="fa fa-plus"></i> Add Term</button>
+                </div>
+            </div>
+        </div>
+        <div class="portlet-body">
+            <div class="table-container">
+                <div id="sample_3_wrapper" class="dataTables_wrapper no-footer">
+                    <div class="row">
+                        <div class="col-md-4 col-sm-5 col-xs-6">
+                            <div class="form-group">
+                                <div class="col-lg-3 col-md-5 col-sm-4 col-xs-8" style="padding-left:0px">
+                                    <select class="form-control" ng-model="pageSize" ng-options="P.value as P.text for P in pageSizeArray"></select>
+                                </div>
+                                <div class="col-md-7  col-sm-8  col-xs-4">
+                                    @*<label for="search" class="control-label" style="padding-top:5px">Items</label>*@
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 col-sm-3 col-xs-1">
+                        </div>
+                        <div class="col-md-4 col-sm-4 col-xs-5">
+                            <div id="sample_3_filter" class="pull-right">
+                                <input ng-model="q" id="search" class="form-control" placeholder="Filter text">
+                            </div>
+                        </div>
+                    </div>
+                        <div class="table-scrollable"> </div>
+                        <table class="table table-bordered table-hover">
+                            <thead>
+                                <tr class="btn-primary">
+                                    <th>Term Name</th>
+                                    <th>Class Name</th>
+                                    <th>Branch Name</th>
+                                    <th>Session Name</th>
+                                    <th>Start Date</th>
+                                    <th>End Date</th>
+
+                                    <th style="text-align:center">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-show="Terms.results.length <= 0"><td colspan="5" style="text-align:center;"><i class="fa fa-refresh"></i> Loading new data!!</td></tr>
+                                <tr dir-paginate="item in Terms.results | filter:q |itemsPerPage:pageSize" current-page="currentPage">
+                                    <td>{{item.Name}}</td>
+                                    <td>{{item.className}}</td>
+                                    <td>{{item.branchName}}</td>
+                                    <td>{{item.SessionName}}</td>
+                                    <td>{{item.startDate | date:'dd/MM/yyyy'}}</td>
+                                    <td>{{item.endDate | date:'dd/MM/yyyy'}}</td>
+                                    <td align="center">
+                                        <a  class="btn btn-icon-only green" ng-click="edit(item)" data-target="#addmodal" data-toggle="modal">
+                                            <i class="fa fa-edit"></i>
+                                        </a>
+                                        <a ng-click="deleteterm(item)" href="javascript:;" class="btn btn-icon-only red">
+                                            <i class="fa fa-trash"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                
+                         <div class="row ">
+                            <dir-pagination-controls boundary-links="true" template-url="~/assets/angular/lib/dirPagination.tpl.html"></dir-pagination-controls>
+                        </div>
+                    </div>
+            </div>
+        </div>
+    </div>
+    <!-- End: life time stats -->
+    <!--Modal Area Start-->
+    <div id="addmodal" class="modal fade" tabindex="-1" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form name="addform" ng-submit="save()" class="form-horizontal" id="form_sample_1" novalidate>
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">X</button>
+                        <h4 class="modal-title">{{aemodalTitle}}</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-body">
+                            <div class="col-md-12">
+                                <div class="form-group" ng-class="{ 'has-error' : submitted && addform.Branch.$invalid}">
+                                    <label class="col-md-3 control-label">
+                                        Branch :
+                                        <span class="required">*</span>
+                                    </label>
+                                    <div class="col-md-9">
+                                        <select class="form-control" ng-model="term.BranchId" name="Branch" ng-options="studentInfo.BranchId as studentInfo.BranchName for studentInfo in CommonFeilds.Branch" required>
+                                            <option value="" selected="selected">Choose Option</option>
+                                        </select>
+                                        <div class="form-control-focus"> </div>
+                                        <span ng-show="submitted && addform.Branch.$error.required" class="help-block">Branch Required</span>
+                                    </div>
+                                </div>
+                                <div class="form-group" ng-class="{ 'has-error' : submitted && addform.Session.$invalid}">
+                                    <label class="col-md-3 control-label">
+                                        Session :
+                                        <span class="required">*</span>
+                                    </label>
+                                    <div class="col-md-9">
+                                        <select class="form-control" ng-model="term.SessionId" name="Session" ng-options="studentInfo.SessionId as studentInfo.SessionName for studentInfo in CommonFeilds.Session" required>
+                                            <option value="" selected="selected">Choose Option</option>
+                                        </select>
+                                        <div class="form-control-focus"> </div>
+                                        <span ng-show="submitted && addform.Session.$error.required" class="help-block">Session Required</span>
+
+                                    </div>
+                                </div>
+                            <div class="form-group" ng-class="{ 'has-error' : submitted && addform.class.$invalid}">
+                                    <label class="col-md-3 control-label">
+                                        Class
+                                        <span class="required">*</span>
+                                    </label>
+                                    <div class="col-md-9">
+                                        <select class="form-control" ng-model="term.ClassId" name="class"  required ng-options="class.ClassId as class.ClassName for class in CommonFeilds.ClassInfo">
+                                            <option value="" selected="selected">Choose Option</option>
+                                        </select>
+                                        <div class="form-control-focus"> </div>
+                                        <span ng-show="submitted && addform.class.$error.required" class="help-block">Class Name Required</span>
+                                    </div>
+                                </div>
+                           <div class="form-group" ng-hide="updateBtn" ng-class="{ 'has-error' : submitted && addform.Name.$invalid}">
+                                    <label class="col-md-3 control-label" for="form_control_1">
+                                        Name
+                                        <span class="required">*</span>
+                                    </label>
+                                    <div class="col-md-9">
+                                        <input type="text" value="0" ng-model="term.Name" class="form-control" placeholder="Name" name="Name" required>
+                                        <div class="form-control-focus"> </div>
+                                        <span ng-show="submitted && addform.Name.$error.required" class="help-block">Name Required</span>
+                                    </div>
+                                </div>
+                                <div class="form-group" ng-class="{ 'has-error' : submitted && addform.startDate.$invalid}">
+                                    <label class="col-md-3 control-label" for="form_control_1">
+                                        Start Date
+                                    </label>
+                                    <div class="col-md-9">
+                                        <input class="form-control" required type="text" @*ng-change="CheckStartTime(term.startDate)"*@ ng-value="term.startDate |date:'dd/MM/yyyy'" ng-click="p1=true" is-open="p1" readonly ng-model="term.startDate" name="startDate" placeholder="Start Date" uib-datepicker-popup="dd/MM/yyyy" />
+                                       <div class="form-control-focus"> </div>
+                                        <span ng-show="submitted &&  addform.startDate.$error.required" class="help-block">Start Date Required</span>
+                                    </div>
+                                </div>
+                                <div class="form-group" ng-class="{ 'has-error' : submitted && addform.endDate.$invalid}">
+                                    <label class="col-md-3 control-label" for="form_control_1">
+                                        End Date
+                                    </label>
+                                    <div class="col-md-9">
+                                        <input class="form-control" required type="text" ng-click="p2=true" ng-value="term.endDate |date:'dd/MM/yyyy'"  is-open="p2" readonly ng-model="term.endDate" name="endDate" placeholder="End Date" uib-datepicker-popup="dd/MM/yyyy" />
+                                          <div class="form-control-focus"> </div>
+                                        <span ng-show="submitted &&  addform.endDate.$error.required" class="help-block">End Date Required </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" data-dismiss="modal" class="btn dark btn-outline" ng-click="resetForm();submitted=false">Cancel</button>
+                        <button type="submit" ng-click="submitted=true" class="btn green">Save</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!--Modal Area End-->
+</div>
+@section Scripts{
+    <script type="text/javascript">
+        OEMSApp.controller("termClt", ["$scope", "$http", "SweetAlert",
+           function ($scope, $http, SweetAlert) {
+               init();
+               function init() {
+                   initialize();
+                   getAllCommons();
+                   getTerms(1);
+                   
+               }
+               function initialize() {
+                   $scope.aemodalTitle = "Add Section";
+                   $scope.currentPage = 1;
+                   $scope.pageno = 1;
+                   $scope.pagesize = 10;
+                   $scope.total_count = 12;
+                   $scope.search = '';
+                   $scope.term = {};
+                   $scope.term.startDate = {};
+                   $scope.Terms = [];
+                   $scope.TermId = '';
+                   $scope.res = {};
+                   $scope.data = {};
+                   $scope.resetForm = resetForm;
+                   $scope.updateBtn = false;
+                   $scope.term.TermId = 0;
+                   $scope.Classes = [];
+                   $scope.CommonFeilds = [];
+               
+                    $scope.pageSizeArray = [];
+                   $scope.pageSizeArray.push({ value: 5, text: 5 });
+                   $scope.pageSizeArray.push({ value: 10, text: 10 });
+                   $scope.pageSizeArray.push({ value: 20, text: 20 });
+                   $scope.pageSizeArray.push({ value: 50, text: 50 });
+                   $scope.currentPage = 1;
+                   $scope.pageSize = 10;
+                   
+               }
+               function resetForm() {
+                   $scope.aemodalTitle = "Add Term";
+                   $scope.term = {};
+                   $scope.addform.$setUntouched();
+                   $scope.addform.$setPristine();
+                   $scope.submitted = false;
+                   $scope.updateBtn = false;
+                   $scope.TermId = '';
+                   $scope.term.TermId = 0;
+                   getTerms(1);
+               }
+
+               function getTerms() {
+                   $scope.Terms = [];
+                   $http({
+                       method: 'GET',
+                       url: baseUrl + 'SetupInstitution/GetAllTerm/'
+                   }).then(function successCallback(response) {
+                       // this callback will be called asynchronously
+                       // when the response is available
+                       $scope.Terms = response.data;
+                       //console.log($scope.Terms);
+                       // $scope.AspNetRoles = response.data;
+                       $scope.total_count = response.data.totalcount;
+                       //console.log(response.data);
+                   }, function errorCallback(response) {
+                       toastr["warning"](response.data.Message);
+                   });
+                  
+               }
+               $scope.searchData = function () {
+                   getTerms(1);
+                   // $scope.total_count = 88;
+               };
+               $scope.edit = function (n) {
+                   $scope.term = {};
+                   $scope.term = n;
+                   $scope.term.TermId = n.TermId;
+                   $scope.aemodalTitle = "Update Term";
+                   $scope.term.startDate  = new Date(n.startDate);
+                   $scope.term.endDate  = new Date(n.endDate);
+                   $scope.TermId = n.TermId;
+                   $scope.updateBtn = true;
+                 
+               };
+
+               $scope.CheckStartTime = function CheckStartTime(n) {
+
+                   angular.forEach($scope.Terms.results, function (value, key) {
+                       console.log(value.startDate);
+                       console.log(n);
+                      // var date = new Date(value.startDate).format('dd/MM/yyyy');
+                      // var date2 = new Date(n).format('dd/MM/yyyy');
+                      //console.log(date);
+                      //console.log(date2);
+                       //alert(date);
+                       //alert('Model '+n);
+                       if (date == n)
+                           toastr["warning"]('Start Date Time is Exist.');
+                       //alert('Hi');
+                   });
+
+               }
+
+               $scope.save = function save() {
+                   if ($scope.addform.$invalid)
+                       return;
+                   if ($scope.term.TermId != 0) /// For Update
+                   {
+                       if ($scope.term != '') {
+                           $http({
+                               method: 'PUT',
+                               url: baseUrl + 'SetupInstitution/UpdateTerm/',
+                               data: $scope.term
+                           }).then(function successCallback(response) {
+                               $('#addmodal').modal('toggle');
+                               getTerms(1);
+                               toastr["info"](response.data.message);
+                               resetForm();
+                           }, function errorCallback(response) {
+                               toastr["warning"](response.data.Message);
+                           });
+                       }
+                   } else {  //  For Add
+                       if ($scope.term != {}) {
+                           $http({
+                               method: 'POST',
+                               url: baseUrl + 'SetupInstitution/AddTerm/',
+                               data:$scope.term
+                           }).then(function successCallback(response) {
+
+                               $('#addmodal').modal('toggle');
+                               getTerms(1);
+                               toastr["info"](response.data.message);
+                               resetForm();
+                           }, function errorCallback(response) {
+                               toastr["warning"](response.data.Message);
+                           });
+                       }
+                   }
+               };
+               $scope.deleteterm = function deleteterm(n) {
+                   // SweetAlert.swal("Good job!", "You clicked the button!", "success");
+                   SweetAlert.swal({
+                       title: "Are you sure to delete it ?", type: "warning", showCancelButton: true, confirmButtonColor: "#DD6B55",
+                       confirmButtonText: "Yes, delete it!",
+                       closeOnConfirm: false
+                   },
+                   function (isConfirm) {
+                       if (isConfirm) {
+                           $http({
+                               method: 'DELETE',
+                               url: baseUrl + 'SetupInstitution/DeleteTerm/' + n.TermId
+                           }).then(function successCallback(response) {
+                               SweetAlert.swal("Deleted!", "Your data has been deleted.", "success");
+                               getTerms(1);
+                           }, function errorCallback(response) {
+                               toastr["warning"](response.data.Message);
+                           });
+                       }
+                   });
+               };
+            
+               function getAllClasses() {
+                   $http({
+                       method: 'GET',
+                       url: baseUrl + 'SetupInstitution/GetClass/'
+                   }).then(function successCallback(response) {
+                       $scope.Classes = response.data.results;
+                   }, function errorCallback(response) {
+                       toastr["info"](response.data.message);
+                   });
+               }
+      
+               function getAllCommons() {
+                   $scope.CommonFeilds = [];
+                   $http({
+                       method: 'GET',
+                       url: baseUrl + 'Common/GetCommonItem/'
+                   }).then(function successCallback(response) {
+                       $scope.CommonFeilds = response.data.results;
+                   }, function errorCallback(response) {
+                       toastr["info"](response.data.message);
+                   });
+               }
+       
+           }]);
+    </script>
+
+
+
+}

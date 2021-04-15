@@ -1,0 +1,515 @@
+﻿
+@{
+    ViewBag.Title = "Salary Structure";
+}
+
+<div class="portlet box blue-hoki" ng-controller="ctrlSalaryStructure">
+    <!-- Begin: life time stats -->
+    <div class="portlet light bordered">
+        <div class="portlet light bordered">
+            <div class="portlet-title">
+                <div class="caption">
+                    <i class="icon-settings font-green"></i>
+                    <span class="caption-subject font-green sbold uppercase">@ViewBag.Title</span>
+                </div>
+                @*<div class="actions">
+                        <div class="btn-group btn-group-solid">
+                            <button ng-click="submitted=false" class="btn green" data-target="#addmodal" data-toggle="modal"> <i class="fa fa-plus"></i> Add Salary Period</button>
+                        </div>
+                    </div>*@
+            </div>
+            <div class="portlet-body">
+                <div class="table-container">
+                    <div id="sample_3_wrapper" class="dataTables_wrapper no-footer">
+                        <form name="addBasic" ng-submit="save()" class="form-horizontal" id="form_sample_1" novalidate>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group" ng-class="{ 'has-error' : submitted && addBasic.EmpId.$invalid}">
+                                        <label class="col-md-4 control-label">
+                                            Employee :
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-8">
+                                            <input type="text" name="EmpId" ng-model="Std" typeahead-on-select='onSelect($item, $model, $label)'
+                                                   placeholder="Search name/ID SMS Notification"
+                                                   uib-typeahead="i  as i.Text for i in Search($viewValue)"
+                                                   typeahead-loading="loadingLocations" typeahead-no-results="noResults" class="form-control">
+                                            <i ng-show="loadingLocations" class="glyphicon glyphicon-refresh"></i>
+                                            <div ng-show="noResults"><i class="glyphicon glyphicon-remove"></i> No Results Found</div>
+                                            <input type="hidden" name="EmpId" ng-value="Std.Value" />
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted &&  addBasic.EmpId.$error.required" class="help-block">Employee Required</span>
+                                        </div>
+                                    </div>
+
+                                    <div ng-show="showall" class="form-group" ng-class="{ 'has-error' : submitted && addBasic.TaxYearId.$invalid}">
+                                        <label class="col-md-4 control-label">
+                                            Tax Year :
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-8">
+                                            <select class="form-control" ng-model="employeeInfo.TaxYearId" name="TaxYearId" required ng-options="taxYear.Id as taxYear.YearName  for taxYear in taxYearlist">
+                                                <option value="" selected="selected">Choose Options</option>
+                                            </select>
+                                            <span ng-show="submitted &&  addBasic.TaxYearId.$error.required" class="help-block">Tax Year Required</span>
+                                        </div>
+                                    </div>
+                                    @*<div ng-show="showall" class="form-group" ng-class="{ 'has-error' : submitted && addBasic.HeadId.$invalid}">
+                                            <label class="col-md-4 control-label">
+                                               Salary Head :
+                                                <span class="required">*</span>
+                                            </label>
+                                            <div class="col-md-8">
+                                                <select class="form-control" ng-model="employeeInfo.HeadId" name="HeadId" required ng-options="h.Id as h.HeadName  for h in salaryHeadList">
+                                                    <option value="" selected="selected">Choose Options</option>
+                                                </select>
+                                                <span ng-show="submitted &&  addBasic.HeadId.$error.required" class="help-block">Head Required</span>
+                                            </div>
+                                        </div>*@
+                                </div>
+
+                                <div class="col-md-6" ng-show="showall">
+                                    <div class="form-group">
+                                        <label class="col-md-4 control-label">
+                                            Name :
+                                        </label>
+                                        <div class="col-md-8">
+                                            <label for="female" class="form-control">{{empName}}</label>
+
+                                        </div>
+                                    </div>
+                                    <div class="form-group" ng-class="{ 'has-error' : submitted && addBasic.GradeId.$invalid}">
+                                        <label class="col-md-4 control-label">
+                                            Grade :
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-8">
+                                            <select class="form-control" ng-model="employeeInfo.GradeId" name="GradeId" required ng-options="g.SalaryGradeId as g.Name  for g in salaryGradeList">
+                                                <option value="" selected="selected">Choose Options</option>
+                                            </select>
+                                            <span ng-show="submitted &&  addBasic.GradeId.$error.required" class="help-block">Grade Required</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <div class="table-scrollable"> </div>
+                            <div class="row" ng-show="showall">
+                                <div class="col-md-6">
+                                    <div align="center">
+                                        <b style="font-family:Arial;"> Earnning</b>
+                                    </div>
+                                    <table class="table table-bordered table-hover">
+                                        <thead>
+                                            <tr class="btn-primary">
+                                                <th>Salary Head</th>
+                                                <th>Amount</th>
+
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr ng-show="salaryHeadList.length <= 0"><td colspan="5" style="text-align:center;"><i class="fa fa-refresh"></i> Loading new data!!</td></tr>
+                                            <tr dir-paginate="item in salaryHeadList| filter:q  | itemsPerPage: pageSize" current-page="currentPage">
+                                                <td ng-if="item.Category==1" ng-model="item.HeadName">{{item.HeadName}}</td>
+                                                <td ng-if="item.Category==1"><input type="number" ng-model="item.Amount" class="form-control" placeholder="Amount" name="Amount"></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+
+                                </div>
+                                <div class="col-md-6">
+                                    <div align="center">
+                                        <b style="font-family:Arial;"> Deduction</b>
+                                    </div>
+                                    <table class="table table-bordered table-hover">
+                                        <thead>
+                                            <tr class="btn-primary">
+                                                <th>Salary Head</th>
+                                                <th>Amount</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr ng-show="salaryHeadList.length <= 0"><td colspan="5" style="text-align:center;"><i class="fa fa-refresh"></i> Loading new data!!</td></tr>
+                                            <tr dir-paginate="item in salaryHeadList | filter:q  | itemsPerPage: pageSize" current-page="currentPage">
+                                                <td ng-if="item.Category==2" ng-model="item.HeadName">{{item.HeadName}}</td>
+                                                <td ng-if="item.Category==2"><input type="number" ng-model="item.Amount" class="form-control" placeholder="Amount" name="Amount"></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <div class="text-right" style="margin-bottom: 2%">
+                                        <button type="button" ng-click="resetForm()" class="btn btn-danger">Clear</button>
+                                        <button type="submit" ng-click="submitted=true" class="btn green-haze">{{modalbutton}}</button>
+                                    </div>
+                                </div>
+                                
+                            </div>
+                        </form>
+                    </div>
+                    <div id="sample_3_wrapper" class="dataTables_wrapper no-footer">
+                        <div class="row">
+                            <div class="col-md-4 col-sm-5 col-xs-6">
+                                <div class="form-group">
+                                    <div class="col-lg-3 col-md-5 col-sm-4 col-xs-8" style="padding-left:0px">
+                                        <select class="form-control" ng-model="pageSize" ng-options="P.value as P.text for P in pageSizeArray"></select>
+                                    </div>
+                                    <div class="col-md-7  col-sm-8  col-xs-4">
+                                        @*<label for="search" class="control-label" style="padding-top:5px">Items</label>*@
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4 col-sm-3 col-xs-1">
+                            </div>
+                            <div class="col-md-4 col-sm-4 col-xs-5">
+                                <div id="sample_3_filter" class="pull-right">
+                                    <input ng-model="q" id="search" class="form-control" placeholder="Filter text">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="table-scrollable"> </div>
+                        <table class="table table-bordered table-hover">
+                            <thead>
+                                <tr class="btn-primary">
+                                    <th>Name</th>
+                                    <th>Head Name</th>
+                                    <th>Amount</th>
+                                    <th style="text-align:center">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody ng-repeat="(key, value) in salaryStructureList">
+                                @*<tr ng-show="salaryStructureList.length <= 0"><td colspan="5" style="text-align:center;"><i class="fa fa-refresh"></i> Loading new data!!</td></tr>*@
+                                <tr dir-paginate="item in value | filter:q  | itemsPerPage: pageSize" current-page="currentPage">
+                                    @*<tr ng-repeat="item in value">*@
+                                    <td ng-if="$index == 0" rowspan="{{ value.length }}">{{item.FullName}}</td>
+                                    <td>{{item.HeadName}}</td>
+                                    <td>{{item.Amount}}</td>
+                                    <td ng-if="$index == 0" rowspan="{{ value.length }}" align="center">
+                                        <a href="javascript:;" class="btn btn-icon-only green" ng-click="editSalaryStructure(item)" data-target="#addmodal" data-toggle="modal">
+                                            <i class="fa fa-edit"></i>
+                                        </a>
+                                        @*<a ng-click="deleteSalaryHead(item.Id)" href="javascript:;" class="btn btn-icon-only red">
+                                            <i class="fa fa-trash"></i>
+                                        </a>*@
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div class="row">
+                            <dir-pagination-controls boundary-links="true" template-url="~/assets/angular/lib/dirPagination.tpl.html"></dir-pagination-controls>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+<!-- End: life time stats -->
+<!-- END FORM-->
+@section Scripts{
+    <script src="~/assets/global/plugins/bootstrap-fileinput/bootstrap-fileinput.js" type="text/javascript"></script>
+    <script src="~/assets/pages/scripts/form-repeater.min.js"></script>
+    <script type="text/javascript">
+        for (i = new Date().getFullYear() ; i > 1900; i--) {
+            $('#yearpicker').append($('<option />').val(i).html(i));
+        }
+    </script>
+    <script type="text/javascript">
+        OEMSApp.controller("ctrlSalaryStructure", ["$scope", "$http", "SweetAlert",
+              function ($scope, $http, SweetAlert) {
+                  init();
+                  function init() {
+                      initialize();
+                      getAllSalaryStructure();
+
+                      getAllEmployeeList();
+                      getAllTaxYearList();
+                      getAllSalaryGrade();
+                     
+
+                  }
+
+                  function initialize() {
+                      $scope.modalbutton = 'Save';
+                      $scope.modalTitle = 'Salary Structure';
+                      $scope.brnlist = [];
+                      $scope.getAllLedger = [];
+                      $scope.taxYearlist = [];
+                      $scope.employeeInfo = {};
+                      $scope.employeeInfos = [];
+                      $scope.salaryStructureList = [];
+                      $scope.resetForm = resetForm;
+                      $scope.checkUpdateId = 0;
+                      $scope.pagesize = 10;
+                      $scope.pageSizeArray = [];
+                      $scope.pageSizeArray.push({ value: 5, text: 5 });
+                      $scope.pageSizeArray.push({ value: 10, text: 10 });
+                      $scope.pageSizeArray.push({ value: 20, text: 20 });
+                      $scope.pageSizeArray.push({ value: 50, text: 50 });
+                      $scope.currentPage = 1;
+                      $scope.pageSize = 10;
+                      $scope.employeelist = [];
+                      $scope.gradelist = [];
+                      $scope.showall = 0;
+                      $scope.resultTable = 1;
+                      $scope.indexing = 0;
+                      $scope.IsEdit = 0;
+
+                  }
+
+                  function resetForm() {
+                      $scope.modalbutton = 'Save';
+                      $scope.modalTitle = "Add Salary Structure";
+                      $scope.employeeInfo = {};
+                      $scope.Id = '';
+                      $scope.checkUpdateId = 0;
+                      $scope.addBasic.$setUntouched();
+                      $scope.addBasic.$setPristine();
+                      $scope.showall = 0;
+                      $scope.Std = null;
+                      $scope.resultTable = 1;
+                      $scope.indexing = 0;
+                      $scope.IsEdit = 0;
+                      $scope.submitted  = false;
+                  }
+                  var empId = 13;
+
+
+                  function getAllEmployeeList() {
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Employee/GetAllEmployeeList/'
+                      }).then(function successCallback(response) {
+                          $scope.employeelist = response.data.results;
+                      }, function errorCallback(response) {
+                          toastr["info"](response.data.Message);
+                      });
+                  }
+
+                  function getAllSalaryHead() {
+                      $scope.salaryHeadList = [];
+                      $scope.salaryList = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Employee/GetAllSalaryHead/'
+                      }).then(function successCallback(response) {
+                          $scope.salaryList = response.data.results;
+                          angular.forEach($scope.salaryList, function (item) {
+                              item.Amount = 0;
+                              item.EmpId = 0;
+                              item.GradeId = 0;
+                              item.TaxYearId = 0;
+                              item.HeadId = 0; 
+                              item.SalaryStructureId = 0;
+                              $scope.salaryHeadList.push(item);
+                          });
+                          //console.log($scope.salaryHeadList);
+                          //console.log($scope.salaryHeadList);
+                      }, function errorCallback(response) {
+                          toastr["info"](response.data.Message);
+                      });
+                  }
+                  function getAllSalaryGrade() {
+                      $scope.salaryGradeList = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Employee/GetSalaryGrade/'
+                      }).then(function successCallback(response) {
+                          $scope.salaryGradeList = response.data.results;
+
+                      }, function errorCallback(response) {
+                          toastr["error"](response.data.Message);
+                      });
+                  }
+
+                  function getAllTaxYearList() {
+                      $scope.taxYearlist = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Employee/GetAllSalaryTaxYear/',
+                      }).then(function successCallback(response) {
+                          $scope.taxYearlist = response.data.results;
+                      }, function errorCallback(response) {
+                      });
+                  }
+
+                  $scope.save = function save() {
+                      $scope.SalaryStructureList = [];
+                      if ($scope.addBasic.$invalid)
+                          return;
+                 
+                     
+                      angular.forEach($scope.salaryHeadList, function (item) {
+
+                          if (item.Amount != 0) {
+                              item.EmpId = Number($scope.employeeInfo.EmpId);
+                              item.GradeId = $scope.employeeInfo.GradeId;
+                              item.TaxYearId = $scope.employeeInfo.TaxYearId;
+                             
+                              if (item.SalaryStructureId !=0) {
+                                  item.HeadId = item.HeadId;
+                              } else {
+                                  item.HeadId = item.Id;
+                              }
+                              item.SalaryStructureId = item.SalaryStructureId;
+                              $scope.SalaryStructureList.push(item);
+                          }
+
+                      });
+                      console.log($scope.SalaryStructureList);
+
+                      if ($scope.SalaryStructureList.length == 0) {
+                          toastr["info"]('Amount Required.');
+                          return;
+                      }
+                      //console.log($scope.SalaryStructureList);
+                      if ($scope.SalaryStructureList.length>0 &&    $scope.IsEdit == 0) {
+                         
+                          $http({
+                              method: 'POST',
+                              url: baseUrl + 'Employee/AddSalaryStructure/',
+                              data: $scope.SalaryStructureList
+                          }).then(function successCallback(response) {
+                              $('#addmodal').modal('toggle');
+                              toastr["info"](response.data.message);
+
+                              getAllSalaryStructure();
+                              resetForm();
+                            
+                          }, function errorCallback(response) {
+                              getAllSalaryStructure();
+                             
+                              toastr["warning"](response.data.Message);
+                          });
+                      }
+                      if ($scope.SalaryStructureList.length > 0 && $scope.IsEdit == 1) {
+                      
+                        
+                              $http({
+                                  method: 'PUT',
+                                  url: baseUrl + 'Employee/UpdateSalaryStructure/',
+                                  data: $scope.SalaryStructureList
+                              }).then(function successCallback(response) {
+                                  toastr["info"](response.data.message);
+                                  getAllSalaryStructure();
+                                  resetForm();
+
+                              }, function errorCallback(response) {
+                                  toastr["warning"](response.data.Message);
+                              });
+                        
+                      }
+                  }
+
+                  function getAllSalaryStructure() {
+                      $scope.salaryStructureList = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Employee/GetAllSalaryStructure/'
+                      }).then(function successCallback(response) {
+                          $scope.salaryStructureList = response.data.results;
+                          result = $scope.salaryStructureList.reduce(function (r, a) {
+                              r[a.FullName] = r[a.FullName] || [];
+                              r[a.FullName].push(a);
+                              return r;
+                          }, Object.create(null));
+                          $scope.salaryStructureList = result;
+                         //console.log($scope.salaryStructureList);
+                      }, function errorCallback(response) {
+                          toastr["info"](response.data.Message);
+                      });
+                  }
+                  $scope.editSalaryStructure = function editSalaryStructure(item) {
+                      //console.log(item);
+                      $scope.salaryHeadList = [];
+                      $scope.employeeInfo.EmpId = item.EmpId;
+                      $scope.employeeInfo.TaxYearId = item.TaxYearId;
+                      $scope.employeeInfo.GradeId = item.GradeId;
+                      $scope.empName = item.FullName;
+                      $scope.showall = 1;
+                      $scope.Std = null;
+                      $scope.IsEdit = 1;
+                      angular.forEach($scope.salaryStructureList, function (value) {
+                         
+                          angular.forEach(value, function (itemt) {
+                            
+                              if (itemt.EmpId == item.EmpId) {
+
+                                  $scope.salaryHeadList.push(itemt);
+                              }
+                          });
+                        
+                       });
+                   
+                      //console.log($scope.salaryHeadList);
+                  }
+                  $scope.deleteSalaryStructure = function deleteSalaryStructure(salaryId) {
+                      SweetAlert.swal({
+                          title: "Are you sure to delete it ?", type: "warning", showCancelButton: true, confirmButtonColor: "#DD6B55",
+                          confirmButtonText: "Yes, delete it!",
+                          closeOnConfirm: false
+                      },
+                        function (isConfirm) {
+                            if (isConfirm) {
+                                $http({
+                                    method: 'DELETE',
+                                    url: baseUrl + 'Employee/DeleteSalaryStructure/' + salaryId,
+                                }).then(function successCallback(response) {
+                                    SweetAlert.swal("Deleted!", "Your data has been deleted.", "success");
+                                    getAllSalaryStructure();
+                                }, function errorCallback(response) {
+                                    toastr["info"](response.data.message);
+                                });
+                            }
+                        });
+                  }
+
+                  $scope.Search = function (val) {
+                      return $http.get(baseUrl + 'Employee/SearchEmployee/' + val, {
+                          params: {
+
+                          }
+                      }).then(function (response) {
+                          return response.data.results.map(function (item) {
+                              return item;
+                          });
+                      });
+                  };
+
+
+                  $scope.onSelect = function onSelect($item, $model, $label) {
+                
+                      $scope.employeeInfo.EmpId = $item.Value;
+                      empId = $item.Value;
+                      $scope.showall = 1;
+                      getAllSalaryHead();
+                      getAllSalaryGrade();
+                      getAllTaxYearList();
+                      $scope.submitted = false;
+                      $scope.IsEdit = 0;
+                      SearchEmployeeId($item.Value);
+                  };
+
+                  function SearchEmployeeId(EmpID) {
+                      $scope.employeeInfos = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Employee/GetEmployeeID/' + EmpID
+                      }).then(function successCallback(response) {
+                          $scope.employeeInfos = response.data.results;
+                          $scope.empName = $scope.employeeInfos[0].FullName;
+                          $scope.empDesignation = $scope.employeeInfos[0].DesignationName;
+                          $scope.empImage = $scope.employeeInfos[0].Image;
+                          $scope.tblshow = true;
+                     
+                      }, function errorCallback(response) {
+                          toastr["error"](response.data.Message);
+                      });
+                  }
+              }]);
+    </script>
+}
+
+
+
+

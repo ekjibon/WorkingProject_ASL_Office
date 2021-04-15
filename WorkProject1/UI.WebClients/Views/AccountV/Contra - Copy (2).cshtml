@@ -1,0 +1,339 @@
+﻿
+@{
+    ViewBag.Title = "Account Contra";
+}
+<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css" rel="stylesheet" />
+<div ng-controller="AcRcvEntryCtrl">
+    <!-- Begin: life time stats -->
+    <div class="portlet light bordered">
+        <div class="portlet-title">
+            <div class="caption">
+                <i class="icon-settings font-green"></i>
+                <span class="caption-subject font-green sbold uppercase">@ViewBag.Title</span>
+            </div>
+        </div>
+
+        <div class="portlet-body">
+            <div class="table-container">
+                <div id="sample_3_wrapper" class="dataTables_wrapper no-footer">
+                    <form name="addform" ng-submit="save()" class="form-horizontal" id="form_sample_1" novalidate autocomplete="off">
+                        <div class="row">
+                            <div class="form-group col-lg-6" ng-class="{ 'has-error' : submitted && addform.name.$invalid}">
+                                <label class="col-md-4 control-label">
+                                    Fiscal Year:
+                                </label>
+                                <div class="col-md-8">
+                                    <input type="text" class="form-control" ng-model="FiscalYear" placeholder="Fiscal Year" name="name" disabled>
+                                    <input type="hidden" name="FisId" value="{{vm.FiscalYear}}" ng-model="vm.FiscalYear" />
+                                    <div class="form-control-focus"> </div>
+                                    <span ng-show="submitted &&  addform.name.$error.required" class="help-block">Name Required</span>
+                                </div>
+                            </div>
+                            <div class="form-group col-lg-6" ng-class="{ 'has-error' : submitted && addform.Date.$invalid}">
+                                <label class="col-md-4 control-label">
+                                    Date:
+                                    <span class="required">*</span>
+                                </label>
+                                <div class="col-md-8">
+                                    <input class="form-control" type="text" ng-click="p1=true" is-open="p1" readonly placeholder="Date" ng-model="vm.Date" uib-datepicker-popup="dd/MM/yyyy" name="Date" />
+                                    <span ng-show="submitted &&  addform.Date.$error.required" class="help-block">Date Required</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="form-group col-lg-6" ng-class="{ 'has-error' : submitted && addform.Voucher.$invalid}">
+                                <label class="col-md-4 control-label">
+                                    Voucher No:
+                                    <span class="required">*</span>
+                                </label>
+                                <div class="col-md-8">
+                                    <input type="text" class="form-control" ng-model="vm.Number" placeholder="Voucher Name" name="Voucher" required>
+                                    <div class="form-control-focus"> </div>
+                                    <span ng-show="submitted &&  addform.Voucher.$error.required" class="help-block">Voucher Required</span>
+                                </div>
+                            </div>
+                            <div class="form-group col-lg-6" ng-class="{ 'has-error' : submitted && addform.Voucher.$invalid}">
+                                <label class="col-md-4 control-label">
+                                    Description:
+                                </label>
+                                <div class="col-md-8">
+                                    <textarea rows="4" class="form-control" ng-model="vm.Remarks" placeholder="Description" name="Description"></textarea>
+                                    <div class="form-control-focus"> </div>
+                                    <span ng-show="submitted &&  addform.Description.$error.required" class="help-block">Description Required</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="table-scrollable"> </div>
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <div class="caption-subject font-green bold uppercase text-center">
+                                    <p style="margin-bottom:0">Target</p>
+                                </div>
+                                <div class="table-scrollable"> </div>
+                                <table class="table table-bordered table-hover">
+                                    <thead>
+                                        <tr class="btn-primary">
+                                            <th>Ledger Name</th>
+                                            <th class="center" style="width:25%">Amount</th>
+                                            <th style="width:18%">Action</th>
+                                            <th style="width:26%">Current Balance</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr ng-repeat="drRow  in vm.TransactionDetail | filter:{DC:1}:true">
+                                            <td>
+                                                <select class="form-control js-example-basic-single" ng-change="GetLedgerByLedgerId(drRow)" name="Category" ng-model="drRow.LedgerId" ng-options="Ledger.LedgerId as Ledger.Name for Ledger in Ledgers">
+                                                    <option value="">Select One</option>
+                                                </select>
+                                            </td>
+                                            <td>
+                                                <input type="number" ng-change="calculation()" ng-disabled="drRow.LedgerId == ''" class="form-control" ng-model="drRow.Amount" placeholder="Amount" name="Amount" required>
+                                            </td>
+                                            <td>
+                                                <div class="btn-group">
+                                                    <button type="button" ng-click="addRow(1)" class="btn btn-xs green-haze"><i class="fa fa-plus"></i></button>
+                                                    <button type="button" ng-click="removeDrRow(drRow)" class="btn btn-xs green-haze red"><i class="fa fa-minus"></i></button>
+                                                </div>
+                                            </td>
+                                            <td ng-model="drRow.CurrentBalance">
+                                                {{drRow.CurrentBalance}}
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="4" class="text-center" ng-model="Contra.DrTotal">Total Debit: {{vm.DrTotal}}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="caption-subject font-green bold uppercase text-center">
+                                    <p style="margin-bottom:0">Source</p>
+                                </div>
+                                <div class="table-scrollable"> </div>
+                                <table class="table table-bordered table-hover">
+                                    <thead>
+                                        <tr class="btn-primary">
+                                            <th>Ledger Name</th>
+                                            <th class="center" style="width:25%">Amount</th>
+                                            <th style="width:18%">Action</th>
+                                            <th style="width:26%">Current Balance</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr ng-repeat="crRow in vm.TransactionDetail | filter:{DC:2}:true">
+                                            <td>
+                                                <select ng-model="crRow.LedgerId" class="form-control js-data-example-ajax" name="Category" ng-change="GetLedgerByLedgerId(crRow)" ng-options="Ledger.LedgerId as Ledger.Name for Ledger in Ledgers">
+                                                    <option value="">Select One</option>
+                                                </select>
+                                            </td>
+                                            <td>
+                                                <input ng-change="calculation(crRow)" ng-model="crRow.Amount" ng-disabled="crRow.LedgerId == ''" type="number" class="form-control" placeholder="Amount" name="Amount" required>
+                                            </td>
+                                            <td>
+                                                <div class="btn-group">
+                                                    <button type="button" ng-click="addRow(2)" class="btn btn-xs green-haze"><i class="fa fa-plus"></i></button>
+                                                    <button type="button" ng-click="removeCrRow(crRow)" class="btn btn-xs green-haze red"><i class="fa fa-minus"></i></button>
+                                                </div>
+                                            </td>
+                                            <td ng-model="crRow.CurrentBalance">
+                                                {{crRow.CurrentBalance}}
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="4" class="text-center" ng-model="Contra.CrTotal">Total Credit: {{vm.CrTotal}}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="row" ng-show="hideSave">
+                            <div class="col-lg-12 text-center">
+                                <span class="caption-subject font-red bold uppercase">
+                                    <p style="margin-bottom:0">Debit and Credit amount needs to be same!</p><br />
+                                    <p>Differents: {{vm.DifDrTotal}}</p>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-12 text-right">
+                                <button type="submit" ng-show="!hideSave" ng-click="submitted=true" class="btn green"><i class="fa fa-save"></i> Save</button>
+                            </div>
+                        </div>
+                    </form>
+                    <div class="table-scrollable"> </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- End: life time stats -->
+
+</div>
+
+@section Scripts{
+    @*<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>*@
+    <script type="text/javascript">
+        //$(function () {
+        //    $('.js-data-example-ajax').select2({
+
+        //    }).ready(function () {
+        //        $(".select2-selection__placeholder").text("Enter a User ID or Name")
+        //    });
+        //});
+        //$(document).ready(function () {
+        //    $('.js-example-basic-single').select2();
+        //});
+        OEMSApp.controller("AcRcvEntryCtrl", ["$scope", "$http", "SweetAlert", "$filter",
+              function ($scope, $http, SweetAlert, $filter) {
+
+                  init();
+                  function init() {
+                      initialize();
+                      GetAllLedgers();
+                      GetActiveFiscalYear();
+                      calculation();
+                  }
+                  function initialize() {
+
+                      $scope.currentPage = 1;
+                      $scope.pageno = 1;
+                      $scope.pagesize = 10;
+                      $scope.total_count = 12;
+                      $scope.search = '';
+                      $scope.res = {};
+                      $scope.data = {};
+                      $scope.resetForm = resetForm;
+                      $scope.calculation = calculation;
+                      
+                      $scope.hstep = 1;
+                      $scope.mstep = 15;
+
+                      $scope.vm = {};
+                      $scope.vm.TransactionDetail = [];
+                      $scope.vm.Type = 3;
+                      $scope.hideSave = false;
+                      $scope.vm.TransactionDetail.push({ LedgerId: 0, Amount: 0, CurrentBalance: 0, DC: 2 });
+                      $scope.vm.TransactionDetail.push({ LedgerId: 0, Amount: 0, CurrentBalance: 0, DC: 1 });
+
+                      $scope.pageSizeArray = [];
+                      $scope.pageSizeArray.push({ value: 5, text: 5 });
+                      $scope.pageSizeArray.push({ value: 10, text: 10 });
+                      $scope.pageSizeArray.push({ value: 20, text: 20 });
+                      $scope.pageSizeArray.push({ value: 50, text: 50 });
+                      $scope.currentPage = 1;
+                      $scope.pageSize = 10;
+
+                  }
+                  function resetForm() {
+                      $scope.addform.$setUntouched();
+                      $scope.addform.$setPristine();
+                      $scope.submitted = false;
+                  }
+
+                  $scope.addRow = function (no) {
+                      $scope.vm.TransactionDetail.push({ LedgerId: '', Amount: 0, CurrentBalance: 0, DC: no });
+                      calculation();
+                  }
+                 
+
+                  $scope.removeCrRow = function (index) {
+                      var index =   $scope.vm.TransactionDetail.indexOf(index);
+                      $scope.vm.TransactionDetail.splice(index, 1);
+                      calculation();
+                  }
+                  $scope.removeDrRow = function (index) {
+                      var index = $scope.Contra.DrRows.indexOf(index);
+                      $scope.vm.TransactionDetail.splice(index, 1);
+                      calculation();
+                  }
+                  function GetAllLedgers() {
+                      $scope.Ledgers = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Accounts/GetAllLedgers/'
+                      }).then(function successCallback(response) {
+                          $scope.Ledgers = response.data.results;
+                      }, function errorCallback(response) {
+                          //toastr["warning"](response.data.Message);
+                      });
+                  }
+
+                  $scope.GetLedgerByLedgerId = function (drRow) {
+                      drRow.CurrentBalance = 0;
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Accounts/GetLedgersByLedgerIdEdit/' + drRow.LedgerId
+                      }).then(function successCallback(response) {
+                          $scope.LedgersById = response.data.results;
+                          drRow.CurrentBalance = $scope.LedgersById[0].CurrentBalance
+                      }, function errorCallback(response) {
+                          //toastr["warning"](response.data.Message);
+                      });
+                  }
+
+                  function GetActiveFiscalYear() {
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Accounts/GetActiveFiscalYear/'
+                      }).then(function successCallback(response) {
+                          $scope.FiscalYears = response.data.results;
+                          $scope.vm.FiscalYear = $scope.FiscalYears[0].Id;
+                          $scope.FiscalYear = $scope.FiscalYears[0].Name;
+                      }, function errorCallback(response) {
+                          //toastr["warning"](response.data.Message);
+                      });
+                  }
+                  function calculation() {
+                      $scope.hideSave = false;
+                      $scope.vm.DifDrTotal = 0
+                      $scope.vm.DrTotal = 0;
+                      $scope.vm.CrTotal = 0;
+                      angular.forEach($scope.vm.TransactionDetail, function (value, key) {
+                          if (value.DC == 1) {
+                              $scope.vm.DrTotal += num(value.Amount);
+                          }
+                          if (value.DC == 2) {
+                              $scope.vm.CrTotal += num(value.Amount);
+                          }
+                          if ($scope.vm.CrTotal != $scope.vm.DrTotal) {
+                              if ($scope.vm.DrTotal > $scope.vm.CrTotal) {
+                                  $scope.vm.DifDrTotal = $scope.vm.DrTotal - $scope.vm.CrTotal;
+                              } else {
+                                  $scope.vm.DifDrTotal = $scope.vm.CrTotal - $scope.vm.DrTotal;
+                              }
+                              $scope.hideSave = true;
+                          } else {
+                              $scope.hideSave = false;
+                          }
+                      });
+                  }
+
+
+                  $scope.save = function save() {
+                      if ($scope.addform.$invalid)
+                          return;
+
+                          $http({
+                              method: 'POST',
+                              url: baseUrl + 'Accounts/AddTransaction/',
+                              data: $scope.vm
+                          }).then(function successCallback(response) {
+                              resetForm();
+                              $('#addmodal').modal('toggle');
+                              toastr["info"](response.data.message);
+
+                          }, function errorCallback(response) {
+                              toastr["warning"](response.data.Message);
+                          });
+                  }
+                  function num(n) {
+
+                      if ($.isNumeric(n)) {
+                          return parseFloat(n);
+                      } else {
+                          return 0;
+                      }
+                  }
+
+              }]);
+    </script>
+}

@@ -1,0 +1,394 @@
+﻿@{
+    ViewBag.Title = "Result Advance Search";
+}
+<div class="portlet box" style="background-color:#18979b" ng-controller="MEGR">
+    <div class="portlet-title">
+        <div class="caption">
+            <i class="fa fa-user-plus"></i>@ViewBag.Title
+        </div>
+    </div>
+    <div class="portlet-body form">
+        <!-- BEGIN First FORM-->
+        <form class="form-horizontal" ng-submit="Search(formCommonFeilds.$valid)" id="formCommonFeilds" name="formCommonFeilds" novalidate>
+            <div class="form-body">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group" ng-class="{ 'has-error' : submitted && formCommonFeilds.Version.$invalid}">
+                            <label class="col-md-5 control-label">
+                                Version :
+                                <span class="required">*</span>
+                            </label>
+                            <div class="col-md-7">
+                                <select class="form-control" ng-model="StudentPromotion.VersionId" ng-disabled="sid" ng-required="!sid" name="Version" ng-options="StudentPromotion.VersionId as StudentPromotion.VersionName for StudentPromotion in CommonFeilds.Version">
+                                    <option value="" selected="selected">Choose Option</option>
+                                </select>
+                                <div class="form-control-focus"> </div>
+                                <span ng-show="submitted && formCommonFeilds.Version.$error.required" class="help-block">Version Required</span>
+                            </div>
+                        </div>
+                        <div class="form-group" ng-class="{ 'has-error' : submitted && formCommonFeilds.Session.$invalid}">
+                            <label class="col-md-5 control-label">
+                                Session :
+                                <span class="required">*</span>
+                            </label>
+                            <div class="col-md-7">
+                                <select class="form-control" ng-model="StudentPromotion.SessionId" ng-disabled="sid" ng-required="!sid" name="Session" ng-options="StudentPromotion.SessionId as StudentPromotion.SessionName for StudentPromotion in CommonFeilds.Session">
+                                    <option value="" selected="selected">Choose Option</option>
+                                </select>
+
+                                <div class="form-control-focus"> </div>
+                                <span ng-show="submitted && formCommonFeilds.Session.$error.required" class="help-block">Session Required</span>
+                            </div>
+                        </div>
+                        <div class="form-group" ng-class="{ 'has-error' : submitted && formCommonFeilds.Branch.$invalid}">
+                            <label class="col-md-5 control-label">
+                                @*<input type="checkbox" ng-click="ChackShift()" ng-model="BranchId" ng-true-value="true" ng-false-value="false" />*@
+                                Branch :
+                                <span class="required">*</span>
+                            </label>
+                            <div class="col-md-7">
+                                <select class="form-control" ng-model="StudentPromotion.BranchId" ng-disabled="BranchId || sid" ng-required="!(sid||BranchId)" name="Branch" ng-options="StudentPromotion.BranchId as StudentPromotion.BranchName for StudentPromotion in CommonFeilds.Branch">
+                                    <option value="" selected="selected">Choose Option</option>
+                                </select>
+                                <div class="form-control-focus"> </div>
+                                <span ng-show="submitted && formCommonFeilds.Branch.$error.required" class="help-block">Branch Name Required</span>
+                            </div>
+                        </div>
+                        @*<div class="form-group">
+                                <label class="col-md-5 control-label pull-left" style="margin-top: -2px; padding: 1px;">
+                                    <input type="checkbox" name="OverAllMerit1" ng-disabled="ShiftWiseMerit1||SectionWiseMerit1||ClassWiseMerit1" ng-model="OverAllMerit1" ng-true-value="true" ng-false-value="false" />  Overall Merit
+                                </label>
+                                <div class="col-md-7">
+                                    <input type="checkbox" name="ShiftWiseMerit" ng-model="ShiftWiseMerit1" ng-disabled="OverAllMerit1||SectionWiseMerit1||ClassWiseMerit1" ng-true-value="true" ng-false-value="false" />  Shift Wise Merit
+                                    <div class="form-control-focus"> </div>
+                                </div>
+                            </div>*@
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group" ng-class="{ 'has-error' : submitted && formCommonFeilds.Shift.$invalid}">
+                            <label class="col-md-5 control-label">
+                                @*<input type="checkbox" ng-disabled="BranchId" ng-change="StudentPromotion.SID = ShiID ? '' : undefined" ng-model="ShiID" ng-true-value="true" ng-false-value="false" />*@
+                                Shift :
+                                <span class="required">*</span>
+                            </label>
+                            <div class="col-md-7">
+                                <select class="form-control" ng-model="StudentPromotion.ShiftId" ng-disabled="ShiID || sid||BranchId" ng-required="!(sid||ShiID||(BranchId && ShiID))" name="Shift" ng-options="StudentPromotion.ShiftId as StudentPromotion.ShiftName for StudentPromotion in CommonFeilds.Shift | filter:{BranchId:StudentPromotion.BranchID}:true">
+                                    <option value="" selected="selected">Choose Option</option>
+                                </select>
+                                <div class="form-control-focus"> </div>
+                                <span ng-show="submitted && formCommonFeilds.Shift.$error.required" class="help-block">Shift Name Required</span>
+                            </div>
+                        </div>
+                        <div class="form-group" ng-class="{ 'has-error' : submitted && formCommonFeilds.Class.$invalid}">
+                            <label class="col-md-5 control-label">
+                                Class :
+                                <span class="required">*</span>
+                            </label>
+                            <div class="col-md-7">
+                                <select class="form-control" ng-model="StudentPromotion.ClassId" ng-disabled="StudentPromotion.VersionId == null||sid" ng-required="!sid" name="Class" ng-change="GetGroup(StudentPromotion.ClassId)" ng-options="StudentPromotion.ClassId as StudentPromotion.ClassName for StudentPromotion in CommonFeilds.ClassInfo | filter:{VersionId:StudentPromotion.VersionId}:true">
+                                    <option value="" selected="selected">Choose Option</option>
+                                </select>
+                                <div class="form-control-focus"> </div>
+                                <span ng-show="submitted && formCommonFeilds.Class.$error.required" class="help-block">Class Required</span>
+                            </div>
+                        </div>
+                        <div class="form-group" ng-class="{ 'has-error' : submitted && formCommonFeilds.Group.$invalid}">
+                            <label class="col-md-5 control-label">
+                                Group :
+                                <span class="required">*</span>
+                            </label>
+                            <div class="col-md-7">
+                                <select class="form-control" ng-disabled="sid || StudentPromotion.ClassId==null|| Groups.length <= 0" ng-required="!sid" ng-change="getExam();GetSection()" ng-model="StudentPromotion.GroupId" name="Group" ng-options="G.GroupId as G.GroupName for G in Groups">
+                                    <option value="" selected="selected">Choose Option</option>
+                                </select>
+                                <div class="form-control-focus"> </div>
+                                <span ng-show="submitted && formCommonFeilds.Group.$error.required" class="help-block">Group Required</span>
+                            </div>
+                        </div>
+                        @*<div class="form-group">
+                                <label class="col-md-5 control-label pull-left" style="margin-top: -2px; padding: 1px;">
+                                    <span><input type="checkbox" name="ClassWiseMerit" ng-model="ClassWiseMerit1" ng-disabled="OverAllMerit1||SectionWiseMerit1||ShiftWiseMerit1" ng-true-value="true" ng-false-value="false" /></span>  Class Wise Merit
+                                </label>
+                                <div class="col-md-7">
+                                    <span><input type="checkbox" name="SectionWiseMerit" ng-model="SectionWiseMerit1" ng-disabled="OverAllMerit1||ClassWiseMerit1||ShiftWiseMerit1" ng-true-value="true" ng-false-value="false" /></span>   Section Wise Merit
+                                    <div class="form-control-focus"> </div>
+                                </div>
+                            </div>*@
+
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group" ng-class="{ 'has-error' : submitted && formCommonFeilds.Section.$invalid}">
+                            <label class="col-md-5 control-label">
+                                <input type="checkbox" ng-change="SubjectSetup.SID = sid ? '' : undefined" ng-model="SecID" ng-true-value="true" ng-false-value="false" />
+                                Section :
+                                <span class="required">*</span>
+                            </label>
+                            <div class="col-md-7">
+                                <select class="form-control" ng-model="StudentPromotion.SectionId" ng-disabled="SecID|| sid || StudentPromotion.ClassId==null" ng-required="!(sid)" name="Section" ng-options="S.SectionId as S.SectionName for S in Sections">
+                                    <option value="" selected="selected">Choose Option</option>
+                                </select>
+                                <div class="form-control-focus"> </div>
+                                <span ng-show="submitted && formCommonFeilds.Section.$error.required" class="help-block">Section Name Required</span>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="col-md-5 control-label" style="padding: 7px 0 !important;">
+                                Based On Grand &nbsp;
+                                <span><input type="checkbox" ng-model="StudentPromotion.ExamType" ng-click="getExam();" ng-true-value="true" ng-false-value="false" /></span>
+                            </label>
+                            <div class="col-md-7">
+                                <select class="form-control" ng-model="StudentPromotion.ExamId" required name="ExamId" ng-options="mainexam.MainExamId as mainexam.MainExamName for mainexam in Exams ">
+                                    <option value="" selected="selected">Select Exam Name</option>
+                                </select>
+                                <div class="form-control-focus"> </div>
+                                <span ng-show="submitted && formCommonFeilds.ExamId.$error.required" class="help-block">Exam Name Required</span>
+
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-5 control-label">
+                            </label>
+                            <div class="col-md-7">
+                                <button ng-click="submitted=true;" class="btn green">Show</button>
+                                <button ng-click="ResetFormCommonFeilds()" class="btn info">Reset</button>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </form>
+        <!-- End First Form-->
+    </div>    
+</div>
+
+
+@section Scripts{
+    <script type="text/javascript">
+        OEMSApp.controller("MEGR", ["$scope", "$http", "SweetAlert", "$window",
+          function ($scope, $http, SweetAlert, $window) {
+
+              init();
+              function init() {
+                  initialize();
+                  getAllCommons();
+              }
+              function initialize() {
+                  $scope.sid = false;
+                  $scope.StudentPromotion = {};
+                  $scope.BranchId = false;
+                  $scope.StudentPromotion.sidChk = false;
+                  $scope.ShiID = false;
+                  $scope.SecID = false;
+                  //$scope.OverAllMerit1 = false;
+                  $scope.ShiftWiseMerit1 = false;
+                  $scope.ClassWiseMerit1 = false;
+                  $scope.SectionWiseMerit1 = false;
+                  $scope.StudentPromotion.ExamType = false;
+                  $scope.PromoteClass = false;
+                  $scope.SelectionStatus1 = false;
+                  $scope.version1 = 0;
+                  $scope.session1 = 0;
+                  $scope.branch1 = 0;
+                  $scope.shift1 = 0;
+                  $scope.classid1 = 0;
+                  $scope.group1 = "";
+                  $scope.section1 = 0,
+                  $scope.version = 0;
+                  $scope.session = 0;
+                  $scope.branch = 0;
+                  $scope.shift = 0;
+                  $scope.classid = 0;
+                  $scope.group = 0;
+                  $scope.section = 0,
+
+                  $scope.StudentPromot = [];
+                  $scope.StudentInfos = [];
+                  $scope.Dropdowns = [];
+                  $scope.CommonFeilds = [];
+                  $scope.PromotedCommonFeilds = [];
+                  $scope.txtsearch = '';
+
+              };
+
+              $scope.getExam = function getExam() {//Lood Exam Name Droupdown.
+                  $scope.MainExams = [];
+
+                  if ($scope.StudentPromotion.ExamType == true) {//if ExamType is true then lood Grand Exams else lood Main Exams.
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'ExamSetup/GetGrandExam/' + $scope.StudentPromotion.VersionId + '/' + $scope.StudentPromotion.SessionId + '/' + $scope.StudentPromotion.ClassId + '/' + $scope.StudentPromotion.GroupId
+                      }).then(function successCallback(response) {
+                          debugger;
+
+                          $scope.MainExams = response.data.results;
+
+                          $scope.Exams = [];
+                          $scope.Exam = {};
+
+                          for (var i = 0 ; i < $scope.MainExams.length; i++) {
+                              $scope.Exam.MainExamName = $scope.MainExams[i].GrandExamName;
+                              $scope.Exam.MainExamId = $scope.MainExams[i].GrandExamId;
+
+                              $scope.Exams.push({
+                                  MainExamName: $scope.Exam.MainExamName, MainExamId: $scope.Exam.MainExamId
+                              });
+                          }
+
+                      }, function errorCallback(response) {
+                      });
+                  }
+                  else {
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'ExamSetup/GetMainExamBySession/' + $scope.StudentPromotion.VersionId + '/' + $scope.StudentPromotion.SessionId + '/' + $scope.StudentPromotion.ClassId + '/' + $scope.StudentPromotion.GroupId
+                      }).then(function successCallback(response) {
+                          $scope.MainExams = response.data.results;
+
+                          $scope.Exams = [];
+                          $scope.Exams = $scope.MainExams;
+
+                      }, function errorCallback(response) {
+                          toastr["error"](response.data.message);
+                      });
+                  }
+
+              };
+
+              function resetForm() {
+                  $scope.submitted = false;
+
+              };
+
+              
+              $scope.ChackShift = function ChackShift() {
+                  if ($scope.BranchId) {
+                      $scope.ShiID = true;
+                  } else {
+                      $scope.ShiID = false;
+                  }
+                  angular.forEach($scope.StudentInfos, function (item) {
+                      item.promote = $scope.SelectionStatus1;
+                  });
+              };
+              
+              
+              $scope.PromoteReset = function Promote() {
+                  $scope.PromoteClass = false;
+              }
+              
+
+              $scope.ResetFormCommonFeilds = function ResetFormCommonFeilds() {// for Resetr Full page
+                  initialize();
+                  getAllCommons();
+                  getPromotedCommons();
+                  $scope.submitted = false;
+                  $scope.selectedAll = false;
+                  $scope.StudentInfos = [];
+              };
+             
+              $scope.GetGroup = function GetGroup(classid) {//Group droupdown lood for first form
+                  $scope.Groups = [];
+                  $http({
+                      method: 'GET',
+                      url: baseUrl + 'Common/GetGroup/' + classid
+                  }).then(function successCallback(response) {
+                      $scope.Groups = response.data.results;
+                  }, function errorCallback(response) {
+                      toastr["error"](response.data.message);
+                  });
+
+              }
+             
+              $scope.GetSection = function GetSection() {//Section droupdown lood for first form
+                  $scope.Sections = []; // ShiID BranchId
+                  if ($scope.BranchId || $scope.ShiID || ($scope.BranchId && $scope.ShiID)) {// without Shift Id for all Shift
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Common/GetSection/' + $scope.StudentPromotion.SessionId + "/" + $scope.StudentPromotion.ClassId + "/" + $scope.StudentPromotion.GroupId
+                      }).then(function successCallback(response) {
+                          $scope.Sections = response.data.results;
+                      }, function errorCallback(response) {
+                          toastr["error"](response.data.message);
+                      });
+                  } else {// with ShiftId for specific Shift
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Common/GetSection/' + $scope.StudentPromotion.SessionId + "/" + $scope.StudentPromotion.ShiftId + "/" + $scope.StudentPromotion.ClassId + "/" + $scope.StudentPromotion.GroupId
+                      }).then(function successCallback(response) {
+                          $scope.Sections = response.data.results;
+                      }, function errorCallback(response) {
+                          toastr["error"](response.data.message);
+                      });
+                  }
+
+              }
+
+              
+
+              function getAllCommons() {//for First form
+                  $scope.CommonFeilds = [];
+
+                  $http({
+                      method: 'GET',
+                      url: baseUrl + 'Common/GetCommonItem/'
+                  }).then(function successCallback(response) {
+                      $scope.CommonFeilds = response.data.results;
+
+                  }, function errorCallback(response) {
+                      toastr["error"](response.data.message);
+                  });
+              }
+              // for Pull filterd Sutent by parametter
+              $scope.Search = function Search(formCommonFeilds) {
+
+                  if (formCommonFeilds) {
+
+                      $scope.StudentInfos = [];
+
+
+                      if ($scope.sid) {//if student id chack box is chack then set all the droupdown value  0
+                          var id = angular.isUndefined($scope.StudentPromotion.StudentInsID);
+                          if ($scope.SecID)
+                              $scope.StudentPromotion.SectionId = 0;
+                          if (!id) {
+                              if ($scope.StudentPromotion.StudentInsID !== '') {
+                                  $scope.StudentPromotion.VersionId = 0;
+                                  $scope.StudentPromotion.SessionId = 0;
+                                  $scope.StudentPromotion.BranchId = 0;
+                                  $scope.StudentPromotion.ShiftId = 0;
+                                  $scope.StudentPromotion.ClassId = 0;
+                                  $scope.StudentPromotion.GroupId = 0;
+                                  $scope.StudentPromotion.SectionId = 0;
+                              }
+
+                          }
+                      }
+
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Promotion/GetFailStudent/' + $scope.SecID + '/' + $scope.StudentPromotion.StudentInsID + '/' + $scope.StudentPromotion.ExamType + '/' + $scope.StudentPromotion.VersionId + '/' + $scope.StudentPromotion.SessionId + '/' + $scope.StudentPromotion.BranchId + '/' + $scope.StudentPromotion.ShiftId + '/' + $scope.StudentPromotion.ClassId + '/' + $scope.StudentPromotion.GroupId + '/' + $scope.StudentPromotion.SectionId +'/'+ $scope.StudentPromotion.ExamId
+                      }).then(function successCallback(response) {
+                          $scope.StudentInfos = response.data.results;
+                          $scope.selectedAll = true;
+                          angular.forEach($scope.StudentInfos, function (item) {
+                          item.Selected = $scope.selectedAll;
+                          });
+                          toastr["success"](response.data.message);
+                      }, function errorCallback(response) {
+                          toastr["error"](response.data.message);
+                      });
+                  }else{
+
+                  }
+              };
+              
+
+
+          }]);
+    </script>
+}
+
+
+

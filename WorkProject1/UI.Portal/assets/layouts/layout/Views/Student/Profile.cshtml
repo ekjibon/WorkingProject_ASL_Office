@@ -1,0 +1,659 @@
+﻿
+@{
+    ViewBag.Title = "Profile";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<style>
+    .text-left {
+        text-align:left!important;
+    }
+</style>
+<div ng-controller="ProfileCtrl">
+    <!--Tab start-->
+    <div class="panel-body">
+        <div class="row">
+            <div class="col-md-3 col-sm-3 col-xs-3">
+                <br />
+                <div class="col-md-12 col-sm-12 col-xs-12">
+                    <div class="fileinput-preview thumbnail" data-trigger="fileinput" style="width: 140px; height: 142px;">
+                        <img ng-show="StuDetail.StudentBasicInfo.StudentPhoto" data-ng-src="@String.Format("data:image/jpg;base64,{0}", "{{StuDetail.StudentBasicInfo.StudentPhoto}}")" class="img-responsive pic-bordered" alt="" style="width: 100%;height: 100%;">
+                        <img ng-show="!StuDetail.StudentBasicInfo.StudentPhoto" src="~/assets/global/img/userimg.png" alt="Alternate Text" class="img-responsive pic-bordered" alt="" style="width: 100%;height: 100%;" />
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-9 col-sm-9 col-xs-9">
+                <div class="row">
+                    <h1 class="font-green sbold uppercase">{{StuDetail.StudentBasicInfo.FullName}} <span style="color:#ff6a00; padding-left:10px;font-size:25px;"> ID:{{StuDetail.StudentBasicInfo.StudentInsID}}    </span></h1>
+                </div>
+                <div class="row" style="margin-right:5px">
+                    <div class="m-grid-col-md-12 m-grid-col-sm-12">
+                        <div class="table-scrollable">
+                            <table class="table table-striped">
+                                <tbody>
+                                    <tr>
+                                        <td class="success" width="20%"> Version </td>
+                                        <td class="">{{StuDetail.StudentBasicInfo.VersionName}} </td>
+                                        <td class="warning" width="20%"> Class </td>
+                                        <td class="">{{StuDetail.StudentBasicInfo.ClassName}}</td>
+                                        <td class="danger" width="20%"> Admission Date </td>
+                                        <td class="">{{StuDetail.StudentBasicInfo.AdmissionDate| date:'dd-MM-yyyy'}}  </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="success" width="20%"> Session </td>
+                                        <td class="">{{StuDetail.StudentBasicInfo.SessionName}}  </td>
+                                        <td class="warning" width="20%"> Group </td>
+                                        <td class="">{{StuDetail.StudentBasicInfo.GroupName}}  </td>
+                                        <td class="danger" width="20%"> Roll </td>
+                                        <td class="">{{StuDetail.StudentBasicInfo.RollNo}} </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="success" width="20%"> Branch </td>
+                                        <td class="">{{StuDetail.StudentBasicInfo.BranchName}}  </td>
+                                        <td class="warning" width="20%"> Section</td>
+                                        <td class="">{{StuDetail.StudentBasicInfo.SectionName}}  </td>
+                                        <td class="danger" width="20%"> Reg. No </td>
+                                        <td class="">{{StuDetail.StudentBasicInfo.RegiNo}}  </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="success" width="20%"> Shift </td>
+                                        <td class="">{{StuDetail.StudentBasicInfo.ShiftName}}  </td>
+                                        <td class="warning" width="20%"> Stud. Type</td>
+                                        <td class="">{{StuDetail.StudentBasicInfo.StudentTypeName}}  </td>
+                                        <td class="danger" width="20%"> House </td>
+                                        <td class="">{{StuDetail.StudentBasicInfo.HouseName}}  </td>
+                                    </tr>
+                                    @*<tr>
+                                            <td class="success" width="20%">  </td>
+                                            <td class=""> </td>
+                                            <td class="warning" width="20%"> </td>
+                                            <td class=""> </td>
+                                            <td class="danger" width="20%">  </td>
+                                            <td class=""> </td>
+                                        </tr>*@
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="tabbable-line tabbable-custom-profile">
+                <ul class="nav nav-tabs">
+                    <li class="active">
+                        <a href="#tab_1_11" data-toggle="tab" aria-expanded="false"> Basic Info </a>
+                    </li>
+                    <li class="">
+                        <a href="#tab_1_55" data-toggle="tab" aria-expanded="false"> Guardian Info </a>
+                    </li>
+                    <li class="">
+                        <a href="#tab_1_33" data-toggle="tab" aria-expanded="false"> Academic Info </a>
+                    </li>
+                    <li class="">
+                        <a href="#tab_1_22" data-toggle="tab" aria-expanded="false"> Contact Info </a>
+                    </li>
+
+
+                    <li class="">
+                        <a href="#tab_1_44" data-toggle="tab" aria-expanded="false"> Sibling Info </a>
+                    </li>
+
+                    <li class="">
+                        <a href="#tab_1_66" data-toggle="tab" aria-expanded="false"> Others Info </a>
+                    </li>
+
+                </ul>
+                <div class="tab-content">
+                    @*Basic Info*@
+                    <div class="tab-pane active" id="tab_1_11">
+                        <div class="col-md-12 col-sm-12 col-xs-12">
+                            <div style="background-color:#1ddbdb" class="col-md-12 success form-control">Student Information</div>
+                            <div class="col-md-6 col-sm-6 col-xs-6">
+
+                                <table class="table table-hover">
+
+                                    <tr class="">
+                                        <th> Name Bangla</th>
+                                        <td>{{StuDetail.StudentBasicInfo.NameBangla}}</td>
+                                    </tr>
+                                    <tr class="">
+                                        <th> Gender</th>
+                                        <td>{{StuDetail.StudentBasicInfo.Gender}}  </td>
+                                    </tr>
+                                    <tr class="">
+                                        <th>Blood Group</th>
+                                        <td>{{StuDetail.StudentBasicInfo.BloodGroup}} </td>
+                                    </tr>
+                                    <tr class="">
+                                        <th> Age</th>
+                                        <td> {{StuDetail.StudentBasicInfo.Age}}</td>
+                                    </tr>
+                                    <tr class="">
+                                        <th>Physical Drawback/Disability </th>
+                                        <td>
+                                            <span ng-if="StuDetail.StudentBasicInfo.IsPhysicalDrawback==true">Yes</span>
+                                            <span ng-if="StuDetail.StudentBasicInfo.IsPhysicalDrawback==false">No</span>
+                                        </td>
+                                    </tr>
+
+                                    @*<tr class="">
+                                            <th> Transport Facility </th>
+                                            <td> {{StuDetail.StudentBasicInfo.TransportFacility }}</td>
+                                        </tr>*@
+                                    <tr class="">
+                                        <th> Height:</th>
+                                        <td>{{StuDetail.StudentBasicInfo.Height}} ft.  </td>
+                                    </tr>
+                                    <tr class="">
+                                        <th> SMS Notification No:</th>
+                                        <td>{{StuDetail.StudentBasicInfo.SMSNotificationNo}}  </td>
+                                    </tr>
+
+
+
+                                </table>
+                            </div>
+
+                            <div class="col-md-6 col-sm-6 col-xs-6">
+
+                                <table class="table table-hover">
+                                    <tr class="">
+                                        <th> Religion</th>
+                                        <td>{{StuDetail.StudentBasicInfo.Religion }} </td>
+                                    </tr>
+                                    <tr class="">
+                                        <th> Nationality</th>
+                                        <td>{{StuDetail.StudentBasicInfo.Nationality }}</td>
+                                    </tr>
+                                    <tr class="">
+                                        <th> Date of Birth</th>
+                                        <td>{{StuDetail.StudentBasicInfo.DateOfBirth | date:'dd-MM-yyyy'}}  </td>
+                                    </tr>
+                                    @*<tr class="">
+                                            <th> Currently Living </th>
+                                            <td> {{StuDetail.StudentBasicInfo.CurrentResidenceType}} </td>
+                                        </tr>*@
+                                    <tr class="">
+                                        <th>Medical Instruction</th>
+                                        <td>{{StuDetail.StudentBasicInfo.RegularMedicineInstruction }}</td>
+                                    </tr>
+                                    <tr class="">
+                                        <th> Description</th>
+                                        <td>{{ StuDetail.StudentBasicInfo.PhyDrawbackDescription}} </td>
+                                    </tr>
+                                    <tr class="">
+                                        <th> Weight</th>
+                                        <td> {{StuDetail.StudentBasicInfo.Weight }} kg.</td>
+                                    </tr>
+                                    @*<tr class="">
+                                            <th> Route Name</th>
+                                            <td>{{StuDetail.StudentBasicInfo.RouteName}}</td>
+                                        </tr>*@
+                                    @*<tr class="">
+                                            <th> Position</th>
+                                            <td> {{StuDetail.StudentBasicInfo.StudentPositionInChildren}} </td>
+                                        </tr>*@
+                                    <tr class="">
+                                        <th> Quota</th>
+                                        <td>{{StuDetail.StudentBasicInfo.Quota}}</td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="col-md-12 col-sm-12 col-xs-12">
+                            <div style="background-color:#1ddbdb" class="col-md-12 success form-control">First Admitted</div>
+                            <table class="table table-hover">
+                                <tr>
+                                    <th>Class </th>
+                                    <th>Month </th>
+                                    <th>Year </th>
+                                </tr>
+                                <tr>
+                                    <td> {{StuDetail.StudentBasicInfo.FirstAdmittedinClass }}</td>
+                                    <td> {{StuDetail.StudentBasicInfo.FirstAdmittedDate| date:'M' }}</td>
+                                    <td> {{StuDetail.StudentBasicInfo.FirstAdmittedDate| date:'y' }}</td>
+                                </tr>
+
+                            </table>
+                            <div style="background-color:#1ddbdb" class="col-md-12 col-sm-12 col-xs-12 form-control">Previous Institute Info</div>
+                            <table class="table table-hover">
+                                <tr>
+                                    <th> Name </th>
+                                    <th> Class </th>
+                                    <th>Section </th>
+                                    <th> Group </th>
+                                    <th> Session </th>
+                                    <th>Version </th>
+                                    <th>Roll </th>
+                                    <th> GPA </th>
+                                    <th> TCNo </th>
+                                    <th> Date </th>
+                                </tr>
+                                <tr>
+                                    <td> {{StuDetail.StudentBasicInfo.PreInsInfoName }}</td>
+                                    <td> {{StuDetail.StudentBasicInfo.PreInsInfoClass }}</td>
+                                    <td> {{StuDetail.StudentBasicInfo.PreInsInfoSection }}</td>
+                                    <td> {{StuDetail.StudentBasicInfo.PreInsInfoGroup }}</td>
+                                    <td> {{StuDetail.StudentBasicInfo.PreInsInfoSession }}</td>
+                                    <td> {{StuDetail.StudentBasicInfo.PreInsInfoVersion }}</td>
+                                    <td> {{StuDetail.StudentBasicInfo.PreInsInfoRollNo }}</td>
+                                    <td> {{StuDetail.StudentBasicInfo.PreInsInfoGPAResult }}</td>
+                                    <td> {{StuDetail.StudentBasicInfo.PreInsInfoTCNo }}</td>
+                                    <td> {{StuDetail.StudentBasicInfo.PreInsInfoDate| date:'dd-MM-yyyy' }}</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+
+                    @*Gurdian Info*@
+                    <div class="tab-pane" id="tab_1_55">
+                        <div class="portlet-body">
+                            <div class="col-md-6 col-sm-6 col-xs-6">
+                                <h4 style="background-color:#c3f8f8; padding:10px; margin:5px;">Father Information</h4>
+                                <table class="table table-hover">
+                                    <tr>
+                                        <th> Father's Name</th>
+                                        <td>{{ StuDetail.StudentBasicInfo.FatherName }} </td>
+                                    </tr>
+                                    <tr>
+                                        <th> Qualification</th>
+                                        <td>{{ StuDetail.StudentGuardianInfo.F_Qualification }} </td>
+                                    </tr>
+                                    <tr>
+                                        <th> Profession</th>
+                                        <td> {{ StuDetail.StudentGuardianInfo.F_Profession }} </td>
+                                    </tr>
+                                    <tr>
+                                        <th> Monthly Income</th>
+                                        <td>{{ StuDetail.StudentGuardianInfo.F_MonthlyIncome }} TK </td>
+                                    </tr>
+                                    <tr>
+                                        <th> Office Address</th>
+                                        <td> {{ StuDetail.StudentGuardianInfo.F_OfficeAddress }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Mobile</th>
+                                        <td>{{ StuDetail.StudentGuardianInfo.F_Mobile }} </td>
+                                    </tr>
+                                    <tr>
+                                        <th> Email</th>
+                                        <td> {{ StuDetail.StudentGuardianInfo.F_Email }} </td>
+                                    </tr>
+                                    <tr>
+                                        <th> TIN</th>
+                                        <td>{{ StuDetail.StudentGuardianInfo.F_TIN }} </td>
+                                    </tr>
+                                    <tr>
+                                        <th> NID No</th>
+                                        <td> {{ StuDetail.StudentGuardianInfo.F_NIDNo }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th> Passport No</th>
+                                        <td> {{ StuDetail.StudentGuardianInfo.F_PassportNo }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Father's Photo</th>
+                                        <td>
+                                            <div class="fileinput-preview thumbnail" data-trigger="fileinput" style="width: 80px; height: 82px;">
+                                                <img data-ng-src="@String.Format("data:image/jpg;base64,{0}", "{{StuDetail.StudentGuardianInfo.F_GuardianImage}}")" alt="...">
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th> Father's Signature</th>
+                                        <td>
+                                            <div class="fileinput-preview thumbnail" data-trigger="fileinput" style="width: 80px; height: 82px;">
+                                                <img data-ng-src="@String.Format("data:image/jpg;base64,{0}", "{{ StuDetail.StudentGuardianInfo.F_GuardianSignature }}")" alt="...">
+                                            </div>
+                                        </td>
+                                    </tr>
+
+                                </table>
+                            </div>
+                            <div class="col-md-6 col-sm-6 col-xs-6">
+                                <h4 style="background-color:#c3f8f8; padding:10px; margin:5px;">  Mother Information</h4>
+                                <table class="table table-hover">
+                                    <tr>
+                                        <th> Mother's Name</th>
+                                        <td>{{ StuDetail.StudentBasicInfo.MotherName }} </td>
+                                    </tr>
+                                    <tr>
+                                        <th> Qualification</th>
+                                        <td>{{ StuDetail.StudentGuardianInfo.M_Qualification }} </td>
+                                    </tr>
+                                    <tr>
+                                        <th> Profession</th>
+                                        <td> {{ StuDetail.StudentGuardianInfo.M_Profession }} </td>
+                                    </tr>
+                                    <tr>
+                                        <th> Monthly Income</th>
+                                        <td>{{ StuDetail.StudentGuardianInfo.M_MonthlyIncome }} TK</td>
+                                    </tr>
+                                    <tr>
+                                        <th> Office Address</th>
+                                        <td> {{ StuDetail.StudentGuardianInfo.M_OfficeAddress }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Mobile</th>
+                                        <td>{{ StuDetail.StudentGuardianInfo.M_Mobile }} </td>
+                                    </tr>
+                                    <tr>
+                                        <th> Email</th>
+                                        <td> {{ StuDetail.StudentGuardianInfo.M_Email }} </td>
+                                    </tr>
+                                    <tr>
+                                        <th> TIN</th>
+                                        <td>{{ StuDetail.StudentGuardianInfo.M_TIN }} </td>
+                                    </tr>
+                                    <tr>
+                                        <th> NID No</th>
+                                        <td> {{ StuDetail.StudentGuardianInfo.M_NIDNo }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th> Passport No</th>
+                                        <td> {{ StuDetail.StudentGuardianInfo.M_PassportNo }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th>Mother's Photo</th>
+                                        <td>
+                                            <div class="fileinput-preview thumbnail" data-trigger="fileinput" style="width: 80px; height: 82px;">
+                                                <img data-ng-src="@String.Format("data:image/jpg;base64,{0}", "{{StuDetail.StudentGuardianInfo.M_GuardianImage}}")" alt="...">
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th> Mother's Signature</th>
+                                        <td>
+                                            <div class="fileinput-preview thumbnail" data-trigger="fileinput" style="width: 80px; height: 82px;">
+                                                <img data-ng-src="@String.Format("data:image/jpg;base64,{0}", "{{ StuDetail.StudentGuardianInfo.M_GuardianSignature }}")" alt="...">
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+
+                            <div class="col-md-6 col-xs-6 col-sm-6">
+                                <h4 style="background-color:#c3f8f8; padding:10px; margin:5px;">Local Guardian Info</h4>
+                                <table class="table table-hover">
+                                    <tr>
+                                        <th>Name </th>
+                                        <td>{{ StuDetail.StudentGuardianInfo.LG_Name }} </td>
+                                    </tr>
+                                    <tr>
+                                        <th> Relation</th>
+                                        <td> {{ StuDetail.StudentGuardianInfo.LG_Relation }} </td>
+                                    </tr>
+                                    <tr>
+                                        <th> Address</th>
+                                        <td>{{ StuDetail.StudentGuardianInfo.LG_Address }} </td>
+                                    </tr>
+                                    <tr>
+                                        <th> Mobile</th>
+                                        <td> {{ StuDetail.StudentGuardianInfo.LG_Mobile }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th> NID</th>
+                                        <td> {{ StuDetail.StudentGuardianInfo.LG_NIDNo }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th> Email</th>
+                                        <td> {{ StuDetail.StudentGuardianInfo.LG_Email }}</td>
+                                    </tr>
+                                </table>
+                            </div>
+
+                            <div class="col-md-6 col-xs-6 col-sm-6">
+                                <h4 style="background-color:#c3f8f8; padding:10px; margin:5px;"> Emergency Contact Information</h4>
+                                <table class="table table-hover">
+                                    <tr>
+                                        <th>Name </th>
+                                        <td>{{ StuDetail.StudentGuardianInfo.E_Name }} </td>
+                                    </tr>
+                                    <tr>
+                                        <th> Relation</th>
+                                        <td> {{ StuDetail.StudentGuardianInfo.E_Relation }} </td>
+                                    </tr>
+                                    <tr>
+                                        <th> Address</th>
+                                        <td>{{ StuDetail.StudentGuardianInfo.E_Address }} </td>
+                                    </tr>
+                                    <tr>
+                                        <th> Mobile</th>
+                                        <td> {{ StuDetail.StudentGuardianInfo.E_Mobile }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th> NID</th>
+                                        <td> {{ StuDetail.StudentGuardianInfo.E_NIDNo }}</td>
+                                    </tr>
+                                    <tr>
+                                        <th> Email</th>
+                                        <td> {{ StuDetail.StudentGuardianInfo.E_Email }}</td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tab-pane" id="tab_1_22">
+                        <div class="portlet-body">
+                            <div class="row">
+                                <div class="col-md-6 col-sm-6 col-xs-6">
+                                    <table class="table table-hover">
+                                        <tr>
+                                            <h4 style="background-color:#c3f8f8; padding:10px; margin:5px;">Present Address</h4>
+                                        </tr>
+                                        <tr>
+                                            <th>  Address</th>
+                                            <td>{{ StuDetail.StudentContactInfo.Pre_Address }} </td>
+                                        </tr>
+                                        <tr>
+                                            <th>  District </th>
+                                            <td> {{ StuDetail.StudentContactInfo.Pre_DisName }} </td>
+                                        </tr>
+                                        <tr>
+                                            <th>  Police Station </th>
+                                            <td>{{ StuDetail.StudentContactInfo.Pre_PSName }} </td>
+                                        </tr>
+                                        <tr>
+                                            <th>  Post Office</th>
+                                            <td> {{ StuDetail.StudentContactInfo.Pre_PostOffice }}</td>
+                                        </tr>
+                                        <tr>
+                                            <th>  Postal Code</th>
+                                            <td> {{ StuDetail.StudentContactInfo.Pre_PostalCode }}</td>
+                                        </tr>
+                                    </table>
+                                </div>
+
+                                <div class="col-md-6 col-sm-6 col-xs-6">
+
+                                    <table class="table table-hover">
+                                        <tr>
+                                            <h4 style="background-color:#c3f8f8; padding:10px; margin:5px;">Parmanent Address</h4>
+                                        </tr>
+                                        <tr>
+                                            <th>  Address</th>
+                                            <td>{{ StuDetail.StudentContactInfo.Par_Address }} </td>
+                                        </tr>
+                                        <tr>
+                                            <th>  District</th>
+                                            <td> {{ StuDetail.StudentContactInfo.Par_DisName }} </td>
+                                        </tr>
+                                        <tr>
+                                            <th>  Police Station  </th>
+                                            <td>{{ StuDetail.StudentContactInfo.Par_PSName }} </td>
+                                        </tr>
+                                        <tr>
+                                            <th>  Post Office</th>
+                                            <td> {{ StuDetail.StudentContactInfo.Par_PostOffice }}</td>
+                                        </tr>
+                                        <tr>
+                                            <th>  Postal Code</th>
+                                            <td> {{ StuDetail.StudentContactInfo.Par_PostalCode }}</td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    @*@academic*@
+                    <div class="tab-pane" id="tab_1_33">
+                        <div class="portlet-body">
+                            <div class="table-scrollable">
+                                <table class="table table-bordered table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th class="success"> # </th>
+                                            <th class="success"> Exam Name </th>
+                                            <th class="success"> Institute Name </th>
+                                            <th class="success"> Address </th>
+                                            <th class="success"> District/Thana </th>
+                                            <th class="success"> Exam Year </th>
+                                            <th class="success"> Passing Year </th>
+                                            <th class="success"> Session </th>
+                                            <th class="success"> Roll </th>
+                                            <th class="success"> RegNo </th>
+                                            <th class="success"> Group</th>
+                                            <th class="success"> Board</th>
+                                            <th class="success"> GPA</th>
+                                            <th class="success"> GPA w/o 4</th>
+                                            <th class="success"> Grade</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr ng-repeat="x in StuDetail.StudentAcademicInfo track by $index">
+                                            <td> {{$index+1}} </td>
+                                            <td> {{x.ExamName}} </td>
+                                            <td> {{x.InstituteName}}</td>
+                                            <td> {{x.InstituteAddress}}</td>
+                                            <td> {{x.DistrictThana}} </td>
+                                            <td>{{x.ExamYear}} </td>
+                                            <td>{{x.PassYear}} </td>
+                                            <td>{{x.ExamSession}} </td>
+                                            <td> {{x.ExamRoll}} </td>
+                                            <td> {{x.ExamRegNo}} </td>
+                                            <td>{{x.ExamGroup}} </td>
+                                            <td> {{x.Board}} </td>
+                                            <td> {{x.GPA}} </td>
+                                            <td> {{x.GPAWithOut4thSubject}} </td>
+                                            <td> {{x.Grade}} </td>
+                                        </tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    @*Siblings*@
+                    <div class="tab-pane" id="tab_1_44">
+                        <div class="portlet-body">
+                            <div class="table-scrollable">
+                                <table class="table table-bordered table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th class="danger"> # </th>
+                                            <th class="danger"> Sibling ID</th>
+                                            <th class="danger"> Name </th>
+                                            <th class="danger"> Roll </th>
+                                            <th class="danger"> Version</th>
+                                            <th class="danger"> Session</th>
+                                            <th class="danger"> Branch </th>
+                                            <th class="danger"> Shift </th>
+                                            <th class="danger"> Class</th>
+                                            <th class="danger"> Group </th>
+                                            <th class="danger"> Section</th>
+                                            <th class="danger"> Student Type</th>
+                                            <th class="danger"> House</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr ng-repeat="x in StuDetail.StudentSiblingInfo track by $index">
+                                            <td> {{$index+1}}  </td>
+                                            <td> {{ x.StudentInsID}} </td>
+                                            <td> {{ x.FullName}} </td>
+                                            <td>  {{x.RollNo }}</td>
+                                            <td> {{ x.VersionName}}</td>
+                                            <td> {{ x.SessionName}}</td>
+                                            <td> {{ x.BranchName}}</td>
+                                            <td> {{ x.ShiftName}} </td>
+                                            <td> {{ x.ClassName}} </td>
+                                            <td> {{ x.GroupName}} </td>
+                                            <td>  {{ x.SectionName}}</td>
+                                            <td> {{ x.StudentTypeName}} </td>
+                                            <td>  {{ x.HouseName}}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    @*Basic Info*@
+                    <div class="tab-pane" id="tab_1_66">
+                        <table class="table table-bordered table-hover">
+                            <thead>
+                                <tr class="btn-primary">
+                                    <th>Type</th>
+                                    <th>Activity</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="x in StuDetail.StudentOthersInfo track by $index">
+                                    <td>{{x.Type}}</td>
+                                    <td>{{x.ExtraActivity}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--Tab End-->
+</div>
+@section Scripts{
+    <script type="text/javascript">
+        OEMSApp.controller("ProfileCtrl", ["$scope", "$http",
+           function ($scope, $http) {
+               init();
+               function init() {
+                   $scope.StuDetail = [];
+                   StuDetail();
+               }
+               function StuDetail() {
+                   $scope.StuDetails = {};
+                   $http({
+                       method: 'GET',
+                       url: baseUrl + 'PortalStudent/GetStudentDetailbyID/'
+                   }).then(function successCallback(response) {
+                       $scope.StuDetail = response.data.results;
+                       if ($scope.StuDetail.StudentGuardianInfo == null)
+                           $scope.StuDetail.StudentGuardianInfo = {};
+
+                       $scope.StuDetail.StudentGuardianInfo.FatherName = $scope.StuDetail.StudentBasicInfo.FatherName;
+                       $scope.StuDetail.StudentGuardianInfo.MotherName = $scope.StuDetail.StudentBasicInfo.MotherName;
+                       $scope.StuDetail.StudentBasicInfo.AdmissionDate = $scope.StuDetail.StudentBasicInfo.AdmissionDate != null ? new Date($scope.StuDetail.StudentBasicInfo.AdmissionDate) : null;
+                       $scope.StuDetail.StudentBasicInfo.DateOfBirth = $scope.StuDetail.StudentBasicInfo.DateOfBirth != null ? new Date($scope.StuDetail.StudentBasicInfo.DateOfBirth) : null;
+                       $scope.StuDetail.StudentBasicInfo.FirstAdmittedDate = $scope.StuDetail.StudentBasicInfo.FirstAdmittedDate != null ? new Date($scope.StuDetail.StudentBasicInfo.FirstAdmittedDate) : null;
+                       $scope.StuDetail.StudentBasicInfo.PreInsInfoDate = $scope.StuDetail.StudentBasicInfo.PreInsInfoDate != null ? new Date($scope.StuDetail.StudentBasicInfo.PreInsInfoDate) : null;
+
+                       if ($scope.StuDetail.StudentContactInfo != null) {
+                           if ($scope.StuDetail.StudentContactInfo.Pre_DisId != null || $scope.StuDetail.StudentContactInfo.Pre_DisId != 0) {
+                               getPStations1($scope.StuDetail.StudentContactInfo.Pre_DisId)
+                           }
+                           if ($scope.StuDetail.StudentContactInfo.Par_DisId != null || $scope.StuDetail.StudentContactInfo.Par_DisId != 0) {
+                               $timeout(function () {
+                                   getPStations2($scope.StuDetail.StudentContactInfo.Par_DisId)
+                               }, 100);
+
+                           }
+                       }
+
+                   }, function errorCallback(response) {
+                       toastr["warning"](response.data.Message);
+                   });
+               }
+           }]);
+    </script>
+}
+
+
+
+

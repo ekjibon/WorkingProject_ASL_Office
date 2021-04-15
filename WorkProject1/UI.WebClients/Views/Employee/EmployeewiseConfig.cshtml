@@ -1,0 +1,235 @@
+﻿
+@{
+    ViewBag.Title = "Employeewise Config";
+}
+
+<div class="kt-container  kt-container--fluid  kt-grid__item kt-grid__item--fluid" ng-controller="EmployeewiseConfigCTRL">
+
+    <div class="row">
+        <div class="kt-portlet kt-portlet--mobile">
+            <div class="kt-portlet__head kt-portlet__head--lg">
+                <div class="kt-portlet__head-label">
+                    <h3 class="kt-portlet__head-title">
+                        Employeewise Config
+                    </h3>
+                </div>
+            </div>
+            <div class="kt-portlet__body">
+                <!-- BEGIN FORM-->
+                <form class="form-horizontal" id="formEmployeewiseConfig" name="formEmployeewiseConfig" novalidate>
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="form-group">
+                                <label class="col-lg-4 control-label ">Empolyee ID</label>
+                                <div class="col-lg-7">
+                                    <input type="text" name="StudentId" ng-model="Std" typeahead-on-select='onSelect($item, $model, $label)'
+                                           placeholder="Search name/ID SMS Notification"
+                                           uib-typeahead="i  as i.Text for i in Search($viewValue)"
+                                           typeahead-loading="loadingLocations" typeahead-no-results="noResults" class="form-control">
+                                    <i ng-show="loadingLocations" class="glyphicon glyphicon-refresh"></i>
+                                    <div ng-show="noResults"><i class="glyphicon glyphicon-remove"></i> No Results Found</div>
+                                    <input type="hidden" name="StudentIID" ng-value="Std.Value" />
+                                    <div class="form-control-focus"> </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </form>
+                <div class="row">
+                    <div class="col-md-4 col-sm-5 col-xs-6">
+                        <div class="form-group">
+                            <div class="col-lg-3 col-md-5 col-sm-4 col-xs-8" style="padding-left:0px">
+
+                                <select class="form-control kt-font-brand" ng-model="pageSize" ng-options="P.value as P.text for P in pageSizeArray"></select>
+                            </div>
+
+                        </div>
+
+                    </div>
+                    <div class="col-md-4 col-sm-3 col-xs-1">
+                    </div>
+                    <div class="col-md-4 col-sm-4 col-xs-5">
+                        <div id="sample_3_filter" class="pull-right">
+                            <input ng-model="q" id="search" class="form-control" placeholder="Filter text">
+                        </div>
+                    </div>
+                </div>
+                <table class="table table-bordered table-hover rounded">
+                    <thead>
+                        @*<tr><th>Empolyee ID : {{EmployeewiseConfig.EmpoyeeId}}</th><th>Employee Name : {{EmployeewiseConfig.FullName}}</th><th> Gross Salary : {{EmployeewiseConfig.CurrentSalary}}</th></tr>*@
+                        <tr class="btn-primary">
+                            <th>SL</th>
+                            <th width="30%"> Head name</th>
+                            <th width="20%">Amount</th>
+
+                        </tr>
+                    </thead>
+                    <tbody>
+
+                        <tr dir-paginate="item in EmployeeSalaryHeadwiseList | itemsPerPage: pageSize " current-page="currentPage">
+
+                            <td width="4%">{{$index+1}}</td>
+                            <td width="30%">{{item.HeadName}}</td>
+                            <td ng-show="item.HeadName=='Arrear'" width="20%"><input type="number" ng-model="item.Amount" class="form-control ng-pristine ng-valid ng-empty ng-touched" disabled /></td>
+                            <td ng-show="item.HeadName=='Salary Hold Refund'" width="20%"><input type="number" ng-model="item.Amount" class="form-control ng-pristine ng-valid ng-empty ng-touched" disabled /></td>
+                            <td ng-hide="item.HeadName=='Arrear' || item.HeadName=='Salary Hold Refund'" width="20%"><input type="number" ng-model="item.Amount" class="form-control ng-pristine ng-valid ng-empty ng-touched" ng-change="TotalAmount()" /></td>
+                        </tr>
+
+                    </tbody>
+                </table>
+
+                <div class="row">
+                    <div class="col-md-10">
+                        <div class="form-group row">
+
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="form-group row pull-right">
+                            <button class="btn btn-success" ng-show="EmployeewiseConfig.TotalAdjustAmount == EmployeewiseConfig.CurrentSalary" ng-click="Adjust()" type="submit">Update</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <dir-pagination-controls boundary-links="true" template-url="~/assets/angular/lib/dirPagination.tpl.html"></dir-pagination-controls>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    
+</div>
+
+
+@section Scripts{
+
+    <script type="text/javascript">
+        OEMSApp.controller("EmployeewiseConfigCTRL", ["$scope", "$http", "SweetAlert", "blockUI", "$filter",
+              function ($scope, $http, SweetAlert, blockUI, $filter) {
+                  init();
+                  function init() {
+                      initialize();
+
+
+
+                  }
+                  function initialize() {
+
+                      $scope.EmployeewiseConfig = {};
+                      $scope.EmployeeSalaryHeadwiseList = [];
+                 
+                      $scope.submitted = false;
+
+                      $scope.pageSizeArray = [];
+                      $scope.pageSizeArray.push({ value: 5, text: 5 });
+                      $scope.pageSizeArray.push({ value: 10, text: 10 });
+                      $scope.pageSizeArray.push({ value: 20, text: 20 });
+                      $scope.pageSizeArray.push({ value: 50, text: 50 });
+                      $scope.currentPage = 1;
+                      $scope.pageSize = 10;
+
+                  }
+
+
+
+                  $scope.Search = function (val) {
+                      return $http.get(baseUrl + 'Employee/SearchEmployee/' + val, {
+                          params: {
+
+                          }
+                      }).then(function (response) {
+                          return response.data.results.map(function (item) {
+                              return item;
+                          });
+                      });
+                  };
+
+                  $scope.onSelect = function onSelect($item, $model, $label) {
+                      $scope.EmployeewiseConfig.EmpID = $item.Value;
+                      
+                      SearchEmployeeId($item.Value);
+                  };
+
+                  function SearchEmployeeId(EmpID) {
+                      $scope.employeeInfos = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Employee/GetEmployeeID/' + EmpID
+                      }).then(function successCallback(response) {
+                          $scope.employeeInfos = response.data.results[0];
+                          $scope.EmployeewiseConfig.FullName = $scope.employeeInfos.FullName;
+                          $scope.EmployeewiseConfig.EmpoyeeId = $scope.employeeInfos.EmpID;
+                          $scope.EmployeewiseConfig.CurrentSalary = $scope.employeeInfos.CurrentSalary;
+                          GetEmployeeSalaryHeadwiseList();
+                          $scope.tblshow = true;
+                      }, function errorCallback(response) {
+                          toastr["error"](response.data.Message);
+                      });
+                  }
+
+                  $scope.resetForm =  function resetForm() {
+
+                  }
+
+
+
+                  function GetEmployeeSalaryHeadwiseList() {
+                      $scope.EmployeeSalaryHeadwiseList = [];
+
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Employee/GetEmployeeSalaryHeadwiseList/' + $scope.EmployeewiseConfig.EmpID
+                      }).then(function successCallback(response) {
+                          $scope.EmployeeSalaryHeadwiseList = response.data.results;
+                          toastr["warning"](response.data.message);
+                      }, function errorCallback(response) {
+                      });
+                  }
+
+                  $scope.TotalAmount = function TotalAmount() {
+
+
+                      
+                      $scope.EmployeewiseConfig.TotalAdjustAmount = 0;
+                      var totalamount = 0;
+
+                      angular.forEach($scope.EmployeeSalaryHeadwiseList, function (item) {
+
+                        
+
+                              totalamount += item.Amount;
+                              $scope.EmployeewiseConfig.TotalAdjustAmount = totalamount;
+                        
+                      });
+                     
+                      if ($scope.EmployeewiseConfig.TotalAdjustAmount > $scope.EmployeewiseConfig.CurrentSalary) {
+                          toastr["warning"]('Invalid Adjust');
+                          return;
+                      }
+
+                  }
+
+                  $scope.Adjust = function Adjust() {
+
+
+                      blockUI.start("Proccessing");
+                      $http({
+                          method: 'POST',
+                          url: baseUrl + 'Employee/UpdateEmployeeWiseSalaryStructure/',
+                          data: $scope.EmployeeSalaryHeadwiseList
+                      }).then(function successCallback(response) {
+                          toastr["success"](response.data.message);
+                          blockUI.stop();
+                      }, function errorCallback(response) {
+                          toastr["error"](response.data.Message);
+                          blockUI.stop();
+                      });
+                  };
+
+              }]);
+    </script>
+}
+

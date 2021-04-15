@@ -1,0 +1,225 @@
+﻿@using UI.Admin.Models.Task;
+@using UI.Admin.Models.Employee;
+@using UI.Admin.Models.Customer;
+@{ 
+    Tickets ticket = ViewData["Tickets"] as Tickets;
+    List<Department> departments = ViewData["DepartmentList"] as List<Department>;
+    List<TicketCategory> TicketCategory = ViewData["TicketCategory"] as List<TicketCategory>;
+    List<Project> ProjectList = ViewData["ProjectList"] as List<Project>;
+    List<Client> ClientList = ViewData["ClientList"] as List<Client>;
+    List<Modules> ModuleList = ViewData["ModuleList"] as List<Modules>;
+}
+
+
+@{
+    ViewBag.Title = "UpdateTicket";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2 class="text-center bold" style="background-color: gainsboro;">Update Ticket</h2>
+
+<div>
+    <form name="frm" class="form-horizontal" action="/Ticket/UpdateTicket" role="form" method="post">
+        <div class="portlet-body form" style="display: block;">
+            <div class="form-body">
+                <div class="row">
+                    <div class="form-group">
+                        <label class="col-md-1 control-label" style="font-size: 136%;margin-left: 4%;">Title</label>
+                        <div class="col-md-10" style="margin-left: 3%;">
+                            <input type="text" hidden name="Id" value="@ticket.Id" />
+                            <input type="text" value="@ticket.Title" name="Title" class="form-control input-lg bs-select" placeholder="Ticket Title" required />
+                        </div>
+                    </div>
+                </div>
+                <div class="row" style="margin-left:1.5%;margin-right: -5%;">
+                    <div class="col-md-6" style="padding-left: 0px;">
+                        <div class="form-group">
+                            <label class="col-md-3 control-label" style="font-size: 136%;">Department</label>
+                            <div class="col-md-9">
+                                <select name="DepartmentId" id="DepartmentId" onchange="LoadDeptManager()" class="form-control input-lg" required>
+                                    @foreach (var item in departments)
+                                  {
+                                      if (item.Id==ticket.DepartmentId)
+                                      {
+                                            <option value="@item.Id" selected>@item.DeptName</option>
+                                      }
+                                      else
+                                      {
+                                            <option value="@item.Id">@item.DeptName</option>
+                                      }
+                                  }
+                                </select>
+                            </div>
+                        </div>
+                        @*<div class="form-group">
+                            <label class="col-md-3 control-label " style="font-size: 136%;">Forward </label>
+                            <div class="col-md-9">
+                                <select class="form-control input-lg" id="ForwardedTo" name="ForwardedTo" >
+                                   
+                                </select>
+                            </div>
+                        </div>*@
+                        <div class="form-group">
+                            <label class="col-md-3 control-label " style="font-size: 136%;">Category</label>
+                            <div class="col-md-9">
+
+                                <select class="form-control input-lg" name="CategoryId">
+                                    @foreach (var item in TicketCategory)
+                                    {
+                                        if (item.Id == ticket.CategoryId)
+                                        {
+                                            <option value="@item.Id" selected>@item.CategoryName</option>
+                                        }
+                                        else
+                                        {
+                                            <option value="@item.Id">@item.CategoryName</option>
+                                        }
+                                    }
+
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label" style="font-size: 136%;">Project</label>
+                            <div class="col-md-9">
+                                <select class="form-control input-lg" name="ProjectId">
+                                    @foreach (var item in ProjectList)
+                                    {
+                                        if (item.Id == ticket.ProjectId)
+                                        {
+                                            <option value="@item.Id" selected>@item.ProjectName</option>
+                                        }
+                                        else
+                                        {
+                                            <option value="@item.Id">@item.ProjectName</option>
+                                        }
+                                    }
+
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-3 control-label" style="font-size: 136%;">Client</label>
+                            <div class="col-md-9">
+                                <select class="form-control input-lg" name="ClientId">
+                                    @foreach (var item in ClientList)
+                                    {
+                                        if (item.Id == ticket.ClientId)
+                                        {
+                                            <option value="@item.Id" selected>@item.ShortName</option>
+                                        }
+                                        else
+                                        {
+                                            <option value="@item.Id">@item.ShortName</option>
+                                        }
+                                    }
+
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6" style="padding-right: 5%;">
+                        <div class="form-group">
+                            <label class="col-md-4 control-label" style="font-size: 136%;">Prority</label>
+                            <div class="col-md-8">
+                                <select name="Priority" class="form-control input-lg bs-select" required>
+                                    @if (ticket.Priority == 1)
+                                    {
+                                        <option value="1" selected>High</option>
+                                        <option value="2">Medium</option>
+                                        <option value="3">Low</option>
+                                    }
+                                    else if (ticket.Priority == 2)
+                                    {
+                                        <option value="1">High</option>
+                                        <option value="2" selected>Medium</option>
+                                        <option value="3">Low</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="1">High</option>
+                                        <option value="2">Medium</option>
+                                        <option value="3" selected>Low</option>
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-4 control-label" style="font-size: 136%;">Module</label>
+                            <div class="col-md-8">
+                                <select class="form-control input-lg" name="ModuleId">
+                                    @foreach (var item in ModuleList)
+                                    {
+                                        if (item.Id == ticket.ModuleId)
+                                        {
+                                            <option value="@item.Id" selected>@item.ModuleName</option>
+
+                                        }
+                                        else
+                                        {
+                                            <option value="@item.Id">@item.ModuleName</option>
+                                        }
+                                    }
+
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-md-4 control-label" style="font-size: 136%;">Old Close Date</label>
+                            <div class="col-md-8">
+                                <label class="form-control input-lg">@ticket.ClosedDate.ToString("dd-MM-yyyy")</label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-4 control-label" style="font-size: 136%;">New Close Date</label>
+                            <div class="col-md-8">
+                                <input type="date" name="ClosedDate" class="form-control input-lg">
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="form-group" style="margin-left:3%;">
+                        <div class="col-md-1">
+                            <label class="control-label" style="font-size: 136%;">Description</label>
+                        </div>
+                        <div class="col-md-7">
+                            <textarea cols="116" name="Description" rows="5" style="margin-left:6%;width:151%;font-size: x-large;" required>@ticket.Description</textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer" style="margin-right: -1%;">
+                    <button type="reset" class="btn btn-danger" style="font-size:large;">Reset</button>
+                    <button type="submit" class="btn btn-success" style="font-size:large;">Update</button>
+                </div>
+            </div>
+        </div>
+
+    </form>
+</div>
+    <script type="text/javascript">
+        function LoadDeptManager()
+        {
+            var DeptId = $('#DepartmentId').val();
+            $.ajax({
+                type: "GET",
+                dataType: "json",
+                url: "../SetUp/LoadManagerList?DeptId=" + DeptId,
+                success: function (data) {
+                    var dropdown = $('#ForwardedTo');
+                    dropdown.empty();
+                    $.each(data, function (i, obj) {
+                        $('#ForwardedTo').append($('<option>').text(obj.FullName).attr('value', obj.UserName));
+                    });
+                },
+                error: function (error) {
+
+                    jsonValue = jQuery.parseJSON(error.responseText);
+                    alert("error" + error.responseText);
+                }
+            });
+        }
+    </script>

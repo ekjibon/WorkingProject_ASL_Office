@@ -1,0 +1,580 @@
+﻿@{
+    ViewBag.Title = "Leave Routing Config";
+}
+<div class="kt-container  kt-container--fluid  kt-grid__item kt-grid__item--fluid" ng-controller="ctrlLeaveRoutingConfig">
+    <div class="row">
+        <div class="kt-portlet kt-portlet--mobile">
+            <div class="kt-portlet__head kt-portlet__head--lg">
+                <div class="kt-portlet__head-label">
+                    <h3 class="kt-portlet__head-title">
+                        Employee Leave Routing Configuration
+                    </h3>
+                </div>
+                <div class="kt-portlet__head-toolbar">
+                    <div class="kt-portlet__head-wrapper">
+                        <div class="dropdown dropdown-inline">
+                            <button type="button" ng-click="resetForm()" class="btn btn-brand btn-icon-sm" data-toggle="modal" data-target="#addmodal" aria-haspopup="true" aria-expanded="false">
+                                <i class="flaticon2-plus"></i> Add New
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="kt-portlet__body">
+
+                <div class="row">
+                    <div class="col-md-4 col-sm-5 col-xs-6">
+                        <div class="form-group">
+                            <div class="col-lg-3 col-md-5 col-sm-4 col-xs-8" style="padding-left:0px">
+
+                                <select class="form-control kt-font-brand" ng-model="pageSize" ng-options="P.value as P.text for P in pageSizeArray"></select>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="col-md-4 col-sm-3 col-xs-1">
+                    </div>
+                    <div class="col-md-4 col-sm-4 col-xs-5">
+                        <div id="sample_3_filter" class="pull-right">
+                            <input ng-model="q" id="search" class="form-control" placeholder="Filter text">
+                        </div>
+                    </div>
+                </div>
+                <table class="table table-bordered table-hover rounded">
+                    <thead>
+                        <tr class="btn-primary">
+
+                            <th>Route Name</th>
+                            <th>Designation</th>
+                            <th style="text-align:center">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-show="LeaveRoutingConfigList.length <= 0"><td colspan="6" style="text-align:center;"><i class="fa fa-refresh"></i> No Data Found..</td></tr>
+
+
+                        <tr dir-paginate="item in LeaveRoutingConfigList| filter:q  | itemsPerPage: pageSize" current-page="currentPage">
+                            <td>{{item.RouteName}} </td>
+                            <td>{{item.DesignationName}}</td>
+                            <td align="center">
+                                <a class="btn btn-outline-success btn-elevate btn-icon" ng-click="GetLeaveRoutingConfigDetailsById(item)" data-toggle="modal" data-target="#addmodal" data-whatever="fat" href="">
+                                    <i class="fa fa-eye"></i>
+                                </a>
+                                <a class="btn btn-outline-danger btn-elevate btn-icon" id="kt_sweetalert_demo_9" ng-click="deleteLeaveRoutingConfig(item.RoutingId)" href="#">
+                                    <i class="fa fa-trash"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="row">
+                    <dir-pagination-controls boundary-links="true" template-url="~/assets/angular/lib/dirPagination.tpl.html"></dir-pagination-controls>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--Modal Area Start-->
+    <div id="addmodal" class="modal fade" tabindex="-1" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content modal-lg">
+                <form name="addBasic" ng-submit="" class="form-horizontal" id="form_sample_1" novalidate autocomplete="off">
+                    <div class="modal-header">
+                        <h4 class="modal-title">{{modalTitle}}</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true" ng-click="resetForm();submitted=false"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-body">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group row" ng-class="{ 'has-error' : submitted && addBasic.route.$invalid}">
+                                        <label class="col-md-3 control-label text-right">
+                                            Route Name :
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-8">
+                                            <input type="text" class="form-control" required name="route" ng-model="LeaveRouting.RouteName" />
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted && addBasic.route.$error.required" class="help-block">Route Name Required</span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group row" ng-class="{ 'has-error' : submitted && addBasic.Designation.$invalid}">
+                                        <label class="col-md-3 control-label text-right">
+                                            Designation :
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-8">
+                                            <select class="form-control" ng-model="LeaveRouting.DesignationId" ng-change="getDeginationByDesig(LeaveRouting.DesignationId)" required name="Designation" ng-options="S.DesignationID as S.DesignationName for S in CommonFeilds.Designation">
+                                                <option value="" selected="selected">Choose Option</option>
+                                            </select>
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted && addBasic.Designation.$error.required" class="help-block">Designation Required</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 form-group row" ng-class="{ 'has-error' : submitted && addBasic.Designation.$invalid}">
+                                    <label class="col-md-5 control-label text-right">
+                                        Filter Designation :
+                                    </label>
+                                    <div class="col-md-7">
+                                        <select class="form-control" ng-model="LeaveRouting.FilterDesignationId" ng-change="getEmployeeByDesig(LeaveRouting.FilterDesignationId)" name="Designation" ng-options="S.DesignationID as S.DesignationName for S in Deginations">
+                                            <option value="" selected="selected">Choose Option</option>
+                                        </select>
+                                        <div class="form-control-focus"> </div>
+                                        <span ng-show="submitted && addBasic.Designation.$error.required" class="help-block">Designation Required</span>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6 form-group row">
+                                    <label class="col-md-4 control-label text-right">
+                                        Employee :
+                                    </label>
+                                    <div class="col-md-8">
+                                        <select class="form-control" ng-model="Employee" required name="employee" ng-options="S as S.FullName for S in Employees">
+                                            <option value="" selected="selected">Choose Option</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-12 form-group row">
+                                    <div class="col-md-2"></div>
+                                    <label class="col-md-3 control-label text-right">
+                                        Mandatory :
+                                    </label>
+                                    <div class="col-md-1">
+                                        <input type="checkbox" class="" style="margin-top:9px" name="IsMandatory" ng-model="IsMandatory" />
+                                    </div>
+
+                                    <label class="col-md-3 control-label text-right">
+                                        Final Approval :
+                                    </label>
+                                    <div class="col-md-1">
+                                        <input type="checkbox" class="" style="margin-top:9px" name="IsFinalApprove" ng-model="IsFinalApprove" />
+                                    </div>
+                                    <div class="col-md-2">
+                                        <button type="button" ng-click="addleaveRouteConfig();submitted=false" class="btn btn-success">Add</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <table ng-show="LeaveRoutingList.length>0" class="table table-bordered">
+                            <tr>
+                                <th>Employee</th>
+                                <th>Mandatory</th>
+                                <th>FinalApprove</th>
+                                <th>Serial</th>
+                                <th>Action</th>
+                            </tr>
+                            <tr ng-repeat="item in LeaveRoutingList track by $index">
+                                <td>{{item.EmpName}} </td>
+
+                                <td>{{item.IsMandatory? 'YES' : 'NO'}}</td>
+                                <td>{{item.IsFinalApprove? 'YES' : 'NO'}}</td>
+                                <td>
+                                    @*{{item.SerialNo}}*@
+                                    <input type="number" class="" min="1" max="5" name="serial" ng-model="item.SerialNo" />
+                                </td>
+                                <td> <button type="button" ng-click="Remove($index,item);submitted=false" class="btn btn-danger">X</button></td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" data-dismiss="modal" class="btn btn-secondary" ng-click="resetForm();submitted=false">Cancel</button>
+                        <button type="submit" ng-click="save();submitted=true" class="btn btn-success">{{modalbutton}}</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!--Modal Area End-->
+
+</div>
+
+<!-- END FORM-->
+@section Scripts{
+
+    <script type="text/javascript">
+        OEMSApp.controller("ctrlLeaveRoutingConfig", ["$scope", "$http", "SweetAlert",
+              function ($scope, $http, SweetAlert) {
+                  init();
+                  function init() {
+                      initialize();
+                      getAllLeaveRoutingConfig();
+                      getAllCommons();
+                      //GetAllEmployee();
+                  }
+
+                  function initialize() {
+                      $scope.modalbutton = 'Save';
+                      $scope.modalTitle = 'Add New Config';
+
+                      $scope.LeaveRoutingConfigInfo = {};
+                      $scope.LeaveRoutingConfigInfo.RoutingId = 0;
+
+
+                      $scope.LeaveRoutingConfigInfos = [];
+                      $scope.LeaveRoutingConfigList = [];
+                      $scope.resetForm = resetForm;
+
+                      $scope.CommonFeilds = [];
+                      //$scope.EmployeeList = [];
+
+                      $scope.LeaveRoutingList = [];
+                      $scope.LeaveRouting = {};
+                      $scope.LeaveRouting.RoutingId = 0;
+                      $scope.SerialNo = 1;
+                      $scope.IsMandatory = true;
+                      $scope.IsFinalApprove = false;
+
+                      $scope.leaveRouteConfigDetails = {};
+
+                      $scope.SerialNoList = [];
+                      $scope.SerialNoList.push({ value: 1, text: 1 });
+                      $scope.SerialNoList.push({ value: 2, text: 2 });
+                      $scope.SerialNoList.push({ value: 3, text: 3 });
+                      $scope.SerialNoList.push({ value: 4, text: 4 });
+                      $scope.SerialNoList.push({ value: 5, text: 5 });
+
+                      $scope.pagesize = 10;
+                      $scope.pageSizeArray = [];
+                      $scope.pageSizeArray.push({ value: 5, text: 5 });
+                      $scope.pageSizeArray.push({ value: 10, text: 10 });
+                      $scope.pageSizeArray.push({ value: 20, text: 20 });
+                      $scope.pageSizeArray.push({ value: 50, text: 50 });
+                      $scope.currentPage = 1;
+                      $scope.pageSize = 10;
+
+                      $scope.dateOptions = { minDate: new Date() };
+                  }
+
+
+                  function resetForm() {
+                      $scope.modalTitle = "Add New Config";
+                      $scope.LeaveRoutingConfigInfo = {};
+                      $scope.LeaveRoutingConfigInfo.RoutingId = 0;
+                      $scope.LeaveRoutingConfigInfo.IsMandatory = true;
+                      $scope.Emp2 = null;
+                      $scope.Emp = null;
+                      $scope.addBasic.$setUntouched();
+                      $scope.addBasic.$setPristine();
+                      $scope.submitted = false;
+                      $scope.modalbutton = 'Save';
+
+                      $scope.LeaveRoutingList = [];
+                      $scope.LeaveRouting = {};
+                      $scope.LeaveRouting.RoutingId = 0;
+                      $scope.SerialNo = 1;
+                      $scope.IsMandatory = true;
+                      $scope.IsFinalApprove = false;
+                      $scope.leaveRouteConfigDetails = {};
+                      $scope.SerialNo_view = 1;
+                      $scope.IsMandatory_view = true;
+                      $scope.IsFinalApprove_view = false;
+                  }
+
+
+                  $scope.addleaveRouteConfig = function addleaveRouteConfig() {
+                      if ($scope.LeaveRoutingList.length > 0) {
+                          if (IsExists($scope.Employee.Id)) {
+                              $scope.LeaveRoutingList.push({
+                                  'NextApproval': $scope.Employee.Id,
+                                  'EmpName': $scope.Employee.FullName,
+                                  'SerialNo': 0
+                           , 'IsMandatory': $scope.IsMandatory
+                          , 'IsFinalApprove': $scope.IsFinalApprove
+                              });
+
+                          } else {
+                              toastr["warning"]('Employee Already Exist.');
+                              return;
+                          }
+                      } else {
+                          $scope.LeaveRoutingList.push({
+                              'NextApproval': $scope.Employee.Id,
+                              'EmpName': $scope.Employee.FullName,
+                              'SerialNo': 0
+                               , 'IsMandatory': $scope.IsMandatory
+                                , 'IsFinalApprove': $scope.IsFinalApprove
+                          });
+                      }
+                      $scope.NextApproval = '';
+                      $scope.SerialNo = 1;
+                      $scope.IsMandatory = true;
+                      $scope.IsFinalApprove = false;
+                      $scope.submitted = false;
+                      serialIndex();
+                  }
+
+
+                  function IsExists(pro) {
+                      var res = true;
+                      angular.forEach($scope.LeaveRoutingList, function (value, key) {
+                          if (value.NextApproval == pro)
+                              res = false;
+                      });
+                      return res;
+                  }
+                  //function IsExistsSerial(pro) {
+                  //    var res = true;
+                  //    angular.forEach($scope.LeaveRoutingList, function (value, key) {
+                  //        if (value.SerialNo == pro)
+                  //            res = false;
+                  //    });
+                  //    return res;
+                  //}
+
+                  $scope.addleaveRouteConfig_view = function addleaveRouteConfig_view() {
+
+                      $scope.leaveRouteConfigDetails.RoutingId = $scope.LeaveRouting.RoutingId;
+                      $scope.leaveRouteConfigDetails.NextApproval = $scope.Employee_View.Id;
+                      $scope.leaveRouteConfigDetails.SerialNo = $scope.SerialNo_view;
+                      $scope.leaveRouteConfigDetails.IsMandatory = $scope.IsMandatory_view;
+                      $scope.leaveRouteConfigDetails.IsFinalApprove = $scope.IsFinalApprove_view;
+                      var a = $scope.leaveRouteConfigDetails;
+                      //console.log(a);
+                      if (IsExists_view($scope.Employee_View.Id)) {
+                          $http({
+                              method: 'POST',
+                              url: baseUrl + 'Employee/AddLeaveRoutingConfigDetails',
+                              data: $scope.leaveRouteConfigDetails
+                          }).then(function successCallback(response) {
+                              //$('#addmodal').modal('toggle');
+                              toastr["success"](response.data.message);
+                              //getAllLeaveRoutingConfig();
+                              resetForm();
+                              $scope.GetLeaveRoutingConfigDetailsById(a)
+                          }, function errorCallback(response) {
+                              toastr["warning"](response.data.Message);
+                          });
+                      } else {
+                          toastr["warning"]('Employee Already Exist.');
+                          return;
+                      }
+                      $scope.NextApproval = '';
+                      $scope.SerialNo_view = 1;
+                      $scope.IsMandatory_view = true;
+                      $scope.IsFinalApprove_view = false;
+                      $scope.submitted = false;
+                  }
+
+                  function IsExists_view(pro) {
+                      var res = true;
+                      angular.forEach($scope.LeaveRoutingConfigDetailsList, function (value, key) {
+                          if (value.NextApproval == pro)
+                              res = false;
+                      });
+                      return res;
+                  }
+                  //function IsExistsSerial_view(pro) {
+                  //    var res = true;
+                  //    angular.forEach($scope.LeaveRoutingConfigDetailsList, function (value, key) {
+                  //        if (value.SerialNo == pro)
+                  //            res = false;
+                  //    });
+                  //    return res;
+                  //}
+                  $scope.Remove = function Remove(index, n) {
+
+
+                      if (n.DetailsId > 0) {
+                          $http({
+                              method: 'DELETE',
+                              url: baseUrl + 'Employee/DeleteLeaveRoutingConfigDetails/' + n.DetailsId,
+                          }).then(function successCallback(response) {
+                              //$scope.GetLeaveRoutingConfigDetailsById(n)
+                              $scope.LeaveRoutingList.splice(index, 1);
+                              serialIndex();
+                          }, function errorCallback(response) {
+                              toastr["error"](response.data.Message);
+                          });
+                      } else {
+                          $scope.LeaveRoutingList.splice(index, 1);
+                          serialIndex();
+                      }
+
+
+                  }
+
+                  $scope.Remove_view = function Remove_view(details) {
+                      $http({
+                          method: 'DELETE',
+                          url: baseUrl + 'Employee/DeleteLeaveRoutingConfigDetails/' + details.DetailsId,
+                      }).then(function successCallback(response) {
+                          $scope.GetLeaveRoutingConfigDetailsById(details)
+                      }, function errorCallback(response) {
+                          toastr["error"](response.data.Message);
+                      });
+                  }
+                  $scope.getDeginationByDesig = function getDeginationByDesig(n) {
+                      $scope.Deginations = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Employee/getDeginationByDesig/' + n
+                      }).then(function successCallback(response) {
+                          $scope.Deginations = response.data.results;
+                          //console.log($scope.Employees);
+                      }, function errorCallback(response) {
+                      });
+                  }
+
+                  $scope.getEmployeeByDesig = function getEmployeeByDesig(n) {
+                      $scope.Employees = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Employee/GetEmpByDesignation/' + n
+                      }).then(function successCallback(response) {
+                          $scope.Employees = response.data.results;
+                          //console.log($scope.Employees);
+                      }, function errorCallback(response) {
+                      });
+                  }
+
+                  function getAllCommons() {
+                      $scope.CommonFeilds = [];
+
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Common/GetCommonItemEmp/'
+                      }).then(function successCallback(response) {
+                          $scope.CommonFeilds = response.data.results;
+                          //console.log($scope.CommonFeilds);
+                      }, function errorCallback(response) {
+                      });
+                  }
+
+                  $scope.save = function save() {
+                      //debugger;
+                      $scope.LeaveRouting.LeaveRoutingConfigDetailsList = $scope.LeaveRoutingList;
+                      //console.log($scope.LeaveRouting);
+
+                      if ($scope.LeaveRouting.RouteName == null || $scope.LeaveRouting.RouteName == '' || $scope.LeaveRouting.RouteName == 'undefined') {
+                          toastr["warning"]('Route Name Required');
+                          return;
+                      }
+                      else if ($scope.LeaveRouting.DesignationId == 0 || $scope.LeaveRouting.DesignationId == null || $scope.LeaveRouting.DesignationId == 'undefined') {
+                          toastr["warning"]('Please Select Designation.');
+                          return;
+                      }
+                      else if ($scope.LeaveRoutingList.length < 1) {
+                          toastr["warning"]('Leave Routing Config List Required');
+                          return;
+                      }
+                      else {
+                          if ($scope.LeaveRouting.RoutingId == 0) { // Add
+                              $http({
+                                  method: 'POST',
+                                  url: baseUrl + 'Employee/AddLeaveRoutingConfig',
+                                  data: $scope.LeaveRouting
+                              }).then(function successCallback(response) {
+                                  $('#addmodal').modal('toggle');
+                                  toastr["success"](response.data.message);
+                                  getAllLeaveRoutingConfig();
+                                  resetForm();
+                              }, function errorCallback(response) {
+                                  toastr["warning"](response.data.Message);
+                              });
+                          } else { // Update
+                              $http({
+                                  method: 'PUT',
+                                  url: baseUrl + 'Employee/UpdateLeaveRoutingConfig',
+                                  data: $scope.LeaveRouting
+                              }).then(function successCallback(response) {
+                                  toastr["success"](response.data.message);
+                                  if (response.data.httpStatusCode != 305) {
+                                      $('#addmodal').modal('toggle');
+                                      getAllLeaveRoutingConfig();
+                                      resetForm();
+                                  }
+
+                              }, function errorCallback(response) {
+                                  toastr["warning"](response.data.Message);
+                              });
+                          }
+                      }
+
+                  }
+
+                  $scope.deleteLeaveRoutingConfig = function deleteLeaveRoutingConfig(routingId) {
+                      SweetAlert.swal({
+                          title: "Are you sure to delete it ?", type: "warning", showCancelButton: true, confirmButtonColor: "#DD6B55",
+                          confirmButtonText: "Yes, delete it!",
+                          closeOnConfirm: false
+                      },
+                        function (isConfirm) {
+                            if (isConfirm) {
+                                $http({
+                                    method: 'DELETE',
+                                    url: baseUrl + 'Employee/DeleteLeaveRoutingConfig/' + routingId,
+                                }).then(function successCallback(response) {
+                                    SweetAlert.swal("Deleted!", "Your data has been deleted.", "success");
+                                    getAllLeaveRoutingConfig();
+                                }, function errorCallback(response) {
+                                    toastr["error"](response.data.Message);
+                                });
+                            }
+                        });
+                  }
+
+                  $scope.editLeaveRoutingConfig = function editLeaveRoutingConfig(item) {
+                      $scope.LeaveRoutingConfigInfo = {};
+                      $scope.modalTitle = "Update Config";
+                      $scope.modalbutton = 'Update';
+                      $scope.LeaveRoutingConfigInfo.RoutingId = item.RoutingId;
+                      $scope.LeaveRoutingConfigInfo.EmpId = item.EmpId;
+                      $scope.LeaveRoutingConfigInfo.NextApproval = item.NextApproval;
+                      $scope.LeaveRoutingConfigInfo.SerialNo = item.SerialNo;
+                      $scope.LeaveRoutingConfigInfo.IsMandatory = item.IsMandatory;
+                      $scope.LeaveRoutingConfigInfo.IsFinalApprove = item.IsFinalApprove;
+
+                      $scope.LeaveRoutingConfigInfo.EmpFullName = item.EmpFullName;
+                      $scope.LeaveRoutingConfigInfo.NextApprovalPerson = item.NextApprovalPerson;
+                  }
+
+                  function getAllLeaveRoutingConfig() {
+                      $scope.LeaveRoutingConfigList = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Employee/GetAllLeaveRoutingConfig/'
+                      }).then(function successCallback(response) {
+                          $scope.LeaveRoutingConfigList = response.data.results;
+                          //console.log($scope.LeaveRoutingConfigList)
+                      }, function errorCallback(response) {
+                          toastr["info"](response.data.Message);
+                      });
+                  }
+
+                  var degId = 0;
+                  $scope.GetLeaveRoutingConfigDetailsById = function GetLeaveRoutingConfigDetailsById(n) {
+                      console.log(n);
+                      if (n.DesignationId > 0) {
+                          degId = n.DesignationId
+                      }
+                      $scope.LeaveRoutingList = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Employee/GetLeaveRoutingConfigDetailsById/' + n.RoutingId
+                      }).then(function successCallback(response) {
+                          $scope.LeaveRoutingList = response.data.results;
+                          serialIndex();
+                          $scope.getDeginationByDesig(degId);
+                          $scope.getEmployeeByDesig(degId);
+                          //console.log($scope.LeaveRoutingList)
+                          $scope.LeaveRouting.RouteName = n.RouteName;
+                          $scope.LeaveRouting.DesignationId = degId;
+                          $scope.LeaveRouting.RoutingId = n.RoutingId;
+                      }, function errorCallback(response) {
+                          toastr["info"](response.data.Message);
+                      });
+                  }
+
+                  function serialIndex() {
+                      angular.forEach($scope.LeaveRoutingList, function (value, key) {
+                          value.SerialNo = key + 1;
+                      });
+                  }
+
+              }]);
+
+    </script>
+}
+

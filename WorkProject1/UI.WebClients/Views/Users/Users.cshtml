@@ -1,0 +1,754 @@
+﻿
+@{
+    ViewBag.Title = "Users";
+}
+@section Styles{
+    <link href="~/assets/global/plugins/datatables/datatables.min.css" rel="stylesheet" />
+<link href="~/assets/global/plugins/bootstrap-fileinput/bootstrap-fileinput.css" rel="stylesheet" type="text/css" />
+}
+<div class="kt-container  kt-container--fluid  kt-grid__item kt-grid__item--fluid" ng-controller="Users">
+    <!-- Begin: life time stats -->  
+
+    <div class="row">
+        <div class="kt-portlet kt-portlet--mobile">
+            <div class="kt-portlet__head kt-portlet__head--lg">
+                <div class="kt-portlet__head-label">
+                    <h3 class="kt-portlet__head-title">
+                        All Users
+                    </h3>
+                </div>
+                <div class="kt-portlet__head-toolbar">
+                    <div class="kt-portlet__head-wrapper">
+                        <div class="dropdown dropdown-inline">
+                            <button type="button" ng-click="getRoles()" class="btn btn-brand btn-icon-sm" data-toggle="modal" data-target="#addmodal" aria-haspopup="true" aria-expanded="false">
+                                <i class="flaticon2-plus"></i> Add New Users
+                            </button>
+                            @{
+                                if (User.IsInRole("Super"))
+                                {
+                                    <div class="btn-group btn-group-solid">
+                                        <a class="btn btn-brand btn-icon-sm" href="@Url.Action("UserList","Report")" target="_blank"> User List Report</a>
+                                    </div>
+                                }
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="kt-portlet__body">
+
+
+                <div class="row">
+                    <div class="col-md-4 col-sm-5 col-xs-6">
+                        <div class="form-group">
+                            <div class="col-lg-3 col-md-5 col-sm-4 col-xs-8" style="padding-left:0px">
+
+                                <select class="form-control kt-font-brand" ng-model="pageSize" ng-options="P.value as P.text for P in pageSizeArray"></select>
+                            </div>
+
+                        </div>
+
+                    </div>
+                    <div class="col-md-4 col-sm-3 col-xs-1">
+                    </div>
+                    <div class="col-md-4 col-sm-4 col-xs-5">
+                        <div id="sample_3_filter" class="pull-right">
+                            <input ng-model="q" id="search" class="form-control" placeholder="Filter text">
+                        </div>
+                    </div>
+                </div>
+                <table class="table table-bordered table-hover rounded">
+                    <thead>
+                        <tr class="btn-primary">
+                            <th>Full Name</th>
+                            <th>Email</th>
+                            <th>Mobile</th>
+                            <th>User Name</th>
+                            <th>Role</th>
+                            @*<th>Account Branch</th>*@
+                            <th>Status</th>
+                            <th>Action</th>
+
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-show="AspNetusers.results.length <= 0"><td colspan="7" style="text-align:center;"><i class="fa fa-refresh"></i> Loading new data!!</td></tr>
+                        @*<tr ng-repeat="item in AspNetusers.results">*@
+                        <tr dir-paginate="item in AspNetusers.results| filter:q  | itemsPerPage: pageSize " current-page="currentPage">
+                            <td>{{item.FullName}}</td>
+                            <td>{{item.Email}}</td>
+                            <td>{{item.MobileNo}}</td>
+                            <td>{{item.UserName}}</td>
+                            <td>{{item.RoleName}}</td>
+                            @*<td>{{item.BranchName}}</td>*@
+                            <td>
+                                <span ng-show="item.LockoutEnabled" class="label label-sm label-danger"> Locked </span>
+                                <span ng-show="!item.LockoutEnabled" class="label label-sm label-info"> Un-Locked </span>
+                            </td>
+                            <td>
+                                <div class="btn-group">
+                                    <button class="btn btn-xs green dropdown-toggle" type="button" data-toggle="dropdown" aria-expanded="false">
+                                        Actions
+                                        @*<i class="fa fa-angle-down"></i>*@
+                                    </button>
+                                    <ul class="dropdown-menu" role="menu" style="left:-100%;">
+                                        <li>
+                                            <a ng-click="reset(item)" href="javascript:;" data-toggle="modal" data-target="#resetmodal">
+                                                <i class="fa fa-key"></i> Reset Password
+                                            </a>
+                                        </li>
+                                        <li ng-show="!item.LockoutEnabled">
+                                            <a href="javascript:;" ng-click="lockuser(item.Id)">
+                                                <i class="icon-lock"></i> Lock User
+                                            </a>
+                                        </li>
+                                        <li ng-show="item.LockoutEnabled">
+                                            <a href="javascript:;" ng-click="unlockuser(item.Id)">
+                                                <i class="icon-lock"></i> Un-Lock User
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a data-toggle="modal" ng-click="getAccountBranch(item.Id)" data-target="#branchmodal">
+                                                <i class="fa fa-key"></i> Assaign Branch
+                                            </a>
+                                        </li>
+                                        <li ng-hide="{{item.RoleId=='7fd1a251-1a3a-4f1c-8fc7-f0147d96471a'}}">
+                                            <a data-toggle="modal" ng-click="getAssignRoles(item.Id)" data-target="#Rolesmodal">
+                                                <i class="fa fa-key"></i> Assaign Roles
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="row">
+                    <dir-pagination-controls boundary-links="true" template-url="~/assets/angular/lib/dirPagination.tpl.html"></dir-pagination-controls>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- End: life time stats -->
+    <!--Modal Area Start-->
+    <div id="addmodal" class="modal fade" tabindex="-1" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form name="frmAdd" ng-submit="Save()" class="form-horizontal" id="frmAdd" novalidate>
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                        <h4 class="modal-title">Add User</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-body">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="form-body">
+                                            <div class="form-group">
+                                                <label class="col-md-3 control-label"></label>
+                                                <div class="col-md-9">
+                                                    <input type="checkbox" ng-model="IsEmp" value="false">From Employee
+                                                    <span class="help-block">  </span>
+                                                </div>
+                                            </div>
+                                            <div class="form-group" ng-show="IsEmp">
+                                                <label class="col-md-3 control-label">Empolyee(Optional)</label>
+                                                <div class="col-md-9">
+                                                    <input type="text" ng-model="Emp" typeahead-on-select='onSelect($item, $model, $label)' placeholder="Search Employee By ID or Name" uib-typeahead="emp  as emp.Text for emp in Search($viewValue)" typeahead-loading="loadingLocations" typeahead-no-results="noResults" class="form-control">
+                                                    <i ng-show="loadingLocations" class="glyphicon glyphicon-refresh"></i>
+                                                    <div ng-show="noResults">
+                                                        <i class="glyphicon glyphicon-remove"></i> No Results Found
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-group" ng-class="{ 'has-error' :submitted && frmAdd.FullName.$invalid}">
+                                                <label class="col-md-3 control-label">
+                                                    Full Name
+                                                    <span class="required">*</span>
+                                                </label>
+                                                <div class="col-md-9">
+                                                    <input type="text" ng-model="Employee.FullName" id="FullName" name="FullName" class="form-control" placeholder="Full Name" required>
+                                                    <div class="form-control-focus"> </div>
+                                                    <span ng-show="submitted && frmAdd.FullName.$error.required" class="help-block">Full Name Required</span>
+                                                    <span class="help-block">  </span>
+                                                </div>
+                                            </div>
+                                            <div class="form-group" ng-class="{ 'has-error' :submitted && frmAdd.UserName.$invalid}">
+                                                <label class="col-md-3 control-label">User Name<span class="required">*</span></label>
+                                                <div class="col-md-9">
+                                                    <input type="text" ng-model="Employee.UserName" id="UserName" name="UserName" class="form-control" placeholder="User Name" required>
+                                                    <div class="form-control-focus"> </div>
+                                                    <span ng-show="submitted && frmAdd.UserName.$error.required" class="help-block">User Name Required</span>
+                                                </div>
+                                            </div>
+                                            <div class="form-group" ng-class="{ 'has-error' :submitted && frmAdd.Email.$invalid}">
+                                                <label class="col-md-3 control-label">
+                                                    Email
+                                                    <span class="required">*</span>
+                                                </label>
+                                                <div class="col-md-9">
+                                                    <input type="email" ng-model="Employee.Email"  name="Email" id="Email" class="form-control" placeholder="Email" required>
+                                                    <div class="form-control-focus"> </div>
+                                                    <span ng-show="submitted && frmAdd.Email.$error.required" class="help-block">Email Required</span>
+                                                    <span ng-show="submitted && frmAdd.Email.$error.email" class="help-block">Email Not Valid</span>
+                                                </div>
+                                            </div>
+                                            <div class="form-group" ng-class="{ 'has-error' :submitted && frmAdd.MobileNo.$invalid}">
+                                                <label class="col-md-3 control-label">
+                                                    Mobile No
+                                                    <span class="required">*</span>
+                                                </label>
+                                                <div class="col-md-9">
+                                                    <input type="text" ng-model="Employee.MobileNo"  name="MobileNo" id="MobileNo" class="form-control" placeholder="Mobile No" required>
+                                                    <div class="form-control-focus"> </div>
+                                                    <span ng-show="submitted && frmAdd.MobileNo.$error.required" class="help-block">MobileNo Required</span>
+                                                </div>
+                                            </div>
+                                            <div class="form-group" ng-class="{ 'has-error' :submitted && frmAdd.version.$invalid}">
+                                                <label class="col-md-3 control-label">Role<span class="required">*</span></label>
+                                                <div class="col-md-9">
+                                                    <select class="form-control" ng-model="Employee.Role" name="version" required ng-options="item.Name as item.Name for item in AspNetRoles"></select>
+                                                    <div class="form-control-focus"> </div>
+                                                    <span ng-show="submitted && frmAdd.version.$error.required" class="help-block">Role Required</span>
+                                                </div>
+                                            </div>
+                                            <div class="form-group" >
+                                                <label class="col-md-3 control-label">Send Notofication</label>
+                                                <div class="col-md-9">
+                                                    <input type="checkbox" ng-model="Employee.IsEmail" /> By Email
+                                                    <input type="checkbox" ng-model="Employee.IsMobile" /> By SMS
+                                                    <div class="form-control-focus"> </div>
+                                                    <span ng-show="submitted && frmAdd.version.$error.required" class="help-block">Role Required</span>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <div class="col-md-9 col-md-offset-2">
+                                                    <div class="fileinput fileinput-new" data-provides="fileinput">
+                                                        <div class="fileinput-new thumbnail" style="width: 200px; height: 150px;">
+                                                            <img src="~/assets/global/no image.jpg" alt=""  style="height:100%"/>
+                                                        </div>
+                                                        <div class="fileinput-preview fileinput-exists thumbnail" style="max-width: 200px; max-height: 150px;"> </div>
+                                                        <div >
+                                                            <span class="btn default btn-file">
+                                                                <span class="fileinput-new"> Select image </span>
+                                                                <span class="fileinput-exists"> Change </span>
+                                                                <input type="file" id="img">
+                                                            </span>
+                                                            <a href="javascript:;" class="btn default fileinput-exists" data-dismiss="fileinput"> Remove </a>
+                                                        </div>
+                                                    </div>
+                                                    </div>
+                                                </div>
+                                        </div>
+                                    </div>
+                                    
+                                </div>                         
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" data-dismiss="modal" class="btn dark btn-outline" ng-click="resetForm();submitted=false">Cancel</button>
+                        <button type="submit" ng-click="submitted=true" class="btn green">Save</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div id="resetmodal" class="modal fade" tabindex="-1" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form name="frmresetPass" ng-submit="ResetPassword()" class="form-horizontal" id="frmAdd" novalidate>
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                        <h4 class="modal-title">Reset Password</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-body">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-body">
+                                        <div class="form-group" ng-class="{ 'has-error' :submitted1 && frmresetPass.RPassword.$invalid}">
+                                            <label class="col-md-3 control-label">
+                                                New Password
+                                                <span class="required">*</span>
+                                            </label>
+                                            <div class="col-md-9">
+                                                <input type="text" ng-model="RPassword.Password" id="RPassword" name="RPassword" class="form-control" placeholder="New Password" required>
+                                                <div class="form-control-focus"> </div>
+                                                <span ng-show="submitted1 && frmresetPass.RPassword.$error.required" class="help-block">New Password Required</span>
+                                                <span class="help-block">  </span>
+                                            </div>
+                                        </div>
+                                        <div class="form-group" >
+                                            <label class="col-md-3 control-label">Send Notification</label>
+                                            <div class="col-md-9">
+                                                <input type="checkbox" ng-model="RPassword.IsEmail" /> By Email
+                                                <input type="checkbox" ng-model="RPassword.IsSMS" /> By SMS
+                                                <div class="form-control-focus"> </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" data-dismiss="modal" class="btn dark btn-outline" ng-click="submitted1=false">Cancel</button>
+                        <button type="submit" ng-click="submitted1=true" class="btn green">Save</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div id="branchmodal" class="modal fade" tabindex="-1"  data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form name="frmresetPass" ng-submit="saveAccountBranch()" class="form-horizontal" id="frmAdd" novalidate>
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                        <h4 class="modal-title">{{aemodalTitle}}</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-body">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-body">
+                                        <div class="form-group" ng-class="{ 'has-error' :submitted1 && frmresetPass.RPassword.$invalid}">
+                                            <div class="col-md-4">
+                                                <label class="control-label">
+                                                    Account Branch
+                                                    <span class="required">*</span>
+                                                </label>
+                                            </div>
+                                            <div class="col-md-8">
+                                                <table >
+                                                    <tr ng-repeat="item in AccountBranchs">
+                                                        <td class="action-checkbox" >
+                                                      
+                                                        <input type="checkbox" id="'{{item.BranchId}}'" ng-model="item.IsSelected" />
+                                                        {{item.Name}}
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                              
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" data-dismiss="modal" class="btn dark btn-outline" ng-click="submitted1=false">Cancel</button>
+                        <button type="submit"  ng-click="submitted1=true" class="btn green">Save</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div id="Rolesmodal" class="modal fade" tabindex="-1" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form name="frmresetPass" ng-submit="UserRoleSave()" class="form-horizontal" id="frmAdd" novalidate>
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                        <h4 class="modal-title">Add Role</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-body">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-body">
+                                        <div class="form-group" ng-class="{ 'has-error' :submitted1 && frmresetPass.RPassword.$invalid}">
+                                            <div class="col-md-4">
+                                                <label class="control-label">
+                                                  Roles
+                                                    <span class="required">*</span>
+                                                </label>
+                                            </div>
+                                            <div class="col-md-8">
+                                                <table>
+                                                    <tr ng-repeat="item in AspNetRoles">
+                                                        <td class="action-checkbox">
+                                                            @*<input type="checkbox"  id="'{{item.BranchId}}'" ng-model="item.IsSelected" />
+                                                            <span> {{item.Name}}</span>*@ 
+                                                            <input type="checkbox" ng-hide="{{item.Id=='7fd1a251-1a3a-4f1c-8fc7-f0147d96471a'}}" id="'{{item.BranchId}}'" ng-model="item.IsSelected" />
+                                                           <span ng-hide="{{item.Id=='7fd1a251-1a3a-4f1c-8fc7-f0147d96471a'}}"> {{item.Name}}</span> 
+                                                        </td>
+                                                    </tr>
+                                                </table>
+
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" data-dismiss="modal" class="btn dark btn-outline" ng-click="submitted1=false">Cancel</button>
+                        <button type="submit" ng-click="submitted1=true" class="btn green">Save</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!--Modal Area End-->
+</div>
+@section Scripts{
+<script src="~/assets/global/plugins/bootstrap-fileinput/bootstrap-fileinput.js" type="text/javascript"></script>
+    <script type="text/javascript">
+        OEMSApp.controller("Users", ["$scope", "$http", "SweetAlert", 
+          function ($scope, $http, SweetAlert) {
+              init();
+              function init() {
+                  initialize();
+                  getusers(1);
+                  getRoles();
+               
+              }
+              function initialize() {
+                  $scope.aemodalTitle = "Add User";
+                  $scope.username = '';
+                  $scope.UserRoles = [];
+                  $scope.AspNetuser = {};
+                  $scope.AspNetusers = [];
+                  $scope.Id = '';
+                  $scope.getusers = getusers;
+                  $scope.res = {};
+                  $scope.data = {};
+                  $scope.resetForm = resetForm;
+
+                  $scope.getRoles = getRoles;
+                  $scope.pageSizeArray = [];
+                  $scope.pageSizeArray.push({ value: 5, text: 5 });
+                  $scope.pageSizeArray.push({ value: 10, text: 10 });
+                  $scope.pageSizeArray.push({ value: 20, text: 20 });
+                  $scope.pageSizeArray.push({ value: 50, text: 50 });
+                  $scope.currentPage = 1;
+                  $scope.pageSize = 10;
+
+                  $scope.RPassword = {};
+                  $scope.RPassword.IsEmail = true;
+                  $scope.RPassword.IsSMS = false;
+
+                  $scope.ph_numbr = "/^\+?\d{11}$/";
+                  $scope.AccountBranchs = [];
+                  $scope.selection = [];
+                  $scope.saveAccountBranch = saveAccountBranch;
+                  $scope.branchUser = {};
+              }
+              function resetForm() {
+                  $scope.aemodalTitle = "Add User";
+                  $scope.username = '';
+                 
+                  $scope.addform.$setPristine();
+                  $scope.submitted = false;
+                  $scope.Id = '';
+              }
+
+              function getusers(pageno) {
+                  $scope.AspNetusers = [];
+                  var searchtxt = $scope.search;
+                  if ($scope.search == 'undefined' || $scope.search == '') {
+                      searchtxt = 'null';
+                  }
+                  $scope.pageno = pageno;
+                  $http({
+                      method: 'GET',
+                      url: baseUrl + 'user/GetAlluser/'
+                  }).then(function successCallback(response) {
+                      // this callback will be called asynchronously
+                      // when the response is available
+                      $scope.AspNetusers = response.data;
+                      // $scope.AspNetusers = response.data;
+                      $scope.total_count = response.data.totalcount;
+                      //console.log(response.data);
+
+                  }, function errorCallback(response) {
+                      // called asynchronously if an error occurs
+                      // or server returns response with an error status.
+                  });
+              }
+              $scope.searchData = function () {
+                  getusers(1);
+                  // $scope.total_count = 88;
+              };
+              $scope.edit = function (n) {
+                  $scope.aemodalTitle = "Update User";
+                  $scope.username = n.Name;
+                  $scope.Id = n.Id;
+              };
+              $scope.editAssiagnBra = function (n) {
+                  $scope.aemodalTitle = "Update Assaign Branch";
+                  $scope.Id = n.Id;
+              };
+              $scope.reset = function (n) {
+                 
+                  $scope.username = n.Name;
+                  $scope.Id = n.Id;
+                  $scope.RPassword.IsEmail = true;
+                  $scope.RPassword.IsSMS = false;
+              };
+
+              $scope.UserRoleSave = function () {
+
+                  for (var i = 0 ; i < $scope.AspNetRoles.length; i++) {
+                      if ($scope.AspNetRoles[i].IsSelected == true) {
+                          $scope.AspNetRoles[i].UserId = $scope.Id;
+                          $scope.AspNetRoles[i].RoleId = $scope.AspNetRoles[i].Id;
+                          $scope.UserRoles.push($scope.AspNetRoles[i]);
+                         
+                      }
+                  }
+
+                  if ($scope.UserRoles.length == 0) {
+                      toastr["warning"]("Please One Select!");
+                      return;
+                  }
+
+                    $http({
+                      method: 'POST',
+                      url: baseUrl + 'User/AddUserRole/',
+                      data: $scope.UserRoles
+                  }).then(function successCallback(response) {
+                      $scope.UserRoles = [];
+                      toastr["success"](response.data.message);
+                      $("#Rolesmodal").modal("hide");
+                      getusers(1);
+                      
+                  }, function errorCallback(response) {
+
+                  });
+              }
+              $scope.deleteuser = function deleteuser(n) {
+
+                  // SweetAlert.swal("Good job!", "You clicked the button!", "success");
+                  SweetAlert.swal({
+                      title: "Are you sure to delete it ? This user may have history ????", type: "warning", showCancelButton: true, confirmButtonColor: "#DD6B55",
+                      confirmButtonText: "Yes, delete it!",
+                      closeOnConfirm: false
+                  },
+                  function (isConfirm) {
+
+
+                      if (isConfirm) {
+                          $http({
+                              method: 'POST',
+                              url: baseUrl + 'Users/Delete/',
+                              data: { id: n }
+                          }).then(function successCallback(response) {
+                              SweetAlert.swal("Deleted!", "Your data has been deleted.", "success");
+                              getusers(1);
+                          }, function errorCallback(response) {
+
+                          });
+
+                      }
+                  });
+
+
+              };
+              $scope.lockuser = function lockuser(id) {
+
+                  // SweetAlert.swal("Good job!", "You clicked the button!", "success");
+                  SweetAlert.swal({
+                      title: "Are you sure to lock this user?", type: "warning", showCancelButton: true, confirmButtonColor: "#DD6B55",
+                      confirmButtonText: "Yes, Lock User.",
+                      closeOnConfirm: false
+                  },
+                  function (isConfirm) {
+
+
+                      if (isConfirm) {
+                          $http({
+                              method: 'POST',
+                              url: baseUrl + 'Users/LockUser/' + id
+                          }).then(function successCallback(response) {
+                              SweetAlert.swal("Locked!", "This user has been locked.", "success");
+                              getusers(1);
+                          }, function errorCallback(response) {
+
+                          });
+
+                      }
+                  });
+              };
+              $scope.unlockuser = function lockuser(id) {
+
+                  // SweetAlert.swal("Good job!", "You clicked the button!", "success");
+                  SweetAlert.swal({
+                      title: "Are you sure to unlock this user?", type: "warning", showCancelButton: true, confirmButtonColor: "#DD6B55",
+                      confirmButtonText: "Yes, Un-Lock User.",
+                      closeOnConfirm: false
+                  },
+                  function (isConfirm) {
+
+
+                      if (isConfirm) {
+                          $http({
+                              method: 'POST',
+                              url: baseUrl + 'Users/UnLockUser/' + id
+                          }).then(function successCallback(response) {
+                              SweetAlert.swal("Locked!", "This user has been unlocked.", "success");
+                              getusers(1);
+                          }, function errorCallback(response) {
+
+                          });
+
+                      }
+                  });
+
+
+              };
+
+              function saveAccountBranch() {
+                  $http({
+                      method: 'POST',
+                      url: baseUrl + 'User/AssignAccountBranch/' + $scope.Id,
+                      data: $scope.AccountBranchs
+                  }).then(function successCallback(response) {
+                      
+                      toastr["success"](response.data.message);
+                      $("#branchmodal").modal("hide");
+                      
+                  }, function errorCallback(response) {
+
+                  });
+              };
+
+              
+              function getRoles() {
+                  $scope.AspNetRoles = [];
+                  $http({
+                      method: 'GET',
+                      url: baseUrl + 'user/GetAllRoles'
+                  }).then(function successCallback(response) {
+                      $scope.AspNetRoles = response.data.results;
+                  }, function errorCallback(response) {
+                  });
+              }
+              $scope.getAccountBranch=  function getAccountBranch(UserId) {
+                  $scope.Id = UserId;
+                  $http({
+                      method: 'GET',
+                      url: baseUrl + 'User/GetUserAccountBranch/' + UserId
+                  }).then(function successCallback(response) {
+                      $scope.AccountBranchs = response.data.results;
+                  }, function errorCallback(response) {
+                  });
+              }
+              $scope.getAssignRoles = function getAssignRoles(UserId) {
+                  $scope.Id = UserId;
+                  $scope.AssignedRoles = [];
+                  $http({
+                      method: 'GET',
+                      url: baseUrl + 'User/GetRolesByUserId/' + UserId
+                  }).then(function successCallback(response) {
+                      $scope.AssignedRoles = response.data.results;
+                      angular.forEach($scope.AspNetRoles, function (value, key) {
+
+                          angular.forEach($scope.AssignedRoles, function (value2, key2) {
+
+                              if (value.Id == value2.RoleId) {
+                                  value.IsSelected = true;
+                              }
+                          });
+
+                      });
+                  }, function errorCallback(response) {
+                  });
+              }
+              $scope.Save = function Save() {
+                  if ($scope.frmAdd.$invalid)
+                      return;
+
+                  if($scope.Emp != undefined)
+                  $scope.Employee.EmpId = $scope.Emp.Value
+
+                  var files = $("#img").get(0).files;
+                  $http({
+                      method: 'POST',
+                      url: baseUrl + '/Users/NewUsers/',
+                      headers: { 'Content-Type': undefined },
+                      transformRequest: function (data) {
+                          var formData = new FormData();
+                          formData.append('userinfo', JSON.stringify($scope.Employee));
+                          if (files.length > 0) {
+                              formData.append("img", files[0]);
+                          }
+                          return formData;
+                      },
+                      data: {}
+                  }).then(function successCallback(response) {
+                      if (response.data.HasError)
+                          toastr["error"](response.data.message);
+                      else {
+
+                          toastr["success"](response.data.message);
+                          getusers(1);
+                          $scope.Employee = {};
+                          $scope.Emp = {};
+                          $scope.submitted = false;
+                      }
+                  });
+              };
+              $scope.ResetPassword = function ResetPassword() {
+                  if ($scope.frmresetPass.$invalid)
+                      return;
+
+               
+                  $http({
+                      method: 'POST',
+                      url: baseUrl + '/Users/ResetPassword/',                     
+                      data: { id: $scope.Id, Password: $scope.RPassword.Password, IsEmail: $scope.RPassword.IsEmail, IsSMS: $scope.RPassword.IsSMS }
+
+                  }).then(function successCallback(response) {
+                     
+                      toastr[response.data.ttype](response.data.message);
+                     
+                          getusers(1);
+                          $scope.RPassword.Password = '';
+                          $scope.RPassword.IsEmail = false;
+                          $scope.RPassword.IsSMS = false;                       
+                          $scope.submitted1 = false;
+                      
+                  });
+              };
+              $scope.Search = function (val) {
+                  return $http.get(baseUrl + 'Employee/SearchEmployee/' + val, {
+                      params: {
+
+                      }
+                  }).then(function (response) {
+                      return response.data.results.map(function (item) {
+                          return item;
+                      });
+                  });
+              };
+              $scope.onSelect = function onSelect($item, $model, $label) {
+
+                  $scope.Employee = {};
+                  $http({
+                      method: 'GET',
+                      url: baseUrl + 'Employee/GetSingleEmployeeInfo/' + $item.Value
+                  }).then(function successCallback(response) {
+                      $scope.Employee.FullName = response.data.results.FullName;
+                      $scope.Employee.UserName = response.data.results.EmpID;
+                      $scope.Employee.Email = response.data.results.Email;
+                      $scope.Employee.MobileNo = response.data.results.SMSNotificationNo;
+
+
+
+                  }, function errorCallback(response) {
+                      toastr["error"](response.data.message);
+                  });
+              };
+          }]);
+    </script>
+}

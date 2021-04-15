@@ -1,0 +1,1770 @@
+﻿
+@{
+    ViewBag.Title = "Profile";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    //Layout = "~/Views/Shared/_adminLayout.cshtml";
+}
+<style>
+    .text-left {
+        text-align:left!important;
+    }
+</style>
+<div ng-controller="ProfileCtrl">
+    <!--Tab start-->
+    <div class="panel-body">
+        <div class="row">
+            <div class="col-md-12 col-sm-12 col-xs-12">
+                <div class="row">
+                    <h1 class="font-green sbold uppercase">{{StuDetail.StudentBasicInfo.FullName}} <span style="color:#ff6a00; padding-left:10px;font-size:25px;"> ID:{{StuDetail.StudentBasicInfo.StudentInsID}}    </span></h1>
+                </div>
+                <div class="row" style="margin-right:5px">
+                    <div class="m-grid-col-md-12 m-grid-col-sm-12">
+                        <div class="table-scrollable">
+                            <table class="table table-striped">
+                                <tbody>
+                                    <tr>
+                                        <td class="success" width="20%"> Version </td>
+                                        <td class="">{{StuDetail.StudentBasicInfo.VersionName}} </td>
+                                        <td class="warning" width="20%"> Class </td>
+                                        <td class="">{{StuDetail.StudentBasicInfo.ClassName}}</td>
+                                        <td class="danger" width="20%"> Admission Date </td>
+                                        <td class="">{{StuDetail.StudentBasicInfo.AdmissionDate| date:'dd-MM-yyyy'}}  </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="success" width="20%"> Session </td>
+                                        <td class="">{{StuDetail.StudentBasicInfo.SessionName}}  </td>
+                                        <td class="warning" width="20%"> Group </td>
+                                        <td class="">{{StuDetail.StudentBasicInfo.GroupName}}  </td>
+                                        <td class="danger" width="20%"> Roll </td>
+                                        <td class="">{{StuDetail.StudentBasicInfo.RollNo}} </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="success" width="20%"> Branch </td>
+                                        <td class="">{{StuDetail.StudentBasicInfo.BranchName}}  </td>
+                                        <td class="warning" width="20%"> Section</td>
+                                        <td class="">{{StuDetail.StudentBasicInfo.SectionName}}  </td>
+                                        <td class="danger" width="20%"> Reg. No </td>
+                                        <td class="">{{StuDetail.StudentBasicInfo.RegiNo}}  </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="success" width="20%"> Shift </td>
+                                        <td class="">{{StuDetail.StudentBasicInfo.ShiftName}}  </td>
+                                        <td class="warning" width="20%"> Stud. Type</td>
+                                        <td class="">{{StuDetail.StudentBasicInfo.StudentTypeName}}  </td>
+                                        <td class="danger" width="20%"> House </td>
+                                        <td class="">{{StuDetail.StudentBasicInfo.HouseName}}  </td>
+                                    </tr>
+                                    @*<tr>
+                                            <td class="success" width="20%">  </td>
+                                            <td class=""> </td>
+                                            <td class="warning" width="20%"> </td>
+                                            <td class=""> </td>
+                                            <td class="danger" width="20%">  </td>
+                                            <td class=""> </td>
+                                        </tr>*@
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="portlet box">
+                <div class="tools">
+                    <a href="javascript:;" class="collapse"> </a>
+                </div>
+                <div class="portlet-body">
+                    <div class="tabbable-custom nav-justified">
+                        <ul class="nav nav-tabs nav-justified">
+                            <li class="active">
+                                <a href="#studentInfo" data-toggle="tab"> Student Info </a>
+                            </li>
+                            <li>
+                                <a href="#guarInfo" data-toggle="tab">Guardian Info </a>
+                            </li>
+                            <li>
+                                <a href="#acaInfo" data-toggle="tab"> Academic Info </a>
+                            </li>
+                            <li>
+                                <a href="#contInfo" data-toggle="tab"> Contact Info  </a>
+                            </li>
+                            <li>
+                                <a href="#sibInfo" data-toggle="tab"> Sibling's Info </a>
+                            </li>
+                            <li>
+                                <a href="#others" data-toggle="tab"> Others </a>
+                            </li>
+                        </ul>
+                        <div class="tab-content">
+                            <div class="tab-pane active" id="studentInfo">
+                                <form name="addBasic" ng-submit="save()" class="form-horizontal" novalidate>
+                                    <div class="portlet-body">
+                                        @*Student Basic*@
+                                        <div class="panel-group accordion" id="accordion3">
+                                            <div class="panel panel-info">
+                                                <div class="panel-heading">
+                                                    <h4 class="panel-title">
+                                                        <a class="accordion-toggle accordion-toggle-styled" data-toggle="collapse" data-parent="#accordion3" href="#collapse_3_1"> Basic Info </a>
+                                                    </h4>
+                                                </div>
+                                                <div id="collapse_3_1" class="panel-collapse in">
+                                                    <div class="panel-body">
+                                                        <br />
+                                                        <div class="row">
+                                                          
+                                                            <div class="col-md-12">
+                                                                <div class="row">
+                                                                    <div class="col-md-6">
+                                                                        <div class="form-group" ng-class="{ 'has-error' : submitted && addBasic.Gender.$invalid}">
+                                                                            <label class="col-md-4 control-label">
+                                                                                Gender :
+                                                                                <span class="required">*</span>
+                                                                            </label>
+                                                                            <div class="col-md-8">
+                                                                                <select class="form-control" ng-model="StuDetail.StudentBasicInfo.Gender" required name="Gender" ng-options="studentInfo.Value as studentInfo.Text for studentInfo in Dropdowns | filter:Type='Gender'">
+                                                                                    <option value="" selected="selected">Choose Option</option>
+                                                                                </select>
+                                                                                <div class="form-control-focus"> </div>
+                                                                                <span ng-show="submitted && addBasic.Gender.$error.required" class="help-block">Gender Required</span>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-md-6">
+                                                                        <div class="form-group" ng-class="{ 'has-error' : submitted && addBasic.Religion.$invalid}">
+                                                                            <label class="col-md-4 control-label">
+                                                                                Religion :
+                                                                            </label>
+                                                                            <div class="col-md-8">
+                                                                                <select class="form-control" ng-model="StuDetail.StudentBasicInfo.Religion" name="Religion" ng-options="studentInfo.Value as studentInfo.Text for studentInfo in Dropdowns | filter:Type='Religion'">
+                                                                                    <option value="" selected="selected">Choose Option</option>
+                                                                                </select>
+                                                                                <div class="form-control-focus"> </div>
+                                                                                <span ng-show="submitted && addBasic.Religion.$error.required" class="help-block">Religion Required</span>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-12">
+                                                                <div class="row">
+                                                                    <div class="col-md-6">
+                                                                        <div class="form-group" ng-class="{ 'has-error' : submitted && addBasic.Blood.$invalid}">
+                                                                            <label class="col-md-4 control-label">
+                                                                                Blood Group :
+                                                                            </label>
+                                                                            <div class="col-md-8">
+                                                                                <select class="form-control" ng-model="StuDetail.StudentBasicInfo.BloodGroup" name="Blood" ng-options="studentInfo.Value as studentInfo.Text for studentInfo in Dropdowns | filter:Type='Blood Group'">
+                                                                                    <option value="" selected="selected">Choose Option</option>
+                                                                                </select>
+                                                                                <div class="form-control-focus"> </div>
+                                                                                <span ng-show="submitted && addBasic.Blood.$error.required" class="help-block">Blood Group Required</span>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-md-6">
+                                                                        <div class="form-group">
+                                                                            <label class="col-md-4 control-label">
+                                                                                Nationality:
+                                                                            </label>
+                                                                            <div class="col-md-8">
+                                                                                <input value="Bangladeshi" type="text" ng-model="StuDetail.StudentBasicInfo.Nationality" class="form-control" placeholder="Nationality" name="Nationality">
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-12">
+                                                                <div class="row">
+                                                                    <div class="col-md-6">
+                                                                        <div class="form-group">
+                                                                            <label class="col-md-4 control-label" ng-class="{ 'has-error' : submitted && addBasic.DOB.$invalid}">
+                                                                                Date of Birth:
+                                                                            </label>
+                                                                            <div class="col-md-8">
+                                                                                <input class="form-control" type="text" ng-value="StuDetail.StudentBasicInfo.DateOfBirth | date:'dd/MM/yyyy'" ng-change="calculateAge()"
+                                                                                       ng-click="p2=true" is-open="p2" uib-datepicker-popup="{{format}}" ng-model="StuDetail.StudentBasicInfo.DateOfBirth" placeholder="Date of Birth" name="DOB" />
+                                                                                <div class="form-control-focus"> </div>
+                                                                                <span ng-show="submitted && addBasic.DOB.$error.required" class="help-block">Date Of Birth Required</span>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-md-6">
+                                                                        <div class="form-group">
+                                                                            <label class="col-md-4 control-label">
+                                                                                Age:
+                                                                            </label>
+                                                                            <div class="col-md-8">
+                                                                                <input type="text" ng-model="StuDetail.StudentBasicInfo.Age" class="form-control" onkeypress='return event.charCode >= 48 && event.charCode <= 57' maxlength="2" placeholder="Age" name="Age" disabled>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-12">
+                                                                <div class="row">
+                                                                    <div class="col-md-6">
+                                                                        <div class="form-group">
+                                                                            <label class="col-md-4 control-label" style="padding-left: 1px;">
+                                                                                Physical Drawback :
+                                                                            </label>
+                                                                            <div class="col-md-8">
+                                                                                <input type="radio" ng-model="StuDetail.StudentBasicInfo.IsPhysicalDrawback" ng-value="true" /> Yes
+                                                                                <input type="radio" ng-model="StuDetail.StudentBasicInfo.IsPhysicalDrawback" ng-value="false" /> No
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-md-6">
+                                                                        <div class="form-group">
+                                                                            <label class="col-md-4 control-label">
+                                                                                Description:
+                                                                            </label>
+                                                                            <div class="col-md-8">
+                                                                                <input type="text" ng-model="StuDetail.StudentBasicInfo.PhyDrawbackDescription" name="PhyDrawbackDescription" class="form-control" placeholder="Physical Drawback Description">
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-12">
+                                                                <div class="row">
+                                                                    <div class="col-md-6">
+                                                                        <div class="form-group">
+                                                                            <label class="col-md-4 control-label">
+                                                                                Quota:
+                                                                            </label>
+                                                                            <div class="col-md-8">
+                                                                                <select class="form-control" ng-model="StuDetail.StudentBasicInfo.Quata" ng-options="studentInfo.Value as studentInfo.Text for studentInfo in Dropdowns | filter:Type='Quota'">
+                                                                                    <option value="" selected>Choose an Option</option>
+                                                                                </select>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-md-6">
+                                                                        <div class="form-group">
+                                                                            <label class="col-md-4 control-label">
+                                                                                Medicine Instruction:
+                                                                            </label>
+                                                                            <div class="col-md-8">
+                                                                                <input type="text" ng-model="StuDetail.StudentBasicInfo.RegularMedicineInstruction" class="form-control" placeholder="Regular Medicine Instruction" name="nameBangla">
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-12">
+                                                                <div class="row">
+                                                                    <div class="col-md-6">
+                                                                        <div class="form-group">
+                                                                            <label class="col-md-4 control-label">
+                                                                                Height:
+                                                                            </label>
+                                                                            <div class="col-md-4">
+                                                                                <div class="input-group">
+                                                                                    <input type="number" ng-model="StuDetail.StudentBasicInfo.Height" ng-value="StuDetail.StudentBasicInfo.Height" class="form-control" placeholder="Height in Ft." id="HeightFT" aria-describedby="basic-addon1">
+                                                                                    <span class="input-group-addon" id="basic-addon1">ft.</span>
+                                                                                </div>
+                                                                            </div>
+                                                                            <div class="col-md-4">
+                                                                                <div class="input-group">
+                                                                                    <input type="text" ng-model="Height" ng-value="StuDetail.StudentBasicInfo.Height *30.48" id="HeightCM" class="form-control" placeholder="Height in cm." name="Height" readonly aria-describedby="basic-addon1">
+                                                                                    <span class="input-group-addon" id="basic-addon1">cm.</span>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-md-6">
+                                                                        <div class="form-group">
+                                                                            <label class="col-md-4 control-label">
+                                                                                Weight:
+                                                                            </label>
+                                                                            <div class="col-md-8">
+                                                                                <div class="input-group">
+                                                                                    <input type="text" ng-model="StuDetail.StudentBasicInfo.Weight" class="form-control" placeholder="Weight in KG" name="Weight" aria-describedby="basic-addon1">
+                                                                                    <span class="input-group-addon" id="basic-addon1">KG</span>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-12">
+                                                                <div class="row">
+                                                                    <div class="col-md-6">
+                                                                        <div class="form-group">
+                                                                            <label class="col-md-4 control-label">
+                                                                                Student Is:
+                                                                            </label>
+                                                                            <div class="col-md-8">
+                                                                                <input type="text" ng-model="StuDetail.StudentBasicInfo.NoOfChildren" class="form-control" placeholder="No Of Children" name="NoOfChildren">
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-md-6">
+                                                                        <div class="form-group">
+                                                                            <label class="col-md-4 control-label">
+                                                                                child of:
+                                                                            </label>
+                                                                            <div class="col-md-8">
+                                                                                <input type="text" ng-model="StuDetail.StudentBasicInfo.StudentPositionInChildren" class="form-control" placeholder="Student Position In Children" name="StudentPositionInChildren">
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="row">
+                                                                <div class="col-md-6">
+                                                                    <div class="form-group" ng-class="{ 'has-error' : submitted && addBasic.sms.$invalid}">
+                                                                        <label class="col-md-4 control-label">
+                                                                            SMS Notification Number:
+                                                                            <span class="required">*</span>
+                                                                        </label>
+                                                                        <div class="col-md-8">
+                                                                            <input type="text" class="form-control" ng-model="StuDetail.StudentBasicInfo.SMSNotificationNo" name="sms" required />
+                                                                            <div class="form-control-focus"> </div>
+                                                                            <span ng-show="submitted && addBasic.sms.$error.required" class="help-block"> SMS Notification Number Required</span>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-md-6">
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="panel panel-info">
+                                                <div class="panel-heading">
+                                                    <h4 class="panel-title">
+                                                        <a class="accordion-toggle accordion-toggle-styled collapsed" data-toggle="collapse" data-parent="#accordion3" href="#collapse_3_2"> First Admitted </a>
+                                                    </h4>
+                                                </div>
+                                                <div id="collapse_3_2" class="panel-collapse collapse">
+                                                    <div class="panel-body" overflow-y:auto;">
+                                                        <div class="col-md-12">
+                                                            <div class="row">
+                                                                <div class="col-md-6">
+                                                                    <div class="form-group">
+                                                                        <label class="col-md-4 control-label">
+                                                                            Class :
+                                                                        </label>
+                                                                        <div class="col-md-8">
+                                                                            <select class="form-control" ng-model="StuDetail.StudentBasicInfo.FirstAdmittedinClass" ng-options="studentInfo.ClassName as studentInfo.ClassName for studentInfo in CommonFeilds.ClassInfo">
+                                                                                <option value="">Choose an Option</option>
+                                                                            </select>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-md-6">
+                                                                    <div class="form-group">
+                                                                        <label class="col-md-4 control-label">
+                                                                            First Admitted Date :
+                                                                        </label>
+                                                                        <div class="col-md-8">
+                                                                            <input class="form-control" type="text" ng-value="StuDetail.StudentBasicInfo.FirstAdmittedDate | date:'dd/MM/yyyy'" ng-click="p5=true" is-open="p5" uib-datepicker-popup="dd-MM-yyyy" ng-model="studentInfo.PreInsInfoDate" readonly placeholder="Date" name="PreviousInstitutionInformationDate" />
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="panel panel-info">
+                                                <div class="panel-heading">
+                                                    <h4 class="panel-title">
+                                                        <a class="accordion-toggle accordion-toggle-styled collapsed" data-toggle="collapse" data-parent="#accordion3" href="#collapse_3_3">Previous Institution Information </a>
+                                                    </h4>
+                                                </div>
+                                                <div id="collapse_3_3" class="panel-collapse collapse">
+                                                    <div class="panel-body">
+                                                        <div class="row">
+                                                            <div class="col-md-12">
+                                                                <div class="form-group">
+                                                                    <label class="col-md-2 control-label">
+                                                                        Institute Name :
+                                                                    </label>
+                                                                    <div class="col-md-10">
+                                                                        <input type="text" ng-model="StuDetail.StudentBasicInfo.PreInsInfoName" class="form-control" placeholder="Institute Name" name="PrevInsName">
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="row">
+                                                            <div class="col-md-6">
+                                                                <div class="form-group">
+                                                                    <label class="col-md-4 control-label">
+                                                                        Class:
+                                                                    </label>
+                                                                    <div class="col-md-8">
+                                                                        <select class="form-control" ng-model="StuDetail.StudentBasicInfo.PreInsInfoClass" ng-options="studentInfo.ClassName as studentInfo.ClassName for studentInfo in CommonFeilds.ClassInfo"></select>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label class="col-md-4 control-label">
+                                                                        Group:
+                                                                    </label>
+                                                                    <div class="col-md-8">
+                                                                        <select ng-model="StuDetail.StudentBasicInfo.PreInsInfoGroup" class="form-control" placeholder="Prev Institute Group" name="PrevInsName" ng-options="G.GroupName as G.GroupName for G in Groups"></select>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label class="col-md-4 control-label">
+                                                                        Version:
+                                                                    </label>
+                                                                    <div class="col-md-8">
+                                                                        <input type="text" ng-model="StuDetail.StudentBasicInfo.PreInsInfoVersion" class="form-control" placeholder="Prev Institute Version" name="PrevInsName">
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label class="col-md-4 control-label">
+                                                                        GPA/Result:
+                                                                    </label>
+                                                                    <div class="col-md-8">
+                                                                        <input type="text" ng-model="StuDetail.StudentBasicInfo.PreInsInfoGPAResult" class="form-control" placeholder="GPA/Result" name="code">
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label class="col-md-4 control-label">
+                                                                        TC No:
+                                                                    </label>
+                                                                    <div class="col-md-8">
+                                                                        <input type="text" ng-model="StuDetail.StudentBasicInfo.PreInsInfoTCNo" class="form-control" placeholder="Transfer Certificate Number" name="PreviousInstitutionInformationTransferCertificateNo">
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-6">
+                                                                <div class="form-group">
+                                                                    <label class="col-md-4 control-label">
+                                                                        Section :
+                                                                    </label>
+                                                                    <div class="col-md-8">
+                                                                        <input type="text" ng-model="StuDetail.StudentBasicInfo.PreInsInfoSection" class="form-control" placeholder="Previous Section" name="PrevInsName">
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label class="col-md-4 control-label">
+                                                                        Session :
+                                                                    </label>
+                                                                    <div class="col-md-8">
+                                                                        <input type="text" ng-model="StuDetail.StudentBasicInfo.PreInsInfoSession" class="form-control" placeholder="Previous Session" name="PrevInsName">
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label class="col-md-4 control-label">
+                                                                        Roll Number:
+                                                                    </label>
+                                                                    <div class="col-md-8">
+                                                                        <input type="text" ng-model="StuDetail.StudentBasicInfo.PreInsInfoRollNo" class="form-control" placeholder="Previous Institution Roll No" name="PreviousInstitutionInformationRollNo">
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label class="col-md-4 control-label">
+                                                                        Date:
+                                                                    </label>
+                                                                    <div class="col-md-8">
+                                                                        @*<input type="date" ng-model="studentInfo.PreInsInfoDate"/>*@
+                                                                        <input class="form-control" type="text" ng-value="StuDetail.StudentBasicInfo.PreInsInfoDate | date:'dd/MM/yyyy'" ng-change="getOrderbydate()" ng-click="p3=true" is-open="p3" uib-datepicker-popup="dd-MM-yyyy" ng-model="studentInfo.PreInsInfoDate" readonly placeholder="Date" name="PreviousInstitutionInformationDate" />
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-actions top">
+                                            <div class="row">
+                                                <div class="col-md-2 pull-right">
+                                                    @*<button type="button" data-dismiss="modal" class="btn dark btn-outline" ng-click="resetForm();submitted=false">Cancel</button>*@
+                                                    <button type="submit" ng-click="submitted=true" class="btn green-haze">Save</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                            @*Guardian Info*@
+                            <div class="tab-pane" id="guarInfo">
+                                <!-- Begin: life time stats -->
+                                <div class="portlet light bordered">
+                                    <div class="portlet-title">
+                                        <div class="caption">
+                                            <i class="icon-settings font-green"></i>
+                                            <span class="caption-subject font-green sbold uppercase"> Guardian All Info </span>
+                                        </div>
+                                        @*<div class="actions">
+                                        <div class="btn-group btn-group-solid">
+                                            <button ng-click="resetGurdian()" class="btn green" data-target="#addGuardianModal" data-toggle="modal"> <i class="fa fa-plus"></i> Add Guardian</button>
+                                        </div>
+                                    </div>*@
+                                    </div>
+                                    <div class="portlet-body">
+                                        <div class="tabbable-line">
+                                            <ul class="nav nav-tabs ">
+                                                <li class="active">
+                                                    <a href="#tab_15_1" data-toggle="tab"><i class="fa fa-users" aria-hidden="true"></i> Father & Mother </a>
+                                                </li>
+                                                <li>
+                                                    <a href="#tab_15_2" data-toggle="tab"><i class="fa fa-user-o" aria-hidden="true"></i> Local Guardian </a>
+                                                </li>
+                                                <li>
+                                                    <a href="#tab_15_3" data-toggle="tab"><i class="fa fa-volume-control-phone" aria-hidden="true"></i> Emergency Contact </a>
+                                                </li>
+                                            </ul>
+                                            @*Guardian Info form start*@
+                                            <form name="addGuardian" ng-submit="saveGuardian()" class="form-horizontal" id="form_sample_1">
+                                                <br />
+                                                <div class="tab-content">
+                                                    <div class="tab-pane active" id="tab_15_1">
+                                                        <div class="row">
+                                                            <div class="col-md-6">
+                                                                <label style="color:#cf681f">Father Info</label>
+                                                                <br />
+                                                                <div class="form-group" ng-class="{ 'has-error' : submitted3 && addGuardian.FatherName.$invalid}">
+                                                                    <label class="col-md-5 control-label">
+                                                                        Father's Name :
+                                                                        <span class="required">*</span>
+                                                                    </label>
+                                                                    <div class="col-md-7">
+                                                                        <input type="text" ng-model="StuDetail.StudentGuardianInfo.FatherName" required name="FatherName" ng-value="StuDetail.StudentBasicInfo.FatherName" class="form-control" placeholder="Father's Name">
+                                                                        <div class="form-control-focus"> </div>
+                                                                        <span ng-show="submitted3 && addGuardian.FatherName.$error.required" class="help-block">Father Name Required</span>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label class="col-md-5 control-label">
+                                                                        Qualification :
+                                                                    </label>
+                                                                    <div class="col-md-7">
+                                                                        <select class="form-control" ng-model="StuDetail.StudentGuardianInfo.F_Qualification" ng-options="studentSearch.Text as studentSearch.Text for studentSearch in Dropdowns | filter:Type='Qualification'">
+                                                                            <option value="" selected>Select Profession</option>
+                                                                        </select>
+                                                                        <div class="form-control-focus"> </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label class="col-md-5 control-label">
+                                                                        Profession:
+                                                                    </label>
+                                                                    <div class="col-md-7">
+                                                                        <select class="form-control" ng-model="StuDetail.StudentGuardianInfo.F_Profession" ng-options="studentSearch.Text as studentSearch.Text for studentSearch in Dropdowns | filter:Type='FatherProfession'">
+                                                                            <option value="" selected>Select Profession</option>
+                                                                        </select>
+                                                                        <div class="form-control-focus"> </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label class="col-md-5 control-label">
+                                                                        Father's Income :
+                                                                    </label>
+                                                                    <div class="col-md-7">
+                                                                        <input type="text" ng-model="StuDetail.StudentGuardianInfo.F_MonthlyIncome" class="form-control" onkeypress='return event.charCode >= 48 && event.charCode <= 57' placeholder="Monthly Income">
+                                                                        <div class="form-control-focus"> </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label class="col-md-5 control-label">
+                                                                        Office Address :
+                                                                    </label>
+                                                                    <div class="col-md-7">
+                                                                        <input type="text" ng-model="StuDetail.StudentGuardianInfo.F_OfficeAddress" class="form-control" placeholder="Office Address">
+                                                                        <div class="form-control-focus"> </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group" ng-class="{ 'has-error' : submitted3 && addGuardian.F_Mobile.$invalid}">
+                                                                    <label class="col-md-5 control-label">
+                                                                        Contact Number :
+                                                                        <span class="required">*</span>
+                                                                    </label>
+                                                                    <div class="col-md-7">
+                                                                        <input type="text" ng- ng-model="StuDetail.StudentGuardianInfo.F_Mobile" required ng-pattern="/^(?:\+?88)?01[15-9]\d{8}$/" class="form-control" placeholder="Mobile No" onkeypress='return event.charCode >= 48 && event.charCode <= 57' name="F_Mobile">
+                                                                        @*<span class="help-block" ng-show="submitted3 && addGuardian.F_Mobile.$error.required"> Contact Number Required </span>*@
+                                                                        <span class="help-block" ng-show="submitted3 && addGuardian.F_Mobile.$error.pattern"> Invaild Number </span>
+                                                                        <div class="form-control-focus"> </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group" ng-class="{ 'has-error' : !submitted3 && addGuardian.F_Email.$invalid }">
+                                                                    <label class="col-md-5 control-label">
+                                                                        Email :
+                                                                    </label>
+                                                                    <div class="col-md-7">
+                                                                        <input type="email" ng-model="StuDetail.StudentGuardianInfo.F_Email" class="form-control" ng-pattern="eml_add" placeholder="Email" name="F_Email">
+                                                                        <div class="form-control-focus"> </div>
+                                                                        <span style="color:red" class="help-block" ng-if="!submitted3 && addGuardian.F_Email.$invalid">Not valid email!</span>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group" ng-class="{ 'has-error' : !submitted3 && !addGuardian.F_TIN.$valid}">
+                                                                    <label class="col-md-5 control-label">
+                                                                        TIN :
+                                                                    </label>
+                                                                    <div class="col-md-7">
+                                                                        <input type="text" name="F_TIN" ng-model="StuDetail.StudentGuardianInfo.F_TIN" class="form-control" ng-minlength="5" placeholder="Father TIN">
+                                                                        <span ng-if="!addGuardian.F_TIN.$valid" class="help-block">Min Length 5</span>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group" ng-class="{ 'has-error' : !submitted3 && !addGuardian.F_NIDNo.$valid}">
+                                                                    <label class="col-md-5 control-label">
+                                                                        NID :
+                                                                    </label>
+                                                                    <div class="col-md-7">
+                                                                        <input type="text" name="F_NIDNo" ng-model="StuDetail.StudentGuardianInfo.F_NIDNo" class="form-control" ng-minlength="10" placeholder="NID Number">
+                                                                        <span ng-if="!addGuardian.F_NIDNo.$valid" class="help-block">Min Length 10</span>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group" ng-class="{ 'has-error' : !submitted3 && !addGuardian.F_PassportNo.$valid}">
+                                                                    <label class="col-md-5 control-label">
+                                                                        Passport No :
+                                                                    </label>
+                                                                    <div class="col-md-7">
+                                                                        <input type="text" ng-model="StuDetail.StudentGuardianInfo.F_PassportNo" class="form-control" ng-minlength="8" name="F_PassportNo" placeholder="Passport NO">
+                                                                        <span ng-if="!addGuardian.F_PassportNo.$valid" class="help-block">Min Length 8</span>
+                                                                    </div>
+                                                                </div>
+
+                                                                <div class="form-group">
+                                                                    <div class="col-md-5 control-label">
+                                                                        Image :
+                                                                    </div>
+                                                                    <div class="col-md-7">
+                                                                        <input type="hidden" value="A4Landscape" name="ImgType" />
+                                                                        <div class="fileinput fileinput-new" data-provides="fileinput">
+                                                                            <div class="fileinput-new thumbnail" style="width: 150px; height: 85px;">
+                                                                                <img src="@String.Format("data:image/jpg;base64,{0}", "{{StuDetail.StudentGuardianInfo.F_GuardianImage}}")" width="200" height="150" alt="">
+                                                                            </div>
+                                                                            <div class="fileinput-preview fileinput-exists thumbnail" style="max-width: 150px; max-height: 85px;"> </div>
+                                                                            <div>
+                                                                                <span class="btn default btn-file">
+                                                                                    <span class="fileinput-new"> Select image </span>
+                                                                                    <span class="fileinput-exists"> Change </span>
+                                                                                    <input type="file" name="..." id="imgFatherImage" accept=".jpg, .png, .jpeg, .gif, .bmp, .tif, .tiff|images/*">
+                                                                                </span>
+                                                                                <a href="javascript:;" class="btn default red fileinput-exists" data-dismiss="fileinput"> Remove </a>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <div class="col-md-5 control-label">
+                                                                        Signature :
+                                                                    </div>
+                                                                    <div class="col-md-7">
+                                                                        <input type="hidden" value="A4Landscape" name="ImgType" />
+                                                                        <div class="fileinput fileinput-new" data-provides="fileinput">
+                                                                            <div class="fileinput-new thumbnail" style="width: 150px; height: 85px;">
+                                                                                <img src="@String.Format("data:image/jpg;base64,{0}", "{{StuDetail.StudentGuardianInfo.F_GuardianSignature}}")" width="200" height="150" alt="">
+                                                                            </div>
+                                                                            <div class="fileinput-preview fileinput-exists thumbnail" style="max-width: 150px; max-height: 85px;"> </div>
+                                                                            <div>
+                                                                                <span class="btn default btn-file">
+                                                                                    <span class="fileinput-new"> Select image </span>
+                                                                                    <span class="fileinput-exists"> Change </span>
+                                                                                    <input type="file" name="..." id="imgFatherSignature" accept=".jpg, .png, .jpeg, .gif, .bmp, .tif, .tiff|images/*">
+                                                                                </span>
+                                                                                <a href="javascript:;" class="btn default red fileinput-exists" data-dismiss="fileinput"> Remove </a>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-6">
+                                                                <label style="color:#cf681f">Mother Info</label>
+                                                                <br />
+                                                                <div class="form-group" ng-class="{ 'has-error' : submitted3 && addGuardian.MotherName.$invalid}">
+                                                                    <label class="col-md-5 control-label">
+                                                                        Mother's Name :
+                                                                        <span class="required">*</span>
+                                                                    </label>
+                                                                    <div class="col-md-7">
+                                                                        <input type="text" ng-model="StuDetail.StudentGuardianInfo.MotherName" required name="MotherName" ng-value="StuDetail.StudentBasicInfo.MotherName" class="form-control" placeholder="Mother's Name">
+                                                                        <div class="form-control-focus"> </div>
+                                                                        <span ng-show="submitted3 && addGuardian.MotherName.$error.required" class="help-block">Mother Name Required</span>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label class="col-md-5 control-label">
+                                                                        Qualification :
+                                                                    </label>
+                                                                    <div class="col-md-7">
+                                                                        <select class="form-control" ng-model="StuDetail.StudentGuardianInfo.M_Qualification" ng-options="studentSearch.Text as studentSearch.Text for studentSearch in Dropdowns | filter:Type='Qualification'">
+                                                                            <option value="" selected>Select Profession</option>
+                                                                        </select>
+                                                                        <div class="form-control-focus"> </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label class="col-md-5 control-label">
+                                                                        Profession:
+                                                                    </label>
+                                                                    <div class="col-md-7">
+                                                                        <select class="form-control" ng-model="StuDetail.StudentGuardianInfo.M_Profession" ng-options="studentSearch.Text as studentSearch.Text for studentSearch in Dropdowns | filter:Type='MotherProfession'">
+                                                                            <option value="" selected>Select Profession</option>
+                                                                        </select>
+                                                                        <div class="form-control-focus"> </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label class="col-md-5 control-label">
+                                                                        Monthly Income :
+                                                                    </label>
+                                                                    <div class="col-md-7">
+                                                                        <input type="text" ng-model="StuDetail.StudentGuardianInfo.M_MonthlyIncome" class="form-control" onkeypress='return event.charCode >= 48 && event.charCode <= 57' placeholder="Monthly Income">
+                                                                        <div class="form-control-focus"> </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label class="col-md-5 control-label">
+                                                                        Office Address :
+                                                                    </label>
+                                                                    <div class="col-md-7">
+                                                                        <input type="text" ng-model="StuDetail.StudentGuardianInfo.M_OfficeAddress" class="form-control" placeholder="Office Address">
+                                                                        <div class="form-control-focus"> </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group" ng-class="{ 'has-error' : submitted3 && addGuardian.Contact.$invalid}">
+                                                                    <label class="col-md-5 control-label">
+                                                                        Contact Number :
+                                                                        <span class="required">*</span>
+                                                                    </label>
+                                                                    <div class="col-md-7">
+                                                                        <input type="text" ng-model="StuDetail.StudentGuardianInfo.M_Mobile" ng-pattern="/^(?:\+?88)?01[15-9]\d{8}$/"
+                                                                               required class="form-control" placeholder="Mobile No" onkeypress='return event.charCode >= 48 && event.charCode <= 57' name="Contact">
+                                                                        @*     <span class="help-block" ng-show="submitted3 && addGuardian.Contact.$error.required"> Contact Number Required </span>*@
+                                                                        <span class="help-block" ng-show="submitted3 && addGuardian.M_Mobile.$error.pattern"> Invaild Number </span>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group" ng-class="{ 'has-error' : !submitted3 && addGuardian.M_Email.$invalid }">
+                                                                    <label class="col-md-5 control-label">
+                                                                        Email :
+                                                                    </label>
+                                                                    <div class="col-md-7">
+                                                                        <input type="email" ng-model="StuDetail.StudentGuardianInfo.M_Email" class="form-control" placeholder="Email" name="M_Email">
+                                                                        <div class="form-control-focus"> </div>
+                                                                        <span style="color:red" class="help-block" ng-if="!submitted3 && addGuardian.M_Email.$invalid">Not valid email!</span>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group" ng-class="{ 'has-error' : !submitted3 && !addGuardian.M_TIN.$valid}">
+                                                                    <label class="col-md-5 control-label">
+                                                                        TIN :
+                                                                    </label>
+                                                                    <div class="col-md-7">
+                                                                        <input type="text" name="M_TIN" ng-model="StuDetail.StudentGuardianInfo.M_TIN" class="form-control" ng-minlength="5" placeholder="Mother TIN">
+                                                                        <span ng-if="!addGuardian.M_TIN.$valid" class="help-block">Min Length 5</span>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group" ng-class="{ 'has-error' : !submitted3 && !addGuardian.M_NIDNo.$valid}">
+                                                                    <label class="col-md-5 control-label">
+                                                                        NID :
+                                                                    </label>
+                                                                    <div class="col-md-7">
+                                                                        <input type="text" name="M_NIDNo" ng-model="StuDetail.StudentGuardianInfo.M_NIDNo" class="form-control" ng-minlength="10" placeholder="NID Number">
+                                                                        <span ng-if="!addGuardian.M_NIDNo.$valid" class="help-block">Min Length 10</span>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group" ng-class="{ 'has-error' : !submitted3 && !addGuardian.M_PassportNo.$valid}">
+                                                                    <label class="col-md-5 control-label">
+                                                                        Passport No :
+                                                                    </label>
+                                                                    <div class="col-md-7">
+                                                                        <input type="text" ng-model="StuDetail.StudentGuardianInfo.M_PassportNo" class="form-control" ng-minlength="8" name="M_PassportNo" placeholder="Passport NO">
+                                                                        <span ng-if="!addGuardian.M_PassportNo.$valid" class="help-block">Min Length 8</span>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <div class="col-md-5 control-label">
+                                                                        Image :
+                                                                    </div>
+                                                                    <div class="col-md-7">
+                                                                        <input type="hidden" value="A4Landscape" name="ImgType" />
+                                                                        <div class="fileinput fileinput-new" data-provides="fileinput">
+                                                                            <div class="fileinput-new thumbnail" style="width: 150px; height: 85px;">
+                                                                                <img src="@String.Format("data:image/jpg;base64,{0}", "{{StuDetail.StudentGuardianInfo.M_GuardianImage}}")" width="200" height="150" alt="">
+                                                                            </div>
+                                                                            <div class="fileinput-preview fileinput-exists thumbnail" style="width: 150px;height: 85px;"> </div>
+                                                                            <div>
+                                                                                <span class="btn default btn-file">
+                                                                                    <span class="fileinput-new"> Select image </span>
+                                                                                    <span class="fileinput-exists"> Change </span>
+                                                                                    <input type="file" name="..." id="imgMotherImage" accept=".jpg, .png, .jpeg, .gif, .bmp, .tif, .tiff|images/*">
+                                                                                </span>
+                                                                                <a href="javascript:;" class="btn default red fileinput-exists" data-dismiss="fileinput"> Remove </a>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <div class="col-md-5 control-label">
+                                                                        Signature :
+                                                                    </div>
+                                                                    <div class="col-md-7">
+                                                                        <input type="hidden" value="A4Landscape" name="ImgType" />
+                                                                        <div class="fileinput fileinput-new" data-provides="fileinput">
+                                                                            <div class="fileinput-new thumbnail" style="width: 150px; height: 85px;">
+                                                                                <img src="@String.Format("data:image/jpg;base64,{0}", "{{StuDetail.StudentGuardianInfo.M_GuardianSignature}}")" width="200" height="150" alt="">
+                                                                            </div>
+                                                                            <div class="fileinput-preview fileinput-exists thumbnail" style="width: 150px; height: 85px;"> </div>
+                                                                            <div>
+                                                                                <span class="btn default btn-file">
+                                                                                    <span class="fileinput-new"> Select image </span>
+                                                                                    <span class="fileinput-exists"> Change </span>
+                                                                                    <input type="file" name="..." id="imgMotherSignature" accept=".jpg, .png, .jpeg, .gif, .bmp, .tif, .tiff|images/*">
+                                                                                </span>
+                                                                                <a href="javascript:;" class="btn default red fileinput-exists" data-dismiss="fileinput"> Remove </a>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="tab-pane" id="tab_15_2">
+                                                        <div class="row">
+                                                            <div class="col-md-6">
+                                                                <label style="color:#cf681f">Local Guardian</label>
+                                                                <br />
+                                                                <div class="form-group">
+                                                                    <label class="col-md-5 control-label">
+                                                                        Name :
+                                                                    </label>
+                                                                    <div class="col-md-7">
+                                                                        <input type="text" ng-model="StuDetail.StudentGuardianInfo.LG_Name" class="form-control" placeholder="Local Guardian Name">
+                                                                        <div class="form-control-focus"> </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label class="col-md-5 control-label">
+                                                                        Relation :
+                                                                    </label>
+                                                                    <div class="col-md-7">
+                                                                        <input type="text" ng-model="StuDetail.StudentGuardianInfo.LG_Relation" class="form-control" placeholder="Relation">
+                                                                        <div class="form-control-focus"> </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label class="col-md-5 control-label">
+                                                                        Address :
+                                                                    </label>
+                                                                    <div class="col-md-7">
+                                                                        <input type="text" ng-model="StuDetail.StudentGuardianInfo.LG_Address" class="form-control" placeholder="Office Address">
+                                                                        <div class="form-control-focus"> </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group" ng-class="{ 'has-error' : submitted3 && addGuardian.LG_Mobile.$invalid}">
+                                                                    <label class="col-md-5 control-label">
+                                                                        Contact Number :
+                                                                    </label>
+                                                                    <div class="col-md-7">
+                                                                        <input type="text" ng- ng-model="StuDetail.StudentGuardianInfo.LG_Mobile" ng-pattern="/^(?:\+?88)?01[15-9]\d{8}$/" class="form-control" placeholder="Mobile No" onkeypress='return event.charCode >= 48 && event.charCode <= 57' name="LG_Mobile">
+                                                                        @*  <span class="help-block" ng-show="submitted3 && addGuardian.LG_Mobile.$error.required"> Contact Number Required </span>*@
+                                                                        <span class="help-block" ng-show="submitted3 && addGuardian.LG_Mobile.$error.pattern"> Invaild Number </span>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label class="col-md-5 control-label">
+                                                                        Email :
+                                                                    </label>
+                                                                    <div class="col-md-7">
+                                                                        <input type="email" ng-model="StuDetail.StudentGuardianInfo.LG_Email" class="form-control" placeholder="Email" name="email">
+                                                                        <div class="form-control-focus"> </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label class="col-md-5 control-label">
+                                                                        NID No :
+                                                                    </label>
+                                                                    <div class="col-md-7">
+                                                                        <input type="text" ng-model="StuDetail.StudentGuardianInfo.LG_NIDNo" class="form-control" placeholder="NIDNo" name="LG_NIDNo">
+                                                                        <div class="form-control-focus"> </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="tab-pane" id="tab_15_3">
+                                                        <div class="row">
+                                                            <div class="col-md-6">
+                                                                <label style="color:#cf681f">Emergency Contact</label>
+                                                                <br />
+                                                                <div class="form-group">
+                                                                    <label class="col-md-5 control-label">
+                                                                        Name :
+                                                                    </label>
+                                                                    <div class="col-md-7">
+                                                                        <input type="text" ng-model="StuDetail.StudentGuardianInfo.E_Name" class="form-control" placeholder="Emergency Guardian Name">
+                                                                        <div class="form-control-focus"> </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label class="col-md-5 control-label">
+                                                                        Address :
+                                                                    </label>
+                                                                    <div class="col-md-7">
+                                                                        <input type="text" ng-model="StuDetail.StudentGuardianInfo.E_Address" class="form-control" placeholder="Office Address">
+                                                                        <div class="form-control-focus"> </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group" ng-class="{ 'has-error' : submitted3 && addGuardian.E_Mobile.$invalid}">
+                                                                    <label class="col-md-5 control-label">
+                                                                        Contact Number :
+                                                                    </label>
+                                                                    <div class="col-md-7">
+                                                                        <input type="text" ng- ng-model="StuDetail.StudentGuardianInfo.E_Mobile" ng-pattern="/^(?:\+?88)?01[15-9]\d{8}$/" class="form-control" placeholder="Mobile No" onkeypress='return event.charCode >= 48 && event.charCode <= 57' name="E_Mobile">
+                                                                        @*<span class="help-block" ng-show="submitted3 && addGuardian.E_Mobile.$error.required"> Contact Number Required </span>*@
+                                                                        <span class="help-block" ng-show="submitted3 && addGuardian.E_Mobile.$error.pattern"> Invaild Number </span>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label class="col-md-5 control-label">
+                                                                        Relation :
+                                                                    </label>
+                                                                    <div class="col-md-7">
+                                                                        <input type="text" ng-model="StuDetail.StudentGuardianInfo.E_Relation" class="form-control" placeholder="Relation" name="E_Relation">
+                                                                        <div class="form-control-focus"> </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label class="col-md-5 control-label">
+                                                                        E_NIDNo :
+                                                                    </label>
+                                                                    <div class="col-md-7">
+                                                                        <input type="text" ng-model="StuDetail.StudentGuardianInfo.E_NIDNo" class="form-control" placeholder="NIDNo ">
+                                                                        <div class="form-control-focus"> </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row">
+                                                        <div class="pull-right" style="padding-right:1%">
+                                                            @*<button type="button" data-dismiss="modal" class="btn dark btn-outline" ng-click="resetGurdian();submitted3=false">Cancel</button>*@
+                                                            <button type="submit" ng-click="submitted3=true" id="pulsate-once" class="btn green-haze">Save</button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- End: life time stats -->
+                            </div>
+                            <div class="tab-pane" id="acaInfo">
+                                <div>
+                                    <!-- Begin: life time stats -->
+                                    <div class="portlet light bordered">
+                                        <div class="portlet-title">
+                                            <div class="caption">
+                                                <i class="icon-settings font-green"></i>
+                                                <span class="caption-subject font-green sbold uppercase">Academic Info </span>
+                                            </div>
+                                            <div class="actions">
+                                                <div class="btn-group btn-group-solid">
+                                                    <button ng-click="resetFormAcademic()" class="btn green" data-target="#addmodalAcademic" data-toggle="modal"> <i class="fa fa-plus"></i> Add New</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="portlet-body">
+                                            <div class="table-container">
+                                                <div id="sample_3_wrapper" class="dataTables_wrapper no-footer">
+                                                    <table class="table table-bordered table-hover">
+                                                        <thead>
+                                                            <tr class="btn-primary">
+                                                                <th>Exam Name</th>
+                                                                <th>Institute Name</th>
+                                                                <th>Year</th>
+                                                                <th>Roll No</th>
+                                                                <th>GPA</th>
+                                                                <th>Board</th>
+                                                                <th>Group</th>
+                                                                <th>Action</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <tr ng-repeat="item in StuDetail.StudentAcademicInfo">
+                                                                <td>{{item.ExamName}}</td>
+                                                                <td>{{item.InstituteName}}</td>
+                                                                <td>{{item.ExamYear}}</td>
+                                                                <td>{{item.ExamRoll}}</td>
+                                                                <td>{{item.GPA}}</td>
+                                                                <td>{{item.Board}}</td>
+                                                                <td>{{item.ExamGroup}}</td>
+                                                                <td>
+                                                                    <a href="javascript:;" class="btn btn-icon-only green" ng-click="editAcademic(item)" data-target="#addmodalAcademic" data-toggle="modal">
+                                                                        <i class="fa fa-edit"></i>
+                                                                    </a>
+                                                                    <a ng-click="deleteAcademic(item)" href="javascript:;" class="btn btn-icon-only red">
+                                                                        <i class="fa fa-trash"></i>
+                                                                    </a>
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- End: life time stats -->
+                                    <!--Modal Area Start-->
+                                    <div id="addmodalAcademic" class="modal fade" tabindex="-1" data-backdrop="static" data-keyboard="false">
+                                        <div class="modal-dialog modal-full">
+                                            <div class="modal-content">
+                                                <form name="AcademicAddform" ng-submit="saveAcademic()" class="form-horizontal" id="form_sample_1" novalidate="">
+                                                    <div class="modal-header">
+                                                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                                                        <h4 class="modal-title">{{academicmodalTitle}}</h4>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <div class="form-body">
+                                                            <div class="col-md-12">
+                                                                <div class="col-md-4">
+                                                                    <div class="form-group" ng-class="{ 'has-error' : submitted4 && AcademicAddform.ExamName.$invalid}">
+                                                                        <label class="col-md-6 control-label" for="form_control_1">
+                                                                            Exam Name
+                                                                            <span class="required">*</span>
+                                                                        </label>
+                                                                        <div class="col-md-6">
+                                                                            <select type="text" ng-model="academic.ExamName" ng-options="item.Text as item.Text for item in Dropdowns | filter:Type='Exam'" class="form-control" placeholder="" name="ExamName" required="">
+                                                                                <option value='' selected="selected">Select Exam</option>
+                                                                            </select>
+                                                                            <div class="form-control-focus"> </div>
+                                                                            <span ng-show="submitted4 && AcademicAddform.ExamName.$error.required" class="help-block">Exam Name Required</span>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="form-group" ng-class="{ 'has-error' : submitted4 && AcademicAddform.InstituteName.$invalid}">
+                                                                        <label class="col-md-6 control-label" for="form_control_1">
+                                                                            Institute Name
+                                                                            <span class="required">*</span>
+                                                                        </label>
+                                                                        <div class="col-md-6">
+                                                                            <input type="text" ng-model="academic.InstituteName" class="form-control" placeholder="Institute Name" name="InstituteName" required="">
+                                                                            <div class="form-control-focus"> </div>
+                                                                            <span ng-show="submitted4 && AcademicAddform.InstituteName.$error.required" class="help-block">Institute Name Required</span>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="form-group" ng-class="{ 'has-error' : submitted4 && AcademicAddform.InstituteAddress.$invalid}">
+                                                                        <label class="col-md-6 control-label" for="form_control_1">
+                                                                            Institute Address
+                                                                            <span class="required">*</span>
+                                                                        </label>
+                                                                        <div class="col-md-6">
+                                                                            <input type="text" ng-model="academic.InstituteAddress" class="form-control" placeholder="Institute Address" name="InstituteAddress" required="">
+                                                                            <div class="form-control-focus"> </div>
+                                                                            <span ng-show="submitted4 && AcademicAddform.InstituteAddress.$error.required" class="help-block">Institute Address Required</span>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="form-group">
+                                                                        <label class="col-md-6 control-label" for="form_control_1">
+                                                                            District & Thana
+                                                                        </label>
+                                                                        <div class="col-md-6">
+                                                                            <input type="text" ng-model="academic.DistrictThana" class="form-control" placeholder="District & Thana">
+                                                                            <div class="form-control-focus"> </div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="form-group">
+                                                                        <label class="col-md-6 control-label" for="form_control_1">
+                                                                            Center
+                                                                        </label>
+                                                                        <div class="col-md-6">
+                                                                            <input type="text" ng-model="academic.Center" class="form-control" placeholder="Center">
+                                                                            <div class="form-control-focus"> </div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="form-group">
+                                                                        <label class="col-md-6 control-label">
+                                                                            Group
+                                                                        </label>
+                                                                        <div class="col-md-6">
+                                                                            @*<select class="form-control" ng-model="academic.ExamGroup" ng-options="group.GroupId as group.GroupName for group in groups"></select>*@
+                                                                            <select class="form-control" ng-model="academic.ExamGroup">
+                                                                                <option value='' selected="selected">Select Select</option>
+                                                                                <option value='Science'>Science</option>
+                                                                                <option value='Arts'>Arts</option>
+                                                                                <option value='Commerce'>Commerce</option>
+                                                                            </select>
+                                                                            <div class="form-control-focus"> </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-md-4">
+                                                                    <div class="form-group" ng-class="{ 'has-error' : submitted4 && AcademicAddform.ExamYear.$invalid}">
+                                                                        <label class="col-md-6 control-label" for="form_control_1">
+                                                                            Exam Year
+                                                                            <span class="required">*</span>
+                                                                        </label>
+                                                                        <div class="col-md-6">
+                                                                            <select type="text" ng-model="academic.ExamYear" class="form-control" placeholder="" name="ExamYear" required="">
+                                                                                <option value='' selected="selected">Select Select</option>
+                                                                                <option value="2017">2017</option>
+                                                                                <option value="2016">2016</option>
+                                                                                <option value="2015">2015</option>
+                                                                                <option value="2014">2014</option>
+                                                                                <option value="2013">2013</option>
+                                                                            </select>
+                                                                            <div class="form-control-focus"> </div>
+                                                                            <span ng-show="submitted4 && AcademicAddform.ExamYear.$error.required" class="help-block">Exam Year Required</span>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="form-group" ng-class="{ 'has-error' : submitted4 && AcademicAddform.PassYear.$invalid}">
+                                                                        <label class="col-md-6 control-label" for="form_control_1">
+                                                                            Pass Year
+                                                                            <span class="required">*</span>
+                                                                        </label>
+                                                                        <div class="col-md-6">
+                                                                            <select type="text" ng-model="academic.PassYear" class="form-control" placeholder="" name="PassYear" required="">
+                                                                                <option value='' selected="selected">Select Select</option>
+                                                                                <option value="2017">2017</option>
+                                                                                <option value="2016">2016</option>
+                                                                                <option value="2015">2015</option>
+                                                                                <option value="2014">2014</option>
+                                                                                <option value="2013">2013</option>
+                                                                            </select>
+                                                                            <div class="form-control-focus"> </div>
+                                                                            <span ng-show="submitted4 && AcademicAddform.PassYear.$error.required" class="help-block">Pass Year Required</span>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="form-group">
+                                                                        <label class="col-md-6 control-label" for="form_control_1">
+                                                                            Exam Session
+                                                                        </label>
+                                                                        <div class="col-md-6">
+                                                                            <input type="text" ng-model="academic.ExamSession" class="form-control" placeholder="Exam Session">
+                                                                            <div class="form-control-focus"> </div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="form-group" ng-class="{ 'has-error' : submitted4 && AcademicAddform.ExamRoll.$invalid}">
+                                                                        <label class="col-md-6 control-label" for="form_control_1">
+                                                                            Roll No
+                                                                            <span class="required">*</span>
+                                                                        </label>
+                                                                        <div class="col-md-6">
+                                                                            <input type="text" onkeypress='return event.charCode >= 48 && event.charCode <= 57' numericbinding ng-model="academic.ExamRoll" class="form-control" placeholder="Roll No" name="ExamRoll" required>
+                                                                            <div class="form-control-focus"> </div>
+                                                                            <span ng-show="submitted4 && AcademicAddform.ExamRoll.$error.required" class="help-block">Roll No Required</span>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="form-group">
+                                                                        <label class="col-md-6 control-label" for="form_control_1">
+                                                                            Reg. No
+                                                                        </label>
+                                                                        <div class="col-md-6">
+                                                                            <input type="text" onkeypress='return event.charCode >= 48 && event.charCode <= 57' ng-model="academic.ExamRegNo" class="form-control" placeholder="Reg. No">
+                                                                            <div class="form-control-focus"> </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-md-4">
+                                                                    <div class="form-group">
+                                                                        <label class="col-md-6 control-label" for="form_control_1">
+                                                                            Board
+                                                                        </label>
+                                                                        <div class="col-md-6">
+                                                                            <input type="text" ng-model="academic.Board" class="form-control" placeholder="Board">
+                                                                            <div class="form-control-focus"> </div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="form-group" ng-class="{ 'has-error' : submitted4 && AcademicAddform.GPA.$invalid}">
+                                                                        <label class="col-md-6 control-label" for="form_control_1">
+                                                                            GPA
+                                                                            <span class="required">*</span>
+                                                                        </label>
+                                                                        <div class="col-md-6">
+                                                                            <input type="text" ng-model="academic.GPA" class="form-control" placeholder="GPA" name="GPA" min="1" max="5" required onkeypress='return event.charCode >= 46 && event.charCode <= 53' maxlength="4">
+                                                                            <div class="form-control-focus"> </div>
+                                                                            <span ng-show="submitted4 && AcademicAddform.GPA.$error.required" class="help-block">GPA Required</span>
+                                                                            <span ng-show="submitted4 && AcademicAddform.GPA.$error.number" class="help-block">Not Valid GPA</span>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="form-group" ng-class="{ 'has-error' : submitted4 && AcademicAddform.GPAWithOut4thSubject.$invalid}">
+                                                                        <label class="col-md-6 control-label" for="form_control_1">
+                                                                            GPA without 4th Subject
+                                                                        </label>
+                                                                        <div class="col-md-6">
+                                                                            <input type="text" onkeypress='return event.charCode >= 48 && event.charCode <= 57' ng-model="academic.GPAWithOut4thSubject" class="form-control" placeholder="GPA without 4th Subject" name="GPAWithOut4thSubject" min="1" max="5">
+                                                                            <div class="form-control-focus"> </div>
+                                                                            <span ng-show="submitted4 && AcademicAddform.GPAWithOut4thSubject.$error.number" class="help-block">Not Valid GPA</span>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="form-group">
+                                                                        <label class="col-md-6 control-label" for="form_control_1">
+                                                                            Grade
+                                                                            <span class="required">*</span>
+                                                                        </label>
+                                                                        <div class="col-md-6">
+                                                                            <input type="text" ng-model="academic.Grade" ng-required="academic.GPA != null" class="form-control" placeholder="Grade">
+                                                                            <div class="form-control-focus"> </div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="form-group">
+                                                                        <label class="col-md-6 control-label" for="form_control_1">
+                                                                            Comments
+                                                                        </label>
+                                                                        <div class="col-md-6">
+                                                                            <input type="text" ng-model="academic.Comment" class="form-control" placeholder="Comments">
+                                                                            <div class="form-control-focus"> </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" data-dismiss="modal" class="btn dark btn-outline" ng-click="resetFormAcademic();submitted4=false">Cancel</button>
+                                                        <button type="submit" ng-click="submitted4=true" class="btn green">Save</button>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!--Modal Area End-->
+                                </div>
+                            </div>
+                            <div class="tab-pane" id="contInfo">
+                                <div class="portlet light bordered">
+                                    <div class="portlet-title">
+                                        <div class="caption">
+                                            <i class="icon-settings font-green"></i>
+                                            <span class="caption-subject font-green sbold uppercase">Contact Info</span>
+                                        </div>
+                                    </div>
+                                    <div class="portlet-body">
+                                        <div class="table-container">
+                                            <div id="sample_3_wrapper" class="dataTables_wrapper no-footer">
+                                                <div class="row">
+                                                    <form name="ContactAddform" ng-submit="saveContactPresent()" class="form-horizontal" id="form_sample_1" novalidate>
+                                                        <div class="col-md-6">
+                                                            <h3 class="sbold">Present Address</h3>
+                                                            <hr />
+                                                            <div class="form-group" ng-class="{ 'has-error' : submitted4 && ContactAddform.Address.$invalid}">
+                                                                <label class="col-md-3 control-label" for="form_control_1">
+                                                                    Address :
+                                                                    <span class="required">*</span>
+                                                                </label>
+                                                                <div class="col-md-9">
+                                                                    <textarea class="form-control" ng-model="StuDetail.StudentContactInfo.Pre_Address" required name="Address" placeholder="Address"></textarea>
+                                                                    <div class="form-control-focus"> </div>
+                                                                    <span ng-show="submitted4 && ContactAddform.Address.$error.required" class="help-block">Address Required</span>
+                                                                </div>
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <label class="col-md-3 control-label">
+                                                                    District :
+                                                                </label>
+                                                                <div class="col-md-9">
+                                                                    <select class="form-control" ng-model="StuDetail.StudentContactInfo.Pre_DisId" ng-options="studentContactInfo.DistrictId as studentContactInfo.DistrictName for studentContactInfo in Districts"
+                                                                            ng-change="getPStations1(StuDetail.StudentContactInfo.Pre_DisId)">
+                                                                        <option value='' selected>Select Option</option>
+                                                                    </select>
+                                                                    <div class="form-control-focus"> </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <label class="col-md-3 control-label">
+                                                                    Police Station :
+                                                                </label>
+                                                                <div class="col-md-9">
+                                                                    <select class="form-control" ng-model="StuDetail.StudentContactInfo.Pre_PSId" ng-options="studentContactInfo.PsId as studentContactInfo.PsName for studentContactInfo in PStations1">
+                                                                        <option value='' selected>Select Option</option>
+                                                                    </select>
+                                                                    <div class="form-control-focus"> </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <label class="col-md-3 control-label" for="form_control_1">
+                                                                    Post Office :
+                                                                </label>
+                                                                <div class="col-md-9">
+                                                                    <input type="text" class="form-control" placeholder="Post Office" ng-model="StuDetail.StudentContactInfo.Pre_PostOffice">
+                                                                    <div class="form-control-focus"> </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <label class="col-md-3 control-label" for="form_control_1">
+                                                                    Post Code :
+                                                                </label>
+                                                                <div class="col-md-9">
+                                                                    <input type="text" class="form-control" placeholder="Post Code" ng-model="StuDetail.StudentContactInfo.Pre_PostalCode">
+                                                                    <div class="form-control-focus"> </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <h3 class="sbold">Permanent Address</h3>
+                                                            <hr />
+                                                            <div class="form-group">
+                                                                <label class="col-md-3 control-label" for="form_control_1">
+                                                                    Address :
+                                                                </label>
+                                                                <div class="col-md-9">
+                                                                    <textarea class="form-control" placeholder="Address" ng-model="StuDetail.StudentContactInfo.Par_Address"></textarea>
+                                                                    <div class="form-control-focus"> </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <label class="col-md-3 control-label">
+                                                                    District :
+                                                                </label>
+                                                                <div class="col-md-9">
+                                                                    <select class="form-control" ng-model="StuDetail.StudentContactInfo.Par_DisId"
+                                                                            ng-options="studentContactInfo.DistrictId as studentContactInfo.DistrictName for studentContactInfo in Districts" ng-change="getPStations2(StuDetail.StudentContactInfo.Par_DisId)">
+                                                                        <option value='' selected>Select Option</option>
+                                                                    </select>
+                                                                    <div class="form-control-focus"> </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <label class="col-md-3 control-label">
+                                                                    Police Station :
+                                                                </label>
+                                                                <div class="col-md-9">
+                                                                    <select class="form-control" ng-model="StuDetail.StudentContactInfo.Par_PSId" ng-options="studentContactInfo.PsId as studentContactInfo.PsName for studentContactInfo in PStations2">
+                                                                        <option value='' selected>Select Option</option>
+                                                                    </select>
+                                                                    <div class="form-control-focus"> </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <label class="col-md-3 control-label" for="form_control_1">
+                                                                    Post Office :
+                                                                </label>
+                                                                <div class="col-md-9">
+                                                                    <input type="text" class="form-control" placeholder="Post Office" ng-model="StuDetail.StudentContactInfo.Par_PostOffice">
+                                                                    <div class="form-control-focus"> </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <label class="col-md-3 control-label" for="form_control_1">
+                                                                    Post Code :
+                                                                </label>
+                                                                <div class="col-md-9">
+                                                                    <input type="text" class="form-control" placeholder="Post Code" ng-model="StuDetail.StudentContactInfo.Par_PostalCode">
+                                                                    <div class="form-control-focus"> </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="form-group col-md-3 pull-right">
+                                                                <button type="submit" ng-click="submitted4=true" class="btn green pull-right">Save</button>
+                                                            </div>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="tab-pane" id="sibInfo">
+                                <div>
+                                    <!-- Begin: life time stats -->
+                                    <div class="portlet light bordered">
+                                        <div class="portlet-title">
+                                            <div class="caption">
+                                                <i class="icon-settings font-green"></i>
+                                                <span class="caption-subject font-green sbold uppercase">Sibling Info</span>
+                                            </div>
+                                            <div class="actions">
+                                                <div class="btn-group btn-group-solid">
+                                                    <button ng-click="resetFormSibling()" class="btn green" data-target="#addmodalSibling" data-toggle="modal"> <i class="fa fa-plus"></i> Add New</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="portlet-body">
+                                            <div class="table-container">
+                                                <div id="sample_3_wrapper" class="dataTables_wrapper no-footer">
+                                                    <div class="table-scrollable"> </div>
+                                                    <table class="table table-bordered table-hover">
+                                                        <thead>
+                                                            <tr class="btn-primary">
+                                                                <th>Sibling ID</th>
+                                                                <th>Name</th>
+                                                                <th> Shift </th>
+                                                                <th> Class</th>
+                                                                <th> Section</th>
+                                                                <th>Action</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <tr ng-repeat="item in StuDetail.StudentSiblingInfo">
+                                                                <td>{{item.StudentInsID}}</td>
+                                                                <td>{{item.FullName}}</td>
+                                                                <td> {{ item.ShiftName}} </td>
+                                                                <td> {{ item.ClassName}} </td>
+                                                                <td>  {{ item.SectionName}}</td>
+                                                                <td>
+                                                                    <a ng-click="deleteSibling(item)" href="javascript:;" class="btn btn-icon-only red">
+                                                                        <i class="fa fa-trash"></i>
+                                                                    </a>
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- End: life time stats -->
+                                    <!--Modal Area Start-->
+                                    <div id="addmodalSibling" class="modal fade" tabindex="-1" data-backdrop="static" data-keyboard="false">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content">
+                                                <form name="addformSibling" ng-submit="saveSibling()" class="form-horizontal" id="form_sample_1" novalidate>
+                                                    <div class="modal-header">
+                                                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                                                        <h4 class="modal-title">{{modalTitleSibling}}</h4>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <div class="form-body">
+                                                            <div class="col-md-12">
+                                                                <div class="form-group" ng-class="{ 'has-error' : submitted5}">
+                                                                    <label class="col-md-4 control-label">
+                                                                        Sibling ID :
+                                                                        <span class="required">*</span>
+                                                                    </label>
+                                                                    <div class="col-md-8">
+                                                                        <fieldset ng-disabled="isSaving">
+                                                                            <div class="form-group">
+                                                                                <div class="col-md-12">
+                                                                                    <input type="text" ng-model="Std1" typeahead-on-select='onSelect1($item, $model, $label)' placeholder="Search Student By ID or Name or SMS Notification No." uib-typeahead="i  as i.Text for i in Search1($viewValue)" typeahead-loading="loadingLocations" typeahead-no-results="noResults" class="form-control">
+                                                                                    <i ng-show="loadingLocations" class="glyphicon glyphicon-refresh"></i>
+                                                                                    <div ng-show="noResults"><i class="glyphicon glyphicon-remove"></i> No Results Found</div>
+                                                                                    <input type="hidden" name="StudentIID" ng-value="Std1.Value" />
+                                                                                </div>
+                                                                            </div>
+                                                                        </fieldset>
+                                                                        <div class="form-control-focus"> </div>
+                                                                        <span ng-show="submitted5" class="help-block">ID Required</span>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label class="col-md-4 control-label">
+                                                                        Name:
+                                                                    </label>
+                                                                    <div class="col-md-8">
+                                                                        <input type="text" ng-model="sibling.FullName" class="form-control" placeholder="" readonly>
+                                                                        <div class="form-control-focus"> </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label class="col-md-4 control-label">
+                                                                        Roll:
+                                                                    </label>
+                                                                    <div class="col-md-8">
+                                                                        <input type="text" ng-model="sibling.RollNo" class="form-control" placeholder="" readonly>
+                                                                        <div class="form-control-focus"> </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label class="col-md-4 control-label">
+                                                                        Branch:
+                                                                    </label>
+                                                                    <div class="col-md-8">
+                                                                        <input type="text" ng-model="sibling.BranchName" class="form-control" placeholder="" readonly>
+                                                                        <div class="form-control-focus"> </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label class="col-md-4 control-label">
+                                                                        Shift:
+                                                                    </label>
+                                                                    <div class="col-md-8">
+                                                                        <input type="text" ng-model="sibling.ShiftName" class="form-control" placeholder="" readonly>
+                                                                        <div class="form-control-focus"> </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label class="col-md-4 control-label">
+                                                                        Class:
+                                                                    </label>
+                                                                    <div class="col-md-8">
+                                                                        <input type="text" ng-model="sibling.ClassName" class="form-control" placeholder="" readonly>
+                                                                        <div class="form-control-focus"> </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label class="col-md-4 control-label">
+                                                                        Section:
+                                                                    </label>
+                                                                    <div class="col-md-8">
+                                                                        <input type="text" ng-model="sibling.SectionName" class="form-control" placeholder="" readonly>
+                                                                        <div class="form-control-focus"> </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" data-dismiss="modal" class="btn dark btn-outline" ng-click="resetFormSibling();submitted5=false">Cancel</button>
+                                                        <button type="submit" ng-click="submitted5=true" class="btn green">Save</button>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!--Modal Area End-->
+                                </div>
+                            </div>
+                            <div class="tab-pane" id="others">
+                                <div>
+                                    <!-- Begin: life time stats -->
+                                    <div class="portlet light bordered">
+                                        <div class="portlet-title">
+                                            <div class="caption">
+                                                <i class="icon-settings font-green"></i>
+                                                <span class="caption-subject font-green sbold uppercase">@ViewBag.Title</span>
+                                            </div>
+                                            <div class="actions">
+                                                <div class="btn-group btn-group-solid">
+                                                    <button ng-click="resetOthers()" class="btn green" data-target="#addOthers" data-toggle="modal"> <i class="fa fa-plus"></i> Add Others Info</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="portlet-body">
+                                            <div class="table-container">
+                                                <div id="sample_3_wrapper" class="dataTables_wrapper no-footer">
+                                                    <div class="table-scrollable"> </div>
+                                                    <table class="table table-bordered table-hover">
+                                                        <thead>
+                                                            <tr class="btn-primary">
+                                                                <th width="30%">Type</th>
+                                                                <th width="10%">Activity</th>
+                                                                <th width="10%">Action</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <tr ng-repeat="item in StuDetail.StudentOthersInfo">
+                                                                <td>{{item.Type}}</td>
+                                                                <td>{{item.ExtraActivity}}</td>
+                                                                <td>
+                                                                    <a href="javascript:;" class="btn btn-icon-only green" ng-click="editOther(item)" data-target="#addOthers" data-toggle="modal">
+                                                                        <i class="fa fa-edit"></i>
+                                                                    </a>
+                                                                    <a ng-click="deleteOthers(item)" href="javascript:;" class="btn btn-icon-only red">
+                                                                        <i class="fa fa-trash"></i>
+                                                                    </a>
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- End: life time stats -->
+                                    <!--Modal Area Start-->
+                                    <div id="addOthers" class="modal fade" tabindex="-1" data-backdrop="static" data-keyboard="false">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content">
+                                                <form name="addOthersInfo" ng-submit="saveOther()" class="form-horizontal" novalidate>
+                                                    <div class="modal-header">
+                                                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                                                        <h4 class="modal-title">{{modalTitleOthers}}</h4>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <div class="form-body">
+                                                            <div class="row">
+                                                                <div class="col-md-10">
+                                                                    <div class="form-group" ng-class="{ 'has-error' : submitted6 && addOthersInfo.Type.$invalid}">
+                                                                        <label class="col-md-4 control-label">
+                                                                            Type :
+                                                                            <span class="required">*</span>
+                                                                        </label>
+                                                                        <div class="col-md-8">
+                                                                            <select class="form-control" ng-model="other.Type" required name="Type" ng-options="other.Value as other.Text for other in Dropdowns | filter:Type='ActivityType'">
+                                                                                <option selected="selected" value=''>Choose</option>
+                                                                            </select>
+                                                                            <div class="form-control-focus"> </div>
+                                                                            <span ng-show="submitted6 && addOthersInfo.Type.$error.required" class="help-block">Type Required</span>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="row">
+                                                                <div class="col-md-10">
+                                                                    <div class="form-group" ng-show="other.Type == 'MemberofClub'">
+                                                                        <label class="col-md-4 control-label">
+                                                                            Member of Club :
+                                                                            <span class="required">*</span>
+                                                                        </label>
+                                                                        <div class="col-md-8">
+                                                                            <select class="form-control" ng-model="other.ExtraActivity" ng-required="other.Type == 'MemberofClub'" ng-options="other.Value as other.Text for other in Dropdowns | filter:Type='Club'">
+                                                                                <option value="" selected="selected">Choose Type</option>
+                                                                            </select>
+                                                                            <div class="form-control-focus"> </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="row">
+                                                                <div class="col-md-10">
+                                                                    <div class="form-group" ng-show="other.Type == 'InterestIn'">
+                                                                        <label class="col-md-4 control-label">
+                                                                            Interest In :
+                                                                            <span class="required">*</span>
+                                                                        </label>
+                                                                        <div class="col-md-8">
+                                                                            <select class="form-control" ng-model="other.ExtraActivity" ng-required="other.Type == 'InterestIn'">
+                                                                                ng-options="other.Value as other.Text for other in Dropdowns | filter:Type='Interest'">
+                                                                                <option value="" selected="selected">Choose Type</option>
+                                                                            </select>
+                                                                            <div class="form-control-focus"> </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="row">
+                                                                <div class="col-md-10">
+                                                                    <div class="form-group" ng-show="other.Type == 'Organization'">
+                                                                        <label class="col-md-4 control-label">
+                                                                            Organization :
+                                                                            <span class="required">*</span>
+                                                                        </label>
+                                                                        <div class="col-md-8">
+                                                                            <select class="form-control" ng-model="other.ExtraActivity" ng-required="other.Type == 'Organization'" name="Type" ng-options="other.Value as other.Text for other in Dropdowns | filter:Type='Organization'">
+                                                                                <option value="" selected="selected">Choose Type</option>
+                                                                            </select>
+                                                                            <div class="form-control-focus"> </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="row">
+                                                                <div class="col-md-10">
+                                                                    <div class="form-group" ng-show="other.Type == 'Participation'">
+                                                                        <label class="col-md-4 control-label">
+                                                                            Participation :
+                                                                            <span class="required">*</span>
+                                                                        </label>
+                                                                        <div class="col-md-8">
+                                                                            <input type="text" class="form-control" ng-required="other.Type == 'Participation'" ng-model="other.ExtraActivity">
+                                                                            <div class="form-control-focus"> </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="row">
+                                                                <div class="col-md-10">
+                                                                    <div class="form-group" ng-show="other.Type == 'MemberofClub'">
+                                                                        <label class="col-md-4 control-label">
+                                                                            From :
+                                                                        </label>
+                                                                        <div class="col-md-8">
+                                                                            <input class="form-control" type="datetime" placeholder="From Date" readonly ng-change="getOrderbydate()" ng-click="p5=true" is-open="p5" uib-datepicker-popup="{{format}}" ng-model="other.From" />
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="row">
+                                                                <div class="col-md-10">
+                                                                    <div class="form-group" ng-show="other.Type == 'MemberofClub'">
+                                                                        <label class="col-md-4 control-label">
+                                                                            To :
+                                                                        </label>
+                                                                        <div class="col-md-8">
+                                                                            <input class="form-control" ng-disabled="other.TillNow" required type="datetime" placeholder="To Date" readonly ng-change="getOrderbydate()" ng-click="p6=true" is-open="p6" uib-datepicker-popup="dd-MM-yyyy" ng-model="other.To" />
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-md-2" ng-show="other.Type == 'Club'">
+                                                                    <div class="form-group">
+                                                                        <label class="mt-checkbox">
+                                                                            <input type="checkbox" required ng-model="other.TillNow" id="inlineCheckbox21"> Till now
+                                                                            <span></span>
+                                                                        </label>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="row">
+                                                                <div class="col-md-10">
+                                                                    <div class="form-group">
+                                                                        <label class="col-md-4 control-label">
+                                                                            Achievements:
+                                                                        </label>
+                                                                        <div class="col-md-8">
+                                                                            <input type="hidden" value="A4Landscape" name="ImgType" />
+                                                                            <div class="fileinput fileinput-new" data-provides="fileinput">
+                                                                                <div class="fileinput-new thumbnail" style="width: 150px; height: 85px;">
+                                                                                    <img src="@String.Format("data:image/jpg;base64,{0}", "{{other.AchievementPicture}}")" width="200" height="150" alt="">
+                                                                                </div>
+                                                                                <div class="fileinput-preview fileinput-exists thumbnail" style="width: 150px;height: 85px;"> </div>
+                                                                                <div>
+                                                                                    <span class="btn default btn-file">
+                                                                                        <span class="fileinput-new"> Select image </span>
+                                                                                        <span class="fileinput-exists"> Change </span>
+                                                                                        <input type="file" name="..." id="imgAchi" accept=".jpg, .png, .jpeg, .gif, .bmp, .tif, .tiff|images/*">
+                                                                                    </span>
+                                                                                    <a href="javascript:;" class="btn default red fileinput-exists" data-dismiss="fileinput"> Remove </a>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" data-dismiss="modal" class="btn dark btn-outline" ng-click="resetOthers();submitted=false">Cancel</button>
+                                                        <button type="submit" ng-click="submitted6=true" class="btn green-haze">Save</button>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!--Modal Area End-->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--Tab End-->
+</div>
+@section Scripts{
+    <script type="text/javascript">
+        OEMSApp.controller("ProfileCtrl", ["$scope", "$http",
+           function ($scope, $http) {
+               init();
+               function init() {
+                   $scope.StuDetail = [];
+                   StuDetail();
+               }
+               function StuDetail() {
+                   $scope.StuDetails = {};
+                   $http({
+                       method: 'GET',
+                       url: baseUrl + 'PortalStudent/GetStudentDetailbyID/'
+                   }).then(function successCallback(response) {
+                       $scope.StuDetail = response.data.results;
+                       if ($scope.StuDetail.StudentGuardianInfo == null)
+                           $scope.StuDetail.StudentGuardianInfo = {};
+
+                       $scope.StuDetail.StudentGuardianInfo.FatherName = $scope.StuDetail.StudentBasicInfo.FatherName;
+                       $scope.StuDetail.StudentGuardianInfo.MotherName = $scope.StuDetail.StudentBasicInfo.MotherName;
+                       $scope.StuDetail.StudentBasicInfo.AdmissionDate = $scope.StuDetail.StudentBasicInfo.AdmissionDate != null ? new Date($scope.StuDetail.StudentBasicInfo.AdmissionDate) : null;
+                       $scope.StuDetail.StudentBasicInfo.DateOfBirth = $scope.StuDetail.StudentBasicInfo.DateOfBirth != null ? new Date($scope.StuDetail.StudentBasicInfo.DateOfBirth) : null;
+                       $scope.StuDetail.StudentBasicInfo.FirstAdmittedDate = $scope.StuDetail.StudentBasicInfo.FirstAdmittedDate != null ? new Date($scope.StuDetail.StudentBasicInfo.FirstAdmittedDate) : null;
+                       $scope.StuDetail.StudentBasicInfo.PreInsInfoDate = $scope.StuDetail.StudentBasicInfo.PreInsInfoDate != null ? new Date($scope.StuDetail.StudentBasicInfo.PreInsInfoDate) : null;
+
+                       if ($scope.StuDetail.StudentContactInfo != null) {
+                           if ($scope.StuDetail.StudentContactInfo.Pre_DisId != null || $scope.StuDetail.StudentContactInfo.Pre_DisId != 0) {
+                               getPStations1($scope.StuDetail.StudentContactInfo.Pre_DisId)
+                           }
+                           if ($scope.StuDetail.StudentContactInfo.Par_DisId != null || $scope.StuDetail.StudentContactInfo.Par_DisId != 0) {
+                               $timeout(function () {
+                                   getPStations2($scope.StuDetail.StudentContactInfo.Par_DisId)
+                               }, 100);
+
+                           }
+                       }
+
+                   }, function errorCallback(response) {
+                       toastr["warning"](response.data.Message);
+                   });
+               }
+           }]);
+    </script>
+}
+
+
+
+

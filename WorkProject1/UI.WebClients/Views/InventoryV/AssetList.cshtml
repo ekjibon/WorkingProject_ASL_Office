@@ -1,0 +1,470 @@
+﻿
+@{
+    ViewBag.Title = "Asset";
+}
+
+<div class="kt-container  kt-container--fluid  kt-grid__item kt-grid__item--fluid" ng-controller="AssetClt"> 
+
+    <div class="row">
+        <div class="kt-portlet kt-portlet--mobile">
+            <div class="kt-portlet__head kt-portlet__head--lg">
+                <div class="kt-portlet__head-label">
+                    <h3 class="kt-portlet__head-title">
+                        Asset List
+                    </h3>
+                </div>
+                <div class="kt-portlet__head-toolbar">
+                    <div class="kt-portlet__head-wrapper">
+                        <div class="dropdown dropdown-inline">
+                            <button type="button" ng-click="resetForm()" class="btn btn-brand btn-icon-sm" data-toggle="modal" data-target="#addmodal" aria-haspopup="true" aria-expanded="false">
+                                <i class="flaticon2-plus"></i> Add New Asset List
+                            </button>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="kt-portlet__body">
+
+                <div class="row">
+                    <div class="col-md-4 col-sm-5 col-xs-6">
+                        <div class="form-group">
+                            <div class="col-lg-3 col-md-5 col-sm-4 col-xs-8" style="padding-left:0px">
+
+                                <select class="form-control kt-font-brand" ng-model="pageSize" ng-options="P.value as P.text for P in pageSizeArray"></select>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="col-md-4 col-sm-3 col-xs-1">
+                    </div>
+                    <div class="col-md-4 col-sm-4 col-xs-5">
+                        <div id="sample_3_filter" class="pull-right">
+                            <input ng-model="q" id="search" class="form-control" placeholder="Filter text">
+                        </div>
+                    </div>
+                </div>
+                <table class="table table-bordered table-hover rounded">
+                    
+                        <thead>
+                            <tr class="btn-primary">
+                                <th>Asset Category</th>
+                                <th>Asset Name</th>
+                                <th>Code</th>
+                                @*<th>Quantity</th>*@
+                                <th>Account Code</th>
+                                <th>Percentage(%)</th>
+                                <th style="text-align:center">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-show="Assets.length <= 0"><td colspan="5" style="text-align:center;"><i class="fa fa-refresh"></i> Loading new data!!</td></tr>
+                            <tr dir-paginate="item in Assets | filter:q | itemsPerPage: pageSize " current-page="currentPage">
+                                <td>{{item.CategoryName}}</td>
+                                <td>{{item.AssetName}}</td>
+                                <td>{{item.AssetCode}}</td>
+                                @*<td>{{item.StockQuantity}}</td>*@
+                                <td>{{item.AccCode}}</td>
+                                <td>{{item.DeprcAmount}}</td>
+
+                                <td align="center">
+                                    <a class="btn btn-outline-brand btn-elevate btn-icon" ng-click="edit(item)" data-target="#addmodal" data-toggle="modal">
+                                        <i class="fa fa-edit"></i>
+                                    </a>
+                                    <a class="btn btn-outline-danger btn-elevate btn-icon" href="javascript:;" id="kt_sweetalert_demo_9" ng-click="deleteAssetCate(item)">
+                                        <i class="fa fa-trash"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                <div class="row">
+                    <dir-pagination-controls boundary-links="true" template-url="~/assets/angular/lib/dirPagination.tpl.html"></dir-pagination-controls>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- End: life time stats -->
+    <!--Modal Area Start-->
+    <div id="addmodal" class="modal fade bd-example-modal-lg" tabindex="-1" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <form name="addform" ng-submit="save()" class="form-horizontal" id="form_sample_1" novalidate>
+                    <div class="modal-header">
+                        <h4 class="modal-title">{{modalTitle}}</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                   </div>
+                    <div class="modal-body">
+                        <div class="form-body">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="row">
+                                        <div class="col-md-6">                                            
+                                            <div class="form-group row" ng-class="{ 'has-error' : submitted && addform.Category.$invalid}">
+                                                <label class="col-md-5 control-label" style="text-align:right">
+                                                    Category:
+                                                    <span class="required">*</span>
+                                                </label>
+                                                <div class="col-md-7">
+                                                    <select class="form-control" required name="Category" ng-model="Asset.AssetCateId" ng-options="a.AssetCateId  as a.CategoryName for a in AssetCategorys">
+                                                        <option selected value="">Choose Options</option>
+                                                    </select>
+                                                    <div class="form-control-focus"> </div>
+                                                    <span ng-show="submitted && addform.Category.$error.required" class="help-block">Category Required</span>
+                                                </div>
+                                            </div>
+                                            <div class="form-group row" ng-class="{ 'has-error' : submitted && addform.SubCategory.$invalid}">
+                                                <label class="col-md-5 control-label" style="text-align:right">
+                                                    Sub Category:
+                                                    <span class="required">*</span>
+                                                </label>
+                                                <div class="col-md-7">
+                                                    <select class="form-control" ng-disabled="Asset.AssetCateId==null" required name="SubCategory" ng-model="Asset.AssetSubCatId" ng-options="a.AssetSubCatId  as a.SubCategoryName for a in AssetSubCategorys | filter:{CategoryId:Asset.CategoryId}:true">
+                                                        <option selected value="">Choose Options</option>
+                                                    </select>
+                                                    <div class="form-control-focus"> </div>
+                                                    <span ng-show="submitted && addform.SubCategory.$error.required" class="help-block">Category Required</span>
+                                                </div>
+                                            </div>
+                                            <div class="form-group row" ng-class="{ 'has-error' : submitted && addform.AssetName.$invalid}">
+                                                <label class="col-md-5 control-label" style="text-align:right">
+                                                    Asset Name :
+                                                    <span class="required">*</span>
+                                                </label>
+                                                <div class="col-md-7">
+                                                    <input type="text" ng-model="Asset.AssetName" class="form-control" placeholder="Product Name" name="AssetName" required>
+                                                    <div class="form-control-focus"> </div>
+                                                    <span ng-show="submitted && addform.AssetName.$error.required" class="help-block">Asset Name Required</span>
+                                                </div>
+                                            </div>
+                                            <div class="form-group row" ng-class="{ 'has-error' : submitted && addform.AssetCode.$invalid}">
+                                                <label class="col-md-5 control-label" style="text-align:right">
+                                                    Asset Code:
+                                                    <span class="required">*</span>
+                                                </label>
+                                                <div class="col-md-7">
+                                                    <input type="text" ng-model="Asset.AssetCode" class="form-control" placeholder="Asset Code" name="AssetCode" required>
+                                                    <div class="form-control-focus"> </div>
+                                                    <span ng-show="submitted && addform.AssetCode.$error.required" class="help-block">Asset Code Required</span>
+                                                </div>
+                                            </div>
+
+
+                                            
+                                        </div>
+                                        <div class="col-md-6">
+
+                                            <div class="form-group row" ng-class="{ 'has-error' : submitted && addform.Depriciation.$invalid}">
+                                                <label class="col-md-5 control-label" style="text-align:right">
+                                                    Depriciation: @*<span class="required">*</span>*@
+                                                </label>
+                                                <div class="col-md-5">
+                                                    <input type="text" ng-model="Asset.DeprcAmount" class="form-control" placeholder="Depriciation" name="Depriciation"> 
+                                                    <div class="form-control-focus"> </div>
+                                                    <span ng-show="submitted && addform.Depriciation.$error.required" class="help-block">Depriciation Required</span>
+                                                </div>
+                                                <div class="col-md-2">
+                                                    <span >%</span>                                                         
+                                                </div>
+
+                                            </div>
+                                            <div class="form-group row" ng-class="{ 'has-error' : submitted && addform.Unit.$invalid}">
+                                                <label class="col-md-5 control-label" style="text-align:right">
+                                                    Unit: <span class="required">*</span>
+                                                </label>
+                                                <div class="col-md-7">
+                                                    <select class="form-control" required name="Unit" ng-model="Asset.UnitId" ng-options="u.UnitSetupId  as u.UnitName for u in AssetUnitSetups">
+                                                        <option selected value="">Choose Options</option>
+                                                    </select>
+                                                    <div class="form-control-focus"> </div>
+                                                    <span ng-show="submitted && addform.Unit.$error.required" class="help-block">Unit Required</span>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="form-group row"ng-class="{'has-error' : submitted && addform.AccountCode.$invalid}">
+                                                <label class="col-md-5 control-label" style="text-align:right">
+                                                    Account Code:
+                                                    @*<span class="required">*</span>*@
+                                                </label>
+                                                <div class="col-md-6">
+                                                    <input type="text" ng-model="drRow.SearchLedger" name="AccountCode"
+                                                          
+                                                           typeahead-on-select='onSelect($item, $model, $label,drRow)'
+                                                           placeholder="Search Ledger by Name"
+                                                           uib-typeahead="i  as i.Text for i in Search($viewValue)"
+                                                           typeahead-loading="loadingLocations" typeahead-no-results="noResults" class="form-control">
+                                                    <i ng-show="loadingLocations" class="glyphicon glyphicon-refresh"></i>
+                                                    <div ng-show="noResults"><i class="glyphicon glyphicon-remove"></i> No Results Found</div>
+                                                    @*<input type="text" ng-model="Supplier.AccountCode" class="form-control" placeholder="Account Code" name="AccountCode" required>*@
+                                                    <div class="form-control-focus"> </div>
+                                                    <span ng-show="submitted && addform.AccountCode.$error.required" class="help-block">Account Code Required</span>
+                                                </div>
+                                                <div class="col-md-1">
+                                                    <i class="glyphicon" ng-class="(shw==1) ? 'Ok glyphicon-ok' : 'cross glyphicon-remove-sign'"></i>
+                                                </div>
+                                            </div>
+                                            <div class="form-group row" @*ng-class="{ 'has-error' : submitted && addform.Description.$invalid}"*@>
+                                                <label class="col-md-5 control-label" style="text-align:right">
+                                                    Description:
+                                                    @*<span class="required">*</span>*@
+                                                </label>
+                                                <div class="col-md-7">
+                                                    <textarea type="text" ng-model="Asset.Description" class="form-control" placeholder="Description" name="Description"></textarea>
+                                                    <div class="form-control-focus"> </div>
+                                                    @*<span ng-show="submitted && addform.Description.$error.required" class="help-block">Description Required</span>*@
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" data-dismiss="modal" class="btn  btn-secondary" ng-click="resetForm();">Cancel</button>
+                        <button type="submit" ng-click="submitted=true;" class="btn btn-success">Save </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!--Modal Area End-->
+</div>
+
+@section Scripts{
+
+    <script type="text/javascript">
+
+        OEMSApp.controller("AssetClt", ["$scope", "$http", "SweetAlert",
+              function ($scope, $http, SweetAlert) {
+
+                  init();
+                  function init() {
+                      initialize();
+                  }
+                  function initialize() {
+                      $scope.modalTitle = "Add Product";
+                      $scope.Asset = {};
+                      $scope.drRow = {};
+                      $scope.Asset.AssetId = 0;
+                      $scope.Assets = [];
+                      $scope.shw = 0;
+                     
+                      $scope.req = true;
+
+                      $scope.AssetCategorys = [];
+                      $scope.AssetSubCategorys = [];
+                      $scope.AssetUnitSetups = [];
+                      $scope.getAssetCategorys = getAssetCategorys;
+                      $scope.getAssetSubCategorys = getAssetSubCategorys;
+                      $scope.getAssetUnitSetups = getAssetUnitSetups;
+                      $scope.getAssets = getAssets;
+                      $scope.resetForm = resetForm;
+
+                      $scope.pageSizeArray = [];
+                      $scope.pageSizeArray.push({ value: 5, text: 5 });
+                      $scope.pageSizeArray.push({ value: 10, text: 10 });
+                      $scope.pageSizeArray.push({ value: 20, text: 20 });
+                      $scope.pageSizeArray.push({ value: 50, text: 50 });
+                      $scope.currentPage = 1;
+                      $scope.pageno = 1;
+                      $scope.pageSize = 10;
+                      $scope.total_count = 12;
+
+                      getAssetCategorys(1);
+                      getAssetSubCategorys(1);
+                      getAssetUnitSetups();
+                      getAssets();
+                  }
+
+                  function resetForm() {
+                      $scope.modalTitle = "Add Asset";
+                      $scope.Asset = {};
+                      $scope.drRow = {};
+                      $scope.Asset.AssetId = 0;
+                      $scope.show = false;
+                      
+                      $scope.req = true;
+                      $scope.shw = 0;
+
+                      $scope.FiledHide = false;
+                      $scope.addform.$setUntouched();
+                      $scope.addform.$setPristine();
+                      $scope.submitted = false;
+                      $scope.submitted1 = false;
+                  //    getAssetCategorys(1);
+                  //    getAssetSubCategorys(1);
+                  //    getAssetUnitSetups();
+                  //    getProducts(1);
+
+                  }
+
+                  function getAssetUnitSetups() {
+                      $scope.AssetUnitSetups = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Inventory/GetAssetUnitSetups/'
+                      }).then(function successCallback(response) {
+                          $scope.AssetUnitSetups = response.data.results;
+                      }, function errorCallback(response) {
+                          toastr["warning"](response.data.Message);
+                      });
+                  }
+
+                  function getAssetCategorys(pageno) {
+                      $scope.AssetCategorys = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Inventory/GetAssetCategorys/'
+                      }).then(function successCallback(response) {
+                          $scope.AssetCategorys = response.data.results;
+                      }, function errorCallback(response) {
+                          toastr["warning"](response.data.Message);
+                      });
+                  }
+
+                  function getAssetSubCategorys(pageno) {
+                      $scope.AssetSubCategorys = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Inventory/GetAssetSubCategorys/'
+                      }).then(function successCallback(response) {
+                          $scope.AssetSubCategorys = response.data.results;
+                      }, function errorCallback(response) {
+                          toastr["warning"](response.data.Message);
+                      });
+                  }
+                  function getAssets() {
+                      $scope.Assets = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Inventory/GetAssets/'
+                      }).then(function successCallback(response) {
+                          $scope.Assets = response.data.results;
+                          console.log(response.data.results);
+                          toastr["info"](response.data.message);
+                      }, function errorCallback(response) {
+                          toastr["warning"](response.data.Message);
+                      });
+                  }
+
+                  $scope.edit = function (n) {
+                      $scope.modalTitle = "Update Asset";
+                      $scope.Asset = n;
+                      $scope.Asset.AssetId = n.AssetId;
+                      $scope.Asset.CategoryId = n.CategoryId;
+
+                      //$scope.Product.ProductSubCateId = n.ProductSubCateId.toString();
+                    
+                      $scope.FiledHide = true;
+                      $scope.show = true;
+                      $scope.req = false;
+
+                  };
+                  $scope.save = function save() {
+                      if (Validation()) {
+                          if ($scope.Asset.AssetId != 0) /// For Update
+                          {
+                              if ($scope.Asset != '') {
+                                  $http({
+                                      method: 'PUT',
+                                      url: baseUrl + 'Inventory/UpdateAsset/',
+                                      data: $scope.Asset
+                                  }).then(function successCallback(response) {
+                                      $('#addmodal').modal('toggle');
+                                      toastr["info"](response.data.message);
+                                      resetForm();
+                                  }, function errorCallback(response) {
+                                      toastr["warning"](response.data.Message);
+                                  });
+                              }
+                          } else {  //  For Add
+                              if ($scope.Asset != {}) {
+                                  $http({
+                                      method: 'POST',
+                                      url: baseUrl + '/Inventory/AddAsset/',
+                                      data: $scope.Asset
+                                  }).then(function successCallback(response) {
+                                      $('#addmodal').modal('toggle');
+                                      toastr["info"](response.data.message);
+                                      resetForm();
+                                  }, function errorCallback(response) {
+                                      toastr["warning"](response.data.Message);
+                                  });
+                              }
+                          }
+
+                      } else {
+                          toastr["warning"]('Form Invalid');
+                      }
+                  };
+
+                  //$scope.FilterProduct = function () {
+                  //    //getProducts(1);
+                  //    if ($scope.filterform.$invalid) {
+                  //        return;
+                  //    }
+                  //    $scope.ProductList = [];
+                  //    angular.forEach($scope.Products, function (item) {
+                  //        if (item.ProductTypeId == $scope.ProductType) {
+                  //            $scope.ProductList.push(item);
+                  //        }
+                  //    });
+                  //    $scope.Products = $scope.ProductList;
+                  //}
+
+                  $scope.deleteAssetCate = function deleteAssetCate(n) {
+                      // SweetAlert.swal("Good job!", "You clicked the button!", "success");
+                      SweetAlert.swal({
+                          title: "Are you sure to delete it ?", type: "warning", showCancelButton: true, confirmButtonColor: "#DD6B55",
+                          confirmButtonText: "Yes, delete it!",
+                          closeOnConfirm: false
+                      },
+                      function (isConfirm) {
+                          if (isConfirm) {
+                              $http({
+                                  method: 'POST',
+                                  url: baseUrl + 'Inventory/DeleteAsset/',
+                                  data: n
+                              }).then(function successCallback(response) {
+                                  SweetAlert.swal("Deleted!", "Your data has been deleted.", "success");
+                                  getAssets(1);
+                              }, function errorCallback(response) {
+                                  toastr["warning"](response.data.Message);
+                              });
+                          }
+                      });
+                  };
+                  $scope.Search = function (val) {
+                      if (val.length >= 2)
+                          return $http.get(baseUrl + 'Inventory/SearchLedger/' + val,
+                          {
+                              params: {}
+                          }).then(function (response) {
+                              return response.data.results.map(function (item) {
+                                  return item;
+                              });
+                          });
+                  };
+
+                  // for dropdown select list event....
+                  $scope.onSelect = function onSelect($item, $model, $label, itemRow) {
+                      $scope.Asset.AccCode = $item.Text;
+                      $scope.shw = 1;
+                  }
+                  function Validation() {
+                      if ($scope.addform.$invalid) {
+                          return false;
+                      }
+                      if ($scope.addform.$valid) {
+                          return true;
+                      }
+                  }
+              }]);
+    </script>
+
+}
+

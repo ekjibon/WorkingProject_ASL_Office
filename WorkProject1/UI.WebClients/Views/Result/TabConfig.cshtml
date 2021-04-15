@@ -1,0 +1,569 @@
+﻿@{
+    ViewBag.Title = "Tab Config Setup";
+}
+<style type="text/css">
+    input[type=number]::-webkit-inner-spin-button,
+    input[type=number]::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+</style>
+<div class="row" ng-controller="CltrTabConfig">
+    <div class="portlet light bordered">
+        <div class="portlet-title">
+            <div class="caption">
+                <i class="icon-settings font-green"></i>
+                <span class="caption-subject font-green sbold uppercase">@ViewBag.Title</span>
+            </div>
+        </div>
+        <div class="portlet-body">
+
+            <form class="form-horizontal" id="frmCommon" name="frmMainExamMarks" novalidate>
+                <div class="form-body">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label class="col-md-5 control-label">
+                                    Version : 
+                                    <span class="required">*</span>  
+                                </label>
+                                <div class="col-md-7">
+                                    <select class="form-control"  ng-model="MainExamSubjectMark.VersionId" required name="Version" ng-options="MainExamSubjectMark.VersionId as MainExamSubjectMark.VersionName for MainExamSubjectMark in CommonFeilds.Version">
+                                        <option value="" selected="selected">Select</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group" >
+                                <label class="col-md-5 control-label">
+                                    Session :
+                                    <span class="required">*</span>  
+                                </label>
+                                <div class="col-md-7">
+                                    <select class="form-control" ng-model="MainExamSubjectMark.SessionId" required name="Session" ng-options="MainExamSubjectMark.SessionId as MainExamSubjectMark.SessionName for MainExamSubjectMark in CommonFeilds.Session">
+                                        <option value="" selected="selected">Select</option>
+                                    </select>                                      
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-5 control-label" style="padding-left:5px">
+                                    MainExam wise clone :
+                                </label>
+                                <div class="col-md-7" ng-show="MainExamID!=null">
+                                    <input style="margin-top:12px" type="checkbox" ng-disabled="MainExamID==null" ng-change="filterMainExam();" ng-model="MainExamSubjectMark.Clone" ng-checked="MainExamSubjectMark.Clone==true">
+                                    <div class="form-control-focus"> </div>
+                                </div>
+                            </div>  
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="form-group" >
+                                <label class="col-md-5 control-label">
+                                    Class :
+                                    <span class="required">*</span>
+                                </label>
+                                <div class="col-md-7">
+                                    <select class="form-control" ng-change="GetGroup(MainExamSubjectMark.ClassId);" ng-model="MainExamSubjectMark.ClassId" name="Class" required ng-options="MainExamSubjectMark.ClassId as MainExamSubjectMark.ClassName for MainExamSubjectMark in CommonFeilds.ClassInfo | filter:{VersionId:MainExamSubjectMark.VersionId}:true">
+                                        <option value="" selected="selected">Select</option>
+                                    </select> 
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-5 control-label">
+                                    Group :
+                                    <span class="required">*</span>
+                                </label>
+                                <div class="col-md-7">
+                                    <select class="form-control" ng-change="getMainExam()"  ng-model="MainExamSubjectMark.GroupId" name="Group" ng-options="G.GroupId as G.GroupName for G in Groups" required>
+                                        <option value="" selected="selected">Select</option>
+                                    </select> 
+                                </div>
+                            </div>
+                            <div class="form-group" ng-show="MainExamSubjectMark.Clone==true">
+                                <label class="col-md-5 control-label">
+                                    Clone Main Exam :
+                                </label>
+                                <div class="col-md-7">
+                                    <select class="form-control" ng-model="MainExamSubjectMark.NewMainExamId" name="NewMainExam" ng-options="mainexam.MainExamId as mainexam.MainExamName for mainexam in CloneMainExams">
+                                        <option value="" selected="selected">Please Select</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label class="col-md-5 control-label">
+                                    Main Exam :
+                                    <span class="required">*</span>
+                                </label>
+                                <div class="col-md-7">
+                                    <select class="form-control" ng-change="getSubExam();getNewMainExam();" ng-disabled="MainExams.length==0" ng-model="MainExamID" required name="mainExam" ng-options="mainexam.MainExamId as mainexam.MainExamName for mainexam in MainExams ">
+                                        <option value="" selected="selected">Select</option>
+                                    </select>                                     
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-5 control-label">
+                                    Sub Exam :
+                                    <span class="required">*</span>
+                                </label>
+                                <div class="col-md-7">
+                                    <select class="form-control" ng-disabled="SubExams.length==0" ng-change="getTabConfig()" ng-model="SubExamID" required name="subExam" ng-options="subExams.SubExamId as subExams.SubExamName for subExams in SubExams ">
+                                        <option value="" selected="selected">Select</option>
+                                    </select>                                   
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-md-5 control-label">                                    
+                                </label>
+                                <div class="col-md-7">
+                                    <button ng-show="MainExamSubjectMark.Clone==true && MainExamSubjectMark.NewMainExamId!=null && MainExamID!=null" type="button" ng-click="Clone();" class="btn green-haze">Clone</button>                        
+                                </div>
+                            </div>                             
+                        </div>
+
+                    </div>
+
+
+                </div>
+            </form>
+            <clearfix></clearfix>
+            <form name="frm" id="tabconfig" ng-submit="AddTabConfig()"  novalidate>
+                <div class="table-container">
+                    <style type="text/css">
+                        .tg {
+                            border-collapse: collapse;
+                            border-spacing: 0;
+                        }
+
+                            .tg td {
+                                font-family: Arial, sans-serif;
+                                font-size: 14px;
+                                padding: 12px 16px;
+                                border-style: solid;
+                                border-width: 1px;
+                                overflow: hidden;
+                                word-break: normal;
+                            }
+
+                            .tg th {
+                                font-family: Arial, sans-serif;
+                                font-size: 14px;
+                                font-weight: normal;
+                                padding: 12px 16px;
+                                border-style: solid;
+                                border-width: 1px;
+                                overflow: hidden;
+                                word-break: normal;
+                            }
+
+                            .tg .tg-yw4l {
+                                vertical-align: top;
+                            }
+                    </style>
+                    <table class="tg table table-bordered table-hover">
+                        <thead>
+                            <tr class="bg-primary">
+                                <th class="tg-yw4l">Writen Exam</th>
+                                <th class="tg-yw4l">Total</th>
+                                <th class="tg-yw4l">Conversion</th>
+                                <th class="tg-031e">Fraction</th>
+                                <th class="tg-yw4l">Sub, Obj &Aacute; Practical</th>
+                                <th class="tg-yw4l">Total</th>
+                                <th class="tg-yw4l">Conversion</th>
+                                <th class="tg-031e">Fraction</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="tg-yw4l">Writen 1</td>
+                                <td class="tg-yw4l">
+                                    <input type="checkbox" ng-model="TabConfig.WrittenObt1" name="w1obj"  ng-checked="TabConfig.WrittenObt1==true" class="form-control">
+                                </td>
+                                <td class="tg-yw4l">
+                                    <input type="checkbox" ng-model="TabConfig.WrittenConv1" name="w1con" ng-checked="TabConfig.WrittenConv1==true" class="form-control">
+                                </td>
+                                <td class="tg-yw4l">
+                                    <input type="checkbox" ng-model="TabConfig.WrittenFrac1" name="w1fra" ng-checked="TabConfig.WrittenFrac1==true" class="form-control">
+                                </td>
+                                <td class="tg-yw4l">Subjective</td>
+                                <td class="tg-yw4l">
+                                    <input type="checkbox" ng-model="TabConfig.SubjectiveObt" name="st" ng-checked="TabConfig.SubjectiveObt==true" class="form-control">
+                                </td>
+                                <td class="tg-yw4l">
+                                    <input type="checkbox" ng-model="TabConfig.SubjectiveConv" name="scon" ng-checked="TabConfig.SubjectiveConv==true" class="form-control">
+                                </td>
+                                <td class="tg-yw4l">
+                                    <input type="checkbox" ng-model="TabConfig.SubjectiveFrac" name="sfra" ng-checked="TabConfig.SubjectiveFrac==true" class="form-control">
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="tg-yw4l">Writen 2</td>
+                                <td class="tg-yw4l">
+                                    <input type="checkbox" ng-model="TabConfig.WrittenObt2" name="w2obj" ng-checked="TabConfig.WrittenObt2==true" class="form-control">
+                                </td>
+                                <td class="tg-yw4l">
+                                    <input type="checkbox" ng-model="TabConfig.WrittenConv2" name="w2con" ng-checked="TabConfig.WrittenConv2==true" class="form-control">
+                                </td>
+                                <td class="tg-yw4l">
+                                    <input type="checkbox" ng-model="TabConfig.WrittenFrac2" name="w2fra" ng-checked="TabConfig.WrittenFrac2==true" class="form-control">
+                                </td>
+                                <td class="tg-yw4l">Objective</td>
+                                <td class="tg-yw4l">
+                                    <input type="checkbox" ng-model="TabConfig.ObjectiveObt" name="ot" ng-checked="TabConfig.ObjectiveObt==true" class="form-control">
+                                </td>
+                                <td class="tg-yw4l">
+                                    <input type="checkbox" ng-model="TabConfig.ObjectiveConv" name="ocon" ng-checked="TabConfig.ObjectiveConv==true" class="form-control">
+                                </td>
+                                <td class="tg-yw4l">
+                                    <input type="checkbox" ng-model="TabConfig.ObjectiveFrac" name="ofra" ng-checked="TabConfig.ObjectiveFrac==true" class="form-control">
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="tg-yw4l">Writen 3</td>
+                                <td class="tg-yw4l">
+                                    <input type="checkbox" ng-model="TabConfig.WrittenObt3" name="w3obj" ng-checked="TabConfig.WrittenObt3==true" class="form-control">
+                                </td>
+                                <td class="tg-yw4l">
+                                    <input type="checkbox" ng-model="TabConfig.WrittenConv3" name="w3con" ng-checked="TabConfig.WrittenConv3==true" class="form-control">
+                                </td>
+                                <td class="tg-yw4l">
+                                    <input type="checkbox" ng-model="TabConfig.WrittenFrac3" name="w3fra" ng-checked="TabConfig.WrittenFrac3==true" class="form-control">
+                                </td>
+                                <td class="tg-yw4l">Practical</td>
+                                <td class="tg-yw4l">
+                                    <input type="checkbox" ng-model="TabConfig.PracticalObt" name="pt" ng-checked="TabConfig.PracticalObt==true" class="form-control">
+                                </td>
+                                <td class="tg-yw4l">
+                                    <input type="checkbox" ng-model="TabConfig.PracticalConv" name="pcon" ng-checked="TabConfig.PracticalConv==true" class="form-control">
+                                </td>
+                                <td class="tg-yw4l">
+                                    <input type="checkbox" ng-model="TabConfig.PracticalFrac" name="pfra" ng-checked="TabConfig.PracticalFrac==true" class="form-control">
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="tg-yw4l">SubExam Total</td>
+                                <td class="tg-yw4l">
+                                    <input type="checkbox" ng-model="TabConfig.SubExamTotalObt" name="stt" ng-checked="TabConfig.SubExamTotalObt==true" class="form-control">
+                                </td>
+                                <td class="tg-yw4l">
+                                    <input type="checkbox" ng-model="TabConfig.SubExamTotalConv" name="stcon" ng-checked="TabConfig.SubExamTotalConv==true" class="form-control">
+                                </td>
+                                <td class="tg-yw4l">
+                                    <input type="checkbox" ng-model="TabConfig.SubExamTotalFrac" name="stfra" ng-checked="TabConfig.SubExamTotalFrac==true" class="form-control">
+                                </td>
+                                <td class="tg-yw4l">Subject ObtMarks</td>
+                                <td class="tg-yw4l">
+                                    <input type="checkbox" ng-model="TabConfig.SubjectObtMarks" name="wtt" ng-checked="TabConfig.SubjectObtMarks==true" class="form-control">
+                                </td>
+                                <td class="tg-yw4l">
+                                    <input type="checkbox" ng-model="TabConfig.SubjectConvertedMarks" name="wstcon" ng-checked="TabConfig.SubjectConvertedMarks==true" class="form-control">
+                                </td>
+                                <td class="tg-yw4l">
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="tg-yw4l">Virtual</td>
+                                <td class="tg-yw4l">
+                                    <input type="checkbox" ng-model="TabConfig.Virtual1" name="vtt" ng-checked="TabConfig.Virtual1==true" class="form-control">
+                                </td>
+                                <td class="tg-yw4l">
+                                    <input type="checkbox" ng-model="TabConfig.Virtual2" name="vtcon" ng-checked="TabConfig.Virtual2==true" class="form-control">
+                                </td>
+                                <td class="tg-yw4l"></td>     
+                                <td class="tg-yw4l">Subject GP and GL</td>
+                                <td class="tg-yw4l">
+                                    <input type="checkbox" ng-model="TabConfig.SubjectGP" name="wtt" ng-checked="TabConfig.SubjectGP==true" class="form-control">
+                                </td>
+                                <td class="tg-yw4l">
+                                    <input type="checkbox" ng-model="TabConfig.SubjectGL" name="wstcon" ng-checked="TabConfig.SubjectGL==true" class="form-control">
+                                </td>   
+                                <td class="tg-yw4l"></td>                        
+                            </tr>
+                            <tr>
+                                <td class="tg-yw4l">DisplayOrder</td>
+                                <td class="tg-yw4l" colspan="7">
+                                    <input type="number" ng-model="TabConfig.DisplayOrder" name="wstcon"  class="form-control">
+                                </td>          
+                            <tr>
+<tr>
+                                <td colspan="5" ng-show="MainExamID>0 && SubExamID>0">
+                                    <button ng-click="submited1=true" class="btn btn-primary btn-large">Save</button>
+                                </td>
+                                <td colspan="5" ng-show="MainExamID>0 && SubExamID>0">
+                                    <button ng-click="resetForm()" class="btn btn-primary btn-large">Reset</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </form>
+        </div>
+        <a ng-click="generateReport()"  class="btn btn-primary ">Report</a>
+    </div>    
+</div>
+@section Scripts{
+
+    <script type="text/javascript">
+        OEMSApp.controller("CltrTabConfig", ["$scope", "$http", "SweetAlert", "$window",
+              function ($scope, $http, SweetAlert, $window) {
+
+                  init();
+                  function init() {
+                      initialize();
+                      getAllCommons();
+                  }
+                  function initialize() {
+                      $scope.MainExamID = 0;
+                      $scope.SubExamID = 0;
+                      $scope.TabConfig = {};
+                      $scope.TabConfig.TabConfigId = 0;
+                      $scope.TabConfig.MainExamId = 0;
+                      $scope.TabConfig.SubExamId = 0;
+
+                      $scope.TabConfig.WrittenObt1 = 0;
+                      $scope.TabConfig.WrittenConv1 = 0;
+                      $scope.TabConfig.WrittenFrac1 = 0;
+
+                      $scope.TabConfig.WrittenObt2 = 0;
+                      $scope.TabConfig.WrittenConv2 = 0;
+                      $scope.TabConfig.WrittenFrac2 = 0;
+
+                      $scope.TabConfig.WrittenObt3 = 0;
+                      $scope.TabConfig.WrittenConv3 = 0;
+                      $scope.TabConfig.WrittenFrac3 = 0;
+
+                      $scope.TabConfig.SubjectiveObt = 0;
+                      $scope.TabConfig.SubjectiveConv = 0;
+                      $scope.TabConfig.SubjectiveFrac = 0;
+
+                      $scope.TabConfig.ObjectiveObt = 0;
+                      $scope.TabConfig.ObjectiveConv = 0;
+                      $scope.TabConfig.ObjectiveFrac = 0;
+
+                      $scope.TabConfig.PracticalObt = 0;
+                      $scope.TabConfig.PracticalConv = 0;
+                      $scope.TabConfig.PracticalFrac = 0;
+
+                      $scope.TabConfig.SubExamTotalObt = 0;
+                      $scope.TabConfig.SubExamTotalConv = 0;
+                      $scope.TabConfig.SubExamTotalFrac = 0;
+
+                      $scope.TabConfig.WrittenTotal = 0;
+                      $scope.TabConfig.SubjectObtMarks = 0;
+                      $scope.TabConfig.SubjectConvertedMarks = 0;
+                      $scope.TabConfig.SubjectGP = 0;
+                      $scope.TabConfig.SubjectGL = 0;
+                      $scope.TabConfig.DisplayOrder = 0;
+                      $scope.TabConfig.Virtual1 = 0;
+                      $scope.TabConfig.Virtual2 = 0;
+
+                      //$scope.MainExamSubjectMark.MainExamId = 0;
+                      $scope.resetForm = resetForm;
+                      $scope.MainExam = {};
+                      $scope.MainExam.MainExamId = 0;
+                      $scope.MainExams = [];
+
+                      $scope.SubExam = {};
+                      $scope.SubExam.SubExamId = 0;
+                      $scope.SubExams = [];
+                      $scope.CommonFeilds = [];
+                      $scope.getNewMainExam = getNewMainExam;
+                      $scope.getMainExam = getMainExam;
+                      $scope.getSubExam = getSubExam;
+
+                  }
+                  //for class ways report ........
+                  $scope.generateReport = function generateReport() {
+
+                          $scope.uri = "@Url.Action("TabConfigReport", "Report")";
+                          $window.open($scope.uri, '_blank');
+
+                  }
+
+                  function resetForm() {
+                      $scope.MainExam = {};
+                      $scope.SubExam = {};
+                      $scope.MainExamID = 0;
+                      $scope.SubExamID = 0;
+                      $scope.TabConfig = {};
+
+                      $scope.submited2 = false;
+                      $scope.submited1 = false;
+                      $scope.submited = false;
+
+                  }
+                  $scope.GetGroup = function GetGroup(classid) {
+                      $scope.Groups = [];
+
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Common/GetGroup/' + classid
+                      }).then(function successCallback(response) {
+                          $scope.Groups = response.data.results;
+
+                      }, function errorCallback(response) {
+                          toastr["info"](response.data.message);
+                      });
+
+                  }
+                  $scope.filterMainExam = function filterMainExam() {
+                      var keepGoing1 = true;
+                      angular.forEach($scope.CloneMainExams, function (value, key) {
+                          if (keepGoing1) {
+                              if (value.MainExamId == $scope.MainExamID) {
+                                  var index = $scope.CloneMainExams.indexOf(value);
+                                  $scope.CloneMainExams.splice(index, 1);
+                                  keepGoing1 = false;
+                              }
+                          }
+                      });
+                  }
+                  $scope.Clone = function () {
+                      if ($scope.MainExamSubjectMark.Clone == true) {
+                          $http({
+                              method: 'GET',
+                              url: baseUrl + 'Result/CloneTabConfig/' + $scope.MainExamSubjectMark.Clone + '/' + $scope.MainExamID + '/' + $scope.MainExamSubjectMark.NewMainExamId
+                          }).then(function successCallback(response) {
+                              toastr["info"](response.data.message);
+                              //$scope.MeritConfigs = response.data.results;
+                              //reset();
+                          }, function errorCallback(response) {
+                              toastr["info"](response.data.message);
+
+                          });
+                      }
+                  };
+                  function getAllCommons() {
+                      $scope.CommonFeilds = [];
+
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Common/GetCommonItem/'
+                      }).then(function successCallback(response) {
+                          $scope.CommonFeilds = response.data.results;
+                      }, function errorCallback(response) {
+                          toastr["info"](response.data.message);
+                      });
+                  }
+
+                  function getNewMainExam() {
+                      $scope.CloneMainExams = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'ExamSetup/GetMainExamBySession/' + $scope.MainExamSubjectMark.VersionId + '/' + $scope.MainExamSubjectMark.SessionId + '/' + $scope.MainExamSubjectMark.ClassId + '/' + $scope.MainExamSubjectMark.GroupId
+                      }).then(function successCallback(response) {
+                          $scope.CloneMainExams = response.data.results;
+                      }, function errorCallback(response) {
+                          toastr["info"](response.data.message);
+                      });
+                  }  
+                   $scope.AddTabConfig = function AddTabConfig() {
+                       if ($scope.MainExamID == 0 && $scope.SubExamID==0)
+                          return;
+                       if ($scope.TabConfig != {}) {
+                           $scope.TabConfig.MainExamId = $scope.MainExamID;
+                           $scope.TabConfig.SubExamId = $scope.SubExamID;
+                              $http({
+                                  method: 'POST',
+                                  url: baseUrl + 'ExamMarkSetup/AddTabConfig/',
+                                  data: $scope.TabConfig
+                              }).then(function successCallback(response) {
+                                  $scope.TabConfig = response.data.results;
+                                  toastr["info"](response.data.message);
+                              }, function errorCallback(response) {
+                                  toastr["info"](response.data.message);
+                              });
+                          }
+                  };
+                  function getMainExam() {
+                      $scope.MainExams = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'ExamSetup/GetMainExamBySession/' + $scope.MainExamSubjectMark.VersionId + '/' + $scope.MainExamSubjectMark.SessionId + '/' + $scope.MainExamSubjectMark.ClassId + '/' + $scope.MainExamSubjectMark.GroupId
+                      }).then(function successCallback(response) {
+                          $scope.MainExams = response.data.results;
+                      }, function errorCallback(response) {
+                          toastr["info"](response.data.message);
+                      });
+                  }
+                  function getSubExam() {
+                      $scope.SubExams = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'ExamSetup/GetSubExamByMainExamID/' + $scope.MainExamID
+                      }).then(function successCallback(response) {
+                          $scope.SubExams = response.data.results;
+                      }, function errorCallback(response) {
+                          toastr["info"](response.data.message);
+                      });
+                  }
+                  $scope.getTabConfig= function getTabConfig() {
+                     // $scope.TabConfig = {};
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'ExamMarkSetup/GetTabConfig/' + $scope.MainExamID + '/' + $scope.SubExamID
+                      }).then(function successCallback(response) {
+                          $scope.TabConfig = response.data.results;
+                      }, function errorCallback(response) {
+                          toastr["info"](response.data.message);
+                      });
+                  }
+                  //for class ways report ........   ClassId
+                  $scope.generateReport = function generateReport() {
+                      if ($scope.MainExamSubjectMark.VersionId == null) {
+                          toastr["info"]("Select a Version.");
+                      }
+                      else if ($scope.MainExamSubjectMark.SessionId == null) {
+                          toastr["info"]("Select a Session.");
+                      }
+                      else {
+                          $scope.uri = "@Url.Action("TabConfigReport", "Report")?VersionID=" + $scope.MainExamSubjectMark.VersionId + "&SessionID=" + $scope.MainExamSubjectMark.SessionId + "&ClassId=" + $scope.MainExamSubjectMark.ClassId;
+                          $window.open($scope.uri, '_blank');
+                      }
+
+                  }
+
+              }]);
+    </script>
+
+    <script type="text/javascript">
+
+
+        $(document).ready(function ($) {
+
+            // Disable scroll when focused on a number input.
+            $(document).on('focus', 'input[type=number]', function (e) {
+                $(this).on('wheel', function (e) {
+                    e.preventDefault();
+                });
+            });
+
+            // Restore scroll on number inputs.
+            $(document).on('blur', 'input[type=number]', function (e) {
+                $(this).off('wheel');
+            });
+
+            // Disable up and down keys.
+            $(document).on('keydown', 'input[type=number]', function (e) {
+                if (e.which == 38 || e.which == 40)
+                    e.preventDefault();
+            });
+
+        });
+    </script>
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+

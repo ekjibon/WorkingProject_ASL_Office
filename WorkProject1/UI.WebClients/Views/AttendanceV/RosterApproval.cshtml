@@ -1,0 +1,731 @@
+﻿
+@{
+    ViewBag.Title = "Roster Approval";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    .disable {
+        background-color: rgba(194, 0, 0, 0.80);
+       color:rgba(56, 6, 90, 0.95)
+    }
+    .DrpdwnWidth ul{
+        width:300px;
+    }
+</style>
+<div class="kt-container  kt-container--fluid  kt-grid__item kt-grid__item--fluid" ng-controller="RosterApproval">
+    <div class="row">
+        <div class="kt-portlet kt-portlet--mobile">
+            <div class="kt-portlet__head kt-portlet__head--lg">
+                <div class="kt-portlet__head-label">
+                    <h3 class="kt-portlet__head-title">
+                        <!----Titel Text-->
+                        Roster Approval
+                        <!----Titel Text -->
+                    </h3>
+                </div>
+            </div>
+
+            <div class="kt-portlet__body">
+
+                <div class="row">
+                    <div class="col-md-3" ng-hide="Temporary">
+                        <input type="checkbox" ng-model="Regular" ng-change="resetForm()" /> <span> Regular</span>
+                    </div>
+                    <div class="col-md-3" ng-hide="Regular">
+                        <input type="checkbox" ng-model="Temporary" ng-change="resetForm()" /> <span> Manual Update</span>
+
+                    </div>
+                </div>
+                <form class="form-horizontal" id="formEmpRoster" name="formEmpRoster" novalidate>
+                    <div class="row" ng-show="Regular">
+                        <div class="col-md-4">
+                            <div class="form-group row" ng-class="{ 'has-error' : submitted && formEmpRoster.Branch.$invalid}">
+                                <label class="col-md-5 control-label" style="text-align:right">
+                                    Emp Branch :
+                                    <span class="required">*</span>
+                                </label>
+                                <div class="col-md-6">
+                                    <select class="form-control" ng-model="EmpRoster.BranchId" ng-required="Regular" name="Branch" ng-options="B.BranchId as B.BranchName for B in CommonFeilds.Branch">
+                                        <option value="" selected="selected">Choose Option</option>
+                                    </select>
+
+                                    <div class="form-control-focus"> </div>
+                                    <span ng-show="submitted && formEmpRoster.Branch.$error.required" class="help-block">Branch Required</span>
+                                </div>
+                            </div>
+
+
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group row" ng-class="{ 'has-error' : submitted && formEmpRoster.Category1.$invalid}">
+                                <label class="col-md-5 control-label" style="text-align:right">
+                                    Emp Category :
+                                    <span class="required">*</span>
+                                </label>
+                                <div class="col-md-6">
+                                    <select class="form-control" ng-model="EmpRoster.EmpCategory" ng-required="Regular" name="Category1" ng-options="item.CategoryID as item.CategoryName for item in CommonFeilds.Category">
+                                        <option value="" selected="selected">Choose Option</option>
+                                    </select>
+                                    <div class="form-control-focus"> </div>
+                                    <span ng-show="submitted && formEmpRoster.Category1.$error.required" class="help-block">Category Required</span>
+                                </div>
+                            </div>
+
+
+
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group row" ng-class="{ 'has-error' :submitted  && formEmpRoster.Title1.$invalid}">
+                                <label class="col-md-5 control-label" style="text-align:right">
+                                    Calendar Title :
+                                    <span class="required">*</span>
+                                </label>
+                                <div class="col-md-6">
+                                    <select class="form-control" ng-change="chkChanged()" ng-disabled="EmpRoster.EmpCategory==null" ng-model="EmpRoster.CalendarId" ng-required="Regular" name="Title1" ng-options="item.Id as item.Title for item in EmpCalenderList | filter:{EmpCategory:EmpRoster.EmpCategory}:true">
+                                        <option value="" selected="selected">Choose Option</option>
+
+                                    </select>
+                                    <div class="form-control-focus"> </div>
+                                    <span ng-show="submitted && formEmpRoster.Title1.$error.required " class="help-block">Title Required</span>
+
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                @*<div class="row">*@
+                                <div class="col-md-2">
+                                    <button class="btn btn-primary btn-sm " name="regularShow" ng-click="ShowEmpRosterList();submitted=true">Show</button>
+                                </div>
+                                <div class="col-md-2">
+                                    <button class="btn btn-success btn-sm " name="regularUpdate" ng-click="Update();submitted = true" type="submit">Approve</button>
+                                </div>
+                                <div class="col-md-2">
+                                    <button class="btn btn-danger btn-sm " name="regularReject" ng-click="Reject();submitted = true" type="submit">Reject</button>
+                                </div>
+                                <div class="col-md-2">
+                                    <a href="@Url.Action("GetRosterSetupReport","Report")?BranchId={{EmpRoster.BranchId}}&CategoryId={{EmpRoster.EmpCategory}}&CalendarId={{EmpRoster.CalendarId}}" target="_blank" class="btn btn-success btn-sm ">
+                                        Report
+                                    </a>
+                                </div>
+                                <div class="col-md-2">
+                                    <button class="btn btn-danger btn-sm" type="button" ng-click="resetForm()">Reset</button>
+                                </div>
+                                @*</div>*@
+
+
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="row" ng-show="Temporary">
+                        <div class="col-md-4">
+                            <div class="form-group row" ng-class="{ 'has-error' : submitted && formEmpRoster.StudentId.$invalid}">
+                                <label class="col-sm-5 control-label pull-left" style="text-align:right">
+                                    Emp.
+                                </label>
+                                <div class="col-md-6 DrpdwnWidth">
+                                    @*<input type="text" ng-model="employeeInfo.EmpID" class="form-control" placeholder="EmpID" name="EmpID">*@
+                                    <input type="text"
+                                           name="StudentId"
+                                           ng-model="Std"
+                                           typeahead-on-select='onSelect($item, $model, $label)' ng-required="Temporary"
+                                           placeholder="Search name/ID SMS Notification"
+                                           uib-typeahead="i  as i.Text for i in Search($viewValue)"
+                                           typeahead-loading="loadingLocations" typeahead-no-results="noResults" class="form-control">
+                                    <i ng-show="loadingLocations" class="glyphicon glyphicon-refresh"></i>
+                                    <div ng-show="noResults"><i class="glyphicon glyphicon-remove"></i> No Results Found</div>
+                                    <input type="hidden" name="StudentIID" ng-value="Std.Value" />
+                                    <div class="form-control-focus"> </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div class="col-md-4">
+
+                            <div class="form-group row">
+                                @*<div class="row" >*@
+                                <div class="col-md-3">
+                                    <button class="btn btn-info btn-sm pull-right" name="temporaryShow" ng-click="ShowEmployeeRoster();submitted=true">Show</button>
+                                </div>
+                                <div class="col-md-3">
+                                    <a class="btn btn-danger btn-sm " name="temporaryReset" ng-click="resetForm()">Reset</a>
+                                </div>
+                                @*</div>*@
+                            </div>
+                        </div>
+                    </div>
+
+                </form>
+                <div class="table-container" style="margin-top: 5%;" ng-show="Temporary">
+                    <div id="sample_3_wrapper" class="dataTables_wrapper no-footer">
+                        <div class="row">
+                            <div class="col-md-4 col-sm-5 col-xs-6">
+                                <div class="form-group row">
+                                    <div class="col-lg-3 col-md-5 col-sm-4 col-xs-8" style="padding-left:0px">
+                                        <select class="form-control" ng-model="pageSize" ng-options="P.value as P.text for P in pageSizeArray"></select>
+                                    </div>
+                                    <div class="col-md-7  col-sm-8  col-xs-4">
+                                        @*<label for="search" class="control-label" style="padding-top:5px">Items</label>*@
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4 col-sm-3 col-xs-1">
+                            </div>
+                            <div class="col-md-4 col-sm-4 col-xs-5">
+                                <div id="sample_3_filter" class="pull-right">
+                                    <input ng-model="q" id="search" class="form-control" placeholder="Filter text">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="table-scrollable"> </div>
+                        <form class="form-horizontal" id="formEmpRoster" name="formEmpRosterList">
+                            <table class="table table-bordered table-hover rounded">
+                                <thead>
+                                    <tr class="btn-primary">
+                                        <th ng-show="EmployeeRoster.length > 0">
+                                            <input type="checkbox" id="all" ng-change="allTempItems(allCheck);" ng-model="allCheck" ng-checked="allCheck" />
+                                            Mark
+                                        </th>
+                                        <th>Calendar Date</th>
+                                        <th>Day</th>
+                                        <th>In Time</th>
+                                        <th>Out Time</th>
+                                        @*<th>Status</th>*@
+
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-show="EmployeeRoster.length <= 0"><td colspan="5" style="text-align:center;"><i class="fa fa-refresh"></i> Loading new data!!</td></tr>
+                                    <tr dir-paginate="item in EmployeeRoster | filter:q  | itemsPerPage: pageSize " current-page="currentPage" @*ng-class="{'disable': (item.TemApproveStatus=='Approved' || item.TemRejecteStatus=='Rejected')}"*@>
+                                        <td><input @*ng-disabled="item.TemApproveStatus=='Approved' || item.TemRejecteStatus=='Rejected'"*@ type="checkbox" ng-change="singleItem(item.IsChecked);" ng-model="item.IsChecked" ng-checked="item.IsChecked" /></td>
+                                        <td>{{item.CalendarDate | date:'dd-MM-yyyy'}}</td>
+                                        <td>{{item.Day}}</td>
+                                        <td>{{item.TempInTime |date:'hh:mm a'}}</td>
+                                        <td>{{item.TempOutTime |date:'hh:mm a'}}</td>
+                                        @*<td ng-show="item.TemApproveStatus=='Approved'">{{item.TemApproveStatus}}</td>
+                                <td ng-show="item.TemRejecteStatus=='Rejected'">{{item.TemRejecteStatus}}</td>*@
+                                    </tr>
+
+                                </tbody>
+                            </table>
+                            <div class="row">
+                                <div class="col-md-1 ">
+                                    <button class="btn btn-success" ng-click="UpdateTemporary();submitted = true && filterform.$valid" type="button">Approve</button>
+                                </div>
+                                <div class="col-md-1 text-left">
+                                    <button class="btn btn-danger" ng-click="RejectTemporary();submitted = true && filterform.$valid" type="button">Reject</button>
+                                </div>
+                            </div>
+                            <br />
+                        </form>
+                        <div class="row">
+                            <dir-pagination-controls boundary-links="true" template-url="~/assets/angular/lib/dirPagination.tpl.html"></dir-pagination-controls>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="table-container" style="margin-top: 5%;" ng-show="Regular">
+                    <div id="sample_3_wrapper" class="dataTables_wrapper no-footer">
+                        <div class="row">
+                            <div class="col-md-4 col-sm-5 col-xs-6">
+                                <div class="form-group row">
+                                    <div class="col-lg-3 col-md-5 col-sm-4 col-xs-8" style="padding-left:0px">
+                                        <select class="form-control" ng-model="pageSize" ng-options="P.value as P.text for P in pageSizeArray"></select>
+                                    </div>
+                                    <div class="col-md-7  col-sm-8  col-xs-4">
+                                        @*<label for="search" class="control-label" style="padding-top:5px">Items</label>*@
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4 col-sm-3 col-xs-1">
+                            </div>
+                            <div class="col-md-4 col-sm-4 col-xs-5">
+                                <div id="sample_3_filter" class="pull-right">
+                                    <input ng-model="q" id="search" class="form-control" placeholder="Filter text">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="table-scrollable"> </div>
+                        <form class="form-horizontal" id="formEmpRoster" name="formEmpRosterList">
+                            <table class="table table-bordered table-hover rounded">
+                                <thead>
+                                    <tr class="btn-primary">
+                                        <th ng-show="EmpRosterList.length > 0">
+                                            <input type="checkbox" id="all" ng-change="allItems(allCheck);" ng-model="allCheck" ng-checked="allCheck" />
+                                            Mark
+                                        </th>
+                                        <th>Date Range</th>
+                                        <th>Name</th>
+                                        <th>In Time</th>
+                                        <th>Out Time</th>
+                                        <th>Remarks</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-show="EmpRosterList.length <= 0"><td colspan="5" style="text-align:center;"><i class="fa fa-refresh"></i> Loading new data!!</td></tr>
+                                    <tr dir-paginate="item in EmpRosterList | filter:q  | itemsPerPage: pageSize " current-page="currentPage" ng-class="{'disable': (item.ApproveStatus=='Approved' || item.RejecteStatus=='Rejected')}">
+                                        <td><input ng-disabled="item.ApproveStatus=='Approved' || item.RejecteStatus=='Rejected'" type="checkbox" ng-change="singleItem(item.IsChecked);" ng-model="item.IsChecked" ng-checked="item.IsChecked" /></td>
+                                        <td>{{item.StartDate | date:'dd-MM-yyyy'}} to {{item.EndDate | date:'dd-MM-yyyy'}}</td>
+                                        <td>{{item.FullName}}</td>
+                                        <td>{{item.InTime |date:'hh:mm a'}}</td>
+                                        <td>{{item.OutTime |date:'hh:mm a'}}</td>
+                                        <td>
+                                            @*<input type="text" ng-model="item.Remarks" class="form-control" />*@
+                                            {{item.Remarks}}
+                                        </td>
+                                        <td ng-show="item.ApproveStatus=='Approved'">{{item.ApproveStatus}}</td>
+                                        <td ng-show="item.RejecteStatus=='Rejected'">{{item.RejecteStatus}}</td>
+                                    </tr>
+
+                                </tbody>
+                            </table>
+                        </form>
+                        <div class="row">
+                            <dir-pagination-controls boundary-links="true" template-url="~/assets/angular/lib/dirPagination.tpl.html"></dir-pagination-controls>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    <script type="text/javascript">
+        OEMSApp.controller("RosterApproval", ["$scope", "$http", "SweetAlert", "blockUI", "$filter",
+              function ($scope, $http, SweetAlert, blockUI, $filter) {
+                  init();
+                  function init() {
+                      initialize();
+                      getAllCommons();
+                      getEmpClanderList();
+                  }
+                  function initialize() {
+                      $scope.EmpRoster = {};
+                      $scope.allCheck = false;
+                      $scope.EmpCalenderList = [];
+                      $scope.EmpRosterList = [];
+                      $scope.EmployeeRoster = [];
+                      $scope.ShowEmpRosterList = ShowEmpRosterList;
+                      $scope.getProcessExistByMonth = [];
+                      $scope.GetMonth = GetMonth;
+                      $scope.modalTitle = "Automated Fees process";
+                      $scope.submitted = false
+      
+                      $scope.Months = [];
+                      $scope.FeesMonthList = [];
+                      $scope.FeesAutomatedMonthList = [];
+                      $scope.pageSizeArray = [];
+                      $scope.pageSizeArray.push({ value: 5, text: 5 });
+                      $scope.pageSizeArray.push({ value: 10, text: 10 });
+                      $scope.pageSizeArray.push({ value: 20, text: 20 });
+                      $scope.pageSizeArray.push({ value: 50, text: 50 });
+                      $scope.currentPage = 1;
+                      $scope.pageSize = 10;
+                  }
+
+
+                  $scope.resetForm = function resetForm() {
+
+                      $scope.EmpRoster = {};
+
+                      $scope.submitted = false;
+
+                  }
+
+                  $scope.allItems = function allItems(c) {
+                      angular.forEach($scope.EmpRosterList, function (value, key) {
+                          if (c) {
+                              value.IsChecked = true;
+                          }
+                          else {
+                              value.IsChecked = false;
+                          }
+                      });
+                  };
+
+                  $scope.allTempItems = function allTempItems(c) {
+                      angular.forEach($scope.EmployeeRoster, function (value, key) {
+                          if (c) {
+                              value.IsChecked = true;
+                          }
+                          else {
+                              value.IsChecked = false;
+                          }
+                      });
+                  };
+                  $scope.singleItem = function singleItem(n) {
+                      $scope.DisCountDisplay = false;
+
+                      $scope.allCheck = false;
+                      angular.forEach($scope.EmpRosterList, function (value, key) {
+                          if ($scope.IsChecked) {
+                              if (value.IsChecked)
+                                  $scope.allCheck = false;
+                              else
+                                  $scope.allCheck = true ;
+                          }
+                      });
+                  };
+
+                  //$scope.ShowEmpRosterList =
+                  function ShowEmpRosterList() {
+                      if ($scope.formEmpRoster.$invalid) {
+
+                          return;
+                      }
+                      $http({
+                          method: 'POST',
+                          url: baseUrl + 'Attendance/GetEmpRosterApproveList/',
+                          data: $scope.EmpRoster
+                      }).then(function successCallback(response) {
+
+                          $scope.EmpRosterList = response.data.results;
+                          angular.forEach($scope.EmpRosterList, function (value, key) {
+                              value.IsChecked = false;
+                          });
+                          console.log($scope.EmpRosterList);
+                      }, function errorCallback(response) {
+
+                      })
+
+                  }
+
+
+                  $scope.ShowEmployeeRoster = function () {  //tem
+
+                      if ($scope.formEmpRoster.$invalid) {
+
+                          return;
+                      }
+                      $http({
+                          method: 'POST',
+                          url: baseUrl + 'Attendance/GetEmpRosterListForApprove/',
+                          data: $scope.EmpRoster
+
+                      }).then(function successCallback(response) {
+
+                          $scope.EmployeeRoster = response.data.results;
+                          console.log($scope.EmployeeRoster);
+                          angular.forEach($scope.EmployeeRoster, function (value, key) {
+                              value.IsChecked = false;
+                          });
+                      }, function errorCallback(response) {
+
+                      })
+                  }
+
+
+
+                  function GetMonth() {
+
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Fees/getMonthByProcess/' + $scope.ProcessId
+                      }).then(function successCallback(response) {
+                          $scope.showButton = true;
+
+                          $scope.Months = response.data.results;
+                      }, function errorCallback(response) {
+
+                      })
+                  }
+                  function getAllCommons() {
+                      $scope.CommonFeilds = [];
+
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Common/GetCommonItemEmp/'
+                      }).then(function successCallback(response) {
+                          $scope.CommonFeilds = response.data.results;
+                          //console.log($scope.CommonFeilds);
+                      }, function errorCallback(response) {
+                      });
+                  }
+
+                  $scope.Search = function (val) {
+                      return $http.get(baseUrl + 'Employee/SearchEmployee/' + val, {
+                          params: {
+
+                          }
+                      }).then(function (response) {
+                          return response.data.results.map(function (item) {
+                              return item;
+                          });
+                      });
+                  };
+                  $scope.onSelect = function onSelect($item, $model, $label) {
+
+                      $scope.EmpRoster.EmpBasicInfoID = $item.Value;
+                      //SearchEmployeeId($item.Value);
+                  };
+
+                  function SearchEmployeeId(EmpID) {
+                      $scope.employeeInfos = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Employee/GetEmployeeID/' + EmpID
+                      }).then(function successCallback(response) {
+                          $scope.employeeInfos = response.data.results;
+                          console.log($scope.employeeInfos);
+                          $scope.tblshow = true;
+                      }, function errorCallback(response) {
+                          toastr["error"](response.data.Message);
+                      });
+                  }
+
+                  function resetForm() {
+                      $scope.submitted = false;
+                      $scope.allCheck = true;
+                      
+                      $scope.CommonFeilds = [];
+
+                      $scope.EmpRosterList = [];
+                      $scope.EmployeeRosterList = [];
+                      $scope.EmployeeRoster = [];
+                      $scope.EmpCalenderList = [];
+                      $scope.EmpCalenderYearList = [];
+                      $scope.EmpCalenderMothList = [];
+                  }
+
+                  $scope.Update = function Update() {
+
+                      SweetAlert.swal({
+                          title: "Are you sure to update it ?", type: "info", showCancelButton: true, confirmButtonColor: "#DD6B55",
+                          confirmButtonText: "Yes, update it!",
+                          closeOnConfirm: false
+                      },
+                    function (isConfirm) {
+                        if (isConfirm) {
+
+                            $scope.EmployeeRosterList = [];
+
+                            if ($scope.EmpRosterList.length == 0) {
+                                toastr["warning"]('At least One Select.');
+                                return;
+                            }
+                            else {
+
+                                for (var i = 0 ; i < $scope.EmpRosterList.length; i++) {
+                                    if ($scope.EmpRosterList[i].IsChecked == true) {
+                                        //if ($scope.EmpRosterList[i].IsChecked == true && $scope.EmpRosterList[i].Status != null) {
+                                        $scope.EmployeeRosterList.push($scope.EmpRosterList[i]);
+
+                                    }
+                                }
+                            }
+                            if ($scope.EmployeeRosterList.length == 0) {
+                                toastr["warning"]('At least One Select.');
+                                return;
+                            }
+                            $http({
+                                method: 'POST',
+                                url: baseUrl + 'Attendance/UpdateEmpRoster/',
+                                data: $scope.EmployeeRosterList
+                            }).then(function successCallback(response) {
+
+                                SweetAlert.swal("Saved!", response.data.message, "success");
+                                window.location.reload();
+                            }, function errorCallback(response) {
+                                toastr["error"](response.data.Message);
+                            });
+                        }
+                    });
+
+                  }
+
+                  $scope.Reject = function Reject() {
+
+                      SweetAlert.swal({
+                          title: "Are you sure to reject it ?", type: "info", showCancelButton: true, confirmButtonColor: "#DD6B55",
+                          confirmButtonText: "Yes, reject it!",
+                          closeOnConfirm: false
+                      },
+                    function (isConfirm) {
+                        if (isConfirm) {
+
+                            $scope.EmployeeRosterList = [];
+
+                            if ($scope.EmpRosterList.length == 0) {
+                                toastr["warning"]('At least One Select.');
+                                return;
+                            }
+                            else {
+
+                                for (var i = 0 ; i < $scope.EmpRosterList.length; i++) {
+                                    if ($scope.EmpRosterList[i].IsChecked == true) {
+                                        //if ($scope.EmpRosterList[i].IsChecked == true && $scope.EmpRosterList[i].Status != null) {
+                                        $scope.EmployeeRosterList.push($scope.EmpRosterList[i]);
+
+                                    }
+                                }
+                            }
+                            if ($scope.EmployeeRosterList.length == 0) {
+                                toastr["warning"]('At least One Select.');
+                                return;
+                            }
+                            $http({
+                                method: 'POST',
+                                url: baseUrl + 'Attendance/RejectEmpRoster/',
+                                data: $scope.EmployeeRosterList
+                            }).then(function successCallback(response) {
+
+                                SweetAlert.swal("Saved!", response.data.message, "success");
+                                window.location.reload();
+                            }, function errorCallback(response) {
+                                toastr["error"](response.data.Message);
+                            });
+                        }
+                    });
+
+                  }
+
+                  $scope.UpdateTemporary = function UpdateTemporary() {
+
+                      SweetAlert.swal({
+                          title: "Are you sure to update it ?", type: "info", showCancelButton: true, confirmButtonColor: "#DD6B55",
+                          confirmButtonText: "Yes, update it!",
+                          closeOnConfirm: false
+                      },
+                    function (isConfirm) {
+                        if (isConfirm) {
+
+                            $scope.EmployeeTempRosterList = [];
+
+                            if ($scope.EmployeeRoster.length == 0) {
+                                toastr["warning"]('At least One Select.');
+                                return;
+                            }
+                            else {
+
+                                for (var i = 0 ; i < $scope.EmployeeRoster.length; i++) {
+                                    if ($scope.EmployeeRoster[i].IsChecked == true) {
+                                        //if ($scope.EmpRosterList[i].IsChecked == true && $scope.EmpRosterList[i].Status != null) {
+                                        $scope.EmployeeTempRosterList.push($scope.EmployeeRoster[i]);
+
+                                    }
+                                }
+                            }
+                            if ($scope.EmployeeTempRosterList.length == 0) {
+                                toastr["warning"]('At least One Select.');
+                                return;
+                            }
+                            $http({
+                                method: 'POST',
+                                url: baseUrl + 'Attendance/UpdateTemporaryEmpRoster/',
+                                data: $scope.EmployeeTempRosterList
+                            }).then(function successCallback(response) {
+
+                                SweetAlert.swal("Saved!", response.data.message, "success");
+                                window.location.reload();
+                            }, function errorCallback(response) {
+                                toastr["error"](response.data.Message);
+                            });
+                        }
+                    });
+
+                  }
+
+                  $scope.RejectTemporary = function RejectTemporary() {
+
+                      SweetAlert.swal({
+                          title: "Are you sure to reject it ?", type: "info", showCancelButton: true, confirmButtonColor: "#DD6B55",
+                          confirmButtonText: "Yes, reject it!",
+                          closeOnConfirm: false
+                      },
+                    function (isConfirm) {
+                        if (isConfirm) {
+
+                            $scope.EmployeeTempRosterList = [];
+
+                            if ($scope.EmployeeRoster.length == 0) {
+                                toastr["warning"]('At least One Select.');
+                                return;
+                            }
+                            else {
+
+                                for (var i = 0 ; i < $scope.EmployeeRoster.length; i++) {
+                                    if ($scope.EmployeeRoster[i].IsChecked == true) {
+                                        //if ($scope.EmpRosterList[i].IsChecked == true && $scope.EmpRosterList[i].Status != null) {
+                                        $scope.EmployeeTempRosterList.push($scope.EmployeeRoster[i]);
+
+                                    }
+                                }
+                            }
+                            if ($scope.EmployeeTempRosterList.length == 0) {
+                                toastr["warning"]('At least One Select.');
+                                return;
+                            }
+                            $http({
+                                method: 'POST',
+                                url: baseUrl + 'Attendance/RejectTemporaryEmpRoster/',
+                                data: $scope.EmployeeTempRosterList
+                            }).then(function successCallback(response) {
+
+                                SweetAlert.swal("Saved!", response.data.message, "success");
+                                window.location.reload();
+                            }, function errorCallback(response) {
+                                toastr["error"](response.data.Message);
+                            });
+                        }
+                    });
+
+                  }
+
+                  function getEmpClanderList() {
+                      //$scope.EmpCalenderList = [];
+
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Attendance/GetEmpCalendarList/'
+                      }).then(function successCallback(response) {
+                          $scope.EmpCalenderList = response.data.results;
+                          //console.log(response.data.results);
+
+                      }, function errorCallback(response) {
+
+                      });
+
+                  }
+
+                  $scope.chkChanged = function () {
+                      $scope.EmpCalenderYearList = [];
+                      $scope.isChange = true;
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Attendance/GetYearRange/' + $scope.EmpRoster.CalendarId
+                      }).then(function successCallback(response) {
+                          $scope.EmpCalenderYearList = response.data.results;
+                          console.log(response.data.results);
+
+                      }, function errorCallback(response) {
+
+                      });
+                  }
+
+                  $scope.chkChanged1 = function () {
+                      $scope.EmpCalenderMothList = [];
+                      $scope.isChange1 = true;
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Attendance/GetMonthRange/' + $scope.EmpRoster.CalendarId + '/' + $scope.EmpRoster.Year
+                      }).then(function successCallback(response) {
+                          $scope.EmpCalenderMothList = response.data.results;
+                          //console.log(response.data.results);
+
+                      }, function errorCallback(response) {
+
+                      });
+                  }
+              }]);
+    </script>
+}
+
+
+
+
+
+

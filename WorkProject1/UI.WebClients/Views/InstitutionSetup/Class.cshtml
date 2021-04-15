@@ -1,0 +1,262 @@
+﻿@{
+    ViewBag.Title = "Classes";
+}
+<div ng-controller="classes">
+    <!-- Begin: life time stats -->
+    <div class="portlet light bordered">
+        <div class="portlet-title">
+            <div class="caption">
+                <i class="icon-settings font-green"></i>
+                <span class="caption-subject font-green sbold uppercase">@ViewBag.Title</span>
+            </div>
+            <div class="actions">
+                <div class="btn-group btn-group-solid">
+                    <button ng-click="resetForm()" class="btn green" data-target="#addmodal" data-toggle="modal"> <i class="fa fa-plus"></i> Add Class</button>
+                </div>
+            </div>
+        </div>
+        <div class="portlet-body">
+            <div class="table-container">
+                <div id="sample_3_wrapper" class="dataTables_wrapper no-footer">
+                    <div class="row">
+                        <div class="col-md-4 col-sm-5 col-xs-6">
+                            <div class="form-group">
+                                <div class="col-lg-3 col-md-5 col-sm-4 col-xs-8" style="padding-left:0px">
+                                    <select class="form-control" ng-model="pageSize" ng-options="P.value as P.text for P in pageSizeArray"></select>
+                                </div>
+                                <div class="col-md-7  col-sm-8  col-xs-4">
+                                    @*<label for="search" class="control-label" style="padding-top:5px">Items</label>*@
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 col-sm-3 col-xs-1">
+                        </div>
+                        <div class="col-md-4 col-sm-4 col-xs-5">
+                            <div id="sample_3_filter" class="pull-right">
+                                <input ng-model="q" id="search" class="form-control" placeholder="Filter text">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="table-scrollable"> </div>
+                    <table class="table table-bordered table-hover">
+                        <thead>
+                            <tr class="btn-primary">
+                             <th>Class Name</th>
+                                <th>Class Code</th>
+                                <th>For College</th>
+                                <th style="text-align:center">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-show="Classes.results.length <= 0"><td colspan="5" style="text-align:center;"><i class="fa fa-refresh"></i> Loading new data!!</td></tr>
+                            <tr dir-paginate="item in Classes.results |filter:q |itemsPerPage:pageSize" current-page="currentPage">
+                               <td>{{item.ClassName}}</td>
+                                <td>{{item.CalssCode}}</td>
+                               <td>{{item.Class_ForCollege ? 'YES': 'NO'}}</td>
+                                @*<td><a href="~/InstitutionSetup/Class?R={{item.ClassId}}" class="label label-sm label-info"> View </a></td>*@
+                                <td align="center">
+                                    <a href="javascript:;" class="btn btn-icon-only green" ng-click="edit(item)" data-target="#addmodal" data-toggle="modal">
+                                        <i class="fa fa-edit"></i>
+                                    </a>
+                                    <a ng-click="deleteclass(item)" href="javascript:;" class="btn btn-icon-only red">
+                                        <i class="fa fa-trash"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="row">
+                            <dir-pagination-controls boundary-links="true" template-url="~/assets/angular/lib/dirPagination.tpl.html"></dir-pagination-controls>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- End: life time stats -->
+    <!--Modal Area Start-->
+    <div id="addmodal" class="modal fade" tabindex="-1" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form name="addform" ng-submit="save()" class="form-horizontal" id="form_sample_1" novalidate>
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                        <h4 class="modal-title">{{aemodalTitle}}</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-body">
+                      <div class="form-group" ng-class="{ 'has-error' : submitted && addform.ClassName.$invalid}">
+                                <label class="col-md-3 control-label">
+                                    Class Name
+                                    <span class="required">*</span>
+                                </label>
+                                <div class="col-md-9">
+                                    <input type="text" ng-model="class.ClassName" class="form-control" placeholder="Class Name" name="ClassName" required>
+                                    <div class="form-control-focus"> </div>
+                                    <span ng-show="submitted && addform.ClassName.$error.required" class="help-block">Class Name Required</span>
+                                </div>
+                            </div>
+                            <div class="form-group" ng-class="{ 'has-error' : submitted && addform.ClassCode.$invalid}">
+                                <label class="col-md-3 control-label" for="form_control_1">
+                                    Class Code
+                                    <span class="required">*</span>
+                                </label>
+                                <div class="col-md-9">
+                                    <input type="text" ng-model="class.CalssCode"  
+                                           ng-pattern="/^\S{0,50}$/" class="form-control" placeholder="Class Code" name="ClassCode" required>
+                                    <div class="form-control-focus"> </div>
+                                    <span ng-show="submitted && addform.ClassCode.$error.required" class="help-block">Class Code Required</span>
+                                    <span style="color:red" class="help-block" ng-if="submitted && addform.ClassCode.$invalid">No Space Allow</span>
+                                </div>
+                            </div>
+                            <div class="mt-checkbox-inline col-md-offset-3">
+                           <label class="mt-checkbox">
+                                    <input type="checkbox"   value="true" ng-model="class.Class_ForCollege"> For College
+                                    <span></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" data-dismiss="modal" class="btn dark btn-outline" ng-click="resetForm();submitted=false">Cancel</button>
+                        <button type="submit" ng-click="submitted=true" class="btn green">Save</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!--Modal Area End-->
+</div>
+@section Scripts{
+    <script type="text/javascript">
+        OEMSApp.controller("classes", ["$scope", "$http", "SweetAlert",
+           function ($scope, $http, SweetAlert) {
+               init();
+               function init() {
+                   initialize();
+                   getClasses(1);
+                  
+               }
+               function initialize() {
+                   $scope.aemodalTitle = "Add Class";
+                   $scope.classname = '';
+                   $scope.currentPage = 1;
+                   $scope.pageno = 1;
+                   $scope.pagesize = 10;
+                   $scope.total_count = 12;
+                   $scope.search = '';
+                   $scope.class = {};
+                   $scope.class.ClassId = 0;
+                   $scope.Classes = [];
+                   $scope.versions = [];
+                   $scope.Id = '';
+                   $scope.getClasses = getClasses;
+                   $scope.res = {};
+                   $scope.data = {};
+                   $scope.resetForm = resetForm;
+               
+                   $scope.pageSizeArray = [];
+                   $scope.pageSizeArray.push({ value: 5, text: 5 });
+                   $scope.pageSizeArray.push({ value: 10, text: 10 });
+                   $scope.pageSizeArray.push({ value: 20, text: 20 });
+                   $scope.pageSizeArray.push({ value: 50, text: 50 });
+                   $scope.currentPage = 1;
+                   $scope.pageSize = 10;
+               }
+               function resetForm() {
+                   $scope.aemodalTitle = "Add Class";
+                   $scope.class = {};
+                   $scope.class.ClassId = 0;
+                   $scope.addform.$setUntouched();
+                   $scope.addform.$setPristine();
+                   $scope.submitted = false;
+                   $scope.Id = '';
+                   getClasses();
+               }
+               function getClasses() {
+                   $scope.Classes = [];
+                   $http({
+                       method: 'GET',
+                       url: baseUrl + 'SetupInstitution/GetAllClassInfo/'
+                   }).then(function successCallback(response) {
+                       // this callback will be called asynchronously
+                       // when the response is available
+                       $scope.Classes = response.data;
+                       // $scope.AspNetRoles = response.data;
+                       $scope.total_count = response.data.totalcount;
+                       //console.log(response.data);
+                   }, function errorCallback(response) {
+                       toastr["warning"](response.data.Message);
+                   });
+               }
+               $scope.searchData = function () {
+                   getClasses(1);
+                   // $scope.total_count = 88;
+               };
+               $scope.edit = function (n) {
+                   $scope.aemodalTitle = "Update Class";
+                   $scope.class = n;
+                   $scope.ClassId = n.ClassId;
+               };
+               $scope.save = function save() {
+                   if ($scope.addform.$invalid)
+                       return;
+                   if ($scope.class.ClassId != 0) /// For Update
+                   {
+                       if ($scope.class.ClassName != '') {
+                           $http({
+                               method: 'PUT',
+                               url: baseUrl + 'SetupInstitution/UpdateClassInfo/',
+                               data: $scope.class
+                           }).then(function successCallback(response) {
+                               $('#addmodal').modal('toggle');
+                               getClasses(1);
+                               toastr["info"](response.data.message);
+                               resetForm();
+                           }, function errorCallback(response) {
+                               toastr["warning"](response.data.Message);
+                           });
+                       }
+                   } else {  //  For Add
+                       if ($scope.class.ClassName != {}) {
+                           $http({
+                               method: 'POST',
+                               url: baseUrl + 'SetupInstitution/AddClassInfo/',
+                              data: $scope.class
+                           }).then(function successCallback(response) {
+                               $('#addmodal').modal('toggle');
+                               getClasses(1);
+                               toastr["info"](response.data.message);
+                               resetForm();
+                           }, function errorCallback(response) {
+                               toastr["warning"](response.data.Message);
+                           });
+                       }
+                   }
+               };
+               $scope.deleteclass = function deleteclass(n) {
+                   // SweetAlert.swal("Good job!", "You clicked the button!", "success");
+                   SweetAlert.swal({
+                       title: "Are you sure to delete it ?", type: "warning", showCancelButton: true, confirmButtonColor: "#DD6B55",
+                       confirmButtonText: "Yes, delete it!",
+                       closeOnConfirm: false
+                   },
+                   function (isConfirm) {
+                       if (isConfirm) {
+                           $http({
+                               method: 'DELETE',
+                               url: baseUrl + 'SetupInstitution/DeleteClassInfo/' + n.ClassId,
+                               data: $scope.class
+                           }).then(function successCallback(response) {
+                               SweetAlert.swal("Deleted!", "Your data has been deleted.", "success");
+                               getClasses(1);
+                           }, function errorCallback(response) {
+                               toastr["warning"](response.data.Message);
+                           });
+                       }
+                   });
+               };
+              
+               
+           }]);
+    </script>
+}

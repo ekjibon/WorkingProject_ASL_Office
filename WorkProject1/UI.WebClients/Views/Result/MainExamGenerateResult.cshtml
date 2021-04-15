@@ -1,0 +1,363 @@
+﻿@{
+    ViewBag.Title = "Generate Result";
+}
+@section Styles{
+   
+}
+
+<div class="portlet box blue-hoki"  ng-controller="MEGR">
+    <div class="portlet-title">
+        <div class="caption">
+            <i class="fa fa-user-plus"></i>Generate Result
+        </div>
+       
+    </div>
+    <div class="portlet-body form">
+        <!-- BEGIN FORM-->
+        <form class="form-horizontal" name="formCommonFeilds" novalidate>
+            <div class="form-body">
+               
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group" ng-class="{ 'has-error' : submitted && formCommonFeilds.Version.$invalid}">
+                            <label class="col-md-5 control-label">
+                                Version :
+                                <span class="required">*</span>
+                            </label>
+                            <div class="col-md-7">
+                                <select class="form-control" ng-model="GenerateResult.VersionID" required name="Version" ng-options="GenerateResult.VersionId as GenerateResult.VersionName for GenerateResult in CommonFeilds.Version">
+                                    <option value="" selected="selected">Choose Option</option>
+                                </select>
+                                <div class="form-control-focus"> </div>
+                                <span ng-show="submitted && formCommonFeilds.Version.$error.required" class="help-block">Version Required</span>
+                            </div>
+                        </div>
+                        <div class="form-group" ng-class="{ 'has-error' : submitted && formCommonFeilds.Session.$invalid}">
+                            <label class="col-md-5 control-label">
+                                Session :
+                                <span class="required">*</span>
+                            </label>
+                            <div class="col-md-7">
+                                <select class="form-control"  ng-model="GenerateResult.SessionId" required name="Session" ng-options="GenerateResult.SessionId as GenerateResult.SessionName for GenerateResult in CommonFeilds.Session">
+                                    <option value="" selected="selected">Choose Option</option>
+                                </select>
+
+                                <div class="form-control-focus"> </div>
+                                <span ng-show="submitted && formCommonFeilds.Session.$error.required" class="help-block">Session Required</span>
+                            </div>
+                        </div>
+
+                        <div class="form-group" ng-class="{ 'has-error' : submitted && formCommonFeilds.Branch.$invalid}">
+                            <label class="col-md-5 control-label">
+                                Branch :
+                                <span class="required">*</span>
+                            </label>
+                            <div class="col-md-7">
+                                <select class="form-control"  ng-model="GenerateResult.BranchID" required name="Branch" ng-options="GenerateResult.BranchId as GenerateResult.BranchName for GenerateResult in CommonFeilds.Branch">
+                                    <option value="" selected="selected">Choose Option</option>
+                                </select>
+                                <div class="form-control-focus"> </div>
+                                <span ng-show="submitted && formCommonFeilds.Branch.$error.required" class="help-block">Branch Name Required</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group" ng-class="{ 'has-error' : submitted && formCommonFeilds.Shift.$invalid}">
+                            <label class="col-md-5 control-label">
+                                Shift :
+                                <span class="required">*</span>
+                            </label>
+                            <div class="col-md-7">
+                                <select class="form-control"  ng-model="GenerateResult.ShiftID" required name="Shift" ng-options="GenerateResult.ShiftId as GenerateResult.ShiftName for GenerateResult in CommonFeilds.Shift | filter:{BranchId:GenerateResult.BranchID}:true">
+                                    <option value="" selected="selected">Choose Option</option>
+                                </select>
+                                <div class="form-control-focus"> </div>
+                                <span ng-show="submitted && formCommonFeilds.Shift.$error.required" class="help-block">Shift Name Required</span>
+                            </div>
+                        </div>
+                        <div class="form-group" ng-class="{ 'has-error' : submitted && formCommonFeilds.Class.$invalid}">
+                            <label class="col-md-5 control-label">
+                                Class :
+                                <span class="required">*</span>
+                            </label>
+                            <div class="col-md-7">
+                                <select class="form-control"  ng-model="GenerateResult.ClassId" name="Class" ng-change="GetGroup(GenerateResult.ClassId)" required ng-options="GenerateResult.ClassId as GenerateResult.ClassName for GenerateResult in CommonFeilds.ClassInfo | filter:{VersionId:GenerateResult.VersionID}:true">
+                                    <option value="" selected="selected">Choose Option</option>
+                                </select>
+                                <div class="form-control-focus"> </div>
+                                <span ng-show="submitted && formCommonFeilds.Class.$error.required" class="help-block">Class Required</span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-5 control-label">
+                                Group :
+                            </label>
+                            <div class="col-md-7">
+                                <select class="form-control" ng-disabled="Groups.length <= 0" ng-change="GetSection();getMainExam();" ng-model="GenerateResult.GroupId" name="Group" ng-options="G.GroupId as G.GroupName for G in Groups">
+                                    <option value="" selected>Choose Option</option>
+                                </select>
+                                <div class="form-control-focus"> </div>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group" ng-class="{ 'has-error' : submitted && formCommonFeilds.Section.$invalid}">
+                            <label class="col-md-5 control-label">
+                                Section :
+                                <span class="required">*</span>
+                            </label>
+                            <div class="col-md-7">
+                                <select class="form-control"  ng-model="GenerateResult.SectionId" required name="Section" ng-options="S.SectionId as S.SectionName for S in Sections">
+                                    <option value="" selected="selected">Choose Option</option>
+                                </select>
+                                <div class="form-control-focus"> </div>
+                                <span ng-show="submitted && formCommonFeilds.Section.$error.required" class="help-block">Section Name Required</span>
+                            </div>
+                        </div>
+                        <div class="form-group" ng-class="{ 'has-error' : submitted && formCommonFeilds.mainExam.$invalid}">
+                            <label class="col-md-5 control-label">
+                                Main Exam :
+                            </label>
+                            <div class="col-md-7">
+                                <select class="form-control"  ng-model="GenerateResult.MainExamId" required name="mainExam" ng-options="mainexam.MainExamId as mainexam.MainExamName for mainexam in MainExams ">
+                                    <option value="" selected="selected">Choose Option</option>
+                                </select>
+                                <div class="form-control-focus"> </div>
+                                <span ng-show="submitted && formCommonFeilds.mainExam.$error.required" class="help-block">Main Exam Name Required</span>
+                                
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-5 control-label">
+                                Tab Size :
+                            </label>
+                            <div class="col-md-7 ">
+                                <select class="form-control" ng-model="Size" name="">
+                                    <option value="" selected="selected">Please Select</option>
+                                    <option value="1">14 X 8.5</option>
+                                    <option value="2">18 X 11.5</option>
+                                    <option value="3">36 X 11.5</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                  
+                </div>
+                <div class="row">
+                    <div class="pull-right">
+                        <button ng-click="submitted=true;Search()" class="btn green">Show</button>
+                        <a href="@Url.Action("MainExamTabulation","Report")?MainExamId={{GenerateResult.MainExamId}}&Versionid={{GenerateResult.VersionID}}&SessionId={{GenerateResult.SessionId}}&BranchID={{GenerateResult.BranchID}}&ShiftID={{GenerateResult.ShiftID}}&ClassId={{GenerateResult.ClassId}}&GroupId={{GenerateResult.GroupId}}&SectionId={{GenerateResult.SectionId}} &Size={{Size}}" target="_blank" class="btn yellow">Tabulation Sheet</a>
+                        <a ng-click="archive()" class="btn green">Archive</a>
+                        <button ng-click="Reset()" class="btn info">Reset</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="panel">
+        <div class="panel-body">
+            <table class="table table-bordered table-inverse">
+                <thead class="btn-primary">
+                    <tr>
+                        <th><input type="checkbox" ng-model="selectedAll" ng-click="selectAll()" />  All</th>
+                        <th> ID </th>
+                        <th> Roll </th>
+                        <th> Name</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                                       
+                    <tr ng-repeat="item in StudentInfos">
+                        <td> <input type="checkbox" ng-model="item.Selected" value="false" ng-click="checkIfAllSelected()"/> </td>
+                        <td> {{item.StudentInsID}} </td>
+                        <td> {{item.RollNo}} </td>
+                        <td width="25%"> {{item.FullName}} </td>
+                        <td width="10%">
+                            <a href="@Url.Action("MainExamResultCard","Report")?MainExamId={{GenerateResult.MainExamId}}&Versionid={{GenerateResult.VersionID}}&SessionId={{GenerateResult.SessionId}}&ClassId={{GenerateResult.ClassId}}&StuId={{item.StudentIID}}"  class="btn btn-icon-only btn-primary" target="_blank"><i class="fa fa-download" aria-hidden="true"></i></a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="6">
+                            <a href="@Url.Action("MainExamResultCard","Report")?MainExamId={{GenerateResult.MainExamId}}&Versionid={{GenerateResult.VersionID}}&SessionId={{GenerateResult.SessionId}}&ClassId={{GenerateResult.ClassId}}&StuId={{GetSelects()}}" class="btn btn-info btn-sm pull-right" target="_blank">View All Result</a>
+                        </td>
+                       
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+        <!-- Table -->
+
+
+    </div>
+    
+
+    <!-- END FORM-->
+</div>
+
+
+@section Scripts{
+    <script type="text/javascript">
+        OEMSApp.controller("MEGR", ["$scope", "$http", "SweetAlert",
+          function ($scope, $http, SweetAlert) {
+
+                  init();
+                  function init() {
+                      initialize();
+                      getAllCommons();
+                     // getMainExam();
+                  }
+                  function initialize() {
+                      $scope.GenerateResult = {};
+                      $scope.GenerateResult.VersionID = 0;
+                      $scope.GenerateResult.SessionId = 0;
+                      $scope.GenerateResult.BranchID = 0;
+                      $scope.GenerateResult.ShiftID = 0;
+                      $scope.GenerateResult.ClassId = 0;
+                      $scope.GenerateResult.GroupId = 0;
+                      $scope.GenerateResult.SectionId = 0;
+                      $scope.GenerateResult.HouseId = 0;
+                      $scope.GenerateResult.StudentType = 0;
+
+                      $scope.GenerateResult = {};
+                    
+                      $scope.StudentInfos = [];
+                      $scope.Dropdowns = [];
+                      $scope.CommonFeilds = [];
+                      $scope.currentPage = 1;
+                      $scope.pageno = 1;
+                      $scope.pagesize = 10;
+                      $scope.total_count = 12;
+                      $scope.txtsearch = '';
+
+                      $scope.getMainExam = getMainExam;
+                  };
+                  function resetForm() {
+                      $scope.submitted = false;
+                  };
+                 
+                  $scope.Reset = function Reset() {
+                      $scope.GenerateResult = {};
+                      $scope.submitted = false;
+                      $scope.selectedAll = false;
+                      $scope.StudentInfos = [];
+                  };
+                  
+                  $scope.GetGroup = function GetGroup(classid) {
+                      $scope.Groups = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Common/GetGroup/' + classid
+                      }).then(function successCallback(response) {
+                          $scope.Groups = response.data.results;
+                      }, function errorCallback(response) {
+                          toastr["error"](response.data.message);
+                      });
+                  }
+                  $scope.archive = function archive() {
+                      if ($scope.Size==null) {
+                          toastr["error"]("Please Select Tabulation Size");
+                          return;
+                      }
+                      $http({
+                          method: 'POST',
+                          url: "@Url.Action("AddMainExamArchive", "Archive")?MainExamId=" + $scope.GenerateResult.MainExamId + "&Size=" + $scope.Size + "&StuId=" + $scope.GetSelects(),
+                          data: $scope.GenerateResult
+                      }).then(function successCallback(response) {
+                          toastr["success"](response.data.message);
+                      }, function errorCallback(response) {
+                          toastr["error"](response.data.message);
+                      });
+                  }
+                  $scope.GetSection = function GetSection() {
+                      $scope.Sections = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Common/GetSection/' + $scope.GenerateResult.SessionId + "/" + $scope.GenerateResult.ShiftID + "/" + $scope.GenerateResult.ClassId + "/" + $scope.GenerateResult.GroupId
+                      }).then(function successCallback(response) {
+                          $scope.Sections = response.data.results;
+                      }, function errorCallback(response) {
+                          toastr["error"](response.data.message);
+                      });
+                  }
+                  function getMainExam() {
+                      $scope.MainExams = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'ExamSetup/GetMainExamBySession/' + $scope.GenerateResult.VersionID + '/' + $scope.GenerateResult.SessionId + '/' + $scope.GenerateResult.ClassId + '/' + $scope.GenerateResult.GroupId
+                      }).then(function successCallback(response) {
+                          $scope.MainExams = response.data.results;
+                      }, function errorCallback(response) {
+                          toastr["error"](response.data.message);
+                      });
+                  }
+                  $scope.selectAll = function () {
+                      angular.forEach($scope.StudentInfos, function (item) {
+                          item.Selected = $scope.selectedAll;
+                      });
+                     
+                  };
+                  $scope.GetSelects = function GetSelects() {
+                      var res = '';
+                      angular.forEach($scope.StudentInfos, function (item) {
+                          if(item.Selected)
+                          {
+                              res = res + ',' + item.StudentIID
+                          }
+                      });
+
+                    return  res.trim()
+
+                  };
+                
+
+                  $scope.checkIfAllSelected = function () {
+                      $scope.selectedAll = $scope.StudentInfos.every(function (item) {
+                          return item.Selected == true
+                      })
+                  };
+                  $scope.Search = function Search() {
+                      if ($scope.formCommonFeilds.$invalid)
+                          return;
+                      
+                      $scope.StudentInfos = [];
+                      $http({
+                          method: 'POST',
+                          url: baseUrl + 'Student/SearchMainExam/',
+                          data: $scope.GenerateResult
+                      }).then(function successCallback(response) {
+                          $scope.StudentInfos = response.data.results;
+                          $scope.selectedAll = true;
+                          angular.forEach($scope.StudentInfos, function (item) {
+                              item.Selected = $scope.selectedAll;
+                          });
+
+                          toastr["success"](response.data.message);
+                      }, function errorCallback(response) {
+                          toastr["error"](response.data.message);
+                      });
+
+                  };
+
+                  
+                 
+                  function getAllCommons() {
+                      $scope.CommonFeilds = [];
+
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Common/GetCommonItem/'
+                      }).then(function successCallback(response) {
+                          $scope.CommonFeilds = response.data.results;
+                      }, function errorCallback(response) {
+                          toastr["error"](response.data.message);
+                      });
+                  }
+            
+                              
+
+              }]);
+    </script>
+} 

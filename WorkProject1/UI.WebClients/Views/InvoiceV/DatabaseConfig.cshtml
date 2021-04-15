@@ -1,0 +1,259 @@
+﻿
+@{
+    ViewBag.Title = "Database Configuration";
+}
+<style type="text/css">
+    input[type=number]::-webkit-inner-spin-button,
+    input[type=number]::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+
+    #ClientId {
+        width: 260px;
+    }
+</style>
+
+<div class="kt-container  kt-container--fluid  kt-grid__item kt-grid__item--fluid" ng-controller="AdminCollectionCntrl">
+    <div class="row">
+        <div class="kt-portlet kt-portlet--mobile">
+            <div class="kt-portlet__head kt-portlet__head--lg">
+                <div class="kt-portlet__head-label">
+                    <h3 class="kt-portlet__head-title">
+                        Database Configuration
+                    </h3>
+                </div>
+            </div>
+            <div class="kt-portlet__body">
+                <!-- BEGIN FORM-->
+                <form class="form-horizontal" ng-submit="Search()" name="frmFilter" id="frmFilter" method="post" enctype="multipart/form-data" novalidate>
+                    <div class="form-body">
+                        <div class="row">
+                            <div class="col-md-2"></div>
+                            <div class="col-md-6">
+                                <div class="form-group row" ng-class="{ 'has-error' :submitted && frmFilter.DataType.$invalid}">
+                                    <label class="col-md-5 control-label" style="text-align:right">
+                                        Data Type :
+                                        <span class="required">*</span>
+                                    </label>
+                                    <div class="col-md-7">
+                                        <select class="form-control" ng-model="mainFilter.DataType" ng-change="filterButton();" required name="DataType">
+                                            <option value="" selected="selected">Select Data Type</option>
+                                            <option value="SMSData">SMS Data</option>
+                                            <option value="StudentData">Student Data</option>
+
+                                        </select>
+                                        <span ng-show="submitted && frmFilter.DataType.$error.required " class="help-block">Data Required</span>
+                                    </div>
+                                </div>
+                                <div class="form-group row" ng-class="{ 'has-error' : submitted && frmFilter.Client.$invalid}">
+                                    <label class="col-md-5 control-label" style="text-align:right">
+                                        Client Name:
+                                    </label>
+                                    <div class="col-md-7">
+                                        <input type="text" ng-model="Client" typeahead-on-select='onSelect($item, $model, $label)' placeholder="Enter client name or ID" uib-typeahead="i  as i.Text for i in Searchtext($viewValue)" typeahead-loading="loadingLocations" typeahead-no-results="noResults" class="form-control">
+                                        <i ng-show="loadingLocations" class="glyphicon glyphicon-refresh"></i>
+                                        <div ng-show="noResults"><i class="glyphicon glyphicon-remove"></i> No Results Found</div>
+                                        <input type="hidden" name="ClientId" ng-model="mainFilter.ClientId" ng-value="Std.Value" />
+                                    </div>
+                                </div>
+                                <div class="form-group row" ng-hide="disBtn" ng-class="{ 'has-error' : submitted && frmFilter.From.$invalid}">
+                                    <label class="col-md-5 control-label" style="text-align:right">
+                                        From:
+                                        <span class="required">*</span>
+                                    </label>
+                                    <div class="col-md-7">
+                                        <input class="form-control" name="From" type="datetime" required placeholder="From Date" readonly ng-click="p1=true" is-open="p1" uib-datepicker-popup="dd/MM/yyyy" ng-model="mainFilter.From" />
+                                        <div class="form-control-focus"> </div>
+                                        <span ng-show="submitted && frmFilter.From.$error.required" class="help-block">From Date Required</span>
+                                    </div>
+                                </div>
+
+                                <div class="form-group row" ng-hide="disBtn" ng-class="{ 'has-error' : submitted && frmFilter.To.$invalid}">
+                                    <label class="col-md-5 control-label" style="text-align:right">
+                                        To:
+                                        <span class="required">*</span>
+                                    </label>
+                                    <div class="col-md-7">
+                                        <input class="form-control" name="To" type="datetime" required placeholder="To Date" readonly ng-click="p2=true" is-open="p2" uib-datepicker-popup="dd/MM/yyyy" ng-model="mainFilter.To" />
+                                        <div class="form-control-focus"> </div>
+                                        <span ng-show="submitted && frmFilter.To.$error.required" class="help-block">To Date Required</span>
+                                    </div>
+                                </div>
+
+
+                                <div class="form-group row">
+                                    <div class="col-md-12 text-right">
+                                        <button ng-click="submitted=true" class="btn btn-success">Generate</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3"></div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+@section Scripts{
+    <script type="text/javascript">
+        OEMSApp.controller("AdminCollectionCntrl", ["$scope", "$http", "SweetAlert", "blockUI", "$window", "$filter",
+          function ($scope, $http, SweetAlert, blockUI, $window, $filter) {
+
+              init();
+              function init() {
+                  initialize();
+                  getAllClient();
+
+              }
+              function initialize() {
+                  $scope.mainFilter = {};
+                  $scope.mainFilter.ClientName = "";
+                  $scope.mainFilters = [];
+                  $scope.mainFilters.Client = [];
+                  $scope.Versions = [];
+                  $scope.MainExams = [];
+                  $scope.SubExams = [];
+                  $scope.DividedExams = [];
+                  $scope.Subjects = [];
+
+                  $scope.txtsearch = '';
+                  $scope.Search = Search;
+                  $scope.getAllClient = getAllClient;
+
+              };
+              $scope.DataType = [{
+                  Id: 1,
+                  Name: 'Bank Date'
+              }, {
+                  Id: 2,
+                  Name: 'Posting Date'
+              }];
+              $scope.filterButton = function filterButton() {
+                  if ($scope.mainFilter.DataType == "StudentData") {
+                      $scope.disBtn = true;
+                      $scope.mainFilter.To = null;
+                      $scope.mainFilter.From = null;
+                  }
+                  else {
+                      $scope.disBtn = false;
+                  }
+              }
+
+              $scope.Searchtext = function (val) {
+                  return $http.get(baseUrl + 'Client/SearchClientDatabaseConfig/' + val
+                      ).then(function (response) {
+                          return response.data.results.map(function (item) {
+                              return item;
+                          });
+                      });
+              };
+              $scope.onSelect = function onSelect($item, $model, $label) {
+                  $scope.mainFilter.ClientName = $item.Value;
+              };
+
+              function Search() {
+                  if ($scope.Client == "") {
+                      $scope.mainFilter.ClientName = "";
+                  };
+                  if (($scope.frmFilter.$invalid && $scope.mainFilter.DataType == "SMSData") || $scope.mainFilter.DataType == null) {
+                      return;
+                  }
+                  else {
+                      var From = $filter('date')($scope.mainFilter.From, "yyyyMMdd");
+                      var To = $filter('date')($scope.mainFilter.To, "yyyyMMdd");
+
+                      if (From > To) {
+                          toastr["warning"]("From Date is greater than To Date");
+                          return;
+                      }
+                      var form = document.createElement("form");
+                      form.target = "_blank";
+                      form.method = "POST";
+                      form.action = window.location.origin + '/Report/DatabaseConfig?ClientName=' + $scope.mainFilter.ClientName + '&DataType=' + $scope.mainFilter.DataType + '&FromDate=' + From + '&ToDate=' + To;
+                      form.style.display = "none";
+                      for (var key in $scope.mainFilter) {
+                          var input = document.createElement("input");
+                          input.type = "hidden";
+                          input.name = key;
+                          if ($scope.mainFilter[key] != "") {
+                              input.value = $scope.mainFilter[key]
+                          }
+                          else {
+                              input.value = " "
+                          }
+                          form.appendChild(input);
+                      }
+                      document.body.appendChild(form);
+                      form.submit();
+                      document.body.removeChild(form);
+                  }
+              };
+
+              $scope.Reset = function Reset() {
+                  initialize();
+                  $scope.frmFilter.$setPristine();
+                  $scope.frmFilter.$setUntouched();
+                  getAllClient();
+                  $scope.submitted = false;
+              };
+              function getAllClient() {
+                  $scope.mainFilters.Client = [];
+                  $http({
+                      method: 'GET',
+                      url: baseUrl + 'Client/GetAllClient/'
+                  }).then(function successCallback(response) {
+                      $scope.mainFilters.Client = response.data.results;
+                  }, function errorCallback(response) {
+                      toastr["info"](response.data.Message);
+                  });
+              }
+
+          }]).directive('multiSelect', function () {
+              function link(scope, element) {
+                  var options = {
+                      enableClickableOptGroups: true,
+                      onChange: function () {
+                          element.change();
+                      }
+                  };
+                  element.multiselect(options);
+              }
+              return {
+                  restrict: 'A',
+                  link: link
+              };
+          }).config(['$provide', function ($provide) {
+              $provide.decorator('selectDirective', ['$delegate', function ($delegate) {
+                  var directive = $delegate[0];
+                  directive.compile = function () {
+                      function post(scope, element, attrs, ctrls) {
+                          directive.link.post.apply(this, arguments);
+                          var ngModelController = ctrls[1];
+                          if (ngModelController && attrs.multiple == true) {
+                              originalRender = ngModelController.$render;
+                              ngModelController.$render = function () {
+                                  originalRender();
+                                  element.multiselect('rebuild');
+                              };
+                          }
+                      }
+                      return {
+                          pre: directive.link.pre,
+                          post: post
+                      };
+                  };
+                  return $delegate;
+              }]);
+          }]);
+    </script>
+
+}
+
+
+
+

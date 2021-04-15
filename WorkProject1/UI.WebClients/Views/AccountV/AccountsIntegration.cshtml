@@ -1,0 +1,301 @@
+﻿
+@{
+    ViewBag.Title = "Accounts Integration";
+}
+
+<div class="kt-container  kt-container--fluid  kt-grid__item kt-grid__item--fluid" ng-controller="AccIntegrationCtrl">
+    <div class="row">
+        <div class="kt-portlet kt-portlet--mobile">
+            <div class="kt-portlet__head kt-portlet__head--lg">
+                <div class="kt-portlet__head-label">
+                    <h3 class="kt-portlet__head-title">
+                        <!----Titel Text-->
+                        @ViewBag.Title
+                        <!----Titel Text -->
+                    </h3>
+                </div>
+                <div class="kt-portlet__head-toolbar">
+                    <div class="kt-portlet__head-wrapper">
+                        <div class="dropdown dropdown-inline">
+                           
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="kt-portlet__body">
+                <form name="addform" ng-submit="save()" class="form-horizontal" id="form_sample_1" novalidate autocomplete="off">
+                    <div class="modal-body">
+                        <div class="form-body">
+                            <div class="row">
+                                <div class="col-md-2">
+
+                                </div>
+                                <div class="col-md-8">
+                                    <div>
+                                        <h2><u>Fees:</u></h2>
+                                        <div class="form-group row" ng-class="{ 'has-error' : submitted && addform.FeesGroupId.$invalid}">
+                                            <label class="col-md-4 control-label" style="text-align:right">
+                                                Fees Group:
+                                                <span class="required">*</span>
+                                            </label>
+                                            <div class="col-md-8">
+                                                <select class="form-control" ng-model="AccIntegration.FeesGroupId" name="FeesGroupId" ng-options="RGroup.Id as RGroup.Name for RGroup in RootGroups" required>
+                                                    <option value="">Select One</option>
+                                                </select>
+                                                <div class="form-control-focus"> </div>
+                                                <span ng-show="submitted &&  addform.FeesGroupId.$error.required" class="help-block">Fees Group Required</span>
+                                            </div>
+                                        </div>
+                                        <div class="form-group row" ng-show="AccIntegration.FeesGroupId==1" ng-class="{ 'has-error' : submitted && addform.FeesLegderId.$invalid}">
+                                            <label class="col-md-4 control-label" style="text-align:right">
+                                                Fees Legder:
+                                                <span class="required">*</span>
+                                            </label>
+                                            <div class="col-md-8">
+                                                <select class="form-control" ng-model="AccIntegration.FeesLegderId" required ng-options="sc.Id as sc.SubName for sc in SubCategory" name="FeesLegderId">
+                                                    <option value="">Select One</option>
+                                                </select>
+                                                <div class="form-control-focus"> </div>
+                                                <span ng-show="submitted &&  addform.FeesLegderId.$error.required" class="help-block">Fees Legder Required</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <h2>
+                                            <u> Employee:</u>
+                                        </h2>
+                                        <div class="form-group row" ng-class="{ 'has-error' : submitted && addform.EmpGroupId.$invalid}">
+                                            <label class="col-md-4 control-label" style="text-align:right">
+                                                Emp Group:
+                                                <span class="required">*</span>
+                                            </label>
+                                            <div class="col-md-8">
+                                                <select class="form-control" ng-model="AccIntegration.EmpGroupId" name="EmpGroupId" ng-options="RGroup.Id as RGroup.Name for RGroup in RootGroups" required>
+                                                    <option value="">Select One</option>
+                                                </select>
+                                                <div class="form-control-focus"> </div>
+                                                <span ng-show="submitted &&  addform.EmpGroupId.$error.required" class="help-block">Emp Group Required</span>
+                                            </div>
+                                        </div>
+                                        <div class="form-group row" ng-show="AccIntegration.EmpGroupId==1" ng-class="{ 'has-error' : submitted && addform.EmpLedgerid.$invalid}">
+                                            <label class="col-md-4 control-label" style="text-align:right">
+                                                Emp Ledger:
+                                                <span class="required">*</span>
+                                            </label>
+                                            <div class="col-md-8">
+                                                <select class="form-control" ng-model="AccIntegration.EmpLedgerid" required ng-options="sc.Id as sc.SubName for sc in SubCategory" name="EmpLedgerid">
+                                                    <option value="">Select One</option>
+                                                </select>
+                                                <div class="form-control-focus"> </div>
+                                                <span ng-show="submitted &&  addform.EmpLedgerid.$error.required" class="help-block">Emp Ledger Required</span>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" data-dismiss="modal" class="btn  btn-secondary" ng-click="resetForm();submitted=false">Cancel</button>
+                                            <button type="submit" ng-click="submitted=true" class="btn btn-success" >Save</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-2">
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+
+    <script type="text/javascript">
+        OEMSApp.controller("AccIntegrationCtrl", ["$scope", "$http", "SweetAlert", "$filter",
+              function ($scope, $http, SweetAlert, $filter) {
+
+                  init();
+                  function init() {
+                      initialize();
+                      getAcLedger();
+                      //getAcRootGroups();
+                  }
+                  function initialize() {
+                      $scope.modalTitle = "Add Account Ledger";
+                      $scope.AccIntegration = {};
+                   
+                      $scope.AccIntegration.IntregationId = 0;
+                  
+                      $scope.RootGroups = [{ Id: 1, Name: 'Income' }];
+                      $scope.SubCategory = [{ Id: 1, SubName: 'Direct Income' }, { Id: 2, SubName: 'Indirect Income' }, ]
+
+                      $scope.AcLedgers = [];
+                      $scope.currentPage = 1;
+                      $scope.pageno = 1;
+                      $scope.pagesize = 10;
+                      $scope.total_count = 12;
+                      $scope.search = '';
+                      $scope.Id = '';
+                
+                      $scope.res = {};
+                      $scope.data = {};
+                      $scope.resetForm = resetForm;
+                      $scope.hstep = 1;
+                      $scope.mstep = 15;
+                      $scope.GroupP = {};
+                      $scope.isGroup = false;
+
+                      $scope.DCs = [
+                          { Id: 1, Name: 'Dr' },
+                          { Id: 2, Name: 'Cr' }
+                      ]
+
+                      $scope.GroupSets = {
+                          choices: []
+                      }
+                      $scope.GroupSets.choices = [];
+
+                      $scope.pageSizeArray = [];
+                      $scope.pageSizeArray.push({ value: 5, text: 5 });
+                      $scope.pageSizeArray.push({ value: 10, text: 10 });
+                      $scope.pageSizeArray.push({ value: 20, text: 20 });
+                      $scope.pageSizeArray.push({ value: 50, text: 50 });
+                      $scope.currentPage = 1;
+                      $scope.pageSize = 10;
+
+                  }
+                  function resetForm() {
+                     $scope.modalTitle = "Add Account Ledger";
+
+                     $scope.AccIntegration = {};
+                     $scope.AccIntegration.IntregationId = 0;
+                      $scope.addform.$setUntouched();
+                      $scope.addform.$setPristine();
+                      $scope.submitted = false;
+             
+                  }
+
+                  function getAcLedger() {
+                      $scope.AcLedgers = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Accounts/GetAllLedgers/'
+                      }).then(function successCallback(response) {
+                          $scope.AcLedgers = response.data.results;
+                      }, function errorCallback(response) {
+                          toastr["warning"](response.data.Message);
+                      });
+                  }
+               
+
+            
+              
+        $scope.edit = function (n) {
+                      $scope.modalTitle = "Edit Account Ledger";
+                      $scope.AcLedger = n;
+                      $scope.Id = n.LedgerId;
+                      $scope.GroupsbyG = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Accounts/GetLedgersByLedgerIdEdit/' + n.ParentId
+                      }).then(function successCallback(response) {
+                          $scope.Groups = response.data.results;
+                          $scope.showChild1 = true;
+                          $scope.GroupP.Parent1 = $scope.Groups[0].LedgerId;
+                          if ($scope.Groups[0].ParentId != 0) {
+                              $http({
+                                  method: 'GET',
+                                  url: baseUrl + 'Accounts/GetLedgersByLedgerIdEdit/' + $scope.Groups[0].ParentId
+                              }).then(function successCallback(response) {
+                                  //$scope.showChild1 = true;
+                                  $http({
+                                      method: 'GET',
+                                      url: baseUrl + 'Accounts/GetAllRootLedger/'
+                                  }).then(function successCallback(response) {
+                                      $scope.RootGroups = response.data.results;
+                                  }, function errorCallback(response) {
+                                      //toastr["warning"](response.data.Message);
+                                  });
+                                  $scope.GroupP.Parent0 = response.data.results[0].LedgerId;
+                              }, function errorCallback(response) {
+                                  //toastr["warning"](response.data.Message);
+                              });
+                          }
+
+                      }, function errorCallback(response) {
+                          toastr["warning"](response.data.Message);
+                      });
+                  }
+                  $scope.save = function save() {
+                      if ($scope.addform.$invalid)
+                          return;
+
+                      if ($scope.AccIntegration != {} && $scope.AccIntegration.IntregationId != 0) /// For Update
+                      {
+                          if ($scope.AccIntegration != '') {
+                              $http({
+                                  method: 'PUT',
+                                  url: baseUrl + 'Accounts/UpdateIntregation/',
+                                  data: $scope.AccIntegration
+                              }).then(function successCallback(response) {
+
+                                  $('#addmodal').modal('toggle');
+                             
+                                  toastr["info"](response.data.message);
+                                  resetForm();
+                              }, function errorCallback(response) {
+                                  toastr["warning"](response.data.Message);
+                                 // $('#addmodal').modal('toggle');
+                                 
+                              });
+                          }
+                      } else {  //  For Add
+                          if ($scope.AccIntegration != {} && $scope.AccIntegration.IntregationId==0) {
+             
+                              $http({
+                                  method: 'POST',
+                                  url: baseUrl + 'Account/AddIntregation/',
+                                  data: $scope.AccIntegration
+                              }).then(function successCallback(response) {
+
+                                  $('#addmodal').modal('toggle');
+                                 
+                                  toastr["info"](response.data.message);
+                                  resetForm();
+                              }, function errorCallback(response) {
+                                  toastr["warning"](response.data.Message);
+                              });
+                          }
+                      }
+                  };
+                  $scope.deleteIntregation = function deleteIntregation(n) {
+                      SweetAlert.swal({
+                          title: "Are you sure to delete it ?", type: "warning", showCancelButton: true, confirmButtonColor: "#DD6B55",
+                          confirmButtonText: "Yes, delete it!",
+                          closeOnConfirm: false
+                      },
+                      function (isConfirm) {
+                          if (isConfirm) {
+                              if (n.IntregationId != 0) {
+                                  //n.IsDeleted = true;
+                                  $http({
+                                      method: 'PUT',
+                                      url: baseUrl + 'Accounts/DeleteIntregation/' + n.IntregationId,
+                                 
+                                  }).then(function successCallback(response) {
+                                      getAcLedger();
+                                      SweetAlert.swal("Deleted!", "Your data has been deleted.", "success");
+                                  }, function errorCallback(response) {
+                                      toastr["warning"](response.data.Message);
+                                      getAcLedger();
+                                  });
+                              }
+                          }
+                      });
+                  };
+              }]);
+    </script>
+}
+

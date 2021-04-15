@@ -1,0 +1,368 @@
+﻿
+@{
+    ViewBag.Title = "Main Exam Statistical Report";
+}
+
+<style type="text/css">
+    input[type=number]::-webkit-inner-spin-button,
+    input[type=number]::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+
+</style>
+
+<div class="portlet light bordered" ng-controller="MainExamStatisticReport">
+    <div class="portlet-title">
+        <div class="caption">
+            <i class="icon-settings font-green"></i>
+            <span class="caption-subject font-green sbold uppercase">@ViewBag.Title</span>
+        </div>
+    </div>
+    <div class="portlet-body form">
+        <!-- BEGIN FORM-->
+        <form class="form-horizontal" name="frmFilter" method="post" enctype="multipart/form-data" novalidate>
+            <div class="form-body">
+                <div class="row">
+                    <div class="col-md-4">    
+                        <div class="form-group" ng-class="{ 'has-error' : submitted && formCommonFeilds.Version.$invalid}">
+                            <label class="col-md-5 control-label">
+                                Version :
+                                <span class="required">*</span>
+                            </label>
+                            <div class="col-md-7">
+                                <select class="form-control" ng-model="mainFilter.VersionID" required name="Version" ng-options="mainFilter.VersionId as mainFilter.VersionName for mainFilter in CommonFeilds.Version">
+                                    <option value="" selected="selected">Choose Option</option>
+                                </select>
+                                <div class="form-control-focus"> </div>
+                                <span ng-show="submitted && formCommonFeilds.Version.$error.required" class="help-block">Version Required</span>
+                            </div>
+                        </div>
+                        <div class="form-group" ng-class="{ 'has-error' : submitted && formCommonFeilds.Session.$invalid}">
+                            <label class="col-md-5 control-label">
+                                Session :
+                                <span class="required">*</span>
+                            </label>
+                            <div class="col-md-7">
+                                <select class="form-control" ng-model="mainFilter.SessionId" required name="Session"  ng-change="getMainExam1();" ng-options="mainFilter.SessionId as mainFilter.SessionName for mainFilter in CommonFeilds.Session">
+                                    <option value="" selected="selected">Choose Option</option>
+                                </select>
+
+                                <div class="form-control-focus"> </div>
+                                <span ng-show="submitted && formCommonFeilds.Session.$error.required" class="help-block">Session Required</span>
+                            </div>
+                        </div>    
+                        <div class="form-group" ng-class="{ 'has-error' : submitted && formCommonFeilds.Branch.$invalid}">
+                            <label class="col-md-5 control-label">
+                                Branch :
+                                <span class="required">*</span>
+                            </label>
+                            <div class="col-md-7">
+                                <select class="form-control" ng-model="mainFilter.BranchID" required name="Branch" ng-options="mainFilter.BranchId as mainFilter.BranchName for mainFilter in CommonFeilds.Branch">
+                                    <option value="" selected="selected">Choose Option</option>
+                                </select>
+                                <div class="form-control-focus"> </div>
+                                <span ng-show="submitted && formCommonFeilds.Branch.$error.required" class="help-block">Branch Name Required</span>
+                            </div>
+                        </div>                  
+                    </div> 
+                    <div class="col-md-4">   
+                        <div class="form-group" ng-class="{ 'has-error' : submitted && formCommonFeilds.Shift.$invalid}">
+                            <label class="col-md-5 control-label">
+                                Shift :
+                                <span class="required">*</span>
+                            </label>
+                            <div class="col-md-7">
+                                <select class="form-control" ng-model="mainFilter.ShiftId" required name="Shift" ng-options="mainFilter.ShiftId as mainFilter.ShiftName for mainFilter in CommonFeilds.Shift | filter:{BranchId:mainFilter.BranchID}:true">
+                                    <option value="" selected="selected">Choose Option</option>
+                                </select>
+                                <div class="form-control-focus"> </div>
+                                <span ng-show="submitted && formCommonFeilds.Shift.$error.required" class="help-block">Shift Name Required</span>
+                            </div>
+                        </div>
+                        <div class="form-group" ng-class="{ 'has-error' : submitted && formCommonFeilds.Class.$invalid}">
+                            <label class="col-md-5 control-label">
+                                Class :
+                                <span class="required">*</span>
+                            </label>
+                            <div class="col-md-7">
+                                <select class="form-control" ng-model="mainFilter.ClassId" name="Class" ng-change="GetGroup(mainFilter.ClassId)" required ng-options="mainFilter.ClassId as mainFilter.ClassName for mainFilter in CommonFeilds.ClassInfo | filter:{VersionId:mainFilter.VersionID}:true">
+                                    <option value="" selected="selected">Choose Option</option>
+                                </select>
+                                <div class="form-control-focus"> </div>
+                                <span ng-show="submitted && formCommonFeilds.Class.$error.required" class="help-block">Class Required</span>
+                            </div>
+                        </div>   
+                        <div class="form-group">
+                            <label class="col-md-5 control-label">
+                                Group :
+                            </label>
+                            <div class="col-md-7">
+                                <select class="form-control" ng-disabled="Groups.length <= 0" ng-change="GetSection();" ng-model="mainFilter.GroupId" name="Group" ng-options="G.GroupId as G.GroupName for G in Groups">
+                                    <option value="" selected>Choose Option</option>
+                                </select>
+                                <div class="form-control-focus"> </div>
+
+                            </div>
+                        </div>  
+                    </div>  
+                    <div class="col-md-4">
+                        <div class="form-group" ng-class="{ 'has-error' : submitted && formCommonFeilds.Section.$invalid}">
+                            <label class="col-md-5 control-label">
+                                Section :
+                                <span class="required">*</span>
+                            </label>
+                            <div class="col-md-7">
+                                <select class="form-control" ng-model="mainFilter.SectionId" required name="Section" ng-options="S.SectionId as S.SectionName for S in Sections" ng-change="getMainExam();">
+                                    <option value="" selected="selected">Choose Option</option>
+                                </select>
+                                <div class="form-control-focus"> </div>
+                                <span ng-show="submitted && formCommonFeilds.Section.$error.required" class="help-block">Section Name Required</span>
+                            </div>
+                        </div> 
+                        <div class="form-group" ng-class="{ 'has-error' : submitted && formCommonFeilds.ReportTypeId.$invalid}">
+                            <label class="col-md-5 control-label">
+                                Report Type :
+                            </label>
+                            <div class="col-md-7">
+                                <select class="form-control" ng-model="mainFilter.ReportTypeId" required name="ReportType" ng-options="R.Id as R.ReportName for R in ReportType">
+                                    <option value="" selected="selected">Select Report Type</option>
+                                </select>
+                                <div class="form-control-focus"> </div>
+                                <span ng-show="submitted && formCommonFeilds.ReportType.$error.required" class="help-block">Report Type Name Required</span>
+
+                            </div>
+                        </div> 
+                        <div  ng-hide="mainFilter.ReportTypeId==3 || mainFilter.ReportTypeId==4" class="form-group" ng-class="{ 'has-error' : submitted && formCommonFeilds.mainExam.$invalid}">
+                            <label class="col-md-5 control-label">
+                                Exam Name :
+                            </label>
+                            <div class="col-md-7">
+                                <select class="form-control" ng-model="mainFilter.MainExamId" required name="mainExam" ng-options="mainexam.MainExamId as mainexam.MainExamName for mainexam in Exams ">
+                                    <option value="" selected="selected">Choose Option</option>
+                                </select>
+                                <div class="form-control-focus"> </div>
+                                <span ng-show="submitted && formCommonFeilds.mainExam.$error.required" class="help-block">Main Exam Name Required</span>
+
+                            </div>
+                        </div> 
+                        <div ng-show="mainFilter.ReportTypeId==3 || mainFilter.ReportTypeId==4" class="form-group" ng-class="{ 'has-error' : submitted && frmFilter.mainExam1.$invalid}">
+                            <label class="col-md-5 control-label">
+                                Exam Name :
+                            </label>
+                            <div class="col-md-7">
+                                <select multiple multi-select ng-model="mainFilter.MainExamId1" ng-required name="mainExam1" ng-options="mainexam.MainExamId as mainexam.MainExamName for mainexam in Exams1"></select>
+                                <div class="form-control-focus"> </div>
+                                <span ng-show="submitted && frmFilter.mainExam1.$error.required" class="help-block">Main Exam Name Required</span>
+                                <div class="form-control-focus"> </div>
+                            </div>
+                        </div>   
+                        <div class="pull-right">
+                            @*<button ng-click="Search()" class="btn green">Show</button>*@
+                            <a ng-show="mainFilter.ReportTypeId==1 || mainFilter.ReportTypeId==2" style="margin-left:3px;" href="@Url.Action("MainExamStatisticRepot","Report")?MainExamId={{mainFilter.MainExamId}}&ClassId={{mainFilter.ClassId}}&GroupId={{mainFilter.GroupId}}&SectionId={{mainFilter.SectionId}}&ReportTypeId={{mainFilter.ReportTypeId}}" class="btn btn-primary" target="_blank">Report</a>
+                            <a  ng-click="MainExamStatisticRepotOverallPassFail();"  ng-show="mainFilter.ReportTypeId==3" style="margin-left:3px;" class="btn btn-primary">Report</a>
+                            <a  ng-click="MainExamStatisticRepotOverallPassFailAll();"  ng-show="mainFilter.ReportTypeId==4" style="margin-left:3px;" class="btn btn-primary" >Report</a>
+                            <button ng-click="Reset()" class="btn info">Reset</button>
+                        </div>
+
+
+                    </div>                             
+                </div>
+
+            </div>
+        </form>
+
+    </div>
+
+</div> 
+@section Scripts{
+    <script type="text/javascript">
+        OEMSApp.controller("MainExamStatisticReport", ["$scope", "$http", "SweetAlert", "blockUI", "$window", "$filter",
+          function ($scope, $http, SweetAlert, blockUI, $window, $filter) {
+
+              init();
+              function init() {
+                  initialize();
+                  getAllCommons();
+              }
+              function initialize() {
+                  $scope.mainFilter = {};
+                  $scope.mainFilters = [];
+                  $scope.Versions = [];
+                  $scope.getAllCommons = getAllCommons;
+                  $scope.btnDis = false;
+                  $scope.spin = false;
+
+                  $scope.mainFilter = {};
+                  $scope.mainFilter.VersionID = 0;
+                  $scope.mainFilter.SessionId = 0;
+                  $scope.mainFilter.BranchID = 0;
+                  $scope.mainFilter.ShiftID = 0;
+                  $scope.mainFilter.ClassId = 0;
+                  $scope.mainFilter.GroupId = 0;
+                  $scope.mainFilter.SectionId = 0;
+                  $scope.getMainExam = getMainExam;
+                  $scope.mainFilter.MainExamids = '';
+              };
+              $scope.ReportType = [{
+                  "ReportName": "Section Wise Statistic",
+                  "Id": 1
+
+              }, {
+                  "ReportName": "Section Wise_Grade Tab",
+                  "Id": 2
+              }, {
+                  "ReportName": "Overall_Pass_Fail Statistic",
+                  "Id": 3
+              }];
+
+              //  $scope.mainFilter.Version = createStringByArray($scope.mainFilter.Version1);
+              $scope.getMainExam1 = function getMainExam() {
+                  $scope.Exams1 = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'ExamSetup/GetMainExamByVersionSession/'+'/' + $scope.mainFilter.SessionId
+                      }).then(function successCallback(response) {
+                          $scope.Exams1 = response.data.results;
+                      }, function errorCallback(response) {
+                          toastr["error"](response.data.message);
+                      });
+              }
+              $scope.MainExamStatisticRepotOverallPassFail = function MainExamStatisticRepotOverallPassFail()
+              {
+                  $scope.mainFilter.MainExamids = createStringByArray($scope.mainFilter.MainExamId1);                      
+                  $scope.url="@Url.Action("MainExamStatisticRepotOverallPassFail", "Report")?MainExamIds="+$scope.mainFilter.MainExamids+"&Version="+$scope.mainFilter.VersionID+"&Session="+$scope.mainFilter.SessionId+"&ReportTypeId="+$scope.mainFilter.ReportTypeId;
+                  $window.open($scope.url,"_black");
+
+              }
+
+              $scope.MainExamStatisticRepotOverallPassFailAll = function MainExamStatisticRepotOverallPassFailAll() {
+                  $scope.mainFilter.MainExamids = createStringByArray($scope.mainFilter.MainExamId1);
+                  $scope.url="@Url.Action("MainExamStatisticRepotOverallPassFailAll", "Report")?MainExamIds="+$scope.mainFilter.MainExamids+"&Session="+$scope.mainFilter.SessionId+"&ReportTypeId="+$scope.mainFilter.ReportTypeId;
+                  $window.open($scope.url,"_black");
+
+              }
+
+
+              function setProgress(s) {
+                  $scope.btnDis = s;
+                  $scope.spin = s;
+              }
+
+              $scope.GetGroup = function GetGroup(classid) {
+                  $scope.Groups = [];
+                  $http({
+                      method: 'GET',
+                      url: baseUrl + 'Common/GetGroup/' + classid
+                  }).then(function successCallback(response) {
+                      $scope.Groups = response.data.results;
+                  }, function errorCallback(response) {
+                      toastr["info"](response.data.Message);
+                  });
+              }
+              $scope.GetSection = function GetSection() {
+                  $scope.Sections = [];
+                  $http({
+                      method: 'GET',
+                      url: baseUrl + 'Common/GetSection/' + $scope.mainFilter.SessionId + "/" + $scope.mainFilter.ShiftId + "/" + $scope.mainFilter.ClassId + "/" + $scope.mainFilter.GroupId
+                  }).then(function successCallback(response) {
+                      $scope.Sections = response.data.results;
+                  }, function errorCallback(response) {
+                      toastr["info"](response.data.Message);
+                  });
+
+              }
+
+              function getMainExam() {
+                  $scope.MainExams = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'ExamSetup/GetMainExamBySession/' + $scope.mainFilter.VersionID + '/' + $scope.mainFilter.SessionId + '/' + $scope.mainFilter.ClassId + '/' + $scope.mainFilter.GroupId
+                      }).then(function successCallback(response) {
+                          $scope.MainExams = response.data.results;
+
+                          $scope.Exams = [];
+                          $scope.Exams = $scope.MainExams;
+
+                      }, function errorCallback(response) {
+                          toastr["error"](response.data.message);
+                      });
+              }
+
+              $scope.Reset = function Reset() {
+                  initialize();
+                  getAllCommons();
+                  $scope.isSubmitted = false;
+              };
+
+              function getAllCommons() {
+                  $scope.CommonFeilds = [];
+
+                  $http({
+                      method: 'GET',
+                      url: baseUrl + 'Common/GetCommonItem/'
+                  }).then(function successCallback(response) {
+                      $scope.CommonFeilds = response.data.results;
+                  }, function errorCallback(response) {
+                      toastr["error"](response.data.message);
+                  });
+              }
+
+              function createStringByArray(array) {
+                  var output = '';
+                  angular.forEach(array, function (value, key) {
+                      if (!isNaN(parseInt(value))) {
+                          output += value + ',';
+                      }
+                      else {
+                          output += "'" + value.toString() + '\',';
+                      }
+                  });
+                  return output;
+              }
+          }]).directive('multiSelect', function () {
+              function link(scope, element) {
+                  var options = {
+                      enableClickableOptGroups: true,
+                      onChange: function () {
+                          element.change();
+                      }
+                  };
+                  element.multiselect(options);
+              }
+              return {
+                  restrict: 'A',
+                  link: link
+              };
+          }).config(['$provide', function ($provide) {
+              $provide.decorator('selectDirective', ['$delegate', function ($delegate) {
+                  var directive = $delegate[0];
+                  directive.compile = function () {
+                      function post(scope, element, attrs, ctrls) {
+                          directive.link.post.apply(this, arguments);
+                          var ngModelController = ctrls[1];
+                          if (ngModelController && attrs.multiple == true) {
+                              originalRender = ngModelController.$render;
+                              ngModelController.$render = function () {
+                                  originalRender();
+                                  element.multiselect('rebuild');
+                              };
+                          }
+                      }
+                      return {
+                          pre: directive.link.pre,
+                          post: post
+                      };
+                  };
+                  return $delegate;
+              }]);
+          }]);
+    </script>
+
+}
+
+
+
+
+
+

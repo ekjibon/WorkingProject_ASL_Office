@@ -1,0 +1,278 @@
+﻿
+@{
+    ViewBag.Title = "View Logs List";
+}
+
+<div ng-controller="LogClt">
+    <!-- Begin: life time stats -->
+    <div class="portlet light bordered">
+        <div class="portlet-title">
+            <div class="caption">
+                <i class="icon-settings font-green"></i>
+                <span class="caption-subject font-green sbold uppercase">@ViewBag.Title</span>
+            </div>
+            <div class="actions">
+
+            </div>
+        </div>
+        <div>
+            <form name="uform"  class="form-horizontal" id="form_sample_1" novalidate>
+                <div class="modal-body">
+                    <div class="form-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group" ng-class="{ 'has-error' : submitted && uform.date.$invalid}">
+                                    <label class="col-md-3 control-label">
+                                      Date
+                                        <span class="required">*</span>
+                                    </label>
+                                    <div class="col-md-9">
+                                        <input class="form-control" type="text" ng-click="p1=true" is-open="p1" readonly ng-model="filter.Date" placeholder="Date" uib-datepicker-popup="dd/MM/yyyy" name="date" required />
+                                        <div class="form-control-focus"> </div>
+                                        <span ng-show="submitted && uform.date.$error.required" class="help-block">Date Required</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group" ng-class="{ 'has-error' : submitted && uform.UserName.$invalid}">
+                                    <label class="col-md-3 control-label">
+                                       User Name
+                                        <span class="required">*</span>
+                                    </label>
+                                    <div class="col-md-9">
+                                        <select class="form-control"  ng-model="filter.UserName" name="UserName" ng-options="m.UserName as m.FullName for m in AspNetusers" required>
+                                            <option value="" selected="selected">Select</option>
+                                        </select>
+                                        <div class="form-control-focus"> </div>
+                                        <span ng-show="submitted && uform.UserName.$error.required" class="help-block">User Name Required</span>
+                                    </div>
+                                </div>
+                                <div class="from-group">
+                                    <div class="col-md-9">
+
+                                    </div>
+                                    <div class="col-md-3">
+                                        <button type="reset" class="btn red" ng-click="Reset()">Reset</button>
+                                        <button type="submit" ng-click="Filter();submitted=true;" class="btn green">Show</button>
+                                    </div>
+                                   
+                                </div>
+                            </div>
+                        </div>
+                      
+                    </div>
+                </div>
+
+            </form>
+        </div>
+            <div class="portlet-body table-container">
+                <div id="sample_3_wrapper" class="dataTables_wrapper no-footer">
+             
+                </div>
+                <div class="table-scrollable"> </div>
+                
+                    <pre style="height:700px;width:1000px;margin-left:13%;overflow:auto;text-align: center;">
+                  <div ng-repeat="item in LogList" style="margin:-35px 0">
+            ---->> Date: {{item.TimeStamp | date :"dd/MM/yyyy   hh:mm a"}}  Message: {{item.Message}}
+                 </div>
+                 </pre>
+               
+            </div>
+        </div>
+    <!-- End: life time stats -->
+    <!--Modal Area Start-->
+    @*<div class="table-container">
+            <div id="sample_3_wrapper" class="dataTables_wrapper no-footer">
+                <div class="row">
+                    <div class="col-md-4 col-sm-5 col-xs-6">
+                        <div class="form-group">
+                            <div class="col-lg-3 col-md-5 col-sm-4 col-xs-8" style="padding-left:0px">
+                                <select class="form-control" ng-model="pageSize" ng-options="P.value as P.text for P in pageSizeArray"></select>
+                            </div>
+                            <div class="col-md-7  col-sm-8  col-xs-4">
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-sm-3 col-xs-1">
+                    </div>
+                    <div class="col-md-4 col-sm-4 col-xs-5">
+                        <div id="sample_3_filter" class="pull-right">
+                            <input ng-model="q" id="search" class="form-control" placeholder="Filter text">
+                        </div>
+                    </div>
+                </div>
+                <div class="table-scrollable"> </div>
+                <table class="table table-bordered table-hover">
+                    <thead>
+                        <tr class="btn-primary">
+                            <th>Time</th>
+                            <th class="text-center">Message</th>
+                            <th class="text-center">Message Template</th>
+                            <th class="text-center">Level</th>
+                            <th class="text-center">Exception</th>
+                            <th class="text-center">UserName</th>
+                            <th style="text-align:center">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-show="LogList.results.length <= 0"><td colspan="5" style="text-align:center;"><i class="fa fa-refresh"></i> Loading new data!!</td></tr>
+                        <tr dir-paginate="item in LogList | filter:q |itemsPerPage:pageSize" current-page="currentPage">
+                            <td>{{item.TimeStamp | date :"dd/MM/yyyy hh:mm a"}}</td>
+                            <td class="text-center">{{item.Message}}</td>
+                            <td class="text-center">{{item.MessageTemplate}}</td>
+                            <td class="text-center">{{item.Level}}</td>
+                            <td class="text-center">{{item.Exception}}</td>
+                            <td class="text-center">{{item.UserName}}</td>
+
+                            <td align="center">
+                                <a class="btn btn-icon-only green" ng-click="edit(item)" data-target="#addmodal" data-toggle="modal">
+                                    <i class="fa fa-edit"></i>
+                                </a>
+                                <a ng-click="deleteclub(item)" href="" class="btn btn-icon-only red">
+                                    <i class="fa fa-trash"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="row">
+                    <dir-pagination-controls boundary-links="true" template-url="~/assets/angular/lib/dirPagination.tpl.html"></dir-pagination-controls>
+                </div>
+            </div>
+        </div>*@
+    <!--Modal Area End-->
+</div>
+@section Scripts{
+    <script type="text/javascript">
+        OEMSApp.controller("LogClt", ["$scope", "$http", "SweetAlert",
+           function ($scope, $http, SweetAlert) {
+               init();
+               function init() {
+                   initialize();
+                   getLogList(1);
+                   getusers(1);
+               }
+               function initialize() {
+                   $scope.aemodalTitle = "Add ECA Club";
+                   $scope.ecaClubName = '';
+                   $scope.currentPage = 1;
+                   $scope.pageno = 1;
+                   $scope.pagesize = 10;
+                   $scope.total_count = 12;
+                   $scope.search = '';
+
+                   $scope.getLogList = getLogList;
+                   $scope.filter = {};
+                   $scope.data = {};
+             
+                  
+          
+                   $scope.pageSizeArray = [];
+                   $scope.pageSizeArray.push({ value: 5, text: 5 });
+                   $scope.pageSizeArray.push({ value: 10, text: 10 });
+                   $scope.pageSizeArray.push({ value: 20, text: 20 });
+                   $scope.pageSizeArray.push({ value: 50, text: 50 });
+                   $scope.currentPage = 1;
+                   $scope.pageSize = 10;
+               }
+
+
+               $scope.Reset = function () {
+                   $scope.filter = {};
+                   getLogList(1);
+                   $scope.submitted = false;
+               }
+               function getLogList() {
+                   $scope.LogList = [];
+                   $http({
+                       method: 'GET',
+                       url: baseUrl + 'SetupInstitution/GetLogList/'
+                   }).then(function successCallback(response) {
+                       // this callback will be called asynchronously
+                       // when the response is available
+                       $scope.LogList = response.data.results;
+
+                       toastr["info"](response.data.message);
+                     
+                       $scope.total_count = response.data.totalcount;
+                       //console.log(response.data);
+                   }, function errorCallback(response) {
+                       toastr["warning"](response.data.Message);
+                   });
+               }
+               $scope.Filter = function ()
+               {
+                   //getLogList(1);
+                   //if ($scope.LogList.length == 0) {
+                   //    getLogList(1);
+                   //}
+                   if ($scope.uform.$invalid) {
+                       return;
+                   }
+                   var date = new Date($scope.filter.Date);
+                   $scope.logListFilter = [];
+                   angular.forEach($scope.LogList, function (item) {
+                      
+                       var logdate = new Date(item.TimeStamp);
+                       if (item.UserName == $scope.filter.UserName && logdate.getDate() == date.getDate()) {
+                           $scope.logListFilter.push(item);
+                       }
+                   });
+
+                   $scope.LogList = $scope.logListFilter;
+                   //console.log($scope.LogList);
+                   toastr["info"]($scope.LogList.length +' Data Found!');
+               }
+               function getusers(pageno) {
+                   $scope.AspNetusers = [];
+                   var searchtxt = $scope.search;
+                   if ($scope.search == 'undefined' || $scope.search == '') {
+                       searchtxt = 'null';
+                   }
+                   $scope.pageno = pageno;
+                   $http({
+                       method: 'GET',
+                       url: baseUrl + 'user/GetAlluser/'
+                   }).then(function successCallback(response) {
+                       // this callback will be called asynchronously
+                       // when the response is available
+                       $scope.AspNetusers = response.data.results;
+
+                       // $scope.AspNetusers = response.data;
+                       $scope.total_count = response.data.totalcount;
+                     
+                   }, function errorCallback(response) {
+                       // called asynchronously if an error occurs
+                       // or server returns response with an error status.
+                   });
+               }
+               $scope.deleteclub = function deleteclub(n) {
+                   SweetAlert.swal({
+                       title: "Are you sure to delete it ?", type: "warning", showCancelButton: true, confirmButtonColor: "#DD6B55",
+                       confirmButtonText: "Yes, delete it!",
+                       closeOnConfirm: false
+                   },
+                   function (isConfirm) {
+                       if (isConfirm) {
+                           $http({
+                               method: 'DELETE',
+                               url: baseUrl + 'SetupInstitution/DeleteECAClub/' + n.ClubId,
+                               data: $scope.class
+                           }).then(function successCallback(response) {
+                               SweetAlert.swal("Deleted!", "Your data has been deleted.", "success");
+                               getECAClubs(1);
+                           }, function errorCallback(response) {
+                               toastr["warning"](response.data.Message);
+                           });
+                       }
+                   });
+               };
+
+           }]);
+    </script>
+}
+
+
+
+

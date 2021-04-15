@@ -1,0 +1,573 @@
+﻿@{
+    ViewBag.Title = "Main Exam Mark Setup";
+}
+<style type="text/css">
+    input[type=number]::-webkit-inner-spin-button, 
+input[type=number]::-webkit-outer-spin-button { 
+  -webkit-appearance: none; 
+  margin: 0; 
+}
+</style>
+
+<div class="row" ng-controller="CltrExamMarkSetup">
+    <div class="portlet light bordered">
+        <div class="portlet-title">
+            <div class="caption">
+                <i class="icon-settings font-green"></i>
+                <span class="caption-subject font-green sbold uppercase">@ViewBag.Title</span>
+            </div>           
+        </div>
+        <div class="portlet-body"> 
+            <form class="form-horizontal" ng-submit="getMainExamSubject()" id="frmCommon" name="frmMainExamMarks" novalidate>
+                <div class="form-body">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="form-group" ng-class="{ 'has-error' : submitted1 && mform.Session.$invalid}">
+                                <label class="col-md-5 control-label">
+                                    Session:
+                                    <span class="required">*</span>
+                                </label>
+                                <div class="col-md-7">
+                                    <select class="form-control" ng-model="MainExamSubjectMark.SessionId" name="Session" ng-options="studentInfo.SessionId as studentInfo.SessionName for studentInfo in CommonFeilds.Session" required>
+                                        <option value="" selected="selected">Choose Option</option>
+                                    </select>
+                                    <div class="form-control-focus"> </div>
+                                    <span ng-show="submitted1 && mform.Session.$error.required" class="help-block">Session Required</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group" ng-class="{ 'has-error' : submitted1 && mform.Term.$invalid}">
+                                <label class="col-md-5 control-label">
+                                    Term :
+                                    <span class="required">*</span>
+                                </label>
+                                <div class="col-md-7">
+                                    <select class="form-control" ng-model="MainExamSubjectMark.TermId" ng-disabled="MainExamSubjectMark.ClassId==null" name="Term" ng-options="T.TermId as T.Name for T in Terms |filter:{ClassId:MainExamSubjectMark.ClassId}:true" required>
+                                        <option value="" selected="selected">Choose Option</option>
+                                    </select>
+                                    <div class="form-control-focus"> </div>
+                                    <span ng-show="submitted1 && mform.Term.$error.required" class="help-block">Term Required</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group" ng-class="{ 'has-error' : submitted1 && mform.MainExam.$invalid}">
+                                <label class="col-md-5 control-label">
+                                    Main Exam :
+                                    <span class="required">*</span>
+                                </label>
+                                <div class="col-md-7">
+                                    <select class="form-control" ng-disabled="MainExamSubjectMark.TermId==null"  ng-model="MainExamSubjectMark.MainExamId" name="MainExam" ng-options="T.MainExamId as T.MainExamName for T in MainExams |filter:{TermId:MainExamSubjectMark.TermId}:true" required>
+                                        <option value="" selected="selected">Choose Option</option>
+                                    </select>
+                                    <div class="form-control-focus"> </div>
+                                    <span ng-show="submitted1 && mform.MainExam.$error.required" class="help-block">Main Exam Required</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row" style="margin-top: 1%;">
+                        <div class="col-md-4">
+                            <div class="form-group" ng-class="{ 'has-error' : submitted1 && mform.class.$invalid}">
+                                <label class="col-md-5 control-label">
+                                    Class
+                                    <span class="required">*</span>
+                                </label>
+                                <div class="col-md-7">
+                                    <select class="form-control" ng-model="MainExamSubjectMark.ClassId" name="class" required ng-options="class.ClassId as class.ClassName for class in CommonFeilds.ClassInfo">
+                                        <option value="" selected="selected">Choose Option</option>
+                                    </select>
+                                    <div class="form-control-focus"> </div>
+                                    <span ng-show="submitted1 && mform.class.$error.required" class="help-block">Class Name Required</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                        </div>
+                        <div class="col-md-4">
+                        <div class="pull-right">
+                           <button type="reset" ng-click="resetForm()" class="btn red">Clear</button>
+                           <button type="submit" ng-click="getMainExamSubject();submitted1=true" class="btn green">Show</button>
+                       </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+            <clearfix></clearfix>
+            <form name="frm" novalidate>
+                <div class="table-container">
+                    <table class="table table-bordered table-hover">
+                        <thead>
+                            <tr class="bg-primary">
+                                <th width="25%">Subject Name</th>
+                                <th width="15%">Full Marks</th>
+                                <th width="14%">Pass Marks</th>
+                                <th width="6%">Is %?</th>
+                                <th width="15%">Remarks</th>
+                                <th width="20%">SubExam Setup</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-style="S.SubjectType=='T' ? { 'background-color':'rgba(245, 204, 88, 0.32)', 'color': '#ff6a00'} : { 'background-color':'', 'color': ''} " ng-repeat="S in MainExamSubjectMarks">
+                                <td>{{S.SubjectName}}</td>
+                                <td ng-class="{ 'has-error' : frm.FullMarks_{{$index}}.$invalid  }">
+                                    <input type="number" ng-min="0" ng-disabled="S.SubjectType=='T' || ResultProcess==1  || (S.MarksEntry > 0 && SuperAdmin != 'Super')" ng-model="S.MainExamFullMarks" class="form-control" name="FullMarks_{{$index}}" value="{{S.MainExamFullMarks==0 ? '' : S.MainExamFullMarks}}" required />
+                                    <span class="help-block" ng-show="frm.FullMarks_{{$index}}.$invalid ">Invalid!</span>
+                                </td>
+                                <td><input type="checkbox" ng-disabled="ResultProcess==1"  ng-model="S.MainExamIsPassDepend" ng-checked="S.MainExamIsPassDepend==true" /></td> 
+                                <td ng-class="{ 'has-error' : (S.MainExamPassMarkIsPercent==false && S.MainExamFullMarks < S.MainExamPassMark) || (S.MainExamPassMarkIsPercent==true && 100 < S.MainExamPassMark)}">
+                                    <input type="number" ng-model="S.MainExamPassMark" ng-disabled="S.MainExamIsPassDepend==false || ResultProcess==1" ng-min="0" class="form-control" name="PassMark_{{$index}}" required />
+                                    <span class="help-block" ng-show="(S.MainExamPassMarkIsPercent==false && S.MainExamFullMarks < S.MainExamPassMark) || (S.MainExamPassMarkIsPercent==true && 100 < S.MainExamPassMark)">Invalid!</span>
+                                </td>
+                                <td>
+                                    <p style="font-size:12px; color:orangered; margin:0 !important" ng-show="S.Id==0">{{S.MainExmConfigured}}</p>
+                                    <p style="font-size:12px; color:mediumvioletred; font-style:italic; margin:0 !important" ng-show="S.SubExmConfigured != 'SubExamConfigured'">{{S.SubExmConfigured}}</p>
+                                    <p style="font-size:12px; color:orangered; margin:0 !important" ng-show="S.DividedExmConfigured != 'DividedExamConfigured'">{{S.DividedExmConfigured}}</p>
+                                </td>
+                                <td>
+                                    <a href="javascript:;" ng-click="getSubExam(S)" ng-show="S.Id!=0"  class="btn green btn-icon-only" data-target="#stack1" data-toggle="modal">
+                                        <i class="fa fa-cog" aria-hidden="true">&nbsp;</i>
+                                    </a>
+                                    <a href="javascript:;" ng-click="MainExamDeleteMark(S.Id)" ng-hide="S.Id==0 || ResultProcess ==1 || (S.MarksEntry > 0 && SuperAdmin != 'Super') || (S.SubjectType=='T' && SuperAdmin != 'Super')" class="btn btn-icon-only red">
+                                        <i class="fa fa-trash">&nbsp;</i>
+                                    </a>
+                                </td>
+                            </tr>
+                            <tr ng-show="MainExamSubjectMarks.length>0">
+                                <td colspan="10">    
+                                    @*<button ng-click="MainExamDeleteAllMark()" ng-disabled="MainExamDeleteValidation()" ng-show="ResultProcess !=1" class="btn red pull-right"> Delete &nbsp;</button>*@ 
+                                    <button ng-click="MainExamDeleteAllMainSubDivMarkSetup()" ng-disabled="MainExamDeleteValidation()" ng-hide="ResultProcess ==1 || MainExamDeleteValidation()" class="btn red pull-right"> Delete All Setup &nbsp;</button>                                                               
+                                    <button ng-click="mainExamMarkSetupSave()" ng-disabled="MainExammarkSetpvalid()" ng-show="ResultProcess !=1" class="btn btn-primary pull-right">&nbsp;<i class="fa fa-floppy-o"></i> Save &nbsp;</button>
+                                   
+                                </td>
+                            </tr>
+                        </tbody>
+
+                    </table>
+
+                </div>
+            </form>
+        </div>
+    </div>
+    <div id="stack1" class="modal fade" tabindex="-1" data-width="400">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                    <h4 class="modal-title">SubExam Mark Setup Of {{SubExamSubjectName}}, Full Marks-{{TotalFullMark}}</h4>
+                </div>
+                <div class="modal-body" style="padding:4px;">  
+                    <div class="table-container">
+                        <table class="table table-bordered table-hover">
+                            <thead>
+                                <tr class="success">
+                                    <th>SubExam</th>
+                                    <th >Conv. Mark</th>
+                                    <th >Exam Mark</th>
+                                    
+
+                                    <th width="15%">Remarks</th>
+                                   
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-style="SubjectType=='T' ? { 'background-color':'rgba(245, 204, 88, 0.32)', 'color': '#ff6a00'} : { 'background-color':'', 'color': ''} " ng-repeat="se in SubExamMarkSetups">
+                                    <td>
+                                        {{se.SubExamName}}
+                                    </td>
+                                    <td >
+                                        <input min="0" type="number" ng-disabled="ResultProcess ==1" ng-model="se.SubExamFullMarks" name="SubExamFullMarks" class="form-control" required>
+                                    </td>
+                                    <td >
+                                        <input min="0" type="number" ng-disabled="ResultProcess ==1" ng-model="se.SubExamExamMarks" name="SubExamExamMarks" class="form-control" required>
+                                       
+                                    </td>  
+                                    <td>
+                                        <a href="javascript:;" ng-click="SubExamDeleteMark(se.Id)" ng-hide="se.Id==0 || ResultProcess ==1 || (SubjectType=='T' && SuperAdmin != 'Super') || (se.SubExamMarksEntry > 0 && SuperAdmin != 'Super')" class="btn btn-icon-only red">
+                                            <i class="fa fa-trash">&nbsp;</i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                    </div>
+                </div>
+                <div class="modal-footer" style="margin-top: -25px;">
+                    <div class="form-group">
+                        <button type="button" ng-click="SaveSubExamMark()"  ng-hide="ResultProcess ==1" class="btn btn-primary">Save</button>
+                        <button ng-click="SubExamDeleteAllMark()" ng-hide="ResultProcess ==1 || SubjectType=='T'" class="btn red"> Delete </button>
+                        <button type="button" data-dismiss="modal" class="btn red">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>   
+  
+</div>
+@section Scripts{
+
+    <script type="text/javascript">
+        OEMSApp.controller("CltrExamMarkSetup", ["$scope", "$http", "SweetAlert",
+              function ($scope, $http, SweetAlert) {
+
+                  init();
+                  function init() {
+                      initialize();
+                      getAllCommons();
+                      getTerms();
+                      getMainExam();
+                  }
+                  function initialize() {                      
+                      $scope.SuperAdmin = 0;
+                      $scope.ResultProcess = 0;
+                      $scope.MainExamSubjectMark = {};
+                      $scope.MainExamSubjectMarks = [];
+                      $scope.MainExamSubjectMark.Id = 0;
+                    
+                      //$scope.MainExamSubjectMark.MainExamId = 0;
+                      $scope.SubjectType = '';
+                      $scope.MainExam = {};
+                      $scope.Mainexam = {};
+                      $scope.MainExam.MainExamId = 0;
+                      $scope.MainExams = [];
+
+                      $scope.SubExam = {};
+                      $scope.Subexam = {};
+                      $scope.SubExam.SubExamId = 0;
+                      $scope.SubExams = [];
+                      $scope.CommonFeilds = [];
+
+                      $scope.Reset = Reset;
+
+                      $scope.res = {};
+                      $scope.data = {};
+                      $scope.resetForm = resetForm;
+                      $scope.getAllCommons = getAllCommons;
+                      $scope.getMainExamSubject = getMainExamSubject;
+
+                      $scope.SubExamMarkSetup = {};
+                      $scope.SubExamMarkSetups = [];
+                      $scope.getSubExam = getSubExam;
+                      $scope.SubExamSubjectName = '';
+                      $scope.TotalFullMark = 0;
+                      $scope.SubExamIDForGet = 0;
+                      $scope.SubExamMarkSetupIDForGet = 0;
+                      $scope.MainExamIDForGet = 0;
+                      $scope.GetSubExamByMainExamID = {};
+                      $scope.GetSubExamMark = {};
+                      $scope.MainExamMarkSetupIdForGet = 0;
+                      $scope.SubExamTotalFullMark = 0;
+                      $scope.getMainExam = getMainExam;
+
+                      $scope.MainExamIDForMarkCheck = 0;
+                      $scope.SubExamIDForMarkCheck = 0;
+                    
+                      $scope.SubjectIDForMarkCheck = 0;
+
+
+                  }
+                  function Reset() {
+                      $scope.MainExamSubjectMarks = [];
+                  }
+
+                  function resetForm() {
+                      $scope.modalTitle = "Sub Exam Details";
+                      //$scope.MainExam = {};
+                      $scope.MainExam.MainExamId = 0;
+
+                      $scope.SubExam = {};
+                      $scope.SubExam.SubExamId = 0;
+
+                      $scope.submited2 = false;
+                      $scope.submited1 = false;
+                      $scope.submited = false;
+
+                  }
+                  function getAllCommons() {
+                      $scope.CommonFeilds = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Common/GetCommonItem/'
+                      }).then(function successCallback(response) {
+                          $scope.CommonFeilds = response.data.results;
+                      }, function errorCallback(response) {
+                          toastr["info"](response.data.message);
+                      });
+                  }
+
+                  function getMainExam() {
+                      $scope.MainExams = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'ExamSetup/GetAllMainExam/'
+                      }).then(function successCallback(response) {
+                          $scope.MainExams = response.data.results;
+                      }, function errorCallback(response) {
+                          toastr["info"](response.data.message);
+                      });
+                  }
+                  //GetMainExamSubject
+
+                  function getMainExamSubject() {
+                      if ($scope.frmMainExamMarks.$invalid)
+                          return;
+                      $scope.MainExamSubjectMarks = [];
+                      $scope.MainExamIDForMarkCheck = $scope.MainExamSubjectMark.MainExamId;
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'ExamMarkSetup/GetMainExamSubject/' + $scope.MainExamSubjectMark.SessionId + '/' + $scope.MainExamSubjectMark.ClassId + '/' + $scope.MainExamSubjectMark.TermId + '/' + $scope.MainExamSubjectMark.MainExamId
+                      }).then(function successCallback(response){
+                          $scope.MainExamSubjectMarks = response.data.results;
+                          $scope.ResultProcess = 0;
+                          $scope.SuperAdmin = response.data.returnvalue;
+                      }, function errorCallback(response) {
+                          toastr["warning"](response.data.Message);
+                      });
+                  }
+
+                  //EndMainExamSubject
+                  //mainExam
+
+                  $scope.mainExamSave = function mainExamSave() {
+
+                      if ($scope.mainForm.$invalid)
+                          return;
+
+                          if ($scope.MainExam != {}) {
+                              $http({
+                                  method: 'POST',
+                                  url: baseUrl + 'ExamSetup/AddMainExam/',
+                                  data: $scope.MainExam
+                              }).then(function successCallback(response) {
+                                  $scope.Mainexam = response.data.results;
+                                  toastr["info"](response.data.message);
+                              }, function errorCallback(response) {
+                                  toastr["info"](response.data.message);
+                              });
+                          }
+
+
+                  };
+                  $scope.MainExamDeleteAllMark = function MainExamDeleteAllMark() {
+                      // SweetAlert.swal("Good job!", "You clicked the button!", "success");
+                      SweetAlert.swal({
+                          title: "Are you sure to delete it ?", type: "warning", showCancelButton: true, confirmButtonColor: "#DD6B55",
+                          confirmButtonText: "Yes, delete it!",
+                          closeOnConfirm: false
+                      },
+                      function (isConfirm) {
+                          if (isConfirm) {
+                              if ($scope.MainExamSubjectMarks.length == 0)
+                                  return;
+                              $http({
+                                  method: 'DELETE',
+                                  url: baseUrl + 'ExamMarkSetup/DeleteAllMainExamSubject/' + $scope.MainExamSubjectMark.SessionId + '/' + $scope.MainExamSubjectMark.ClassId + '/' + $scope.MainExamSubjectMark.TermId + '/' + $scope.MainExamSubjectMark.MainExamId
+                              }).then(function successCallback(response) {
+                                  SweetAlert.swal("Deleted!", "Your data has been deleted.", "success");
+                                  getMainExamSubject();
+                              }, function errorCallback(response) {
+                                  toastr["error"](response.data.Message);
+                              });
+
+                          }
+                      });
+
+
+                  };
+                  $scope.MainExamDeleteAllMainSubDivMarkSetup = function MainExamDeleteAllMainSubDivMarkSetup() {
+                      // SweetAlert.swal("Good job!", "You clicked the button!", "success");
+                      SweetAlert.swal({
+                          title: "Are you sure to delete it ?", type: "warning", showCancelButton: true, confirmButtonColor: "#DD6B55",
+                          confirmButtonText: "Yes, delete it!",
+                          closeOnConfirm: false
+                      },
+                      function (isConfirm) {
+                          if (isConfirm) {
+                              if ($scope.MainExamSubjectMarks.length == 0)
+                                  return;
+                              $http({
+                                  method: 'DELETE',
+                                  url: baseUrl + 'ExamMarkSetup/DeleteAllMainSubDivMarkSetup/'  + $scope.MainExamSubjectMark.SessionId + '/' + $scope.MainExamSubjectMark.ClassId + '/' + $scope.MainExamSubjectMark.MainExamId
+                              }).then(function successCallback(response) {
+                                  SweetAlert.swal("Deleted!", "Your data has been deleted.", "success");
+                                  getMainExamSubject();
+                              }, function errorCallback(response) {
+                                  toastr["error"](response.data.Message);
+                              });
+                          }
+                      });
+                  };
+
+                  $scope.MainExamDeleteMark = function MainExamDeleteMark(M) {
+                      SweetAlert.swal({
+                          title: "Are you sure to delete it ?", type: "warning", showCancelButton: true, confirmButtonColor: "#DD6B55",
+                          confirmButtonText: "Yes, delete it!",
+                          closeOnConfirm: false
+                      },
+                      function (isConfirm) {
+                                if (isConfirm) {
+                                    $http({
+                                        method: 'DELETE',
+                                        url: baseUrl + 'ExamMarkSetup/DeleteMainExamMark/'+ M
+                                    }).then(function successCallback(response) {
+                                        SweetAlert.swal("Deleted!", "Your data has been deleted.", "success");
+                                        getMainExamSubject();
+                                       // toastr["info"](response.data.message);                                       
+                                    }, function errorCallback(response) {
+                                        toastr["error"](response.data.Message);
+                                    });
+
+                                }
+                            });
+                    
+                  }
+            
+                  //mainExam
+                  //subExam
+                  $scope.mainExamMarkSetupSave = function mainExamMarkSetupSave() {
+                      if ($scope.MainExamSubjectMarks != []) {
+                              $http({
+                                  method: 'POST',
+                                  url: baseUrl + 'ExamMarkSetup/AddMainExamMark/',
+                                  data: $scope.MainExamSubjectMarks
+                              }).then(function successCallback(response) {
+                                  $scope.MainExamSubjectMarks = response.data.results;
+                                  toastr["info"](response.data.message);  
+                                  resetForm();
+                              }, function errorCallback(response) {
+                                  getMainExamSubject();
+                                  toastr["error"](response.data.Message);
+                              });
+                      }
+                      else {
+                          return;
+                      }
+
+                  };
+                 
+                  $scope.editSubExam = function (sube) {
+                      $scope.SubExam = sube;
+                  };
+                  // SubExam MarSetup
+                  function getSubExam(mainExamMarkSetup) {                          
+                      $scope.SubjectType = mainExamMarkSetup.SubjectType;
+                      $scope.GetSubExamByMainExamID = mainExamMarkSetup;
+                      $scope.SubExamSubjectName = mainExamMarkSetup.SubjectName;
+                      $scope.TotalFullMark = mainExamMarkSetup.MainExamFullMarks;
+                      $scope.MainExamMarkSetupIdForGet = mainExamMarkSetup.Id;
+                      $scope.MainExamIDForGet = mainExamMarkSetup.MainExamId;
+                      $scope.SubjectIDForMarkCheck = mainExamMarkSetup.MainExamSubjectID;
+                      $scope.SubExamIDForMarkCheck = 0;
+                      $scope.SubExamMarkSetups = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'MarkSetup/GetSubExamMarkSetup/' + mainExamMarkSetup.Id + '/' + mainExamMarkSetup.MainExamId
+                      }).then(function successCallback(response) {
+                          $scope.SubExamMarkSetups = response.data.results;
+                          angular.forEach($scope.SubExamMarkSetups, function (item) {
+                              $scope.SubExamIDForMarkCheck = item.SubExamId; // id is in $scope.Id   
+                              return;
+                          });
+                      }, function errorCallback(response) {
+                          toastr["error"](response.data.Message);
+                      });
+                  };
+                  $scope.SaveSubExamMark = function SaveSubExamMark() {
+                      $scope.SubExamMarkSetups = JSON.parse(angular.toJson($scope.SubExamMarkSetups))
+                      if ($scope.SubExamMarkSetups != []) {
+                          $http({
+                              method: 'POST',
+                              url: baseUrl + 'MarkSetup/AddSubExamMarkSetup/' + $scope.MainExamIDForGet + '/' + $scope.SubjectIDForMarkCheck,
+                              data: $scope.SubExamMarkSetups
+                          }).then(function successCallback(response) {
+                              $scope.SubExamMarkSetups = response.data.results;
+                              toastr["info"](response.data.message);   
+                              resetForm();
+                          }, function errorCallback(response) {
+                              toastr["error"](response.data.Message);
+                          });
+                      }
+                      else {
+                          return;
+                      }
+                  };
+
+                  $scope.SubExamDeleteAllMark = function SubExamDeleteAllMark() {
+                      if ($scope.SubExamMarkSetups.length == 0)
+                          return;
+                      $http({
+                          method: 'DELETE',
+                          url: baseUrl + 'ExamMarkSetup/DeleteAllSubExamMarkSetup/' + $scope.MainExamMarkSetupIdForGet + '/' + $scope.MainExamIDForGet + '/' + $scope.SubExamIDForMarkCheck + '/' + $scope.SubjectIDForMarkCheck
+                      }).then(function successCallback(response) {
+                          toastr["info"](response.data.message);
+                          getSubExam($scope.GetSubExamByMainExamID);
+                      }, function errorCallback(response) {
+                          toastr["error"](response.data.Message);
+                      });
+                  }
+                  $scope.SubExamDeleteMark = function SubExamDeleteMark(Id) {
+                              $http({
+                                  method: 'DELETE',
+                                  url: baseUrl + 'ExamMarkSetup/DeleteSubExamMark/' + Id + '/' + $scope.MainExamIDForMarkCheck + '/' + $scope.SubjectIDForMarkCheck
+                              }).then(function successCallback(response) {
+                                  toastr["info"](response.data.message);
+                                  getSubExam($scope.GetSubExamByMainExamID);
+                              }, function errorCallback(response) {
+                                  toastr["error"](response.data.Message);
+                              });
+                  }
+                  function getTerms() {
+                      $scope.Terms = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'SetupInstitution/GetAllTerm/'
+                      }).then(function successCallback(response) {
+                          // this callback will be called asynchronously
+                          // when the response is available
+                          $scope.Terms = response.data.results;
+                          $scope.total_count = response.data.totalcount;
+                          //console.log(response.data);
+                      }, function errorCallback(response) {
+                          toastr["warning"](response.data.Message);
+                      });
+
+                  }
+              }]);
+    </script>
+
+    <script type="text/javascript">
+        $(document).ready(function ($) {
+            // Disable scroll when focused on a number input.
+            $(document).on('focus', 'input[type=number]', function (e) {
+                $(this).on('wheel', function (e) {
+                    e.preventDefault();
+                });
+            });
+            // Restore scroll on number inputs.
+            $(document).on('blur', 'input[type=number]', function (e) {
+                $(this).off('wheel');
+            });
+            // Disable up and down keys.
+            $(document).on('keydown', 'input[type=number]', function (e) {
+                if (e.which == 38 || e.which == 40)
+                    e.preventDefault();
+            });
+        });
+    </script>
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+   

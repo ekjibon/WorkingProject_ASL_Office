@@ -1,0 +1,486 @@
+﻿
+@{
+    ViewBag.Title = "Highest Mark Policy";
+}
+
+<div ng-controller="HighestMarkConfigSetupCntrl">
+    <!-- Begin: life time stats -->
+    <div class="portlet light bordered">
+        <div class="portlet-title">
+            <div class="caption">
+                <i class="icon-settings font-green"></i>
+                <span class="caption-HighestMarkConfig font-green sbold uppercase">@ViewBag.Title</span>
+            </div>
+            <div class="actions">
+                <div class="btn-group btn-group-solid">
+                    <button ng-click="resetForm()" class="btn green" data-target="#addmodal" data-toggle="modal"> <i class="fa fa-plus"></i> Add Highest Mark Policy</button>
+                </div>
+            </div>
+        </div>
+        <div class="portlet-body">
+
+            <form class="form-horizontal" ng-submit="getHighestMarkConfig()" id="formCommonFeilds" name="formCommonFeilds" novalidate>
+                <div class="form-body">
+                    <div class="row">
+                     <div class="col-md-4">
+                            <div class="form-group" ng-class="{ 'has-error' : submitted1 && formCommonFeilds.Session.$invalid}">
+                                <label class="col-md-5 control-label">
+                                    Session :
+                                    <span class="required">*</span>
+                                </label>
+                                <div class="col-md-7">
+                                    <select class="form-control" ng-model="Fillter.SessionId" required name="Session" ng-options="HighestMarkConfigSetup.SessionId as HighestMarkConfigSetup.SessionName for HighestMarkConfigSetup in CommonFeilds.Session">
+                                        <option value="" selected="selected">Select</option>
+                                    </select>
+                                    <div class="form-control-focus"> </div>
+                                    <span ng-show="submitted1 && formCommonFeilds.Session.$error.required" class="help-block">Session Required</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group" ng-class="{ 'has-error' : submitted1 && formCommonFeilds.Class.$invalid}">
+                                <label class="col-md-5 control-label">
+                                    Class :
+
+                                </label>
+                                <div class="col-md-7">
+                                    <select class="form-control" name="Class" ng-model="Fillter.ClassId" ng-options="HighestMarkConfigSetup.ClassId as HighestMarkConfigSetup.ClassName for HighestMarkConfigSetup in CommonFeilds.ClassInfo">
+                                        <option value="" selected="selected">Select</option>
+                                    </select>
+                                    <div class="form-control-focus"> </div>
+                                    <span ng-show="submitted1 && formCommonFeilds.Class.$error.required" class="help-block">Class Required</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="btn-group btn-group-solid pull-right" style="margin-bottom:5px">
+                                <button ng-click="submitted1=true" class="btn btn-primary btn-large">&nbsp;&nbsp; <i class="fa fa-search"></i> Show &nbsp;&nbsp;&nbsp;&nbsp;</button>
+                                <a ng-click="generateReport()" style="margin-left:3px;" class="btn btn-primary">Report</a>
+                            </div>
+                        </div>
+                     </div>
+                </div>
+            </form>
+
+            <div class="table-container">
+                <div id="sample_3_wrapper" class="dataTables_wrapper no-footer">
+                    <div class="table-scrollable"> </div>
+                    <table class="table table-bordered table-hover">
+                        <thead>
+                            <tr style="background-color: #83b3db;">
+                                <th>Class Name</th>
+                                <th>Branch</th>
+                                <th>Class</th>
+                                <th>Shift</th>
+                                <th>Section</th>
+                                <th>Overall</th>
+                                <th>Fraction</th>
+                                <th width="12%">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-show="HighestMarkConfigSetups.results.length <= 0"><td colspan="8" style="text-align:center;"><i class="fa fa-refresh"></i> Data not found!</td></tr>
+                            <tr dir-paginate="item in HighestMarkConfigSetups.results|itemsPerPage:pagesize" total-items="total_count">
+                                <td>{{item.ClassName}}</td>
+                                <td><input type="checkbox" ng-disabled="true" ng-model="item.BranchWise" ng-checked="item.BranchWise !=0" /></td>
+                               
+                                <td><input type="checkbox" ng-disabled="true" ng-model="item.ClassWise" ng-checked="item.ClassWise !=0" /></td>
+                                <td><input type="checkbox" ng-disabled="true" ng-model="item.ShiftWise" ng-checked="item.ShiftWise !=0" /></td>
+                                <td><input type="checkbox" ng-disabled="true" ng-model="item.SectionWise" ng-checked="item.SectionWise !=0" /></td>
+                                <td><input type="checkbox" ng-disabled="true" ng-model="item.IsOverall" ng-checked="item.IsOverall !=0" /></td>
+                                <td><input type="checkbox" ng-disabled="true" ng-model="item.IsFrac" ng-checked="item.IsFrac !=0" /></td>
+
+
+                                <td>
+                                    <a href="" class="btn btn-icon-only green" ng-click="edit(item)" data-target="#addmodal" data-toggle="modal">
+                                        <i class="fa fa-edit"></i>
+                                    </a>
+                                    <a ng-click="deleteHighestMarkConfig(item)" href="" class="btn btn-icon-only red">
+                                        <i class="fa fa-trash"></i>
+                                    </a>
+                                </td>
+
+                            </tr>
+
+                        </tbody>
+
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- End: life time stats -->
+    <!--Modal Area Start-->
+    <div id="addmodal" class="modal fade" tabindex="-1" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <form name="addform" ng-submit="save()" class="form-horizontal" id="form_sample_1" novalidate>
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                        <h4 class="modal-title">{{modalTitle}}</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                               <div class="form-group" ng-class="{ 'has-error' : submitted && addform.Session.$invalid}">
+                                        <label class="col-md-4 control-label">
+                                            Session :
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-8">
+                                            <select class="form-control" ng-model="HighestMarkConfigSetup.SessionId" ng-disabled="HighestMarkConfigSetup.Clone==true" required name="Session" ng-options="HighestMarkConfigSetup.SessionId as HighestMarkConfigSetup.SessionName for HighestMarkConfigSetup in CommonFeilds.Session">
+                                                <option value="" selected="selected">Select</option>
+                                            </select>
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted && addform.Session.$error.required" class="help-block">Session Required</span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-4 control-label">
+                                            Clone :
+                                            <input type="checkbox" ng-disabled="HighestMarkConfigSetup.SessionId==null" ng-change="filterSession();" ng-model="HighestMarkConfigSetup.Clone" ng-checked="HighestMarkConfigSetup.Clone==true">
+                                        </label>
+                                        <div class="col-md-8" ng-show="HighestMarkConfigSetup.Clone==true">
+                                            <select class="form-control" ng-model="HighestMarkConfigSetup.NewSessionId" name="NewSessionId" ng-options="HighestMarkConfigSetup.SessionId as HighestMarkConfigSetup.SessionName for HighestMarkConfigSetup in CloneSession.Session">
+                                                <option value="" selected="selected">Select New Session</option>
+                                            </select>
+                                            <div class="form-control-focus"> </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <fieldset ng-hide="HighestMarkConfigSetup.Clone" style="width:100%">
+                                     <div class="form-group" ng-class="{ 'has-error' : submitted && addform.Class.$invalid}">
+                                            <label class="col-md-4 control-label">
+                                                Class :
+                                                <span class="required">*</span>
+                                            </label>
+                                            <div class="col-md-8">
+                                                <select class="form-control"  ng-model="HighestMarkConfigSetup.ClassId" name="Class" required  ng-options="HighestMarkConfigSetup.ClassId as HighestMarkConfigSetup.ClassName for HighestMarkConfigSetup in CommonFeilds.ClassInfo | filter:{VersionId:HighestMarkConfigSetup.VersionId}:true">
+                                                    <option value="" selected="selected">Select</option>
+                                                </select>
+                                                <div class="form-control-focus"> </div>
+                                                <span ng-show="submitted && addform.Class.$error.required" class="help-block">Class Required</span>
+                                            </div>
+                                        </div>
+                                  <div class="form-group" ng-class="{ 'has-error' : submitted && addform.Group.$invalid}">
+                                            <label class="col-md-4 control-label">
+                                                Is Fraction :
+
+                                            </label>
+                                            <div class="col-md-8">
+                                                <input type="checkbox" width="150" height="150" ng-true-value="true" ng-false-value="false" ng-model="HighestMarkConfigSetup.IsFrac" style="width:20px;height:20px;" />
+                                                <div class="form-control-focus"> </div>
+                                            </div>
+
+                                        </div>
+
+
+                                    </fieldset>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <fieldset ng-hide="HighestMarkConfigSetup.Clone" style="width:100%">
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            <label class="col-md-2 control-label">
+                                                Select :
+                                            </label>
+                                            <div class="col-md-10">
+                                                <div class="mt-checkbox-inline">
+                                                    <label class="mt-checkbox">
+                                                        <input type="checkbox" ng-model="HighestMarkConfigSetup.BranchWise" ng-checked="HighestMarkConfigSetup.BranchWise==true"> Branch
+                                                        <span></span>
+                                                    </label>
+                                              <label class="mt-checkbox">
+                                                        <input type="checkbox" ng-model="HighestMarkConfigSetup.ClassWise" ng-checked="HighestMarkConfigSetup.ClassWise==true"> Class
+                                                        <span></span>
+                                                    </label>
+                                                    <label class="mt-checkbox">
+                                                        <input type="checkbox" ng-model="HighestMarkConfigSetup.ShiftWise" ng-checked="HighestMarkConfigSetup.ShiftWise==true"> Shift
+                                                        <span></span>
+                                                    </label>
+                                                    <label class="mt-checkbox">
+                                                        <input type="checkbox" ng-model="HighestMarkConfigSetup.SectionWise" ng-checked="HighestMarkConfigSetup.SectionWise==true"> Section
+                                                        <span></span>
+                                                    </label>
+                                                    <label class="mt-checkbox">
+                                                        <input type="checkbox" ng-model="HighestMarkConfigSetup.IsOverall" ng-checked="HighestMarkConfigSetup.IsOverall==true"> Overall
+                                                        <span></span>
+                                                    </label>
+                                                    @*<label class="mt-checkbox">
+                                                            <input type="checkbox" ng-model="HighestMarkConfigSetup.IsFrac" ng-checked="HighestMarkConfigSetup.IsFrac==true"> IsFraction
+                                                            <span></span>
+                                                        </label>*@
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+
+                                </fieldset>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="modal-footer">
+                        @*<input type="checkbox" id="switch" ng-true-value="true" ng-false-value="false"  class="make-switch" data-on-text="&nbsp;Clone On&nbsp;" data-off-text="&nbsp;Clone Off&nbsp;" ng-model="CloneActive">*@
+
+                        <button type="button" data-dismiss="modal" class="btn dark btn-outline" ng-click="resetForm();submitted=false">Cancel</button>
+                        <button ng-hide="HighestMarkConfigSetup.Clone==true" type="submit" ng-click="submitted=true" class="btn green-haze">Save</button>
+                        <button ng-show="HighestMarkConfigSetup.Clone==true && HighestMarkConfigSetup.NewSessionId!=null" type="button" ng-click="Clone();" class="btn green-haze">Clone</button>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+    <!--Modal Area End-->
+
+</div>
+
+@section Scripts{
+   
+    <script type="text/javascript">
+        OEMSApp.controller("HighestMarkConfigSetupCntrl", ["$scope", "$http", "SweetAlert", "blockUI", "$window",
+              function ($scope, $http, SweetAlert, blockUI, $window) {
+
+                  init();
+                  function init() {
+                      initialize();
+                      getAllHighestMarkConfig();
+                      getAllCommons();
+                      getCloneSession();
+
+                  }
+                  function initialize() {
+                      $scope.modalTitle = "Add Highest Mark Policy";
+                      $scope.HighestMarkConfigSetup = {};
+                      $scope.Fillter = {};
+                      $scope.HighestMarkConfigSetup.HighestMarkConfigId = 0;
+                      $scope.HighestMarkConfigSetups = [];
+
+                      $scope.CommonFeilds = [];
+                    
+
+                      $scope.getHighestMarkConfig = getHighestMarkConfig;
+                      $scope.res = {};
+                      $scope.data = {};
+                      $scope.resetForm = resetForm;
+                      $scope.getAllCommons = getAllCommons;
+                      $scope.btnDis = false;
+
+                  }
+                  $scope.cloneFunction = function cloneFunction(CloneActive) {
+                      alert(CloneActive);
+                  }
+                  //for class ways report ........
+                  $scope.generateReport = function generateReport() {
+                  
+                      if ($scope.Fillter.SessionId == null) {
+                          toastr["info"]("Select a Session.");
+                      }
+                      else {
+                          $scope.uri = "@Url.Action("HighestMarkSetupReport", "Report")?SessionID=" + $scope.Fillter.SessionId;
+                          $window.open($scope.uri, '_blank');
+                      }
+
+                  }
+                  function resetForm() {
+                      $scope.modalTitle = "Add Highest Mark Policy";
+                      $scope.HighestMarkConfigSetup.HighestMarkConfigId = 0;
+                      $scope.HighestMarkConfigSetup = {};
+                      $scope.HighestMarkConfigSetup.ID = 0;
+                      $scope.submitted1 = false;
+                      $scope.submitted = false;
+
+
+
+                  }
+                  function reset() {
+                      $scope.modalTitle = "Add Highest Mark Policy";
+                      $scope.HighestMarkConfigSetup.HighestMarkConfigId = 0;
+                      $scope.HighestMarkConfigSetup.VersionWise = 0;
+                      $scope.HighestMarkConfigSetup.ClassWise = 0;
+                      $scope.HighestMarkConfigSetup.ShiftWise = 0;
+                      $scope.HighestMarkConfigSetup.SectionWise = 0;
+                      $scope.HighestMarkConfigSetup.BranchWise = 0;
+                      $scope.submitted1 = false;
+                      $scope.submitted = false;
+                  }
+                  function getAllCommons() {
+                      //$scope.CommonFeilds = [];
+
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Common/GetCommonItem/'
+                      }).then(function successCallback(response) {
+                          $scope.CommonFeilds = response.data.results;
+                      }, function errorCallback(response) {
+                          toastr["error"](response.data.Message);
+                      });
+                  }
+                  function getCloneSession() {//for second form
+                      $scope.CloneSession = [];
+
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Common/GetCommonItem/'
+                      }).then(function successCallback(response) {
+                          $scope.CloneSession = response.data.results;
+
+                      }, function errorCallback(response) {
+                          toastr["error"](response.data.Message);
+                      });
+                  }
+                  function getHighestMarkConfig() {
+                      if ($scope.formCommonFeilds.$invalid)
+                          return;
+                      $scope.HighestMarkConfigSetups = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Result/GetHighestMarkSetup/'+ $scope.Fillter.SessionId + '/' + $scope.Fillter.ClassId 
+                      }).then(function successCallback(response) {
+                          $scope.HighestMarkConfigSetups = response.data;
+                          $scope.total_count = response.data.totalcount;
+                          if ($scope.pagesize == -1)
+                              $scope.pagesize = 500;
+
+                      }, function errorCallback(response) {
+                          toastr["error"](response.data.Message);
+                      });
+
+                  }
+                  function getAllHighestMarkConfig() {
+                      $scope.HighestMarkConfigSetups = [];
+
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Result/GetAllHighestMarkSetup/'
+                      }).then(function successCallback(response) {
+                          $scope.HighestMarkConfigSetups = response.data;
+                          $scope.total_count = response.data.totalcount;
+                          if ($scope.pagesize == -1)
+                              $scope.pagesize = 500;
+
+                      }, function errorCallback(response) {
+                          toastr["error"](response.data.Message);
+                      });
+
+                  }
+                  $scope.filterSession = function filterSession() {
+                      var keepGoing1 = true;
+                      angular.forEach($scope.CloneSession.Session, function (value, key) {
+                          if (keepGoing1) {
+                              if (value.SessionId == $scope.HighestMarkConfigSetup.SessionId) {
+                                  var index = $scope.CloneSession.Session.indexOf(value);
+                                  $scope.CloneSession.Session.splice(index, 1);
+                                  keepGoing1 = false;
+                              }
+                          }
+                      });
+                  }
+           
+                  $scope.edit = function (n) {
+                      $scope.HighestMarkConfigSetup = {};
+                      $scope.modalTitle = "Update HighestMarkConfig";
+                      $scope.HighestMarkConfigSetup = n;
+                      $scope.HighestMarkConfigSetup.GroupId = n.GroupId;
+                      $scope.ID = n.ID;                       
+                      $scope.NoEffectOnExam;                  
+
+                  };
+
+                  $scope.Clone = function () {
+                      if ($scope.HighestMarkConfigSetup.Clone == true) {
+                          $http({
+                              method: 'GET',
+                              url: baseUrl + 'Result/CloneHighestMarkSetup/' + $scope.HighestMarkConfigSetup.Clone + '/' + $scope.HighestMarkConfigSetup.NewSessionId + '/' + $scope.HighestMarkConfigSetup.SessionId
+                          }).then(function successCallback(response) {
+                              toastr["info"](response.data.message);
+                              $scope.HighestMarkConfigSetups = response.data;
+                              reset();
+                          }, function errorCallback(response) {
+                              toastr["error"](response.data.Message);
+
+                          });
+                      }
+                  };
+
+                  $scope.save = function save() {
+                      if ($scope.addform.$invalid)
+                          return;
+                      if ($scope.HighestMarkConfigSetup != {}) /// For Update
+                      {
+                          if ($scope.HighestMarkConfigSetup.HighestMarkConfigId > 0) {
+                              $http({
+                                  method: 'PUT',
+                                  url: baseUrl + 'Result/UpdateHighestMarkSetup/',
+                                  data: $scope.HighestMarkConfigSetup
+                              }).then(function successCallback(response) {
+                                  $scope.HighestMarkConfigSetups = response.data;
+                                  toastr["info"](response.data.message);
+                                  reset();
+                              }, function errorCallback(response) {
+                                  toastr["error"](response.data.Message);
+                              });
+                          }
+                          else {
+                              $http({
+                                  method: 'POST',
+                                  url: baseUrl + '/Result/AddHighestMarkSetup/',
+                                  data: $scope.HighestMarkConfigSetup
+                              }).then(function successCallback(response) {
+                                  toastr["info"](response.data.message);
+                                  $scope.HighestMarkConfigSetups = response.data;
+                                  reset();
+                              }, function errorCallback(response) {
+                                  toastr["error"](response.data.Message);
+
+                              });
+                          }
+
+                      } else {  //  For Add
+                          alert('Invalid Submission');
+                          return;
+                      }
+
+                  };
+                  $scope.deleteHighestMarkConfig = function deleteHighestMarkConfig(n) {
+
+                      // SweetAlert.swal("Good job!", "You clicked the button!", "success");
+                      SweetAlert.swal({
+                          title: "Are you sure to delete it ?", type: "warning", showCancelButton: true, confirmButtonColor: "#DD6B55",
+                          confirmButtonText: "Yes, delete it!",
+                          closeOnConfirm: false
+                      },
+                      function (isConfirm) {
+
+                          ///   $scope.Fillter.VersionID + '/' + $scope.Fillter.SessionId + '/' + $scope.Fillter.ClassId + '/' + $scope.Fillter.GroupId
+                          if (isConfirm) {
+                              $http({
+                                  method: 'DELETE',
+                                  url: baseUrl + '/Result/HighestMarkConfig/' + n.HighestMarkConfigId
+                              }).then(function successCallback(response) {
+                                  SweetAlert.swal("Deleted!", "Your data has been deleted.", "success");
+                                  getAllHighestMarkConfig();
+
+                                  // $scope.HighestMarkConfigSetups = response.data.results;
+                              }, function errorCallback(response) {
+                                  toastr["error"](response.data.Message);
+                              });
+
+                          }
+                      });
+
+
+                  };
+
+
+              }]);
+
+    </script>
+
+}
+

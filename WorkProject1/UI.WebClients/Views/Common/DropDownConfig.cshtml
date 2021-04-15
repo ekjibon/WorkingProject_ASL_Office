@@ -1,0 +1,340 @@
+﻿@{
+    ViewBag.Title = "Common DropDown";
+}
+<div ng-controller="CtrlCommonInfo">
+    <!-- Begin: life time stats -->
+    <div class="portlet light bordered">
+        <div class="portlet-title">
+            <div class="caption">
+                <i class="icon-settings font-green"></i>
+                <span class="caption-subject font-green sbold uppercase">@ViewBag.Title</span>
+            </div>
+            <div class="actions">
+                <div class="btn-group btn-group-solid">
+                    <button ng-click="resetForm()" class="btn green" data-target="#addmodal" data-toggle="modal"> <i class="fa fa-plus"></i> Add Item</button>
+                </div>
+            </div>
+        </div>
+        <div class="portlet-body">
+            <div class="table-container">
+                <div id="sample_3_wrapper" class="dataTables_wrapper no-footer">
+                    <div class="row">
+                        <div class="col-md-4 col-sm-4">
+                            <div class="form-group">
+                                <div class="col-md-4">
+                                    <select class="form-control" ng-model="pageSize" ng-options="P.value as P.text for P in pageSizeArray"></select>
+                                </div>
+                                <div class="col-md-6 col-md-pull-1">
+                                    @*<label for="search" class="control-label">Items per page</label>*@
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-5 col-sm-5">
+                            <div class="form-group">
+                                <label class="col-md-3 control-label">
+                                    Type :
+                                </label>
+                                <div class="col-md-9 col-md-pull-1">
+                                    <select class="form-control" ng-model="Type">
+                                        <option value="">Select Option</option>
+                                        <option value="Gender">Gender Response</option>
+                                        <option value="Marital Status">Marital Status</option>
+                                        <option value="Blood Group">Blood Group</option>
+                                        <option value="Religion">Religion </option>
+                                        <option value="Nationality">Nationality</option>
+                                        <option value="Club">Club</option>
+                                        <option value="Interest">Interest</option>
+                                        <option value="Organization">Organization</option>
+                                        <option value="Exam">Exam</option>
+                                        <option value="ExamBoard">Exam Board</option>
+                                        <option value="ExamGroup">Exam Group</option>
+                                        <option value="Quota">Quota </option>
+                                        <option value="ActivityType">ActivityType</option>
+                                        <option value="SignatureType">SignatureType</option>
+                                        <option value="rptTemplate">rptTemplate</option>
+                                        <option value="Qualification">Qualification</option>
+                                        <option value="Policy Name">Policy Name</option>
+                                        <option value="VehicleType">Vehicle Type</option>
+                                        <option value="Transportpolicy">Transport policy</option>
+                                        <option value="FatherProfession">Father Profession</option>
+                                        <option value="MotherProfession">Mother Profession</option>
+                                        <option value="SMSCategory">SMS Category</option>
+                                        <option value="JobCategory">Job Category</option>
+                                        <option value="JobStatus">Job Status</option>
+                                        <option value="JobShift">Job Shift</option>
+                                        <option value="EmpDept">Employee Department</option>
+                                        <option value="EmpPDept">Employee Portal Department</option>
+                                        <option value="AssesmentComment">AssesmentComment</option>
+                                        <option value="EmployeeRoster">Employee Roster</option>
+                                        <option value="Team">Team</option>
+                                        <option value="Others">Others</option>
+                                        
+                                        
+                                    </select>
+                                    <div class="form-control-focus"> </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-sm-3">
+                            <div id="sample_3_filter" class="pull-right">
+                                <input ng-model="q" id="search" class="form-control" placeholder="Filter text">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="table-scrollable"> </div>
+                    <table class="table table-bordered table-hover">
+                        <thead>
+                            <tr class="btn-primary">
+                                <th>
+                                    SN
+                                </th>
+                                <th>
+                                    Text
+                                </th>
+                                <th>
+                                    Value
+                                </th>
+                                <th>
+                                    Type
+                                </th>
+                                <th style="width:15%">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr dir-paginate="x in AllDropdown | filter:q  | filter:Type | itemsPerPage: pageSize " current-page="currentPage">
+                                <td> {{$index + 1}} </td>
+                                <td> {{x.Text}}   </td>
+                                <td> {{x.Value}}   </td>
+                                <td> {{x.Type}}   </td>
+                                <td class="text-center">
+                                    <a href="javascript:;" class="btn btn-icon-only green" ng-click="EditForm(x)"  data-target="#addmodal" data-toggle="modal">
+                                        <i class="fa fa-edit"></i>
+                                    </a>
+                                    <a  href="javascript:;" ng-click="DeleteDropdown(x)" class="btn btn-icon-only red">
+                                        <i class="fa fa-trash"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="row">
+                            <dir-pagination-controls boundary-links="true" template-url="~/assets/angular/lib/dirPagination.tpl.html"></dir-pagination-controls>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- End: life time stats -->
+    <div id="addmodal" class="modal fade" tabindex="-1" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form name="addform" ng-submit="SaveDropdown()" class="form-horizontal" id="form_sample_1" novalidate>
+                    <div class="modal-header">
+                        <a class="close" data-dismiss="modal" aria-hidden="true"></a>
+                        <h4 class="modal-title">{{title}}</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-body">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group"  ng-class="{ 'has-error' : submitted && addform.Item.$invalid}">
+                                        <label class="col-md-4 control-label">
+                                            Item :
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-8">
+                                            <input type="text" ng-model="DropDownInfo.Text" required name="Item" placeholder="Item" class="form-control" />
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted && addform.Item.$error.required " class="help-block">Item Required</span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group" ng-class="{ 'has-error' : submitted && addform.Value.$invalid}">
+                                        <label class="col-md-4 control-label">
+                                            Value :
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-8">
+                                            <input type="text" ng-model="DropDownInfo.Value" ng-pattern="/^\S{0,50}$/" required name="Value" placeholder="Value" class="form-control" />
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted && addform.Value.$error.required " class="help-block">Value Required</span>
+                                            <span style="color:red" class="help-block" ng-if="submitted && addform.Value.$invalid">No Space Allow</span>
+                                         </div>
+                                    </div>
+                                    <div class="form-group" ng-class="{ 'has-error' : submitted && addform.Type.$invalid}">
+                                        <label class="col-md-4 control-label">
+                                            Type :
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-8">
+                                            <select class="form-control" name="Type" required ng-model="DropDownInfo.Type">
+                                                <option value=''>Select Option</option>
+                                                <option value="Gender">Gender Response</option>
+                                                <option value="Marital Status">Marital Status</option>
+                                                <option value="Blood Group">Blood Group</option>
+                                                <option value="Religion">Religion </option>
+                                                <option value="Nationality">Nationality</option>
+                                                <option value="Club">Club</option>
+                                                <option value="Interest">Interest</option>
+                                                <option value="Organization">Organization</option>
+                                                <option value="Exam">Exam</option>
+                                                <option value="ExamBoard">Exam Board</option>
+                                                <option value="ExamGroup">Exam Group</option>
+                                                <option value="Quota">Quota </option>
+                                                <option value="ActivityType">ActivityType</option>
+                                                <option value="SignatureType">SignatureType</option>
+                                                <option value="rptTemplate">rptTemplate</option>
+                                                <option value="Qualification">Qualification</option>
+                                                <option value="Policy Name">Policy Name</option>
+                                                <option value="VehicleType">Vehicle Type</option>
+                                                <option value="Transportpolicy">Transport policy</option>
+                                                <option value="FatherProfession">Father Profession</option>
+                                                <option value="MotherProfession">Mother Profession</option>
+                                                <option value="SMSCategory">SMS Category</option>
+                                                <option value="JobCategory">Job Category</option>
+                                                <option value="JobStatus">Job Status</option>
+                                                <option value="JobShift">Job Shift</option>
+                                                <option value="EmpDept">Employee Department</option>
+                                                <option value="EmpPDept">Employee Portal Department</option>
+                                                <option value="AssesmentComment">AssesmentComment</option>
+                                                <option value="EmployeeRoster">Employee Roster</option>
+                                                <option value="Team">Team</option>
+                                                <option value="Others">Others</option>
+                                            </select>
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted && addform.Type.$error.required " class="help-block">Type Required</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" data-dismiss="modal" class="btn dark btn-outline" ng-click="resetForm();submitted=false">Cancel</button>
+                        <button type="submit" ng-click="submitted=true" class="btn green-haze" ng-disabled="btnDis">{{btn}} <i ng-show="spin" class="fa fa-spinner fa-spin" style="font-size:20px"></i></button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts{
+    <script type="text/javascript">
+        OEMSApp.controller("CtrlCommonInfo", ["$scope", "$http", "SweetAlert",
+              function ($scope, $http, SweetAlert) {
+                  init();
+                  function init() {
+                      initialize();
+                      getAllDropdown();
+                  }
+                  function initialize() {
+                      $scope.AllDropdown = [];
+                      $scope.DropDownInfo = {};
+                      $scope.SaveDropdown = SaveDropdown;
+                      $scope.getAllDropdown = getAllDropdown;
+
+                      $scope.resetForm = resetForm;
+                      $scope.currentPage = 1;
+                      $scope.pageSize = 10;
+                      $scope.currentPage = 1;
+                      $scope.pageno = 1;
+                      $scope.pageSizeArray = [];
+                      $scope.pageSizeArray.push({ value: 5, text: 5 });
+                      $scope.pageSizeArray.push({ value: 10, text: 10 });
+                      $scope.pageSizeArray.push({ value: 20, text: 20 });
+                      $scope.pageSizeArray.push({ value: 50, text: 50 });
+                      $scope.title = "Add Item";
+                      $scope.btn = "Save";
+                      $scope.submitted = false;
+                  };
+                  $scope.DeleteDropdown = function DeleteDropdown(n) {
+                      // SweetAlert.swal("Good job!", "You clicked the button!", "success");
+                      SweetAlert.swal({
+                          title: "Are you sure to delete it ?", type: "warning", showCancelButton: true, confirmButtonColor: "#DD6B55",
+                          confirmButtonText: "Yes, delete it!",
+                          closeOnConfirm: false
+                      },
+                      function (isConfirm) {
+                          if (isConfirm) {
+                              $http({
+                                  method: 'POST',
+                                  url: baseUrl + 'Common/DeleteDropdown/',
+                                  data: n
+                              }).then(function successCallback(response) {
+                                  SweetAlert.swal("Deleted!", "Your data has been deleted.", "success");
+                                      getAllDropdown();
+                                      $scope.DropDownInfo = {};
+                                      toastr["success"](response.data.message);
+                              }, function errorCallback(response) {
+                                  toastr["warning"](response.data.Message);
+                              });
+                          }
+                      });
+                  };
+                  $scope.EditForm = function EditForm(x)
+                  {
+                      $scope.DropDownInfo = x;
+                      $scope.title = "Update Item";
+                      $scope.btn = "Update";
+                  }
+                  function getAllDropdown() {
+                      $scope.AllDropdown = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Common/GetDropDown/'
+                      }).then(function successCallback(response) {
+                          $scope.AllDropdown = response.data.results;
+                          toastr["success"](response.data.message);
+                      }, function errorCallback(response) {
+                          toastr["warning"](response.data.message);
+                      });
+                  }
+                  function SaveDropdown() {
+                      if ($scope.addform.$invalid)
+                          return;
+                      if ($scope.DropDownInfo.Id)
+                      {
+                          $http({
+                              method: 'POST',
+                              url: baseUrl + 'Common/UpdateDropDown/',
+                              data: $scope.DropDownInfo
+                          }).then(function successCallback(response) {
+                              $('#addmodal').modal('toggle');
+                              //toastr["info"](response.data.message);
+                              
+                                  toastr["success"](response.data.message);
+                                  Reset();
+                          }, function errorCallback(response) {
+                              toastr["warning"](response.data.Message);
+                          });
+                      }
+                      else {
+                          $http({
+                              method: 'POST',
+                              url: baseUrl + 'Common/AddDropDown/',
+                              data: $scope.DropDownInfo
+                          }).then(function successCallback(response) {
+                              console.log(response.data.message);
+                              $('#addmodal').modal('toggle');
+                              Reset();
+                              $scope.title = "Add Item";
+                              $scope.btn = "Save";
+                        
+                              toastr["success"](response.data.message);
+                          }, function errorCallback(response) {
+                              toastr["warning"](response.data.Message);
+                          });
+                      }
+                  }
+                  function resetForm() {
+                      getAllDropdown();
+                      $scope.AllDropdown = [];
+                      $scope.DropDownInfo = {};
+                      $scope.title = "Add Item";
+                      $scope.btn = "Save";
+                      $scope.addform.$setUntouched();
+                      $scope.addform.$setPristine();
+                      $scope.submitted = false;
+                  };
+              }]);
+    </script>
+}

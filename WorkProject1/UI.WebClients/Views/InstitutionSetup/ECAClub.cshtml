@@ -1,0 +1,290 @@
+﻿
+@{
+    ViewBag.Title = "ECA Club";
+}
+
+<div ng-controller="ECAClub">
+    <!-- Begin: life time stats -->
+    <div class="portlet light bordered">
+        <div class="portlet-title">
+            <div class="caption">
+                <i class="icon-settings font-green"></i>
+                <span class="caption-subject font-green sbold uppercase">@ViewBag.Title</span>
+            </div>
+            <div class="actions">
+                <div class="btn-group btn-group-solid">
+                    <button ng-click="resetForm()" class="btn green" data-target="#addmodal" data-toggle="modal"> <i class="fa fa-plus"></i> Add Club</button>
+                </div>
+            </div>
+        </div>
+        <div class="portlet-body">
+            <div class="table-container">
+                <div id="sample_3_wrapper" class="dataTables_wrapper no-footer">
+                    <div class="row">
+                        <div class="col-md-4 col-sm-5 col-xs-6">
+                            <div class="form-group">
+                                <div class="col-lg-3 col-md-5 col-sm-4 col-xs-8" style="padding-left:0px">
+                                    <select class="form-control" ng-model="pageSize" ng-options="P.value as P.text for P in pageSizeArray"></select>
+                                </div>
+                                <div class="col-md-7  col-sm-8  col-xs-4">
+                                    @*<label for="search" class="control-label" style="padding-top:5px">Items</label>*@
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 col-sm-3 col-xs-1">
+                        </div>
+                        <div class="col-md-4 col-sm-4 col-xs-5">
+                            <div id="sample_3_filter" class="pull-right">
+                                <input ng-model="q" id="search" class="form-control" placeholder="Filter text">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="table-scrollable"> </div>
+                    <table class="table table-bordered table-hover">
+                        <thead>
+                            <tr class="btn-primary">
+                                <th>Club Name</th>
+                                <th class="text-center">Category Name</th>
+                                <th class="text-center">Description</th>
+                                <th class="text-center">Status</th>
+                                <th style="text-align:center">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-show="ECAClubs.results.length <= 0"><td colspan="5" style="text-align:center;"><i class="fa fa-refresh"></i> Loading new data!!</td></tr>
+                            <tr dir-paginate="item in ECAClubs.results | filter:q |itemsPerPage:pageSize" current-page="currentPage">
+                                <td>{{item.ClubName}}</td>
+                                <td class="text-center">{{item.CategoryName}}</td>
+                                <td class="text-center">{{item.Description}}</td>
+                                <td class="text-center" ng-if="item.Status=='A'">Active</td>
+                                <td class="text-center" ng-if="item.Status=='I'">In Active</td>
+                                <td align="center">
+                                    <a class="btn btn-icon-only green" ng-click="edit(item)" data-target="#addmodal" data-toggle="modal">
+                                        <i class="fa fa-edit"></i>
+                                    </a>
+                                    <a ng-click="deleteclub(item)" href="" class="btn btn-icon-only red">
+                                        <i class="fa fa-trash"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="row">
+                        <dir-pagination-controls boundary-links="true" template-url="~/assets/angular/lib/dirPagination.tpl.html"></dir-pagination-controls>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- End: life time stats -->
+    <!--Modal Area Start-->
+    <div id="addmodal" class="modal fade" tabindex="-1" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form name="addform" ng-submit="save()" class="form-horizontal" id="form_sample_1" novalidate autocomplete="off">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">X</button>
+                        <h4 class="modal-title">{{aemodalTitle}}</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-body">
+                            <div class="form-group" ng-class="{ 'has-error' : submitted && addform.ClubName.$invalid}">
+                                <label class="col-md-3 control-label">
+                                    Club Name
+                                    <span class="required">*</span>
+                                </label>
+                                <div class="col-md-9">
+                                    <input type="text" ng-model="ECAClub.ClubName" class="form-control" placeholder="ECA Club Name" name="ClubName" required>
+                                    <div class="form-control-focus"> </div>
+                                    <span ng-show="submitted && addform.ClubName.$error.required" class="help-block">ECA Club Name Required</span>
+                                </div>
+                            </div>
+                            <div class="form-group" ng-class="{ 'has-error' : submitted && addform.CategoryName.$invalid}">
+                                <label class="col-md-3 control-label">
+                                    Category Name
+                                    <span class="required">*</span>
+                                </label>
+                                <div class="col-md-9">
+                                    <select class="form-control" required ng-model="ECAClub.CategoryName" name="CategoryName" ng-options="C.Id as C.text for C in CategoryList">
+                                        <option value="" selected="selected">Choose Option</option>
+                                    </select>
+                                    <div class="form-control-focus"> </div>
+                                    <span ng-show="submitted && addform.CategoryName.$error.required" class="help-block">Category Required</span>
+                                </div>
+                            </div>
+                            <div class="form-group" ng-class="{ 'has-error' : submitted && addform.Description.$invalid}">
+                                <label class="col-md-3 control-label">
+                                    Description
+                                    <span class="required">*</span>
+                                </label>
+                                <div class="col-md-9">
+                                    <input type="text" ng-model="ECAClub.Description" class="form-control" placeholder="Description" name="Description" >
+                                    <div class="form-control-focus"> </div>
+                                    <span ng-show="submitted && addform.Description.$error.required" class="help-block">Description Required</span>
+                                </div>
+                            </div>
+                            <div class="form-group" ng-class="{ 'has-error' : submitted && addform.Status.$invalid}">
+                                <label class="col-md-3 control-label">
+                                    Status
+                                    <span class="required">*</span>
+                                </label>
+                                <div class="col-md-9">
+                                    <select class="form-control" ng-model="ECAClub.Status" name="Status" required>
+                                        <option value='' selected>Select</option>
+                                        <option value='A' selected>Active</option>
+                                        <option value='I' selected>In Active</option>
+                                    </select>
+                                    <div class="form-control-focus"> </div>
+                                    <span ng-show="submitted && addform.Status.$error.required" class="help-block">Status Required</span>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" data-dismiss="modal" class="btn dark btn-outline" ng-click="resetForm();submitted=false">Cancel</button>
+                        <button type="submit" ng-click="submitted=true" class="btn green">Save</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!--Modal Area End-->
+</div>
+@section Scripts{
+    <script type="text/javascript">
+        OEMSApp.controller("ECAClub", ["$scope", "$http", "SweetAlert",
+           function ($scope, $http, SweetAlert) {
+               init();
+               function init() {
+                   initialize();
+                   getECAClubs(1);
+
+               }
+               function initialize() {
+                   $scope.aemodalTitle = "Add ECA Club";
+                   $scope.ecaClubName = '';
+                   $scope.currentPage = 1;
+                   $scope.pageno = 1;
+                   $scope.pagesize = 10;
+                   $scope.total_count = 12;
+                   $scope.search = '';
+                   $scope.ECAClub = {};
+                   $scope.ECAClub.ECAClubId = 0;
+                   $scope.ECAClubs = [];
+                   $scope.Id = '';
+                   $scope.getECAClubs = getECAClubs;
+                   $scope.res = {};
+                   $scope.data = {};
+                   $scope.resetForm = resetForm;
+                   //Category List
+                   $scope.CategoryList = [];
+                   $scope.CategoryList.push({ Id: 'Physical', text: 'Physical' });
+                   $scope.CategoryList.push({ Id: 'Technical', text: 'Technical' });
+                   $scope.CategoryList.push({ Id: 'Service', text: 'Service' });
+                   $scope.pageSizeArray = [];
+                   $scope.pageSizeArray.push({ value: 5, text: 5 });
+                   $scope.pageSizeArray.push({ value: 10, text: 10 });
+                   $scope.pageSizeArray.push({ value: 20, text: 20 });
+                   $scope.pageSizeArray.push({ value: 50, text: 50 });
+                   $scope.currentPage = 1;
+                   $scope.pageSize = 10;
+               }
+               function resetForm() {
+                   $scope.aemodalTitle = "Add ECA Club";
+                   $scope.ECAClub = {};
+                   $scope.ECAClub.ECAClubId = 0;
+                   $scope.addform.$setUntouched();
+                   $scope.addform.$setPristine();
+                   $scope.submitted = false;
+                   $scope.Id = '';
+                   getECAClubs();
+               }
+               function getECAClubs() {
+                   $scope.ECAClubs = [];
+                   $http({
+                       method: 'GET',
+                       url: baseUrl + 'SetupInstitution/GetAllECAClub/'
+                   }).then(function successCallback(response) {
+                       // this callback will be called asynchronously
+                       // when the response is available
+                       $scope.ECAClubs = response.data;
+                       // $scope.AspNetRoles = response.data;
+                       $scope.total_count = response.data.totalcount;
+                       //console.log(response.data);
+                   }, function errorCallback(response) {
+                       toastr["warning"](response.data.Message);
+                   });
+               }
+               $scope.searchData = function () {
+                   getECAClubs(1);
+                   // $scope.total_count = 88;
+               };
+               $scope.edit = function (n) {
+                   $scope.aemodalTitle = "Update ECA Club";
+                   $scope.ECAClub = n;
+                   $scope.ECAClubId = n.ECAClubId;
+               };
+               $scope.save = function save() {
+                   if ($scope.addform.$invalid)
+                       return;
+                   if ($scope.ECAClub.ECAClubId != 0) /// For Update
+                   {
+                       if ($scope.ECAClub.ECAClubName != '') {
+                           $http({
+                               method: 'PUT',
+                               url: baseUrl + 'SetupInstitution/UpdateECAClub/',
+                               data: $scope.ECAClub
+                           }).then(function successCallback(response) {
+                               $('#addmodal').modal('toggle');
+                               getECAClubs(1);
+                               toastr["info"](response.data.message);
+                               resetForm();
+                           }, function errorCallback(response) {
+                               toastr["warning"](response.data.Message);
+                           });
+                       }
+                   } else {  //  For Add
+                       if ($scope.ECAClub.ECAClubName != {}) {
+                           $http({
+                               method: 'POST',
+                               url: baseUrl + 'SetupInstitution/AddECAClub/',
+                               data: $scope.ECAClub
+                           }).then(function successCallback(response) {
+                               $('#addmodal').modal('toggle');
+                               getECAClubs(1);
+                               toastr["info"](response.data.message);
+                               resetForm();
+                           }, function errorCallback(response) {
+                               toastr["warning"](response.data.Message);
+                           });
+                       }
+                   }
+               };
+               $scope.deleteclub = function deleteclub(n) {
+                   SweetAlert.swal({
+                       title: "Are you sure to delete it ?", type: "warning", showCancelButton: true, confirmButtonColor: "#DD6B55",
+                       confirmButtonText: "Yes, delete it!",
+                       closeOnConfirm: false
+                   },
+                   function (isConfirm) {
+                       if (isConfirm) {
+                           $http({
+                               method: 'DELETE',
+                               url: baseUrl + 'SetupInstitution/DeleteECAClub/' + n.ClubId,
+                               data: $scope.class
+                           }).then(function successCallback(response) {
+                               SweetAlert.swal("Deleted!", "Your data has been deleted.", "success");
+                               getECAClubs(1);
+                           }, function errorCallback(response) {
+                               toastr["warning"](response.data.Message);
+                           });
+                       }
+                   });
+               };
+
+           }]);
+    </script>
+}
+
+

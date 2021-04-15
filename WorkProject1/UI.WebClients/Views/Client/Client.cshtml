@@ -1,0 +1,889 @@
+﻿
+@{
+    ViewBag.Title = "Client";
+}
+<style>
+    .clientHover:hover{
+        background-color:#fafbfc;
+    }
+</style>
+
+<div class="kt-container  kt-container--fluid  kt-grid__item kt-grid__item--fluid" ng-controller="ctrlClient">
+
+    <div class="row">
+        <div class="kt-portlet kt-portlet--mobile">
+            <div class="kt-portlet__head kt-portlet__head--lg">
+                <div class="kt-portlet__head-label">
+                    <h3 class="kt-portlet__head-title">
+                        All Client
+                    </h3>
+                </div>
+                <div class="kt-portlet__head-toolbar">
+                    <div class="kt-portlet__head-wrapper">
+                        <div class="dropdown dropdown-inline">
+                            <button type="button" class="btn btn-brand btn-icon-sm" data-toggle="modal" data-target="#addmodal" aria-haspopup="true" aria-expanded="false">
+                                <i class="flaticon2-plus"></i> Add New Client
+                            </button>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="kt-portlet__body">
+
+
+                <div class="row">
+                    <div class="col-md-4 col-sm-5 col-xs-6">
+                        <div class="form-group">
+                            <div class="col-lg-3 col-md-5 col-sm-4 col-xs-8" style="padding-left:0px">
+
+                                <select class="form-control kt-font-brand" ng-model="pageSize" ng-options="P.value as P.text for P in pageSizeArray"></select>
+                            </div>
+
+                        </div>
+
+                    </div>
+                    <div class="col-md-4 col-sm-3 col-xs-1">
+                    </div>
+                    <div class="col-md-4 col-sm-4 col-xs-5">
+                        <div id="sample_3_filter" class="pull-right">
+                            <input ng-model="q" id="search" class="form-control" placeholder="Filter text">
+                        </div>
+                    </div>
+                </div>
+                <table class="table table-bordered table-hover rounded">
+                    <thead>
+                            <tr class="btn-primary">
+                                <th>SL#</th>
+                                <th>Client Full Name</th>
+                                <th>Short Name</th>
+                                <th>Client Code</th>
+                                <th>Client Address</th>
+                                <th>Base Url</th>
+                                <th>Active Status</th>
+                                <th></th>
+                                <th style="text-align:center">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-show="clientList.length <= 0"><td colspan="8" style="text-align:center;"><i class="fa fa-refresh"></i> Loading new data!!</td></tr>
+                            <tr dir-paginate="item in clientList| filter:q  | itemsPerPage: pageSize" current-page="currentPage">
+                                <td>{{$index+1}}</td>
+                                <td>{{item.FullName}}</td>
+                                <td>{{item.ShortName}}</td>
+                                <td>{{item.Code}}</td>
+                                <td>{{item.Address}}</td>
+                                <td>{{item.BaseUrl}}</td>
+
+                                <td align="center" ng-if="item.ActivityStatus=='A'">
+                                    <a class="label label-md label-primary"  ng-click="changeActivityStatus(item)">Active</a>
+                                </td>
+
+                                <td align="center" ng-if="item.ActivityStatus=='I'">
+                                    <a class="label label-md label-warning"  ng-click="changeActivityStatus(item)">Inactive</a>
+                                </td>
+                               
+                                <td><button data-target="#addmodal" data-toggle="modal" ng-click="viewClient(item)" class="btn btn-primary">View</button></td>
+                                <td style="text-align:center">
+                                    <div class="btn-group">
+                                        <button class="btn btn-xs green dropdown-toggle" type="button" data-toggle="dropdown" aria-expanded="false">
+                                            Options
+                                        </button>
+                                        <ul class="dropdown-menu" role="menu">
+
+                                            <li>
+                                                <a class="clientHover" data-target="#DBModal" data-toggle="modal" ng-click="getDBListbytClientId(item.Id)">
+                                                    <i class="fas fa-database"></i> Database
+                                                </a>
+                                            </li>
+                                            <li class="text-center">
+                                                <a class="clientHover" data-target="#addmodal" data-toggle="modal" ng-click="editClient(item)" >
+                                                    <i class="fa fa-edit"></i>Edit
+                                                </a>
+                                                <a class="clientHover" ng-click="deleteClient(item.Id)" >
+                                                    <i class="fa fa-trash"></i> Delete
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                </table>
+                <div class="row">
+                    <dir-pagination-controls boundary-links="true" template-url="~/assets/angular/lib/dirPagination.tpl.html"></dir-pagination-controls>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!--Modal Area Start-->
+    <div id="addmodal" class="modal fade bd-example-modal-lg" tabindex="-1" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <form name="addBasic" ng-submit="save()" class="form-horizontal" id="form_sample_1" novalidate autocomplete="off">
+                    <div class="modal-header">
+                        <h4 class="modal-title">{{modalTitle}}</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true" ng-click="resetForm();submitted=false"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-body">
+                            <div class="row">
+                                <div class="col-md-12">
+                                   <div class="row">
+                                       <div class="col-md-6">
+                                           <div class="form-group row" ng-class="{ 'has-error' : submitted && addBasic.FullName.$invalid}">
+                                               <label class="col-md-6 control-label" style="text-align:right">
+                                                   Client Full Name :
+                                                   <span class="required">*</span>
+                                               </label>
+                                               <div class="col-md-6">
+                                                   <input type="text" ng-model="clientInfo.FullName" ng-disabled="btnDisForView" class="form-control" placeholder="Full Name" name="FullName" required>
+                                                   <div class="form-control-focus"> </div>
+                                                   <span ng-show="submitted &&  addBasic.FullName.$error.required" class="help-block">Client Full Name Required</span>
+                                               </div>
+                                           </div>
+
+                                           <div class="form-group row" ng-class="{ 'has-error' : submitted && addBasic.ShortName.$invalid}">
+                                               <label class="col-md-6 control-label" style="text-align:right">
+                                                   Short Name :
+                                                   <span class="required">*</span>
+                                               </label>
+                                               <div class="col-md-6">
+                                                   <input type="text" ng-model="clientInfo.ShortName" ng-disabled="btnDisForView" class="form-control" placeholder="Short Name" name="ShortName" ng-change="generateClientId()" style="text-transform:uppercase" required>
+                                                   <div class="form-control-focus"> </div>
+                                                   <span ng-show="submitted &&  addBasic.ShortName.$error.required" class="help-block">Short Name Required</span>
+                                               </div>
+                                           </div>
+
+                                           <div class="form-group row" ng-class="{ 'has-error' : submitted && addBasic.MonthDay.$invalid}">
+                                               <label class="col-md-6 control-label"  style="text-align:right">
+                                                   Month and Year :
+                                                   <span class="required"></span>
+                                               </label>
+                                               <div class="col-md-6">
+                                                   <input class="form-control" ng-model="clientInfo.MonthDay" ng-disabled="btnDisForView" name="MonthDay" type="datetime" placeholder="Year and Month" readonly ng-change="generateClientId()" ng-click="p1=true;" is-open="p1" datepicker-options="{minMode: 'month'}" datepicker-mode="'month'" uib-datepicker-popup="MM/yyyy" />
+                                               </div>
+                                           </div>
+
+                                           <div class="form-group row" ng-class="{ 'has-error' : submitted && addBasic.ClientId.$invalid}">
+                                               <label class="col-md-6 control-label"  style="text-align:right">
+                                                   Client ID :
+                                                   
+                                               </label>
+                                               <div class="col-md-6">
+                                                   <input type="text" ng-model="clientInfo.ClientId" ng-disabled="btnDisForView" class="form-control" placeholder="Client ID" name="ClientId" readonly>
+                                               </div>
+                                           </div>
+
+                                           <div class="form-group row" ng-class="{ 'has-error' : submitted && addBasic.Code.$invalid}">
+                                               <label class="col-md-6 control-label"  style="text-align:right">
+                                                   Client Code :
+                                                   @*<span class="required">*</span>*@
+                                               </label>
+                                               <div class="col-md-6">
+                                                   <input type="text" ng-model="clientInfo.Code" ng-disabled="btnDisForView" class="form-control" placeholder="Client Code" name="Code" >
+                                                   <div class="form-control-focus"> </div>
+                                                   <span ng-show="submitted &&  addBasic.Code.$error.required" class="help-block">Client Code Required</span>
+                                               </div>
+                                           </div>
+
+                                           @*Ledger CODE*@
+                                           <div class="form-group row" ng-class="{ 'has-error' : submitted && addBasic.LedgerId.$invalid}">
+                                               <label class="col-md-6 control-label" style="text-align:right">
+                                                   Ledger Code : 
+                                                   <span class="required">*</span>
+                                               </label>
+                                               <div class="col-md-6">
+                                                   <select class="form-control" ng-model="clientInfo.LedgerId" ng-disabled="btnDisForView" required name="LedgerId" ng-options="ledger.LedgerId as ledger.CodeWithName for ledger in LedgerList">
+                                                       <option value="" selected="selected">Choose Option</option>
+                                                   </select>
+                                                   <div class="form-control-focus"> </div>
+                                                   <span ng-show="submitted && addBasic.LedgerId.$error.required" class="help-block">Ledger Code Required</span>
+                                               </div>
+                                           </div>
+
+                                           <div class="form-group row" ng-class="{ 'has-error' : submitted && addBasic.Address.$invalid}">
+                                               <label class="col-md-6 control-label"  style="text-align:right">
+                                                   Client Address :
+                                                   @*<span class="required">*</span>*@
+                                               </label>
+                                               <div class="col-md-6">
+                                                   <input type="text" ng-model="clientInfo.Address" ng-disabled="btnDisForView" class="form-control" placeholder="Address" name="Address" >
+                                                   <div class="form-control-focus"> </div>
+                                                   <span ng-show="submitted &&  addBasic.Address.$error.required" class="help-block">Address Required</span>
+                                               </div>
+                                           </div>
+                                       </div>
+                                       <div class="col-md-6">
+                                           <div class="form-group row" ng-class="{ 'has-error' : submitted && addBasic.BaseUrl.$invalid}">
+                                               <label class="col-md-6 control-label"  style="text-align:right">
+                                                   Base Url :
+                                                   @*<span class="required">*</span>*@
+                                               </label>
+                                               <div class="col-md-6">
+                                                   <input type="url" ng-model="clientInfo.BaseUrl" ng-disabled="btnDisForView" class="form-control" placeholder="Base Url" name="BaseUrl" >
+                                                   <div class="form-control-focus"> </div>
+                                                   <span ng-show="submitted &&  addBasic.BaseUrl.$error.required" class="help-block">BaseUrl Required</span>
+                                               </div>
+                                           </div>
+
+                                           <div class="form-group row" ng-class="{ 'has-error' : submitted && addBasic.Apps.$invalid}">
+                                               <label class="col-md-6 control-label" style="text-align:right">
+                                                   Apps :
+                                                   @*<span class="required">*</span>*@
+                                               </label>
+                                               <div class="col-md-6">
+                                                   <select ng-model="clientInfo.Apps" ng-disabled="btnDisForView" class="form-control" placeholder="Apps" name="Apps" >
+                                                       <option value=''>Choose Option</option>
+                                                       <option value='1'>YES</option>
+                                                       <option value='2'>NO</option>
+                                                   </select>
+                                                   <div class="form-control-focus"> </div>
+                                                   <span ng-show="submitted &&  addBasic.Apps.$error.required" class="help-block">Apps Required</span>
+                                               </div>
+                                           </div>
+
+                                           <div class="form-group row" ng-class="{ 'has-error' : submitted && addBasic.WebPortal.$invalid}">
+                                               <label class="col-md-6 control-label" style="text-align:right">
+                                                   Web Portal :
+                                                   @*<span class="required">*</span>*@
+                                               </label>
+                                               <div class="col-md-6">
+                                                   <select ng-model="clientInfo.WebPortal" ng-disabled="btnDisForView" class="form-control" placeholder="Web Portal" name="WebPortal" >
+                                                       <option value=''>Choose Option</option>
+                                                       <option value='1'>YES</option>
+                                                       <option value='2'>NO</option>
+                                                   </select>
+                                                   <div class="form-control-focus"> </div>
+                                                   <span ng-show="submitted &&  addBasic.WebPortal.$error.required" class="help-block">Web Portal Required</span>
+                                               </div>
+                                           </div>
+
+                                           <div class="form-group row" ng-class="{ 'has-error' : submitted && addBasic.SMS.$invalid}">
+                                               <label class="col-md-6 control-label" style="text-align:right">
+                                                   SMS :
+                                                   @*<span class="required">*</span>*@
+                                               </label>
+                                               <div class="col-md-6">
+                                                   <select ng-model="clientInfo.SMS" ng-disabled="btnDisForView" class="form-control" placeholder="SMS" name="SMS" >
+                                                       <option value=''>Choose Option</option>
+                                                       <option value='1'>YES</option>
+                                                       <option value='2'>NO</option>
+                                                   </select>
+                                                   <div class="form-control-focus"> </div>
+                                                   <span ng-show="submitted &&  addBasic.SMS.$error.required" class="help-block">SMS Required</span>
+                                               </div>
+                                           </div>
+
+                                           <div class="form-group row" ng-class="{ 'has-error' : submitted && addBasic.Subscription.$invalid}">
+                                               <label class="col-md-6 control-label" style="text-align:right">
+                                                   Subscription :
+                                                   @*<span class="required">*</span>*@
+                                               </label>
+                                               <div class="col-md-6">
+                                                   <select ng-model="clientInfo.Subscription" ng-disabled="btnDisForView" class="form-control" placeholder="Subscription" name="Subscription" >
+                                                       <option value=''>Choose Option</option>
+                                                       <option value='1'>YES</option>
+                                                       <option value='2'>NO</option>
+                                                   </select>
+                                                   <div class="form-control-focus"> </div>
+                                                   <span ng-show="submitted &&  addBasic.Subscription.$error.required" class="help-block">Subscription Required</span>
+                                               </div>
+                                           </div>
+
+                                           <div class="form-group row" ng-class="{ 'has-error' : submitted && addBasic.ActivityStatus.$invalid}">
+                                               <label class="col-md-6 control-label" style="text-align:right">
+                                                   Activity Status :
+                                                   <span class="required">*</span>
+                                               </label>
+                                               <div class="col-md-6">
+                                                   <select ng-model="clientInfo.ActivityStatus" ng-disabled="btnDisForView" class="form-control" placeholder="Activity Status" name="ActivityStatus" required>
+                                                       <option value=''>Choose Option</option>
+                                                       <option value='A'>Active</option>
+                                                       <option value='I'>Inactive</option>
+                                                   </select>
+                                                   <div class="form-control-focus"> </div>
+                                                   <span ng-show="submitted &&  addBasic.ActivityStatus.$error.required" class="help-block">Activity Status Required</span>
+                                               </div>
+                                           </div>
+                                       </div>
+                                   </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" data-dismiss="modal" class="btn btn-secondary" ng-click="resetForm();submitted=false">Cancel</button>
+                        <button type="submit" ng-click="submitted=true" ng-hide="btnDisForView" class="btn btn-success">{{modalbutton}}</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div id="DBModal" class="modal fade bd-example-modal-lg" tabindex="-1" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <form class="form-horizontal" novalidate>
+                    <div class="modal-header">
+                        <h4 class="modal-title">{{DBModalTital}}</h4>
+                        <button type="button" ng-click="resetClientId();" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="actions">
+                            <div class="btn-group btn-group-solid pull-right">
+                                <button class="btn btn-brand btn-icon-sm" data-target="#DBaddModal" data-toggle="modal" aria-haspopup="true" aria-expanded="false"> 
+                                    <i class="flaticon2-plus"></i> Add DB
+                                </button>
+                            </div>
+                            
+                        </div>
+
+                        <div class="portlet-body">
+                            <div class="table-container">
+                                <div id="sample_3_wrapper" class="dataTables_wrapper no-footer">
+
+                                    <div class="table-scrollable"> </div>
+                                    <table class="table table-bordered table-hover">
+                                        <thead>
+                                            <tr class="btn-primary">
+                                                <th style="text-align:center">SL</th>
+                                                <th>Host</th>
+                                                <th>DbName</th>
+                                                <th>DbPass</th>
+                                                <th>Type</th>
+                                                <th>Is Default</th>
+                                                <th style="text-align:center">Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr ng-show="ClientList.length <= 0"><td style="text-align:center;"><i class="fa fa-refresh"></i> Loading new data!!</td></tr>
+                                            <tr ng-repeat="item in DBList" total-items="total_count">
+                                                <td style="text-align:center">{{$index+1}}</td>
+                                                <td>{{item.Host}}</td>
+                                                <td>{{item.DbName}}</td>
+                                                <td>{{item.DbPass}}</td>
+                                                <td>
+                                                    <span ng-show="item.Type == 'O'"> Old </span>
+                                                    <span ng-show="item.Type == 'N'"> New </span>
+                                                </td>
+                                                <td style="text-align:center">
+                                                    <span ng-show="item.IsDefault" class="label label-sm label-default"> Default DB </span>
+                                                </td>
+                                                <td style="text-align:center">
+                                                    <div class="btn-group">
+                                                        <button class="btn btn-xs green dropdown-toggle" type="button" data-toggle="dropdown" aria-expanded="false">
+                                                            Options
+                                                            @*<i class="fa fa-angle-down"></i>*@
+                                                        </button>
+                                                        <ul class="dropdown-menu" role="menu">
+                                                            
+                                                            <li ng-show="!item.IsDefault">
+                                                                <a class="" ng-click="SatAsDefault(item)">
+                                                                    <i class="fas fa-shield-alt"></i> Set as Default 
+                                                                </a>
+                                                            </li>
+                                                            <li>
+                                                                <a class="" ng-click="DeleteDB(item)">
+                                                                    <i class="fa fa-trash"></i> Delete
+                                                                </a>
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" data-dismiss="modal" class="btn btn-secondary" ng-click="resetClientId();">Cancel</button>
+
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div id="DBaddModal" class="modal fade" tabindex="-1" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog ">
+            <div class="modal-content">
+                <form name="DBaddform" ng-submit="saveDB()" class="form-horizontal" id="form_sample_2" novalidate>
+                    <div class="modal-header">
+                        <h4 class="modal-title">Add Database</h4>
+                        <button type="button" ng-click="resetDBForm();" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-body">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group row" ng-class="{ 'has-error' : submitted1 && DBaddform.Host.$invalid}">
+                                        <label class="col-md-7 control-label" style="text-align:right">
+                                            Host :
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-5">
+                                            <select ng-model="DB.Host" class="form-control" name="Host" required>
+                                                <option value="" selected>Select</option>
+                                                <option value="10.10.50.2">10.10.50.2</option>
+                                                <option value="10.10.50.3">10.10.50.3</option>
+                                            </select>
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted1 && DBaddform.Host.$error.required" class="help-block">Host is Required</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="form-group row" ng-class="{ 'has-error' : submitted1 && DBaddform.DbName.$invalid}">
+                                        <label class="col-md-7 control-label" style="text-align:right">
+                                            Database Name :
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-5">
+                                            <input type="text" ng-model="DB.DbName" class="form-control" placeholder="Database Name" name="DbName" required>
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted1 && DBaddform.DbName.$error.required" class="help-block">Name is Required</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="form-group row" ng-class="{ 'has-error' : submitted1 && DBaddform.DbUserName.$invalid}">
+                                        <label class="col-md-7 control-label" style="text-align:right">
+                                            Database User Name :
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-5">
+                                            <select ng-model="DB.DbUserName" class="form-control" name="DbUserName" required>
+                                                <option value="" selected>Select</option>
+                                                <option value="sa">sa</option>
+                                                <option value="adbuser">adbuser</option>
+                                                <option value="bdbuser">bdbuser</option>
+                                                <option value="cdbuser">cdbuser</option>
+                                                <option value="ddbuser">ddbuser</option>
+                                                <option value="edbuser">edbuser</option>
+                                                <option value="fdbuser">fdbuser</option>
+                                                <option value="gdbuser">gdbuser</option>
+                                                <option value="hdbuser">hdbuser</option>
+                                                <option value="idbuser">idbuser</option>
+                                                <option value="jdbuser">jdbuser</option>
+                                                <option value="kdbuser">kdbuser</option>
+                                                <option value="ldbuser">ldbuser</option>
+                                                <option value="mdbuser">mdbuser</option>
+                                                <option value="ndbuser">ndbuser</option>
+                                                <option value="odbuser">odbuser</option>
+                                                <option value="pdbuser">pdbuser</option>
+                                                <option value="qdbuser">qdbuser</option>
+                                                <option value="rdbuser">rdbuser</option>
+                                                <option value="sdbuser">sdbuser</option>
+                                                <option value="tdbuser">tdbuser</option>
+                                                <option value="udbuser">udbuser</option>
+                                                <option value="vdbuser">vdbuser</option>
+                                                <option value="wdbuser">wdbuser</option>
+                                                <option value="xdbuser">xdbuser</option>
+                                                <option value="ydbuser">ydbuser</option>
+                                                <option value="zdbuser">zdbuser</option>
+                                            </select>
+
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted1 && DBaddform.DbUserName.$error.required" class="help-block">Database User Name is Required</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="form-group row" ng-class="{ 'has-error' : submitted1 && DBaddform.DbPass.$invalid}">
+                                        <label class="col-md-7 control-label" style="text-align:right">
+                                            Database Password :
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-5">
+                                            <input type="password" ng-model="DB.DbPass" class="form-control" placeholder="Database Password" name="DbPass" required>
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted1 && DBaddform.DbPass.$error.required" class="help-block">Passwords is Required</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="form-group row" ng-class="{ 'has-error' : submitted1 && DBaddform.Type.$invalid}">
+                                        <label class="col-md-7 control-label" style="text-align:right">
+                                            Type :
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-5">
+                                            <select ng-model="DB.Type" class="form-control" name="Type" required>
+                                                <option value="" selected>Select</option>
+                                                <option value="N">New</option>
+                                                <option value="O">Old</option>
+                                            </select>
+
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted1 && DBaddform.Type.$error.required" class="help-block">Type is Required</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" data-dismiss="modal" class="btn btn-secondary" ng-click="resetDBForm();submitted1=false">Cancel</button>
+                        <button type="submit" ng-click="submitted1=true" class="btn btn-success">Save <i ng-show="spin" class="fa fa-spinner fa-spin" style="font-size:20px"></i></button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!--Modal Area End-->
+</div>
+<!-- END FORM-->
+@section Scripts{
+
+    <script type="text/javascript">
+        OEMSApp.controller("ctrlClient", ["$scope", "$http", "SweetAlert",
+              function ($scope, $http, SweetAlert) {
+                  init();
+                  function init() {
+                      initialize();
+                      getAllClient();
+                      GetAllLedgers();
+                  }
+
+                  function initialize() {
+                      $scope.modalbutton = 'Save';
+                      $scope.modalTitle = 'All Client';
+                      $scope.DBModalTital = "Add Client Database";
+                      $scope.btnDisForView = false;
+                      //new client
+                      $scope.clientInfo = {};
+                      $scope.DB = {};
+                      $scope.clientInfos = [];
+                      $scope.clientList = [];
+                      $scope.resetForm = resetForm;
+                      $scope.resetDBForm = resetDBForm;
+
+
+                      $scope.checkUpdateId = 0;
+                      $scope.pagesize = 10;
+                      $scope.pageSizeArray = [];
+                      $scope.pageSizeArray.push({ value: 5, text: 5 });
+                      $scope.pageSizeArray.push({ value: 10, text: 10 });
+                      $scope.pageSizeArray.push({ value: 20, text: 20 });
+                      $scope.pageSizeArray.push({ value: 50, text: 50 });
+                      $scope.currentPage = 1;
+                      $scope.pageSize = 10;
+                  }
+
+                  function resetForm() {
+                      $scope.modalTitle = "Add New Client";
+                      $scope.clientInfo = {};
+                      $scope.Id = '';
+                      $scope.checkUpdateId = 0;
+                      $scope.addBasic.$setUntouched();
+                      $scope.addBasic.$setPristine();
+                      $scope.btnDisForView = false;
+                      $scope.modalbutton = 'Save';
+                      
+                  }
+
+                  function GetAllLedgers() {
+                      //$scope.CommonFeilds = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Accounts/GetAllLedgersForInvoice/'
+                      }).then(function successCallback(response) {
+                          $scope.LedgerList = response.data.results;
+                      }, function errorCallback(response) {
+                      });
+                  }
+
+
+
+                  $scope.generateClientId = function generateClientId()
+                  {
+                      var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+                      var yearAndMonth = ($scope.clientInfo.MonthDay).toString().split(" ");
+                      var month = Number(months.indexOf(yearAndMonth[1])+ 1);
+                      var monthString = month < 10 ? ('0' + month) : ('' + month);
+                      $scope.clientInfo.ClientId = ($scope.clientInfo.ShortName).toUpperCase() + monthString + yearAndMonth[3];
+                  }
+
+                  $scope.save = function save() {
+                      
+                      if ($scope.addBasic.$invalid)
+                          return;
+                      else {
+                          var result = validation();
+                          if (result) {
+                              if ($scope.checkUpdateId != 10002) {
+                                  $http({
+                                      method: 'POST',
+                                      url: baseUrl + 'Client/AddClient/',
+                                      data: $scope.clientInfo
+                                  }).then(function successCallback(response) {
+                                      $('#addmodal').modal('toggle');
+                                      toastr["info"](response.data.message);
+                                      getAllClient();
+                                      resetForm();
+                                  }, function errorCallback(response) {
+                                      toastr["warning"](response.data.Message);
+                                  });
+                              }
+                              if ($scope.checkUpdateId == 10002) {
+                                  $http({
+                                      method: 'PUT',
+                                      url: baseUrl + 'Client/UpdateClient/',
+                                      data: $scope.clientInfo
+                                  }).then(function successCallback(response) {
+                                      toastr["info"](response.data.message);
+                                      if (response.data.httpStatusCode != 305) {
+                                          $('#addmodal').modal('toggle');
+                                          getAllClient();
+                                          resetForm();
+                                      }
+
+                                  }, function errorCallback(response) {
+                                      toastr["warning"](response.data.Message);
+                                  });
+                              }
+                          }
+                      }
+                  }
+                  
+                  $scope.deleteClient = function deleteClient(id) {
+                      SweetAlert.swal({
+                          title: "Are you sure to delete it ?", type: "warning", showCancelButton: true, confirmButtonColor: "#DD6B55",
+                          confirmButtonText: "Yes, delete it!",
+                          closeOnConfirm: false
+                      },
+                        function (isConfirm) {
+                            if (isConfirm) {
+                                $http({
+                                    method: 'DELETE',
+                                    url: baseUrl + 'Client/DeleteClient/' + id,
+                                }).then(function successCallback(response) {
+                                    SweetAlert.swal("Deleted!", "Your data has been deleted.", "success");
+                                    getAllClient();
+                                }, function errorCallback(response) {
+                                    toastr["error"](response.data.Message);
+                                });
+                            }
+                        });
+                  }
+
+                  $scope.editClient = function editClient(item) {
+                      $scope.modalTitle = "Update Client";
+                      $scope.modalbutton = 'Update';
+                      $scope.clientInfo.Id = item.Id;
+                      $scope.clientInfo.ClientId = item.ClientId;
+                      $scope.clientInfo.FullName = item.FullName;
+                      $scope.clientInfo.ShortName = item.ShortName;
+                      $scope.clientInfo.Code = item.Code;
+                      $scope.clientInfo.LedgerId = item.LedgerId;
+                      $scope.clientInfo.Address = item.Address;
+                      $scope.clientInfo.BaseUrl = item.BaseUrl;
+                      $scope.clientInfo.Apps = item.Apps;
+                      $scope.clientInfo.WebPortal = item.WebPortal;
+                      $scope.clientInfo.SMS = item.SMS;
+                      $scope.clientInfo.Subscription = item.Subscription;
+                      $scope.clientInfo.ActivityStatus = item.ActivityStatus;
+                      $scope.btnDisForView = false;
+
+                      $scope.checkUpdateId = 10002;
+                  }
+                  $scope.viewClient = function viewClient(item) {
+                      $scope.modalTitle = "View Client";
+                      $scope.btnDisForView =true;
+                      $scope.clientInfo.Id = item.Id;
+                      $scope.clientInfo.ClientId = item.ClientId;
+                      $scope.clientInfo.FullName = item.FullName;
+                      $scope.clientInfo.ShortName = item.ShortName;
+                      $scope.clientInfo.Code = item.Code;
+                      $scope.clientInfo.LedgerId = item.LedgerId;
+                      $scope.clientInfo.Address = item.Address;
+                      $scope.clientInfo.BaseUrl = item.BaseUrl;
+                      $scope.clientInfo.Apps = item.Apps;
+                      $scope.clientInfo.WebPortal = item.WebPortal;
+                      $scope.clientInfo.SMS = item.SMS;
+                      $scope.clientInfo.Subscription = item.Subscription;
+                      $scope.clientInfo.ActivityStatus = item.ActivityStatus;
+
+                      $scope.checkUpdateId = 10002;
+                  }
+                  function getAllClient() {
+                      $scope.clientList = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Client/GetAllClient/'
+                      }).then(function successCallback(response) {
+                          $scope.clientList = response.data.results;
+                      }, function errorCallback(response) {
+                          toastr["info"](response.data.Message);
+                      });
+                  }
+
+                  $scope.changeActivityStatus = function changeActivityStatus(item) {
+                      $scope.clientInfo.Id = item.Id;
+                      $scope.clientInfo.ActivityStatus = item.ActivityStatus;
+
+                      SweetAlert.swal({
+                          title: "Are you sure you want to change Activity Status ?", type: "warning", showCancelButton: true, confirmButtonColor: "#DD6B55",
+                          confirmButtonText: "Yes, change it!",
+                          closeOnConfirm: true
+                      },
+                        function (isConfirm) {
+                            if (isConfirm) {
+                                $http({
+                                    method: 'PUT',
+                                    url: baseUrl + 'Client/ChangeActivityStatus/',
+                                    data: $scope.clientInfo
+                                }).then(function successCallback(response) {
+                                    toastr["info"](response.data.message);
+                                    if (response.data.httpStatusCode != 305) {
+                                        getAllClient();
+                                        resetForm();
+                                    }
+
+                                }, function errorCallback(response) {
+                                    toastr["warning"](response.data.Message);
+                                });
+                            }
+                        });
+                  }
+
+                  function validation() {
+
+                      if ($scope.clientInfo.Id == undefined) {
+                          return true;
+                      }
+                      else {
+                          
+                           if ($scope.clientInfo.ActivityStatus == null) {
+                              toastr["info"]("Please Select Sany option..!");
+                              return false;
+                          }
+
+                          else {
+                              return true;
+                          }
+                      }
+                  }
+
+                  //DBModal start
+
+                  $scope.getDBListbytClientId = function getDBListbytClientId(ClientId) {
+                      $scope.DBList = [];
+                      $scope.DB.ClientId = ClientId;
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Client/GetDBByClientId/' + ClientId
+                      }).then(function successCallback(response) {
+                          $scope.DBList = response.data.results;
+
+                      }, function errorCallback(response) {
+                          toastr["info"](response.data.Message);
+                      });
+
+                  }
+
+                  $scope.editDB = function (n) {
+                      $scope.DBModalTital = "Edit Client Database";
+                      $scope.DB = n;
+                      //$scope.Id = n.Id;
+                  };
+
+                  $scope.resetClientId = function resetClientId() {
+                      $scope.DB = {};
+                      $scope.submitted1 = false;
+                  };
+
+                  function resetDBForm() {
+                      $scope.DB.Host = null;
+                      $scope.DB.DbName = null;
+                      $scope.DB.DbPass = null;
+                      $scope.DB.Type = null;
+                      $scope.submitted1 = false;
+                  }
+
+                  $scope.saveDB = function saveDB() {
+                      if ($scope.DBaddform.$invalid) {
+                          toastr["info"]("Form is Invalid.");
+                          //return;
+                      } else {
+                          if ($scope.DB.ClientsDbId > 0) /// For Update
+                          {
+
+                              $http({
+                                  method: 'PUT',
+                                  url: baseUrl + 'Client/UpdateDatabase/',
+                                  data: $scope.DB
+                              }).then(function successCallback(response) {
+                                  $('#DBaddModal').modal('toggle');
+                                  $scope.getDBListbytClientId($scope.DB.ClientId);
+                                  toastr["info"](response.data.message);
+                                  resetDBForm();
+                              }, function errorCallback(response) {
+                                  toastr["info"](response.data.Message);
+                              });
+
+                          } else {  //  For Add
+
+                              $http({
+                                  method: 'POST',
+                                  url: baseUrl + 'Client/AddDatabase/',
+                                  data: $scope.DB
+                              }).then(function successCallback(response) {
+                                  $('#DBaddModal').modal('toggle');
+                                  $scope.getDBListbytClientId($scope.DB.ClientId);
+                                  resetDBForm();
+                              }, function errorCallback(response) {
+                                  toastr["info"](response.data.Message);
+                              });
+                          }
+                      }
+
+                  }
+
+                  $scope.DeleteDB = function DeleteDB(n) {
+                      SweetAlert.swal({
+                          title: "Are you sure to delete it ?", type: "warning", showCancelButton: true, confirmButtonColor: "#DD6B55",
+                          confirmButtonText: "Yes, delete it!",
+                          closeOnConfirm: false
+                      },
+                    function (isConfirm) {
+                        if (isConfirm) {
+                            $http({
+                                method: 'DELETE',
+                                url: baseUrl + 'Client/DeleteDatabase/' + n.ClientsDbId
+                            }).then(function successCallback(response) {
+                                SweetAlert.swal("Deleted!", "Your data has been deleted.", "success");
+                                $scope.getDBListbytClientId($scope.DB.ClientId);
+                                
+                            }, function errorCallback(response) {
+                                toastr["error"](response.data.Message);
+                            });
+                        }
+                    });
+                  }
+
+                  $scope.SatAsDefault = function SatAsDefault(n) {
+
+                      $http({
+                          method: 'POST',
+                          url: baseUrl + 'Client/SatAsDefault/',
+                          data: n
+                      }).then(function successCallback(response) {
+                          
+                          $scope.getDBListbytClientId($scope.DB.ClientId);
+                      }, function errorCallback(response) {
+                          toastr["info"](response.data.Message);
+                      });
+
+                  }
+              }]);
+
+    </script>
+}
+

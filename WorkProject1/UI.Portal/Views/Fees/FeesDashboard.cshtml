@@ -1,0 +1,220 @@
+﻿
+@{
+    ViewBag.Title = "FeesDashboard";
+    Layout = "~/Views/Shared/_adminLayout.cshtml";
+}
+
+<div ng-controller="FDashboardCtrl">
+
+
+    <div class="row">
+        <div class="col-lg-4">
+            <div class="studentprofildashbord">
+                <div class="studentprofildashbordInner">
+                    <div class="studentdashIcon">
+                        <div class="studentdashIconInner text-center">
+                            <img src="~/assets/images/Icon/feespay.svg" alt="">
+                        </div>
+                    </div>
+                    <div class="studentdashText">
+                        <h3>Fee Payment</h3>
+                    </div>
+                    <div class="fessImagedas text-center">
+                        <img src="~/assets/images/Icon/Feepayment.svg" alt="">
+                    </div>
+                    <div class="fessdasbordamount text-center">
+                        <h3>Current Outstanding</h3>
+                        <h4> <img src="~/assets/images/Icon/taka.svg" alt="">{{PaymentSum.DueAmount}}</h4>
+
+                    </div>
+                    <div class="fesspaymentdate text-center">
+                        <a href="@Url.Action("FeesPayment","Fees")">Pay Now</a>
+                    </div>
+                </div>
+            </div>
+            <div class="clickToPage text-center">
+                <a href="@Url.Action("FeesPayment","Fees")">View Details</a>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="studentprofildashbord">
+                <div class="studentprofildashbordInner">
+                    <div class="studentdashIcon">
+                        <div class="studentdashIconInner studentdashIconInner1 text-center">
+                            <img src="~/assets/images/Icon/sumhistory.svg" alt="">
+                        </div>
+                    </div>
+                    <div class="studentdashText upadtestuText">
+                        <h3>Payment History</h3>
+                    </div>
+                    <div class="lastpayment text-center">
+                        <p>Last Payment Amount</p>
+                        <h4><img src="~/assets/images/Icon/taka2.svg" alt="">{{PaymentHistory.TotalAmount}}</h4>
+                    </div>
+                    <div class="fessdasamountdate">
+                        <div class="amounytpayDate">
+                            <h3> <img src="~/assets/images/Icon/calendar (1).svg" alt="">{{PaymentHistory.BankCollectionDate | date:'dd MMMM yyyy'}}</h3>
+                        </div>
+                        <div class="amounytpayTime">
+                            <h3><img src="~/assets/images/Icon/wall-clock.svg" alt=""> {{PaymentHistory.BankCollectionDate | date:'hh:mma'}}</h3>
+                        </div>
+                    </div>
+                    <div class="paymentby text-center">
+                        <p>Payment Mode: <span>{{PaymentHistory.PType}}</span></p>
+
+                        <h4>Transaction ID: <span>{{PaymentHistory.TrxID}}</span></h4>
+                    </div>
+                </div>
+            </div>
+            <div class="clickupdate text-center">
+                <a href="@Url.Action("PaymentHistory", "Fees")">View Details</a>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="studentprofildashbord">
+                <div class="studentprofildashbordInner">
+                    <div class="studentdashIcon">
+                        <div class="studentdashIconInner studentdashIconInner2 text-center">
+                            <img src="~/assets/images/Icon/summary.svg" alt="">
+                        </div>
+                    </div>
+                    <div class="studentdashText CurriculumText">
+                        <h3>Yearly Payment Summary</h3>
+                    </div>
+                    <div class="lastpayment text-center">
+                        <h3>Current Month</h3>
+                        <p style="color: #5E5E5E;">Payment Amount</p>
+                        <h4 style="color: #5E5E5E;"><img src="~/assets/images/Icon/taka3.svg" alt="">{{PaymentsYearly.TotalAmount}}</h4>
+                    </div>
+                    <div class="fessdasamountMonthly">
+                        <div class="amounytpayDate">
+                            <p>Previous Due</p>
+                            <h4 style="color: #5E5E5E;"><img src="~/assets/images/Icon/taka3.svg" alt="">{{PaymentsYearly.PreviousDue}}</h4>
+                        </div>
+                        <div class="amounytpayTime">
+                            <p>Current Due</p>
+                            <h4 style="color: #5E5E5E;"><img src="~/assets/images/Icon/taka3.svg" alt="">{{PaymentsYearly.DueAmount}}</h4>
+                        </div>
+                    </div>
+                    <div class="fessdasamountMonthly2">
+                        <div class="amounytpayDate">
+                            <p style="color: #5E5E5E">Advance Amount</p>
+                            <h4 style="color: #FF6680"><img src="~/assets/images/Icon/taka2.svg" alt="">{{PaymentsYearly.AdvanceAmount}}</h4>
+                        </div>
+                        <div class="amounytpayTime">
+                            <p style="color: #5E5E5E">Total Paid</p>
+                            <h4 style="color: #FF6680;"><img src="~/assets/images/Icon/taka2.svg" alt="">{{PaymentsYearly.PaidAmount}}</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="clickapply text-center">
+                <a href="@Url.Action("PaymentYearly", "Fees")">View Details</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div  style="margin-top: 14px;margin-left: -7px;">
+            <a class="btn btn-info" href="~/Fees/FAQ" target="_blank">
+                FAQ
+            </a>
+            <a class="btn btn-info" href="~/Fees/PaymentProcessFlow" target="_blank">
+                Payment Process Flow
+            </a>
+        </div>
+    </div>
+
+
+
+</div>
+@section Scripts{
+
+
+
+
+    <script type="text/javascript">
+
+    OEMSApp.controller("FDashboardCtrl", ["$scope", "$http", "SweetAlert", "blockUI", "$window", "$filter",
+   function ($scope, $http, SweetAlert, blockUI, $window, $filter) {
+       init();
+
+       function init() {
+
+
+           //ShowMessage();
+           getPaymentYearly();
+            getPaymentHistory();
+            getSum();
+           $scope.PaymentHistory = {};
+           $scope.PaymentsYearly = {};
+           $scope.PaymentSum = {};
+           $scope.pageSizeArray = [];
+           $scope.pageSizeArray.push({ value: 5, text: 5 });
+           $scope.pageSizeArray.push({ value: 10, text: 10 });
+           $scope.pageSizeArray.push({ value: 20, text: 20 });
+           $scope.pageSizeArray.push({ value: 50, text: 50 });
+           $scope.currentPage = 1;
+           $scope.pageSize = 15;
+
+       }
+
+
+       function ShowMessage() {
+           SweetAlert.swal(
+
+               "Dear Parents,Please be informed that our tuition fee entry is still under process. Shortly you will see your updated paid tuition fee summary. Thank you, CGSD Administration"
+           );
+       }
+
+       function getPaymentYearly() {
+           $scope.PaymentsYearly = {};
+           $http({
+               method: 'GET',
+               url: baseUrl + 'PortalFees/YearlyDashbd/'
+           }).then(function successCallback(response) {
+               //console.log(response);
+               $scope.PaymentsYearly = response.data.results[0];
+               //console.log($scope.PaymentHistory);
+           }, function errorCallback(response) {
+               toastr["warning"](response.data.Message);
+           });
+       }
+
+
+       function getPaymentHistory() {
+           $scope.PaymentHistory = {};
+           $http({
+               method: 'GET',
+               url: baseUrl + 'PortalFees/FeesDashBoard/'
+           }).then(function successCallback(response) {
+               //console.log(response);
+               $scope.PaymentHistory = response.data.results[0];
+               //console.log($scope.PaymentHistory);
+           }, function errorCallback(response) {
+               toastr["warning"](response.data.Message);
+           });
+       }
+
+       function getSum() {
+           $scope.PaymentSum = {};
+           $http({
+               method: 'GET',
+               url: baseUrl + 'PortalFees/FeesPaymentSum/'
+           }).then(function successCallback(response) {
+               //console.log(response);
+               $scope.PaymentSum = response.data.results[0];
+
+
+               //console.log($scope.TotalAm);
+           }, function errorCallback(response) {
+               toastr["warning"](response.data.Message);
+           });
+       }
+
+
+
+           }]);
+    </script>
+}
+

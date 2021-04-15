@@ -1,0 +1,334 @@
+﻿
+@{
+    ViewBag.Title = "Charts  of Account Set Up";
+}
+@section Styles{
+    <link href="~/assets/global/plugins/jstree/dist/themes/default/style.min.css" rel="stylesheet" type="text/css" />
+}
+
+
+
+
+<div class="kt-container  kt-container--fluid  kt-grid__item kt-grid__item--fluid" ng-controller="AcLedgerCtrl">
+    <div class="row">
+        <div class="kt-portlet kt-portlet--mobile">
+            <div class="kt-portlet__head kt-portlet__head--lg">
+                <div class="kt-portlet__head-label">
+                    <span class="kt-portlet__head-icon">
+                        @*<i class="kt-font-brand flaticon2-line-chart"></i>*@
+                    </span>
+                    <h3 class="kt-portlet__head-title">
+                        <!----Titel Text-->
+                        @ViewBag.Title
+                        <input type='button' id='btn' value='Print' onclick='printDiv();'>
+                      
+                        <!----Titel Text -->
+                    </h3>
+                </div>
+                <div class="kt-portlet__head-toolbar">
+                    <div class="kt-portlet__head-wrapper">
+                        <div class="dropdown dropdown-inline">
+                            @*<button type="button" class="btn btn-brand btn-icon-sm" data-toggle="modal" data-target="#addmodal" aria-haspopup="true" aria-expanded="false">
+                                <!----Add Button -->
+                                <i class="flaticon2-plus"></i> Add New
+                                <!----Add Button -->
+                            </button>*@
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="kt-portlet__body">
+
+                <div class="col-md-12 col-lg-12">
+                    <form class="form-horizontal" id="submit_form" method="POST">
+                        <div class="form-wizard">
+                            <div class="form-body" id="DivIdToPrint">
+                                <div id="tree_2" class="tree-demo"> </div>
+
+                            </div>
+                            <div class="form-actions">
+
+                            </div>
+                        </div>
+                    </form>
+                </div>
+               
+               
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<!--
+<div class="row" ng-controller="">
+    <div class="col-md-12">
+        <div class="portlet light bordered" id="form_wizard_1">
+            <div class="portlet-title">
+                <div class="caption">
+                    <i class="icon-layers font-red"></i>
+                    <span class="caption-subject font-red bold uppercase">
+                        @ViewBag.Title
+                       
+                    </span>
+                </div>
+                <div class="actions">
+                    @*<a class="btn btn-circle btn-icon-only btn-default" href="javascript:;">
+                            <i class="icon-cloud-upload"></i>
+                        </a>
+                        <a class="btn btn-circle btn-icon-only btn-default" href="javascript:;">
+                            <i class="icon-wrench"></i>
+                        </a>
+                        <a class="btn btn-circle btn-icon-only btn-default" href="javascript:;">
+                            <i class="icon-trash"></i>
+                        </a>*@
+                </div>
+            </div>
+            <div class="portlet-body form">
+                <div class="row">
+                    
+                    <div class="col-md-12" >
+                        <form class="form-horizontal" id="submit_form" method="POST">
+                            <div class="form-wizard">
+                                <div class="form-body">
+                                    <div id="tree_2" class="tree-demo"> </div>
+                                
+                                </div>
+                                <div class="form-actions">
+                                    
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+    
+    -->
+
+@section Scripts{
+    <script src="//cdn.odhyyon.com/oms/assets/global/plugins/jquery-validation/js/jquery.validate.min.js" type="text/javascript"></script>
+    <script src="//cdn.odhyyon.com/oms/assets/global/plugins/jquery-validation/js/jquery.validate.js" type="text/javascript"></script>
+    <script src="//cdn.odhyyon.com/oms/assets/global/plugins/bootstrap-wizard/jquery.bootstrap.wizard.min.js" type="text/javascript"></script>
+    <!-- END PAGE LEVEL PLUGINS -->
+    <script src="//cdn.odhyyon.com/oms/assets/global/plugins/jstree/dist/jstree.min.js" type="text/javascript"></script>
+
+    <!-- BEGIN PAGE LEVEL SCRIPTS -->
+  
+
+
+    <!-- END PAGE LEVEL SCRIPTS -->
+    <script type="text/javascript">
+        var isTreeOpen = false;
+        function printDiv() {
+            //$("#tree_2").jstree("open_all", -1);
+
+            if (isTreeOpen) {
+                $(".jstree").jstree('close_all');
+            } else {
+                $(".jstree").jstree('open_all');
+            }
+            isTreeOpen = !isTreeOpen;
+            var divToPrint = document.getElementById('DivIdToPrint');
+
+            var newWin = window.open('', 'Print-Window');
+
+            newWin.document.open();
+
+            newWin.document.write('<html><body onload="window.print()">' + divToPrint.innerHTML + '</body></html>');
+
+            newWin.document.close();
+
+            setTimeout(function () { newWin.close(); }, 10);
+
+        }
+
+
+        OEMSApp.controller("AcLedgerCtrl", ["$scope", "$http", "SweetAlert", "$filter",
+              function ($scope, $http, SweetAlert, $filter) {
+
+                  init();
+                  function init() {
+                      initialize();
+                      datatimes();
+                      getFisYears();
+                  }
+                  function initialize() {
+                      $scope.modalTitle = "Add Account Ledger";
+                      $scope.AcLedger = {};
+                      $scope.RootGroups = [];
+                      $scope.Groups = [];
+                      $scope.GroupsbyG = [];
+                      $scope.AcLedger.LedgerId = 0;
+
+                      $scope.AcLedgers = [];
+                      $scope.currentPage = 1;
+                      $scope.pageno = 1;
+                      $scope.pagesize = 10;
+                      $scope.total_count = 12;
+                      $scope.search = '';
+                      $scope.Id = '';
+                      $scope.isDisabled = false;
+
+                      $scope.FisYearsCOA = [];
+
+                      $scope.res = {};
+                      $scope.data = {};
+                      $scope.resetForm = resetForm;
+                      $scope.hstep = 1;
+                      $scope.mstep = 15;
+                      $scope.GroupP = {};
+
+                      $scope.DCs = [
+                          { Id: 1, Name: 'Dr' },
+                          { Id: 2, Name: 'Cr' }
+                      ]
+                      $scope.AcLedger.OpenningBalanceDc = 1;
+                      $scope.pageSizeArray = [];
+                      $scope.pageSizeArray.push({ value: 5, text: 5 });
+                      $scope.pageSizeArray.push({ value: 10, text: 10 });
+                      $scope.pageSizeArray.push({ value: 20, text: 20 });
+                      $scope.pageSizeArray.push({ value: 50, text: 50 });
+                      $scope.currentPage = 1;
+                      $scope.pageSize = 10;
+
+                  }
+                  function resetForm() {
+                      $scope.modalTitle = "Add Account Ledger";
+
+                      $scope.AcLedger = {};
+                      $scope.AcLedger.LedgerId = 0;
+                      $scope.addform.$setUntouched();
+                      $scope.addform.$setPristine();
+                      $scope.submitted = false;
+                  }
+
+                  function getFisYears() {
+                      $scope.FisYears = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Accounts/GetAllFiscalYear/'
+                      }).then(function successCallback(response) {
+                          $scope.FisYearsCOA = response.data.results;
+                          if ($scope.FisYearsCOA.length > 0) {
+                              $scope.isDisabled = true;
+                          }
+                      }, function errorCallback(response) {
+                          //toastr["warning"](response.data.Message);
+                      });
+                  }
+
+                  $scope.FiscalyearCheacked = function () {
+                      $('.button-next').trigger('click');
+                  }
+                  $scope.getAcLedgerList = function () {
+                      $('.button-next').click();
+                  }
+                  function getAcLedger() {
+                      $scope.AcLedgers = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Accounts/GetAllLedgerTemp/'
+                      }).then(function successCallback(response) {
+                          $scope.AcLedgers = response.data.results;
+                      }, function errorCallback(response) {
+                          toastr["warning"](response.data.Message);
+                      });
+                  }
+                  $scope.edit = function (n) {
+                      $scope.modalTitle = "Edit Account Ledger";
+                      $scope.AcLedger = n;
+                      $scope.Id = n.LedgerId;
+                  }
+                  $scope.GetCheckFiscal = function () {
+                      $http({
+                          method: 'POST',
+                          url: baseUrl + 'Accounts/AddLedger/',
+                          data: $scope.selarray
+                      }).then(function successCallback(response) {
+                          $scope.AcLedgers = response.data.results;
+                      }, function errorCallback(response) {
+                      });
+                  }
+                  $scope.GetCheckList = function () {
+                      $http({
+                          method: 'POST',
+                          url: baseUrl + 'Accounts/AddLedger/',
+                          data: $scope.selarray
+                      }).then(function successCallback(response) {
+                          $scope.AcLedgers = response.data.results;
+                      }, function errorCallback(response) {
+                      });
+                  }
+                  $scope.save = function save() {
+                      $http({
+                          method: 'POST',
+                          url: baseUrl + 'Accounts/AddCOA/',
+                          headers: { 'Content-Type': undefined },
+                          transformRequest: function (data) {
+                              var formData = new FormData();
+                              formData.append('FisYear', JSON.stringify($scope.FisYear));
+                              formData.append('AcLedgers', JSON.stringify($scope.AcLedgers));
+                              return formData;
+                          },
+                          data: $scope.FisYear
+                      }).then(function successCallback(response) {
+                          toastr["info"](response.data.message);
+                      });
+
+                  }
+                  function datatimes() {
+                      $scope.$watch('FisYear.StartDate', function (niu) {
+                          if (niu) {
+                              $scope.dateOptions.minDate = niu
+                          }
+                      });
+                  }
+                  $scope.selarray = [];
+                  $scope.marray = [];
+                  $.ajax({
+                      method: "GET",
+                      url: baseUrl + "Accounts/GetLedgerTree",
+                      data: {}
+                  })
+                .done(function (res) {
+                    $scope.marray = res;
+                    $('#tree_2').jstree({
+                        'plugins': ["wholerow", "types"],
+                        'core': {
+                            "themes": {
+                                "responsive": false
+                            },
+                            'data': res
+                        },
+                        "types": {
+                            "default": {
+                                "icon": "fa fa-folder icon-state-warning icon-lg"
+                            },
+                            "file": {
+                                "icon": "fa fa-plus icon-state-warning icon-lg"
+                            }
+                        }
+                    }).on('changed.jstree', function (e, data) {
+                        // console.log(data);
+
+                        var i, j, r = [];
+                        for (i = 0, j = data.selected.length; i < j; i++) {
+                            r.push(data.instance.get_node(data.selected[i]).id);
+                            //console.log(r);
+                            //r.push(data.node.parent);
+                        }
+                        $scope.selarray = r;
+                    });
+                });
+              }]);
+    </script>
+}
+

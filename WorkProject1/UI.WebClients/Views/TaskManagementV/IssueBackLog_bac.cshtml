@@ -1,0 +1,963 @@
+﻿
+@{
+    ViewBag.Title = "IssueBackLog";
+}
+
+<div ng-controller="IssueDetails">
+    <section id="searchArea">
+        <div class="row">
+            <div class="col-lg-2">
+                <input type="text" class="form-control searchArea" placeholder="City">
+            </div>
+            <div class="col-lg-1">
+                <div class="wrap">
+                    <div class="checkbox-dropdown">
+                        <div class="checkbox-dropdown-button">
+                            <div class="dropdown-label">Assignee</div>
+                            <div class="dropdown-quantity"></div>
+                            <i class="dropdown-icon fa fa-angle-down"></i>
+                        </div>
+                        <div class="checkbox-dropdown-inner">
+                            <input type="search" class="checkbox-dropdown-search" />
+                            <button type="button" class="btn btn-uncheck-all">All Sales</button>
+                            <ul class="checkbox-dropdown-list"></ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-1">
+                <div class="wrap">
+                    <div class="checkbox-dropdown">
+                        <div class="checkbox-dropdown-button">
+                            <div class="dropdown-label">Reporter</div>
+                            <div class="dropdown-quantity"></div>
+                            <i class="dropdown-icon fa fa-angle-down"></i>
+                        </div>
+                        <div class="checkbox-dropdown-inner">
+                            <input type="search" class="checkbox-dropdown-search" />
+                            <button type="button" class="btn btn-uncheck-all">All Sales</button>
+                            <ul class="checkbox-dropdown-list"></ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-1">
+                <div class="wrap">
+                    <div class="checkbox-dropdown">
+                        <div class="checkbox-dropdown-button">
+                            <div class="dropdown-label">Status</div>
+                            <div class="dropdown-quantity"></div>
+                            <i class="dropdown-icon fa fa-angle-down"></i>
+                        </div>
+                        <div class="checkbox-dropdown-inner">
+                            <input type="search" class="checkbox-dropdown-search" />
+                            <button type="button" class="btn btn-uncheck-all">All Sales</button>
+                            <ul class="checkbox-dropdown-list"></ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-2">
+                <div class="creatIssu">
+                    <a href="" data-toggle="modal" data-target="#creatModal">Create</a>
+                </div>
+            </div>
+            <div class="actions">
+                <div class="btn-group btn-group-solid">
+                    <button ng-click="submitted=false" class="btn green" data-target="#addmodal" data-toggle="modal"> <i class="fa fa-plus"></i> Add New Sprint</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <div class="row">
+        <div ng-class="IsShowIssueDetails? 'col-md-8' : 'col-md-12'">
+            <div class="issueType">
+                <div class="dropDown">
+                    <select id="inputState" class="form-control">
+                        <option selected>Created</option>
+                        <option>Key</option>
+                        <option>Last viewed</option>
+                        <option>Priority</option>
+                        <option>Resolved</option>
+                        <option>Status</option>
+                        <option>Updated</option>
+                    </select>
+                </div>
+                <div class="list text-right">
+                    <form action=""><button type="submit"><i class="fas fa-list-ul"></i></button></form>
+                </div>
+                <div class="refress text-center">
+                    <form action=""><button type="submit"><i class="fas fa-sync"></i></button></form>
+                </div>
+                <div class="row">
+                    <div class="col-lg-12 mb-3" ng-repeat="item in IssueList track by item.Id">
+                        <a href="#" ng-click="getIssueDetails(item.Id)">
+                            <div class="issuName">
+                                <h4>{{item.Title}}</h4>
+                                <div class="issueBox">
+                                    <div class="issueBoxLeft">
+                                        <i class="fas fa-atlas"></i> <span>{{item.Description}}</span>
+                                    </div>
+                                    <div class="issueBoxLeft">
+                                        <div class="fa-align-right">
+                                            <span>{{item.ProjectName}}</span>
+                                        </div>  
+                                        <div class="issuIcon text-center">                                                                                       
+                                            <i class="fas fa-user"></i>
+                                        </div>                                        
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4" ng-show="IsShowIssueDetails">
+                <button type="button" class="close" ng-click="hideDetals()" >
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            <div class="issueDetails">
+                <h4>
+                    <a href="#"><i class="fas fa-bookmark"></i>  Project Code - {{IssueDetails.ProjectName}}</a>
+                </h4>
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="issueDetailsIcon">
+
+                            <div class="attach"> <a href="" data-toggle="modal" data-target="#exampleModal"><i class="fas fa-paperclip"></i> Attach</a></div>
+                            <div class="subtask"><button type="submit" id="showAddUp"><i class="far fa-copy"></i> Create subtask</button></div>
+                            <div class="link">
+                                <div class="linlIcon">
+                                    <button type="submit" class="weblink" id="weblinkButtonTop"><i class="fas fa-link"></i> Add web link</button>
+
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="description">
+                            <div class="descriptionMain">
+                                <label for="exampleFormControlTextarea1">Description</label> <br>
+                                <button type="button" id="descriptionshowButton">Add a description...</button>
+                            </div>
+                            <form id="descriptionShow" style="display: none;">
+                                <div class="form-group">
+                                    <label for="exampleFormControlTextarea1">Description</label>
+                                    <textarea class="form-control" ng-model="IssueDetails.Description" id="exampleFormControlTextarea1" rows="3" placeholder="Add a description..."></textarea>
+                                </div>
+
+                                <button type="submit" class="btn btn-primary">Save</button>
+                                <button type="button" class="btn btn-light" id="descriptionCancel">Cancel</button>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="col-lg-12">
+                        <div class="listHeader">
+                            <div class="listHeaderIteam">
+                                <p>Attachments <span>1</span></p>
+                            </div>
+                            <div class="listHeaderIteam text-right">
+                                <a href=""><i class="fas fa-ellipsis-h"></i></a>
+                                <a href="" data-toggle="modal" data-target="#exampleModal"><i class="fas fa-plus"></i></a>
+                            </div>
+                        </div>
+                        <div class="listDetails">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Name</th>
+                                        <th scope="col">Size</th>
+                                        <th scope="col">Date added</th>
+                                        <th scope="col">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><i class="fas fa-list-alt"></i> Holiday Notice - Durga Puja</td>
+                                        <td>78KB</td>
+                                        <td>12 Nov 2020 5:11pm</td>
+                                        <td class="detailsAction">
+                                            <a href="" class="hidenDelet"><i class="fas fa-trash"></i></a>
+                                            <a href=""><i class="fas fa-cloud-download-alt"></i></a>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="col-lg-12">
+                        <div class="backlogIteam">
+                            <div class="backlogIteamInnerLeft">
+                                <p>Sprint</p>
+                            </div>
+                            <div class="backlogIteamInnerRight">
+                                <div class="containerMain">  
+                                    
+                                        <select class="form-control" ng-model="Sprint.Id" required name="Sprint" ng-change="UpdateSprint(Sprint.Id)" ng-options="Sprint.Id as Sprint.SprintTitle for Sprint in SprintList">
+                                            <option value="" selected="selected">Choose an Option</option>
+                                        </select>
+                                        <div class="form-control-focus"> </div>
+                                        <span ng-show="submited && mainForm.Version.$error.required" class="help-block">Sprint Required</span>
+                                    
+                                    @*<select class="form-control form-control-xs selectpicker" name="" data-size="7" data-live-search="true" data-title="Location" id="state_list" data-width="100%">
+                                        <option value="" selected>Backlog</option>
+                                        <option value="">Selected for Development</option>
+                                        <option value="">In Progress</option>
+                                        <option value="">Done</option>
+                                        <hr>
+                                        <option value="">View workflow</option>
+                                    </select>*@
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-12">
+                        <div class="backlogIteam">
+                            <div class="backlogIteamInnerLeft">
+                                <p>Assignee</p>
+                            </div>
+                            <div class="backlogIteamInnerRight">
+                                <div class="containerMain">
+                                    <select class="form-control" ng-model="Sprint.Id" required name="Sprint" ng-options="Sprint.Id as Sprint.SprintTitle for Sprint in SprintList">
+                                        <option value="" selected="selected">Choose an Option</option>
+                                    </select>
+                                    <div class="form-control-focus"> </div>
+                                    <span ng-show="submited && mainForm.Version.$error.required" class="help-block">Sprint Required</span>
+                                    @*<select class="form-control form-control-xs selectpicker" name="" data-size="7" data-live-search="true" data-title="Location" id="state_list" data-width="100%">
+                                        <option value="" selected>Backlog</option>
+                                        <option value="">Selected for Development</option>
+                                        <option value="">In Progress</option>
+                                        <option value="">Done</option>
+                                        <hr>
+                                        <option value="">View workflow</option>
+                                    </select>*@
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                 <!-- <div class="col-lg-12">
+                        <div class="backlogIteam">
+                            <div class="backlogIteamInnerLeft">
+                                <p>Reporter</p>
+                            </div>
+                            <div class="backlogIteamInnerRight">
+                                <div class="containerMain">
+                                    <select class="form-control" ng-model="Sprint.Id" required name="Sprint" ng-options="Sprint.Id as Sprint.SprintTitle for Sprint in SprintList">
+                                        <option value="" selected="selected">Choose an Option</option>
+                                    </select>
+                                    <div class="form-control-focus"> </div>
+                                    <span ng-show="submited && mainForm.Version.$error.required" class="help-block">Sprint Required</span>
+                                    @*<select class="form-control form-control-xs selectpicker" name="" data-size="7" data-live-search="true" data-title="Location" id="state_list" data-width="100%" style="background-color: aquamarine;">
+                                        <option value="" selected>Rafiqul islam</option>
+                                        <option value="">Arifur Rahaman</option>
+                                        <option value="">Anup Sarkar</option>
+                                    </select>*@
+                                </div>
+                            </div>
+                        </div>
+                    </div>   -->
+                    <div class="col-lg-12">
+                        <div class="backlogIteam">
+                            <div class="backlogIteamInnerLeft">
+                                <p>Priority</p>
+                            </div>
+                            <div class="backlogIteamInnerRight">
+                                <div class="containerMain">
+                                    @*<select class="form-control" ng-model="Sprint.Id" required name="Sprint" ng-options="Sprint.Id as Sprint.SprintTitle for Sprint in SprintList">
+                                        <option value="" selected="selected">Choose an Option</option>
+                                    </select>*@
+                                    <div class="form-control-focus"> </div>
+                                    <span ng-show="submited && mainForm.Version.$error.required" class="help-block">Sprint Required</span>
+                                    <select class="form-control form-control-xs selectpicker" name="" data-size="7" data-live-search="true" data-title="Location" id="state_list" data-width="100%" style="background-color: aquamarine;">
+                                        <option value="" selected>Choose one ..</option>
+                                        <option value="Highest">Highest</option>
+                                        <option value="High">High</option>
+                                        <option value="Low">Low</option>
+                                        <option value="Lowest">Lowest</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-12">
+                        <div class="listHeader SubtasksHeader">
+                            <div class="listHeaderIteam">
+                                <p>Subtasks</p>
+                            </div>
+                            <div class="listHeaderIteam text-right">
+                                <a href=""><i class="fas fa-ellipsis-h"></i></a>
+                                <button type="submit" id="showAdd"><i class="fas fa-plus"></i></button>
+                            </div>
+                        </div>
+                        <div class="listDetails" >
+                            <table class="table table-striped table-sm">
+                                <tbody>
+                                    <tr  ng-repeat="item in IssueDetails.SubIssueList">
+                                        <td><i class="fas fa-list-alt"></i> 
+                                            <h4>{{item.Title}} </h4>
+                                            <span>{{item.Description}}</span>
+                                        </td>
+                                </tbody>
+                            </table>
+                        </div>
+
+
+
+                        <div class="SubtasksAdd text-right" id="SubtasksAdd" style="display: none;">
+                            <form>
+                                <div class="form-group">
+                                    <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
+                                </div>
+                                <button type="submit" class="btn btn-primary">Creat</button>
+                                <button type="button" class="btn btn-light" id="subCancel">Cancel</button>
+                            </form>
+                        </div>
+
+<!--
+
+                        <div class="listHeader SubtasksHeader">
+                            <div class="listHeaderIteam">
+                                <p>Linked issues</p>
+                            </div>
+                            <div class="listHeaderIteam text-right">
+                                <button type="submit" id="showLinkPlus"><i class="fas fa-plus"></i></button>
+                            </div>
+                        </div>
+                        <div class="listDetails">
+                            <table class="table table-bordered table-sm">
+
+                                <tbody>
+                                    <tr>
+                                        <td><i class="fas fa-bookmark"></i> TEST-4 <span>test</span></td>
+
+                                        <td class="text-right">
+                                            <a href=""><i class="fas fa-arrow-up"></i></a>
+                                            <a href="" class="btn btn-light backlog">Backlog</a>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><i class="fas fa-bookmark"></i> TEST-4 <span>test</span></td>
+
+                                        <td class="text-right">
+                                            <a href=""><i class="fas fa-arrow-up"></i></a>
+                                            <a href="" class="btn btn-light backlog">Backlog</a>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        
+                        <div class="linkedIssues" id="linkedIssu" style="display: none;">
+                            <p>Linked issues</p>
+                            <form>
+                                <div class="linkIssLeft">
+                                    <div class="form-group">
+
+                                        <select class="form-control" id="exampleFormControlSelect1">
+                                            <option>is blocked by</option>
+                                            <option>blocks</option>
+                                            <option>is Cloned by</option>
+                                            <option>clones</option>
+                                            <option>is duplicated by</option>
+                                            <option>duplicates</option>
+                                            <option>relates to</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="linkIssRight text-right">
+
+                                    <div class="form-group">
+                                        <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
+                                    </div>
+                                    <button type="submit" class="btn btn-primary">Creat</button>
+                                    <button type="button" class="btn btn-light" id="linkIssueCancel">Cancel</button>
+
+                                </div>
+                            </form>
+                        </div>
+    -->
+
+                        <div class="listHeader SubtasksHeader">
+                            <div class="listHeaderIteam">
+                                <p>Web Link</p>
+                            </div>
+                            <div class="listHeaderIteam text-right">
+                                <button type="submit" id="showWeblinkClick"><i class="fas fa-plus"></i></button>
+                            </div>
+                        </div>
+                        <div class="listDetails">
+                            <table class="table table-striped table-sm">
+
+                                <tbody>
+                                    <tr  ng-repeat="item in IssueDetails.IssueWebLinksList">
+                                        <td>
+                                                <a href="{{item.Url}}" target="_blank"><i class="fas fa-globe-asia"></i> {{item.Url}}</a>
+                                         </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="" text-right" id="showWeblink" style="display: none;">
+
+                            <div class="row">
+                                <div class="col text-left">
+                                    <label for="inputEmail4">Url</label>
+                                    <input type="text" class="form-control" placeholder="https://www.example.com">
+                                </div>
+                                <div class="col text-left mb-2">
+                                    <label for="inputEmail4">Link text</label>
+                                    <input type="text" class="form-control" placeholder="Add a description...">
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-primary">save</button>
+                            <button type="button" class="btn btn-light" id="weblinkCancel">Cancel</button>
+
+                        </div>
+
+
+                      
+                    </div>
+                    <div class="col-lg-12">
+                        <div class="activity">
+                            Comments
+                        </div>
+                        <ul class="nav nav-pills mb-3 activityTab" id="pills-tab" role="tablist">
+                            <li class="nav-item">
+                                <p>Show:</p>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <a class="nav-link active" id="pills-home-tab" data-toggle="pill" href="#pills-home" role="tab" aria-controls="pills-home" aria-selected="true">Comments</a>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <a class="nav-link" id="pills-profile-tab" data-toggle="pill" href="#pills-profile" role="tab" aria-controls="pills-profile" aria-selected="false">History</a>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <a class="nav-link" id="pills-contact-tab" data-toggle="pill" href="#pills-contact" role="tab" aria-controls="pills-contact" aria-selected="false">Work log</a>
+                            </li>
+                        </ul>
+                        <div class="tab-content" id="pills-tabContent">
+                            <div class="tab-pane fade show active" id="pills-home" role="tabpanel" aria-labelledby="pills-home-tab">
+                                <div class="comments">
+                                    <div class="commentEditsection" ng-repeat="item in IssueDetails.CommentsList">
+                                        <p>{{item.Description}}</p>
+                                        <div class="commentUser">
+                                            <div class="CommentUserImage">
+                                                <img src="assets/images/noimage.png" alt="">
+                                            </div>
+                                        </div>
+                                        <div class="commentUserName">
+                                            <p>Rafiqul islam <span>2 days ago</span></p>
+                                            <h5>Test</h5>
+
+                                           
+                                            <form id="editeComment" style="display: none;">
+                                                <div class="form-group">
+                                                    <textarea class="form-control" id="exampleFormControlTextarea1" rows="3" placeholder="Add a description..."></textarea>
+                                                </div>
+                                                <button type="submit" class="btn btn-primary">Save</button>
+                                                <button type="button" class="btn btn-light" id="commentsCancel">Cancel</button>
+                                            </form>
+
+
+                                           
+
+                                            <div class="actionButton">
+                                                <button type="submit" id="showEdit">Edit</button>
+                                                <button type="submit" id="deletEdit">Delete</button>
+
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                    <div class="addComments">
+                                        <form>
+                                            <div class="form-group">
+                                                <textarea class="form-control" id="exampleFormControlTextarea1" rows="1" placeholder="Add a description..."></textarea>
+                                            </div>
+                                            <button type="submit" class="btn btn-primary">Save</button>
+                                            <button type="button" class="btn btn-light">Cancel</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="tab-pane fade" id="pills-profile" role="tabpanel" aria-labelledby="pills-profile-tab">
+                                <div class="commentEditsection">
+                                    <div class="commentUser">
+                                        <div class="CommentUserImage">
+                                            <img src="assets/images/noimage.png" alt="">
+                                        </div>
+                                    </div>
+                                    <div class="commentUserName">
+                                        <p>Rafiqul islam <span>created the Issue</span> <span>2 days ago</span></p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="tab-pane fade" id="pills-contact" role="tabpanel" aria-labelledby="pills-contact-tab">...</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!----
+            <div class="col-lg-3">
+            @*<div class="containerBacklog">
+                <i class="fa fa-angle-down backlogarrow"></i>
+                <select class="form-control form-control-xs selectpicker" name="" data-size="7" data-live-search="true" data-title="Location" id="state_list" data-width="100%">
+                    <option value="" selected>Backlog </option>
+                    <option value="">Selected for Development</option>
+                    <option value="">In Progress</option>
+                    <option value="">Done</option>
+                    <hr>
+                    <option value="">View workflow</option>
+                </select>
+            </div>*@
+
+            <div class="backlogIteam">
+                <div class="backlogIteamInnerLeft">
+                    <p>Reporter</p>
+                </div>
+                <div class="backlogIteamInnerRight">
+                    <div class="containerMain">
+                        <select class="form-control form-control-xs selectpicker" name="" data-size="7" data-live-search="true" data-title="Location" id="state_list" data-width="100%" style="background-color: aquamarine;">
+                            <option value="" selected>Rafiqul islam</option>
+                            <option value="">Arifur Rahaman</option>
+                            <option value="">Anup Sarkar</option>
+
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="backlogIteam">
+                <div class="backlogIteamInnerLeft">
+                    <p>Labels</p>
+                </div>
+                <div class="backlogIteamInnerRight">
+                    <div class="containerMain">
+                        <select class="form-control form-control-xs selectpicker" name="" data-size="7" data-live-search="true" data-title="Location" id="state_list" data-width="100%" style="background-color: aquamarine;">
+                            <option value="" selected>Rafiqul islam</option>
+                            <option value="">Arifur Rahaman</option>
+                            <option value="">Anup Sarkar</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="backlogIteam">
+                <div class="backlogIteamInnerLeft">
+                    <p>Priority</p>
+                </div>
+                <div class="backlogIteamInnerRight">
+                    <div class="containerMain">
+                        <select class="form-control form-control-xs selectpicker" name="" data-size="7" data-live-search="true" data-title="Location" id="state_list" data-width="100%" style="background-color: aquamarine;">
+                            <option value="" selected>Rafiqul islam</option>
+                            <option value="">Arifur Rahaman</option>
+                            <option value="">Anup Sarkar</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        ------->
+
+
+    </div>
+
+
+    <!--Modal Area Start-->
+    <div id="addmodal" class="modal fade" tabindex="-1" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form name="addBasic" ng-submit="save()" class="form-horizontal" id="form_sample_1" novalidate autocomplete="off">
+                    <div class="modal-header">
+                        <h4 class="modal-title">{{modalTitle}}</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true" ng-click="resetForm();submitted=false"></button>                        
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-body">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group" ng-class="{ 'has-error' : submitted && addBasic.SprintTitle.$invalid}">
+                                        <label class="col-md-4 control-label">
+                                            Sprint Title :
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-8">
+                                            <input type="text" ng-model="SprintInfo.SprintTitle" class="form-control" placeholder="Sprint Name" name="SprintTitle" required>
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted &&  addBasic.SprintTitle.$error.required" class="help-block">Sprint Title Required</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group" ng-class="{ 'has-error' : submitted && addBasic.StartDate.$invalid}">
+                                        <label class="col-md-4 control-label">
+                                            Start Date :
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-8">
+                                            <input type="text" class="form-control" uib-datepicker-popup="dd/MM/yyyy" placeholder="Start Date" name="StartDate" ng-model="SprintInfo.SprintStartDate" is-open="strat.opened" ng-click="strat.opened=true" ng-required="true" close-text="Close" readonly="readonly" />
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted &&  addBasic.StartDate.$error.required" class="help-block">Start Date Required</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group" ng-class="{ 'has-error' : submitted && addBasic.EndDate.$invalid}">
+                                        <label class="col-md-4 control-label">
+                                            End Date :
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-8">
+                                            <input type="text" class="form-control" uib-datepicker-popup="dd/MM/yyyy" placeholder="End Date" name="EndDate" ng-model="SprintInfo.SprintEndDate" is-open="end.opened" ng-click="end.opened=true" ng-required="true" close-text="Close" readonly="readonly" />
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted &&  addBasic.EndDate.$error.required" class="help-block">End Date Required</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group" ng-class="{ 'has-error' : submitted && addBasic.Completed.$invalid}">
+                                        <label class="col-md-4 control-label">
+                                            Completed :
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-8">
+                                            <select ng-model="SprintInfo.Completed" class="form-control" placeholder="Completed" name="Completed" required>
+                                                <option value=''>Choose Option</option>
+                                                <option value=1>Yes</option>
+                                                <option value=0>No</option>
+                                            </select>
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted &&  addBasic.Completed.$error.required" class="help-block">Completed Status Required</span>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" data-dismiss="modal" class="btn dark btn-outline" ng-click="resetForm();submitted=false">Cancel</button>
+                        <button type="submit" ng-click="submitted=true" class="btn green-haze">{{modalbutton}}</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!--Modal Area End-->
+
+    <!-------Modal------->
+    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">New message</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="form-group">
+
+                            <input type="file" class="form-control" id="recipient-name">
+                        </div>
+
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary">Save</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-------Modal------->
+<!-----Creat Modal----->
+<div class="modal fade" id="creatModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content creatModal">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Create issue</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="form-group col-md-4">
+                        <label for="inputState">Project</label>
+                        <div class="containerMain creatIssueDropDown">
+                            <i class="fa fa-angle-down backlogarrow"></i>
+                            <select class="form-control form-control-xs selectpicker" name="" data-size="7" data-live-search="true" data-title="Location" id="state_list" data-width="100%" style="background-color: aquamarine;">
+                                <option value="" selected>Rafiqul islam</option>
+                                <option value="">Arifur Rahaman</option>
+                                <option value="">Anup Sarkar</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group col-md-4">
+                        <label for="inputState">Issue Type</label>
+                        <div class="containerMain creatIssueDropDown">
+                            <i class="fa fa-angle-down backlogarrow"></i>
+                            <select class="form-control form-control-xs selectpicker" name="" data-size="7" data-live-search="true" data-title="Location" id="state_list" data-width="100%" style="background-color: aquamarine;">
+                                <option value="" selected>Rafiqul islam</option>
+                                <option value="">Arifur Rahaman</option>
+                                <option value="">Anup Sarkar</option>
+                            </select>
+                        </div>
+                    </div>
+                    <hr>
+
+                    <div class="form-group">
+                        <label for="formGroupExampleInput">Summary</label>
+                        <textarea class="form-control" id="exampleFormControlTextarea1" rows="1" placeholder="Add a description..."></textarea>
+                    </div>
+                    <div class="form-group col-md-4">
+                        <label for="inputState">Attachment</label>
+                        <input type="file" class="form-control">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="formGroupExampleInput">Description</label>
+                        <textarea class="form-control" id="exampleFormControlTextarea1" rows="1" placeholder="Add a description..."></textarea>
+                    </div>
+
+                    <div class="form-group col-md-4">
+                        <label for="inputState">Reporter</label>
+                        <div class="containerMain ">
+                            <select class="form-control form-control-xs selectpicker" name="" data-size="7" data-live-search="true" data-title="Location" id="state_list" data-width="100%" style="background-color: aquamarine;">
+                                <option value="" selected>Rafiqul islam</option>
+                                <option value="">Arifur Rahaman</option>
+                                <option value="">Anup Sarkar</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group col-md-4">
+                        <label for="inputState">Linked Issues</label>
+                        <div class="containerMain creatIssueDropDown">
+                            <i class="fa fa-angle-down backlogarrow"></i>
+                            <select class="form-control form-control-xs selectpicker" name="" data-size="7" data-live-search="true" data-title="Location" id="state_list" data-width="100%" style="background-color: aquamarine;">
+                                <option value="" selected>Rafiqul islam</option>
+                                <option value="">Arifur Rahaman</option>
+                                <option value="">Anup Sarkar</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group col-md-4">
+                        <label for="inputState">Issue</label>
+                        <div class="containerMain ">
+                            <select class="form-control form-control-xs selectpicker" name="" data-size="7" data-live-search="true" data-title="Location" id="state_list" data-width="100%" style="background-color: aquamarine;">
+                                <option value="" selected>Rafiqul islam</option>
+                                <option value="">Arifur Rahaman</option>
+                                <option value="">Anup Sarkar</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group col-md-4">
+                        <label for="inputState">Assignee</label>
+                        <div class="containerMain creatIssueDropDown">
+                            <i class="fa fa-angle-down backlogarrow"></i>
+                            <select class="form-control form-control-xs selectpicker" name="" data-size="7" data-live-search="true" data-title="Location" id="state_list" data-width="100%" style="background-color: aquamarine;">
+                                <option value="" selected>Rafiqul islam</option>
+                                <option value="">Arifur Rahaman</option>
+                                <option value="">Anup Sarkar</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group col-md-4">
+                        <label for="inputState">Priority</label>
+                        <div class="containerMain creatIssueDropDown">
+                            <i class="fa fa-angle-down backlogarrow"></i>
+                            <select class="form-control form-control-xs selectpicker" name="" data-size="7" data-live-search="true" data-title="Location" id="state_list" data-width="100%" style="background-color: aquamarine;">
+                                <option value="" selected>Rafiqul islam</option>
+                                <option value="">Arifur Rahaman</option>
+                                <option value="">Anup Sarkar</option>
+                            </select>
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-----Creat Modal------->
+
+
+@section Scripts{
+
+    <script type="text/javascript">
+
+        OEMSApp.controller("IssueDetails", ["$scope", "$http", "SweetAlert",
+              function ($scope, $http, SweetAlert) {
+
+                  init();
+                  function init() {
+                      initialize();
+                      getIssueList();
+                      getSprintList();
+
+                  }
+                  function initialize() {
+
+                      //$scope.pageno = 1;
+                      //$scope.total_count = 12;
+                      //$scope.search = '';
+                      //$scope.Requisition = {};
+
+                     // $scope.PurchaseOrderList = [];
+
+                      $scope.IssueList = getIssueList;
+                      $scope.IssueDetails = {};
+                      $scope.IsShowIssueDetails = 0;
+                      $scope.SprintList = getSprintList;
+                      //$scope.res = {};
+                      //$scope.data = {};
+
+
+                      //$scope.btnDis = false;
+                      //$scope.spin = false;
+                      //$scope.pageSizeArray = [];
+                      //$scope.pageSizeArray.push({ value: 5, text: 5 });
+                      //$scope.pageSizeArray.push({ value: 10, text: 10 });
+                      //$scope.pageSizeArray.push({ value: 20, text: 20 });
+                      //$scope.pageSizeArray.push({ value: 50, text: 50 });
+                      //$scope.currentPage = 1;
+                      //$scope.pageSize = 10;
+
+                  }
+
+
+
+                  
+
+                  function getIssueList() {
+                      $scope.IssueList = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'TaskManagement/GetIssueList/'
+                      }).then(function successCallback(response) {
+                          $scope.IssueList = response.data.results;
+                          console.log($scope.IssueList);
+                      }, function errorCallback(response) {
+                          toastr["warning"](response.data.Message);
+                      });
+                  }
+
+                  $scope.getIssueDetails = function (id) {                  
+                      console.log(id);
+                      $scope.IssueDetails = {};
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'TaskManagement/getIssueDetails/'+ id
+                      }).then(function successCallback(response) {
+                          $scope.IssueDetails = response.data.results;
+                          $scope.IsShowIssueDetails = 1;
+                          console.log($scope.IssueDetails);
+                      }, function errorCallback(response) {
+                          toastr["warning"](response.data.Message);
+                      });
+                  }
+                  $scope.hideDetals = function() {
+                      $scope.IsShowIssueDetails = 0;
+                  }
+                  
+
+                  function getSprintList() {
+                      $scope.SprintList = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'TaskManagement/GetAllSprint/'
+                      }).then(function successCallback(response) {
+                          $scope.SprintList = response.data.results;
+                          console.log($scope.SprintList);
+                      }, function errorCallback(response) {
+                          toastr["warning"](response.data.Message);
+                      });
+                  }
+
+                  
+                  $scope.UpdateSprint = function (sprintId) {
+                      console.log('sprint Id -'+sprintId);
+                      console.log('Issue Id - '+$scope.IssueDetails.Id);
+                      
+                  }
+
+                  //function SearchPO(pageno) {
+                  //    SweetAlert.swal("search");
+                  //    $scope.pageno = pageno;
+                  //    $scope.IssueList = [];
+                  //    $http({
+                  //        method: 'POST',
+                  //        url: baseUrl + 'Student/Search/' + $scope.pageno + '/' + $scope.pageSize,
+                  //        data: $scope.studentSearch
+                  //    }).then(function successCallback(response) {
+                  //        $scope.IssueList = response.data.results;
+                  //        $scope.total_count = response.data.totalcount;
+                  //    }, function errorCallback(response) {
+                  //        toastr["warning"](response.data.Message);
+                  //    });
+                  //};
+
+                  //function setProgress(s) {
+                  //    $scope.btnDis = s;
+                  //    $scope.spin = s;
+                  //}
+
+                  //$scope.edit = function (n) {
+                  //    $scope.Requisition = n;
+                  //    $scope.Requisition.RequisitionId = n.RequisitionId;
+                  //    $scope.Requisition.Description = n.Description;
+
+                  //}
+
+
+                  //$scope.details = function (n) {
+                  //    $scope.PurchaseOrderLIst = [];
+                  //    angular.forEach($scope.PurchaseOrderList.OrderDetails, function (item) {
+                  //        if (n.POId == item.POId) {
+                  //            $scope.PurchaseOrderLIst.push(item);
+                  //        }
+                  //    });
+                  //    console.log($scope.PurchaseOrderLIst);
+                  //};
+
+                  //$scope.delete = function(n) {
+                  //    // SweetAlert.swal("Good job!", "You clicked the button!", "success");
+                  //    SweetAlert.swal({
+                  //        title: "Are you sure to delete it ?", type: "warning", showCancelButton: true, confirmButtonColor: "#DD6B55",
+                  //        confirmButtonText: "Yes, delete it!",
+                  //        closeOnConfirm: false
+                  //    },
+                  //    function (isConfirm) {
+                  //        if (isConfirm) {
+                  //            $http({
+                  //                method: 'POST',
+                  //                url: baseUrl + 'Inventory/PurchaseOrderDelete/',
+                  //                data: n
+                  //            }).then(function successCallback(response) {
+                  //                SweetAlert.swal("Deleted!", "Your data has been deleted.", "success");
+                  //                getPurchaseOrderList(1);
+                  //            }, function errorCallback(response) {
+
+                  //                toastr["warning"](response.data.Message);
+                  //            });
+                  //        }
+                  //    });
+                  //};
+              }]);
+    </script>
+
+}
+

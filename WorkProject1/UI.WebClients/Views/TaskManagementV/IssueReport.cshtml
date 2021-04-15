@@ -1,0 +1,367 @@
+﻿
+@{
+    ViewBag.Title = "Issue Report";
+}
+
+<div class="kt-container  kt-container--fluid  kt-grid__item kt-grid__item--fluid" ng-controller="ctrlIssueReport">
+
+    <div class="row">
+        <div class="kt-portlet kt-portlet--mobile">
+            <div class="kt-portlet__head kt-portlet__head--lg">
+                <div class="kt-portlet__head-label">
+                    <h3 class="kt-portlet__head-title">
+                        Issue Report
+                    </h3>
+                </div>
+            </div>
+            <div class="kt-portlet__body">
+                <!-- BEGIN FORM-->
+                <form name="reportForm" class="form-horizontal" id="form_sample_1" novalidate>
+                    <div class="form-body">
+                        <div class="row">
+                            <div class="col-md-4">
+
+                                <div class="form-group" ng-class="{ 'has-error' : submitted && reportForm.Department.$invalid}">
+                                    <div class="row">
+                                        <label class="col-md-4 control-label">
+                                            Department :
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-8">
+                                            <select class="form-control" ng-model="ReportInfo.DepartmentId" required name="Department" ng-options="dept.DepartmentID as dept.DepartmentName for dept in CommonFeilds.Department">
+                                                <option value="" selected="selected">Choose an Option</option>
+                                            </select>
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted && reportForm.Department.$error.required" class="help-block">Department Required</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            <div class="col-md-4">
+                                <div class="form-group" ng-class="{ 'has-error' : submitted && reportForm.ReportType.$invalid}">
+                                    <div class="row">
+                                        <label class="col-md-4 control-label">
+                                            Report Type :
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-8">
+                                            <select class="form-control" ng-model="ReportInfo.ReportTypeId" required name="ReportType">
+                                                <option value="" selected="selected">Choose an Option</option>
+                                                <option value="1">Task details</option>
+                                                <option value="2">Daily Schedule</option>
+                                                <option value="3">Sprint</option>
+                                                <option value="4">Individual Issue List</option>
+                                            </select>
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted && reportForm.ReportType.$error.required" class="help-block">Report Type Required</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4" ng-show="ReportInfo.ReportTypeId==4">
+                                <div class="form-group" ng-class="{ 'has-error' : submitted && reportForm.Date.$invalid}">
+                                    <div class="row">
+                                        <label class="col-md-4 control-label">
+                                            Date :
+                                        </label>
+                                        <div class="col-md-8">
+                                            <input type="text" class="form-control" uib-datepicker-popup="dd/MM/yyyy" placeholder="Date" name="Date" ng-model="ReportInfo.StartDate" is-open="strat.opened" ng-click="strat.opened=true" ng-required="ReportInfo.ReportTypeId==4" close-text="Close" readonly="readonly" />
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted &&  reportForm.Date.$error.required" class="help-block"> Date Required</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+
+                            <div class="col-md-4" ng-show="ReportInfo.ReportTypeId==1 || ReportInfo.ReportTypeId ==2 || ReportInfo.ReportTypeId ==3">
+                                <div class="form-group" ng-class="{ 'has-error' : submitted && reportForm.StartDate.$invalid}" >
+                                    <div class="row">
+                                        <label class="col-md-4 control-label">
+                                            Start Date :
+
+                                        </label>
+                                        <div class="col-md-8">
+                                            <input type="text" class="form-control" uib-datepicker-popup="dd/MM/yyyy" placeholder="Start Date" name="StartDate" ng-model="ReportInfo.StartDate" is-open="strat.opened" ng-click="strat.opened=true" ng-required="ReportInfo.ReportTypeId==1 || ReportInfo.ReportTypeId==2" close-text="Close" readonly="readonly" />
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted &&  reportForm.StartDate.$error.required" class="help-block">Start Date Required</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-4" ng-show="ReportInfo.ReportTypeId==1 || ReportInfo.ReportTypeId ==3">
+
+                                <div class="form-group" ng-class="{ 'has-error' : submitted && reportForm.ProjectId.$invalid}" >
+                                    <div class="row">
+                                        <label class="col-md-4 control-label">
+                                            Project :
+
+                                        </label>
+                                        <div class="col-md-8">
+                                            <select class="form-control" ng-model="ReportInfo.ProjectId" name="ProjectId" ng-disabled="ReportInfo.DepartmentId==null || ReportInfo.DepartmentId==0 || ReportInfo.DepartmentId==''" ng-change="getAllSprintByProjectId()" ng-options="project.Id as project.ProjectName for project in ProjectList | filter: {DepartmentId:ReportInfo.DepartmentId}" ng-required="ReportInfo.ReportTypeId==3">
+                                                <option value="" selected="selected">Choose an Option</option>
+                                            </select>
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted && reportForm.ProjectId.$error.required" class="help-block"> Project Required</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            <div class="col-md-4" ng-show="ReportInfo.ReportTypeId==1 || ReportInfo.ReportTypeId ==2 || ReportInfo.ReportTypeId ==3">
+                                <div class="form-group" ng-class="{ 'has-error' : submitted && reportForm.IssueTypeId.$invalid}" >
+                                    <div class="row">
+                                        <label class="col-md-4 control-label">
+                                            Issue Type :
+
+                                        </label>
+                                        <div class="col-md-8">
+                                            <select class="form-control" ng-model="ReportInfo.IssueTypeId" name="IssueTypeId" ng-options="issueType.Id as issueType.IssueTypeName for issueType in issueTypeList">
+                                                <option value="" selected="selected">Choose an Option</option>
+                                            </select>
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted && reportForm.IssueTypeId.$error.required" class="help-block">  Issue Type Required</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-4" ng-show="ReportInfo.ReportTypeId==1 || ReportInfo.ReportTypeId ==2 || ReportInfo.ReportTypeId ==3">
+
+                                <div class="form-group" ng-class="{ 'has-error' : submitted && reportForm.EndDate.$invalid}">
+                                    <div class="row">
+                                        <label class="col-md-4 control-label">
+                                            End Date :
+
+                                        </label>
+                                        <div class="col-md-8">
+                                            <input type="text" class="form-control" uib-datepicker-popup="dd/MM/yyyy" placeholder="End Date" name="EndDate" ng-model="ReportInfo.EndDate" is-open="end.opened" ng-click="end.opened=true" ng-required="ReportInfo.ReportTypeId==1 || ReportInfo.ReportTypeId==2" close-text="Close" readonly="readonly" />
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted &&  reportForm.EndDate.$error.required" class="help-block">End Date Required</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div class="row">
+
+                            <div class="col-md-4" ng-show="ReportInfo.ReportTypeId==1 || ReportInfo.ReportTypeId ==3">
+
+                                <div class="form-group" ng-class="{ 'has-error' : submitted && reportForm.SprintId.$invalid}" >
+                                    <div class="row">
+                                        <label class="col-md-4 control-label">
+                                            Sprint :
+
+                                        </label>
+                                        <div class="col-md-8">
+                                            <select class="form-control" ng-model="ReportInfo.SprintId" name="SprintId" ng-disabled="ReportInfo.ProjectId==null || ReportInfo.ProjectId==0 || ReportInfo.ProjectId==''" ng-options="sprint.Id as sprint.SprintTitle for sprint in SprintList" ng-required="ReportInfo.ReportTypeId==3">
+                                                <option value="" selected="selected">Choose an Option</option>
+                                            </select>
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted && reportForm.SprintId.$error.required" class="help-block">Sprint Title Required</span>
+                                        </div>
+
+
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-4" ng-show="ReportInfo.ReportTypeId==1 || ReportInfo.ReportTypeId ==2 || ReportInfo.ReportTypeId ==3">
+
+                                <div class="form-group" ng-class="{ 'has-error' : submitted && reportForm.ClientId.$invalid}" >
+                                    <div class="row">
+                                        <label class="col-md-4 control-label">
+                                            Client :
+
+                                        </label>
+                                        <div class="col-md-8">
+                                            <select class="form-control" ng-model="ReportInfo.ClientId" name="ClientId" ng-options="client.Id as client.FullName for client in clientList">
+                                                <option value="" selected="selected">Choose an Option</option>
+                                            </select>
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted && reportForm.ClientId.$error.required" class="help-block">Client Required</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <div class="row">
+                                    <label class="col-md-6 control-label">
+
+                                    </label>
+                                    <div class="col-md-6">
+                                        <button type="button" data-dismiss="modal" ng-click="resetForm();" class="btn btn-danger">Reset</button>&nbsp;
+                                        <button type="button" ng-click="ReportShow();submitted=true" class="btn btn-primary">Report</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </form>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+
+    <script type="text/javascript">
+        OEMSApp.controller("ctrlIssueReport", ["$scope", "$http", "SweetAlert", "$filter",
+              function ($scope, $http, SweetAlert, $filter) {
+                  init();
+                  function init() {
+                      initialize();
+                      getProjectList();
+                      getAllDropdowns();
+                      getAllCommons();
+                      getAllClient();
+                      getAllIssueType();
+                  }
+
+                  function initialize() {
+                      $scope.ReportInfo = {};
+                      $scope.ReportInfo.Id = 0;
+                      $scope.resetForm = resetForm;
+                      $scope.pagesize = 10;
+                      $scope.pageSizeArray = [];
+                      $scope.pageSizeArray.push({ value: 5, text: 5 });
+                      $scope.pageSizeArray.push({ value: 10, text: 10 });
+                      $scope.pageSizeArray.push({ value: 20, text: 20 });
+                      $scope.pageSizeArray.push({ value: 50, text: 50 });
+                      $scope.currentPage = 1;
+                      $scope.ReportShow = ReportShow;
+                      $scope.submitted = false;
+                  }
+
+                  function resetForm() {
+                      $scope.ReportInfo = {};
+                      $scope.ReportInfo.Id = 0;
+                      $scope.reportForm.$setUntouched();
+                      $scope.reportForm.$setPristine();
+                      $scope.submitted = false;
+                  }
+
+                  function ReportShow() {
+                      if ($scope.reportForm.$invalid) {
+                          return;
+                      }
+                      // $scope.SearchList = [];
+                      $scope.ReportInfo.FromDate = $filter('date')($scope.ReportInfo.StartDate, "yyyy-MM-dd");
+                      $scope.ReportInfo.ToDate = $filter('date')($scope.ReportInfo.EndDate, "yyyy-MM-dd");
+                      if ($scope.ReportInfo.FromDate > $scope.ReportInfo.ToDate) {
+                          toastr["warning"]('Date Range Invalid!');
+                          return;
+                      }
+                      var form = document.createElement("form");
+                      form.target = "_blank";
+                      form.method = "POST";
+                      form.action = window.location.origin + '/Report/TaskReport/';
+                      form.style.display = "none";
+                      for (var key in $scope.ReportInfo) {
+                          var input = document.createElement("input");
+                          input.type = "hidden";
+                          input.name = key;
+                          if ($scope.ReportInfo[key] != null) {
+                              input.value = $scope.ReportInfo[key]
+                          }
+                          else {
+                              input.value = " "
+                          }
+                          form.appendChild(input);
+                      }
+                      document.body.appendChild(form);
+                      form.submit();
+                      document.body.removeChild(form);
+                  }
+
+                  function getAllIssueType() {
+                      $scope.issueTypeList = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'TaskManagement/GetAllIssueType/'
+                      }).then(function successCallback(response) {
+                          $scope.issueTypeList = response.data.results;
+                      }, function errorCallback(response) {
+                          toastr["info"](response.data.Message);
+                      });
+                  }
+
+                  function getAllCommons() {
+                      $scope.CommonFeilds = [];
+
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Common/GetCommonItemEmp/'
+                      }).then(function successCallback(response) {
+                          $scope.CommonFeilds = response.data.results;
+                      }, function errorCallback(response) {
+                      });
+                  }
+                  function getAllDropdowns() {
+                      $scope.Dropdowns = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Common/GetAllDropDown/'
+                      }).then(function successCallback(response) {
+                          $scope.Dropdowns = response.data.results;
+                      }, function errorCallback(response) {
+                      });
+                  }
+
+
+                  function getAllClient() {
+                      $scope.clientList = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Client/GetAllClient/'
+                      }).then(function successCallback(response) {
+                          $scope.clientList = response.data.results;
+                      }, function errorCallback(response) {
+                          toastr["info"](response.data.Message);
+                      });
+                  }
+
+                  $scope.getAllSprintByProjectId = function getAllSprintByProjectId() {
+                      $scope.SprintList = [];
+
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'TaskManagement/GetSprintByProjectId/' + $scope.ReportInfo.ProjectId
+                      }).then(function successCallback(response) {
+                          $scope.SprintList = response.data.results;
+                      }, function errorCallback(response) {
+                          toastr["warning"](response.data.Message);
+                      });
+                  }
+
+                  function getProjectList() {
+                      $scope.ProjectList = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'TaskManagement/GetAllProject/'
+                      }).then(function successCallback(response) {
+                          $scope.ProjectList = response.data.results;
+                          console.log($scope.ProjectList);
+                      }, function errorCallback(response) {
+                          toastr["warning"](response.data.Message);
+                      });
+                  }
+
+              }]);
+
+    </script>
+}
+

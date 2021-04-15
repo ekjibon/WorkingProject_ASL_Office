@@ -1,0 +1,435 @@
+﻿
+@{
+    ViewBag.Title = "FeesPayment";
+    Layout = "~/Views/Shared/_adminLayout.cshtml";
+  
+}
+
+<!----------------Content Start----------------->
+<div ng-controller="FeesPayCtl">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="fessPayment mb-2">
+                <h3>Fees Payment</h3>
+                <div class="row">
+                    <div class="col-lg-4">
+                        <div class="form-group row">
+                            <label class="col-sm-4 col-form-label" style="font-weight: 700;">Academic Session</label>
+                            <div class="col-sm-8">
+                                <label class="form-control customLabel">{{Session.SessionName}}</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="form-group row">
+                            <label class="col-sm-4 col-form-label" style="font-weight: 700;">Fees Session</label>
+                            <div class="col-sm-8">
+                               @* <select class="form-control" id="exampleFormControlSelect1" ng-change="getFeesDueInfo(FeesSessionYearId)" name="Month" ng-model="FeesSessionYearId" required ng-options='b.FeesSessionYearId as (b.MonthName+ "  "  + "(" + b.Year + ")" ) for b in SessionMonthList'>*@
+                                    @*<select class="form-control" ng-change="GetSessionMonthList(SessionId);" ng-model="SessionId" required name="SessionId" ng-options="p.FeesFiscalSessionId as p.FiscalSessionName for p in CommonFeilds.FiscalSession">
+                                        <option value="" selected="selected">Please Select</option>
+                                    </select>*@
+                                <label class="form-control customLabel">{{fisCalSession.FiscalSessionName}}</label>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="form-group row">
+                            <label class="col-sm-4 col-form-label" style="font-weight: 700;">Month</label>
+                            <div class="col-sm-8">
+                                <select class="form-control" id="exampleFormControlSelect1" ng-change="getFeesDueInfo(FeesSessionYearId)" name="Month" ng-model="FeesSessionYearId" required ng-options='b.FeesSessionYearId as (b.MonthName+ "  "  + "(" + b.Year + ")" ) for b in SessionMonthList'>
+                                    <option value="" selected="selected">Please Select</option>
+                                </select>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="fessPayment" ng-show="FeesInfos.length > 0">
+                <div class="fesspaymentHead">
+                    <div class="fessTitle">
+                        <h3>Fees Payment</h3>
+                    </div>
+                    <div class="voucherBtn text-right">
+                        @*<a href="@Url.Action("FeesBook", "PortalReport")?FeesSessionYear={{SessionYearId}}" class="btn btn-primary" target="_blank" >Voucher</a>*@
+                        <button class="btn btn-primary" data-toggle="modal" aria-expanded="false" data-target="#addmodal" >Voucher</button>
+                    </div>
+                </div>
+
+                <form @*action="@Url.Action("ProcessbKash", "Fees")" method="post"*@>
+                    <div class="table-responsive fessPaymentTable">
+                        <table class="table table-striped">
+                            <thead class="tableHead">
+                                <tr>
+                                    <th scope="col">Fees Head</th>
+                                    <th class="text-center" scope="col">Dues Amount</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+
+                                <tr ng-repeat="item in FeesInfos ">
+
+                                    <td>{{item.HeadName }}  </td>
+                                    <td class='text-center'>
+                                        {{item.DueAmount}}
+                                        <input type='text' name="FeesSessionYearId" value="{{SessionYearId}}" hidden />
+
+                                    </td>
+
+                                </tr>
+
+                            </tbody>
+
+                            <tfoot>
+                                <tr>
+                                    <td colspan="1" style="text-align:Right;  font-weight: bold;"> Total</td>
+                                    <td style="text-align:center;  font-weight: bold;"> {{getTotal ('DueAmount')}}</td>
+
+                                </tr>
+
+                            </tfoot>
+
+                        </table>
+                    </div>
+                    <div class="paymentbtn text-right">
+      
+                        @*<button type="submit" style="margin-right: 0;" class="makepaymentBtn"><img src="../assets/images/pay2fee/bKashButton.png" alt=""></button>*@
+                        <button type="button" ng-click="save()" class="btn btn-info">Online Payment</button>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+    <!--Modal Area Start-->
+    <div id="addmodal" class="modal fade" tabindex="-1" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog">
+            <div class="modal-content" style="width:600px;">
+                <div class="modal-header">
+                    <h4 class="modal-title pull-left">Please select payment method</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">X</button>
+                </div>
+
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label class="col-md-6 control-label">
+                            <input type="radio" name="flag" ng-model="feespayment.PayMode" value="1">
+                            Cash
+                        </label>
+                        <label class="col-md-6 control-label">
+                        <input type="radio" name="flag" ng-model="feespayment.PayMode" value="2" >
+                          Cheque
+                      </label>
+                        <label class="col-md-6 control-label">
+                            <input type="radio" name="flag" ng-model="feespayment.PayMode" value="3">
+                            Online transfer
+                        </label>
+
+                    </div>
+                    <div class="form-group" ng-show="feespayment.PayMode==2">
+                        <label class="col-lg-4 col-md-6 col-sm-6 control-label">
+                            Cheque Number :
+                            <span class="required">*</span>
+                        </label>
+                             <div class="col-lg-7 col-md-6 col-sm-6">
+                                 <input type="text" ng-model="feespayment.ChaqueNumber" name="cheque" placeholder="Enter Cheque No"
+                                        class="form-control">
+                            <div class="form-control-focus"> </div>
+                            
+                        </div>
+                    </div>
+                    
+                </div>
+
+                <div class="modal-footer">                    
+                    <button type="button" ng-click="AddOnlinetrans()" data-dismiss="modal" class="btn btn-info ">Download</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--Modal Area End-->
+</div>
+<!----------------Content Start---------------->
+
+<script src="~/assets/global/plugins/bootstrap-fileinput/bootstrap-fileinput.js"></script>
+@section Scripts{
+
+    <script type="text/javascript">
+
+        OEMSApp.controller("FeesPayCtl", ["$scope", "$http", "SweetAlert", "blockUI", "$window", "$filter",
+               function ($scope, $http, SweetAlert, blockUI, $window, $filter) {
+                   init();
+
+                   function init() {
+                       getAllCommons();
+                       getSession();
+                       getfisCalSession();
+                     //  GetSessionMonthList();
+                       $scope.feespayment = {};
+                       $scope.feespaymentTotal = {};
+                       $scope.FeesObj = {};
+                       $scope.Session = {};
+                       $scope.SessionMonthList = [];
+                       $scope.FeesInfos = [];
+                       $scope.fisCalSession = {};
+                       $scope.pageSizeArray = [];
+                       $scope.pageSizeArray.push({ value: 5, text: 5 });
+                       $scope.pageSizeArray.push({ value: 10, text: 10 });
+                       $scope.pageSizeArray.push({ value: 20, text: 20 });
+                       $scope.pageSizeArray.push({ value: 50, text: 50 });
+                       $scope.currentPage = 1;
+                       $scope.pageSize = 10;
+                      // $scope.GetSessionMonthList 
+                       $scope.getFeesDueInfo = getFeesDueInfo;
+                     //  $scope.feespayment.ChaqueNumber = "";
+                      // $scope.feespayment.PayMode = 1;
+                   }
+
+                   //function ShowMessage() {
+                   //    SweetAlert.swal(
+
+                   //        "Dear Parents,Please be informed that our tuition fee entry is still under process. Shortly you will see your updated paid tuition fee summary. Thank you, CGSD Administration"
+                   //    );
+                   //}
+
+                   function getAllCommons() {
+                       $scope.CommonFeilds = [];
+
+                       $http({
+                           method: 'GET',
+                           url: baseUrl + 'PortalFees/GetCommonItem/'
+                       }).then(function successCallback(response) {
+                           $scope.CommonFeilds = response.data.results;
+                           //console.log($scope.CommonFeilds);
+                       }, function errorCallback(response) {
+                       });
+                   }
+
+                   function getfisCalSession() {
+                       $http({
+                           method: 'GET',
+                           url: baseUrl + 'PortalFees/FisCalSession/'
+                       }).then(function successCallback(response) {
+                           $scope.fisCalSession = response.data.results[0];
+                           GetSessionMonthList()
+                       }, function errorCallback(response) {
+                           toastr["warning"](response.data.Message);
+                       });
+                   };
+
+                   function getSession() {
+                       $http({
+                           method: 'GET',
+                           url: baseUrl + 'PortalFees/AcademicSession/'
+                       }).then(function successCallback(response) {
+                           $scope.Session = response.data.results[0];
+
+                       }, function errorCallback(response) {
+                           toastr["warning"](response.data.Message);
+                       });
+                   };
+
+                  // $scope.GetSessionMonthList = function GetSessionMonthList(sessionId) {
+                   function GetSessionMonthList() {
+                       $scope.SessionMonthList = [];
+                       $scope.LastmonthofSession = {}
+                       $http({
+                           method: 'GET',
+                           url: baseUrl + 'PortalFees/GetMonthByfeesSession/' + $scope.fisCalSession.FeesFiscalSessionId
+                       }).then(function successCallback(response) {
+                           $scope.SessionMonthList = response.data.results;
+                          // $scope.LastmonthofSession = $scope.SessionMonthList[$scope.SessionMonthList.length - 1].FeesSessionYearId;
+                           var date = new Date();
+                           var year = date.getFullYear();
+                           var month = date.getMonth() + 1;
+                          
+                           angular.forEach($scope.SessionMonthList, function (item) {
+                               if (item.MonthId == month && item.Year == year) {
+                                   getFeesDueInfo(item.FeesSessionYearId);
+                                   $scope.FeesSessionYearId = item.FeesSessionYearId;
+                               }
+                               //else {
+                               //    $scope.FeesSessionYearId = $scope.SessionMonthList[$scope.SessionMonthList.length - 1].FeesSessionYearId;
+                               //    getFeesDueInfo($scope.FeesSessionYearId);
+                               //}
+                           });
+                         
+
+                       }, function errorCallback(response) {
+                       });
+                   }
+                   //function GetSessionMonthList() {
+                   //    $http({
+                   //        method: 'GET',
+                   //        url: baseUrl + 'PortalFees/GetMonthBySession/'
+                   //    }).then(function successCallback(response) {
+
+                   //        $scope.SessionMonthList = response.data.results;
+                   //        var date = new Date();
+                   //        var year = date.getFullYear();
+                   //        var month = date.getMonth()+1;
+
+                   //        angular.forEach($scope.SessionMonthList, function (item) {
+                   //            if (item.MonthId == month && item.Year == year) {
+                   //                getFeesDueInfo(item.FeesSessionYearId);
+                   //                $scope.FeesSessionYearId = item.FeesSessionYearId;
+                   //            }
+
+                   //        });
+                   //    }, function errorCallback(response) {
+                   //    });
+                   //}
+
+                    function getFeesDueInfo(FeesSessionYearId) {
+                       //debugger;
+                        $scope.SessionYearId = FeesSessionYearId;
+                        $scope.feespayment.FeesSessionYearId = FeesSessionYearId;
+                       $http({
+                           method: 'GET',
+                           url: baseUrl + 'PortalFees/FeesPayment/' + FeesSessionYearId
+                       }).then(function successCallback(response) {
+                           console.log(response);
+                           $scope.FeesInfos = response.data.results;
+                           console.log($scope.FeesInfos);
+                       }, function errorCallback(response) {
+                           toastr["error"](response.data.Message);
+                       });
+
+                   };
+
+
+                   $scope.getTotal = function getTotal(type) {
+                       var total = 0;
+                       angular.forEach($scope.FeesInfos, function (el) {
+                           total += el[type];
+                       });
+                       $scope.feespaymentTotal = total;
+                       return total;
+                   };
+
+                    function Download() {
+
+
+                        $scope.uri = "@Url.Action("FeesBook", "PortalReport")?FeesSessionYear=" + $scope.SessionYearId + '&PayMode=' + $scope.feespayment.PayMode + '&ChequeNo=' + $scope.feespayment.ChaqueNumber;
+                        $window.open($scope.uri, '_blank');
+
+                       // resetForm();
+
+                   };
+
+                   $scope.AddOnlinetrans = function AddOnlinetrans() {
+                       $http({
+                           method: 'POST',
+                           url: baseUrl + 'PortalFees/AddOnlinetrans/',
+                           data : $scope.feespayment
+                       }).then(function successCallback(response) {
+                           Download();
+                           window.location.reload();
+                       }, function errorCallback(response) {
+                           toastr["error"](response.data.Message);
+                       });
+
+                   };
+
+                   $scope.save = function save() {
+
+               
+
+                       SweetAlert.swal({
+                           title: "Do you want to Pay ?",
+
+                           type: "info",
+                           showCancelButton: true,
+                           confirmButtonColor: "#DD6B55", confirmButtonText: "Yes",
+                           cancelButtonText: "Cancel",
+                           closeOnConfirm: false,
+                           closeOnCancel: true
+                       },
+                     function (isConfirm) {
+                         if (isConfirm) {
+                             $http({
+                                 method: 'POST',
+                                 url: baseUrl + 'PortalFees/Pay2FeeCreate/' + $scope.FeesSessionYearId,
+                                 
+                             }).then(function successCallback(response) {
+                                 window.location.href = response.data.GatewayUrl;
+                                 //resetForm();
+                                 getFeesDueInfo($scope.FeesSessionYearId);
+                             }, function errorCallback(response) {
+                                 toastr["warning"](response.data.Message);
+                             });
+                         }
+
+                     });
+
+
+                   };
+
+               }]) ;
+
+        //OEMSApp.filter('total', function () {
+        //    return function (input, property) {
+        //        console.log('CALC', input, property);
+        //        var total = 0;
+        //        angular.forEach(input, function (value, key) { total += parseFloat(value[property]) });
+        //        return total;
+        //    }
+        //});
+    </script>
+
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            //console.log(window.location);
+            var collectionlist;
+            var ColllectionList = new Array();
+            //$.get(baseUrl + "PortalFees/FeesPayment/", function (data) {
+            //    //console.log(data.results);
+            //    collectionlist = data.results;
+            //    //$('#totalamt').html(0);
+            //    var str = "";
+            //    for (var i = 0; i < collectionlist.length; i++) {
+            //        str += "<tr><td>" + collectionlist[i].HeadName + " (" + collectionlist[i].DueMonth + ")</td><td class='text-center' scope='col'>" + collectionlist[i].DueAmount + "</td><td><input type='text' id='invoice"+i+"' onchange='CheckInvoiceAmount(this.value," + collectionlist[i].DueAmount + ","+i+")' value='" + collectionlist[i].InvoiceAmount + "' name='' class='form-control' /></td></tr>";
+            //        ColllectionList.push(collectionlist[i]);
+            //    }
+
+            //    $("#dueList").append(str);
+            //});
+
+            CheckInvoiceAmount = function CheckInvoiceAmount(invoice, due, index) {
+
+                var id = "#invoice_" + index;
+                //alert(invoice);
+                if (invoice > due) {
+                    $('' + id + '').val('0');
+                    //collectionlist[index].InvoiceAmount = 0;
+                    alert('Invalid Amount!');
+                } else {
+                    //collectionlist[index].InvoiceAmount = invoice;
+                }
+                //console.log(collectionlist);
+                TotalInvoice();
+
+
+
+            }
+            TotalInvoice = function TotalInvoice() {
+                var total = 0;
+                //$("table > tbody > tr").each(function () {
+                //    var currentRow = $(this); //Do not search the whole HTML tree twice, use a subtree instead
+                //    //alert(currentRow.find(".invoiceAmount").val());
+                //    total += parseInt(currentRow.find(".invoiceAmount").val());
+                //});
+                $('#totalamt').html(total);
+                collectionlist[0].DueAmount = total;
+            }
+
+
+
+        });
+    </script>
+
+}

@@ -1,0 +1,305 @@
+﻿
+@{
+    ViewBag.Title = "Employee Calendar Config";
+}
+<div class="kt-container  kt-container--fluid  kt-grid__item kt-grid__item--fluid" ng-controller="empCalendarConfigCntrl">
+    <div class="row">
+        <div class="kt-portlet kt-portlet--mobile">
+            <div class="kt-portlet__head kt-portlet__head--lg">
+                <div class="kt-portlet__head-label">
+
+                    <h3 class="kt-portlet__head-title">
+                        <!----Title Text-->
+                        Employee Calendar Config
+                        <!----Title Text -->
+                    </h3>
+                </div>
+            </div>
+
+            <div class="kt-portlet__body">
+
+                <form class="form-horizontal" ng-submit="getempCalendarConfig()" name="frmempCalendarConfig" novalidate>
+                    <div class="form-body">
+                        <div class="row">
+                            <div class="col-lg-3 col-md-3">
+                                <div class="form-group row">
+                                    <label class="col-lg-4 col-md-4 control-label pull-left" style="text-align:right">
+                                        Title :
+                                        <span class="required">*</span>
+                                    </label>
+                                    <div class="col-md-7" ng-class="{ 'has-error' :Submitted  && frmempCalendarConfig.Title.$invalid}">
+                                        <select class="form-control" ng-model="empCalendarConfig.CalendarId" name="Title" ng-options="item.Id as item.Title for item in EmpCalenderList" required>
+                                            <option value="" selected="selected">Select</option>
+
+                                        </select>
+                                        <div class="form-control-focus"> </div>
+                                        <span ng-show="Submitted && frmempCalendarConfig.Title.$error.required " class="help-block">Title is Required</span>
+
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-3 col-md-3">
+                                <div class="form-group row">
+                                    <label class="col-lg-4 col-md-4 control-label pull-left" style="text-align:right">
+                                        Year:
+                                        <span class="required">*</span>
+                                    </label>
+                                    <div class="col-md-7" ng-class="{ 'has-error' :Submitted  && frmempCalendarConfig.Value.$invalid}">
+                                        <select class="form-control" ng-model="empCalendarConfig.Value" name="Value" ng-options="aYear.Value as aYear.Text for aYear in YearList" ng-change="getAllMonth()" required>
+                                            <option value="" selected="selected">Select</option>
+                                        </select>
+                                        <div class="form-control-focus"> </div>
+                                        <span ng-show="Submitted && frmempCalendarConfig.Value.$error.required " class="help-block">Year is Required</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group row" ng-class="{ 'has-error' : Submitted && frmempCalendarConfig.Month.$invalid}">
+                                    <label class="col-md-4 control-label" style="text-align:right">
+                                        Month:
+                                        <span class="required">*</span>
+                                    </label>
+                                    <div class="col-md-7">
+                                        <select class="form-control" name="Month" ng-model="empCalendarConfig.Month" required ng-options="aMonth.Value as aMonth.Text for aMonth in MonthList">
+                                            <option value="" selected="selected">Please Select</option>
+                                        </select>
+                                        <span ng-show="Submitted &&  frmempCalendarConfig.Month.$error.required" class="help-block">Month is Required</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-3 col-md-3">
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <button type="submit" ng-click="Submitted=true" class="btn btn-success text-left">Show</button>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <button type="button" ng-click="Report();" class="btn btn-primary" style="width:65px">Report</button>
+                                    </div>
+                                    <div class="col-md-6" ng-hide="(empCalendarConfig.CalendarId == null || empCalendarConfig.CalendarId == '')">
+                                        <a href="@Url.Action("EmpCalendarView", "AttendanceV")?id={{empCalendarConfig.CalendarId}}" target="_blank" class="btn btn-label-primary" style="width:137px">Calendar View</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+                <table class="table table-bordered table-hover rounded">
+                    <thead>
+                        <tr class="btn-primary">
+                            <th> Date </th>
+                            <th> Leave Type</th>
+                            <th> Holiday Name</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="item in Calendar" style="background-color:{{item.ColorCode}}">
+                            <td> {{item.CalendarDate| date:'MMMM dd, yyyy , (EEEE)' }} </td>
+                            <td>
+                                <select class="form-control" @*ng-disabled="item.IsDateDisable==true"*@ ng-model="item.DayType" name="type">
+                                    <option value="Regular" selected="selected">Regular</option>
+                                    <option value="Holiday">Holiday</option>
+                                    <option value="LongHoliday">Long Holiday</option>
+                                    <option value="Weekend">Weekend</option>
+                                </select>
+                            </td>
+                            <td>
+                                <input type="text" ng-model="item.HolidayName" @*ng-disabled="item.IsDateDisable==true" *@ name="HolidayName" class="form-control" required>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="10" style="padding-right:0px">
+                                @*<button ng-click="DeleteVirtualExam()" class="btn red pull-right">Delete</button>*@
+                                <button ng-click="Save()" class="btn btn-success pull-right">  Save</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="row">
+                    <dir-pagination-controls boundary-links="true" template-url="~/assets/angular/lib/dirPagination.tpl.html"></dir-pagination-controls>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+
+    <script type="text/javascript">
+
+        OEMSApp.controller("empCalendarConfigCntrl", ["$scope", "$http", "SweetAlert", "$window",
+              function ($scope, $http, SweetAlert, $window) {
+                  init();
+                  function init() {
+                      initialize();
+                      getEmpClanderList();
+                  }
+                  function initialize() {
+                      $scope.empCalendarConfig = {};
+                      $scope.Calendar = [];
+                      $scope.EmpCalenderList = [];
+                      $scope.getempCalendarConfig = getempCalendarConfig;
+                      $scope.btnDis = false;
+                      $scope.spin = false;
+                      $scope.Submitted = false;
+                      $scope.isChange = false;
+                      $scope.isChange1 = false;
+                      getAllYear();
+                      $scope.getAllMonth = getAllMonth;
+                  };
+                  function setProgress(s) {
+                      $scope.btnDis = s;
+                      $scope.spin = s;
+                  }
+                  function getAllYear() {
+                      $scope.YearList = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Common/GetAllYear/'
+                      }).then(function successCallback(response) {
+                          $scope.YearList = response.data.results.Table;
+                      }, function errorCallback(response) {
+                          toastr["warning"](response.data.Message);
+                      });
+                  }
+                  function getAllMonth() {
+                      $scope.MonthList = [];
+                      if ($scope.empCalendarConfig.Value == null) {
+                          return;
+                      }
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Common/GetAllMonth/'
+                      }).then(function successCallback(response) {
+                          $scope.MonthList = response.data.results.Table;
+                      }, function errorCallback(response) {
+                          toastr["warning"](response.data.Message);
+                      });
+                  }
+                  function getEmpClanderList() {
+                      $scope.EmpCalenderList = [];
+
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Attendance/GetEmpCalendarList/'
+                      }).then(function successCallback(response) {
+                          $scope.EmpCalenderList = response.data.results;
+                          //console.log(response.data.results);
+
+                      }, function errorCallback(response) {
+
+                      });
+
+                  }
+
+                  $scope.chkChanged = function () {
+                      $scope.isChange = true;
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Attendance/GetYearRange/' + $scope.empCalendarConfig.CalendarId
+                      }).then(function successCallback(response) {
+                          $scope.EmpCalenderYearList = response.data.results;
+                          //console.log(response.data.results);
+                          //angular.forEach($scope.EmpCalenderList, function (value, key) {
+                          //    if (value.EmpCategory == 1003 && value.Id == $scope.empCalendarConfig.CalendarId) {
+                          //        $scope.show = true;
+                          //    }
+                          //})
+                      }, function errorCallback(response) {
+
+                      });
+
+                  }
+
+                  $scope.chkChanged1 = function () {
+                      $scope.isChange1 = true;
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Attendance/GetMonthRange/' + $scope.empCalendarConfig.CalendarId + '/' + $scope.empCalendarConfig.year
+                      }).then(function successCallback(response) {
+                          $scope.EmpCalenderMothList = response.data.results;
+                          console.log(response.data.results);
+
+                      }, function errorCallback(response) {
+
+                      });
+                  }
+
+                  function getempCalendarConfig() {
+                      $scope.empCalendarConfig.year = $scope.empCalendarConfig.Value;
+                      $scope.empCalendarConfig.month = $scope.empCalendarConfig.Month;
+                      if ($scope.frmempCalendarConfig.$invalid)
+                          return;
+                      $scope.Calendar = [];
+                      if ($scope.frmempCalendarConfig.$invalid == true)
+                          return;
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Attendance/EmpCalendarSetup/' + $scope.empCalendarConfig.year + '/' + $scope.empCalendarConfig.month + '/' + $scope.empCalendarConfig.CalendarId
+                      }).then(function successCallback(response) {
+                          $scope.Calendar = response.data.results;
+                          angular.forEach($scope.Calendar, function (value, key) {
+                              value.CalendarId = $scope.empCalendarConfig.CalendarId;
+                          });
+                      }, function errorCallback(response) {
+                          toastr["warning"](response.data.Message);
+                      });
+                  };
+                  $scope.Report = function Report() {
+                      $scope.empCalendarConfig.year = $scope.empCalendarConfig.Value;
+                      $scope.empCalendarConfig.month = $scope.empCalendarConfig.Month;
+                      if ($scope.empCalendarConfig.CalendarId == null) {
+                          toastr["info"]("Title is Required.");
+                          return;
+                      }
+                      else if ($scope.empCalendarConfig.year == null) {
+                          toastr["info"]("Year is Required.");
+                          return;
+                      }
+                      else if ($scope.empCalendarConfig.month == null) {
+                          toastr["info"]("Month is Required.");
+                          return;
+                      }
+                      else {
+                          $scope.uri = "@Url.Action("EmpCalenderSetupSummeryReport", "Report")?YearId=" + $scope.empCalendarConfig.year + "&Month=" + $scope.empCalendarConfig.month + "&CalendarId=" + $scope.empCalendarConfig.CalendarId;
+                          $window.open($scope.uri, '_blank');
+                      }
+                  }
+                  $scope.Save = function Save() {
+                      if ($scope.Calendar.length == 0)
+                          return;
+                      $http({
+                          method: 'POST',
+                          url: baseUrl + 'Attendance/AddEmpCalendarSetupconfig/',
+                          data: $scope.Calendar
+                      }).then(function successCallback(response) {
+                          toastr["success"](response.data.message);
+                          getempCalendarConfig();
+                      }, function errorCallback(response) {
+                          toastr["info"](response.data.Message);
+                      });
+                  };
+
+                  $scope.Reset = function Reset() {
+                      initialize();
+                      $scope.Submitted = false;
+                  };
+                  $scope.ResetSource = function ResetSource() {
+                      $scope.Calendar = [];
+                  };
+                  $scope.DeleteVirtualExam = function DeleteVirtualExam() {
+                      $http({
+                          method: 'POST',
+                          url: baseUrl + 'Result/DeleteVirtualExam/',
+                          data: $scope.VirtualExams
+                      }).then(function successCallback(response) {
+                          toastr["info"](response.data.message);
+                          empCalendarConfig();
+                      }, function errorCallback(response) {
+                          toastr["info"](response.data.message);
+                      });
+                  }
+              }]);
+    </script>
+}
+

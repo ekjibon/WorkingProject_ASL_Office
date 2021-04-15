@@ -1,0 +1,173 @@
+﻿@{
+    ViewBag.Title = "Add ECA";
+}
+
+<div class="row mt-3" ng-controller="EcaApplyClt">
+    <div class="col-lg-12">
+        <div class="card">
+            <div class="card-header Leave-card-header">
+                ECA Apply
+            </div>
+            <div class="card-body">
+@if (ViewBag.DocumentId != 0)
+{
+    <div class="row">
+        <div class="col-md-6">
+            <form name="formCommonFeilds" novalidate>
+                <div class="form-group row" ng-class="{ 'has-error' : submitted && formCommonFeilds.ChoiceTypeId.$invalid}">
+                    <label for="inputPassword" class="col-sm-3 col-form-label">Choice Type</label>
+                    <div class="col-sm-9" style="margin-left: -8%;">
+                        <select class="form-control" ng-model="StudentClub.ChoiceTypeId" name="ChoiceTypeId" ng-options="m.Id as m.text for m in Choices" required>
+                            <option value="" selected="selected">Select</option>
+                        </select>
+                        <span ng-show="submitted && formCommonFeilds.ChoiceTypeId.$error.required" class="required">Choice Required</span>
+                    </div>
+                </div>
+                <div class="form-group row" ng-class="{ 'has-error' : submitted && formCommonFeilds.TermId.$invalid}">
+                    <label for="inputPassword" class="col-sm-3 col-form-label">Term</label>
+                    <div class="col-sm-9" style="margin-left: -8%;">
+                        <select class="form-control" ng-model="StudentClub.TermId" name="TermId" ng-options="m.TermId as m.Name for m in Terms" required>
+                            <option value="" selected="selected">Select</option>
+                        </select>
+                        <span ng-show="submitted && formCommonFeilds.TermId.$error.required" class="required">Term Required</span>
+                    </div>
+                </div>
+                @*<div class="form-group row" ng-class="{ 'has-error' : submitted && formCommonFeilds.DayId.$invalid}">
+                    <label for="inputPassword" class="col-sm-3 col-form-label">Day</label>
+                    <div class="col-sm-9" style="margin-left: -8%;">
+                        <select class="form-control" ng-model="StudentClub.DayId"  name="DayId" ng-options="m.Id as m.text for m in Days" required>
+                            <option value="" selected="selected">Select</option>
+                        </select>
+                        <span ng-show="submitted && formCommonFeilds.DayId.$error.required" class="required">Day Required</span>
+                    </div>
+                </div>
+                <div class="form-group row" ng-class="{ 'has-error' : submitted && formCommonFeilds.CategoryName.$invalid}">
+                    <div class="col-sm-3">
+                        <label for="message-text" class="col-form-label">Club Category</label>
+                    </div>
+                    <div class="col-sm-9" style="margin-left: -8%;">
+                        <select class="form-control" ng-model="StudentClub.CategoryName" ng-change="ECAClublist(StudentClub.CategoryName)" name="CategoryName"  required>
+                            <option value="" selected="selected">Select</option>
+                            <option value="Physical">Physical</option>
+                            <option value="Technical">Technical</option>
+                            <option value="Service" >Service</option>
+                        </select>
+                        <span ng-show="submitted && formCommonFeilds.CategoryName.$error.required" class="required">Club Category Required</span>
+                    </div>
+                </div>*@
+                <div class="form-group row" ng-class="{ 'has-error' : submitted && formCommonFeilds.ClubId.$invalid}">
+                    <div class="col-sm-3">
+                        <label for="message-text" class="col-form-label">Club</label>
+                    </div>
+                    <div class="col-sm-9" style="margin-left: -8%;">
+                        <select class="form-control" ng-model="StudentClub.ClubId" ng-disabled="StudentClub.TermId==null" name="ClubId" ng-options="m.ClubId as m.ClubName for m in Clublist | filter:{TermId:StudentClub.TermId}:true" required>
+                            <option value="" selected="selected">Select</option>
+                        </select>
+                        <span ng-show="submitted && formCommonFeilds.ClubId.$error.required" class="required">Club Name Required</span>
+                    </div>
+                </div>
+                <div style="margin-left: 70%;">
+                    <button type="reset" class="btn btn-danger" ng-click="submitted=false" data-dismiss="modal">Reset</button>
+                    <button type="button" class="btn btnColor" ng-click="SaveECA();submitted=true">Apply</button>
+                </div>
+            </form>
+        </div>
+        <div class="col-md-6 col-sm-6 col-lg-6 col-xs-6">
+
+            <iframe width="100%" height="650" src="@Url.Action("Download","Attendance")?DocumentId=@ViewBag.DocumentId"></iframe>
+  </div>
+    </div>
+}else
+{
+    <div>
+        <h4>ECA Document Didn't Upload Yet.</h4>
+    </div>
+}
+
+
+</div>
+        </div>
+    </div>
+</div>
+@section Scripts{
+    <script type="text/javascript">
+        OEMSApp.controller("EcaApplyClt", ["$scope", "$http", "SweetAlert", "blockUI", "$window", "$filter",
+                  function ($scope, $http, SweetAlert, blockUI, $window, $filter) {
+                      init();
+                      function init() {
+                          initialize();
+                          ECAClublist();
+                          getTermList();
+                      
+                      }
+                      function initialize() {
+                          $scope.pageSizeArray = [];
+                          $scope.pageSizeArray.push({ value: 5, text: 5 });
+                          $scope.pageSizeArray.push({ value: 10, text: 10 });
+                          $scope.pageSizeArray.push({ value: 20, text: 20 });
+                          $scope.pageSizeArray.push({ value: 50, text: 50 });
+                          $scope.currentPage = 1;
+                          $scope.pageSize = 10;
+                          $scope.StudentClub = {};
+                          $scope.document = {};
+                          $scope.Choices = [];
+                          $scope.Choices.push({ Id: 1, text: 'First Choice' }, { Id: 2, text: 'Second Choice' });
+                          $scope.Terms = [];
+                        
+
+                          $scope.Days = [];
+                          $scope.Days.push(
+                                            { Id: 2, text: 'Sunday' },
+                                             { Id: 3, text: 'Monday' },
+                                             { Id: 4, text: 'Thuesday' });
+                      
+                          $scope.oddColor = '#E4F4F7';
+                      };
+                      $scope.SaveECA = function SaveECA() {
+                          if ($scope.formCommonFeilds.$invalid)
+                                   return;
+                          $http({
+                              method: 'POST',
+                              url: baseUrl + 'PortalECA/AddECA/',
+                              data: $scope.StudentClub
+                          }).then(function SuccessCallback(response) {
+                              $scope.StudentClub = {};
+                              $scope.submitted = false;
+                              toastr["success"](response.data.message);
+                          },
+                          function errorCallback(response) {
+                              toastr["success"](response.data.Message);
+                          });
+                      }
+
+                      function getTermList() {
+                          $scope.Terms = [];
+                          $http({
+                              method: 'GET',
+                              url: baseUrl + 'PortalStudent/GetAllTermByClassId/'
+                          }).then(function SuccessCallback(response) {
+                              $scope.Terms = response.data.results;
+                              console.log($scope.Terms);
+                          }, function errorCallback() {
+
+                          });
+                      }
+
+                       function ECAClublist() {
+                       //if ($scope.formCommonFeilds.CategoryName.$invalid)
+                       //    return;
+                          $scope.Clublist = [];
+                          $http({
+                              method: 'GET',
+                              url: baseUrl + 'PortalECA/GetECAClubList/'
+                          }).then(function SuccessCallback(response) {
+                              $scope.Clublist = response.data.results;
+                         
+                          },
+                          function errorCallback() { });
+                      }
+
+                    
+                  }]);
+    </script>
+}

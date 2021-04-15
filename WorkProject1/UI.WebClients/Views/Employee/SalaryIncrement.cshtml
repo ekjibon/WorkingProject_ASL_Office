@@ -1,0 +1,338 @@
+﻿@{
+    ViewBag.Title = "Salary Increment";
+}
+<div class="kt-container  kt-container--fluid  kt-grid__item kt-grid__item--fluid" ng-controller="SalaryIncrementCTRL">
+    <div class="row">
+        <div class="kt-portlet kt-portlet--mobile">
+            <div class="kt-portlet__head kt-portlet__head--lg">
+                <div class="kt-portlet__head-label">
+                    <h3 class="kt-portlet__head-title">
+                        Salary Increment
+                    </h3>
+                </div>
+            </div>
+            <div class="kt-portlet__body">
+                <!-- BEGIN FORM-->
+                <form class="form-horizontal" id="formSalaryIncrement" ng-click="ShowSalaryIncrementList();" name="formSalaryIncrement" novalidate>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group row">
+                                <label class="col-md-6 control-label text-right ">Employee:</label>
+                                <div class="col-md-6">
+                                    <input type="text" name="EmployeeId" ng-model="Std" typeahead-on-select='onSelect($item, $model, $label)'
+                                           placeholder="Search name/ID"
+                                           uib-typeahead="i  as i.Text for i in Search($viewValue)"
+                                           typeahead-loading="loadingLocations" typeahead-no-results="noResults" class="form-control">
+                                    <i ng-show="loadingLocations" class="glyphicon glyphicon-refresh"></i>
+                                    <div ng-show="noResults"><i class="glyphicon glyphicon-remove"></i> No Results Found</div>
+                                    <input type="hidden" name="EmployeeId" ng-value="Std.Value" />
+                                    <div class="form-control-focus"> </div>
+                                </div>
+                            </div>
+                            <div class="form-group row" ng-class="{ 'has-error' : submitted && formSalaryIncrement.Branch.$invalid}">
+                                <label class="col-md-6 control-label text-right">
+                                    Branch :
+                                    <span class="required">*</span>
+                                </label>
+                                <div class="col-md-6">
+                                    <select class="form-control" ng-model="SalaryIncrement.BranchId" name="Branch" ng-options="B.BranchId as B.BranchName for B in CommonFeilds.Branch" requirsd>
+                                        <option value="" selected="selected">Choose Option</option>
+                                    </select>
+
+                                    <div class="form-control-focus"> </div>
+                                    <span ng-show="submitted && formSalaryIncrement.Branch.$error.required" class="help-block">Branch Required</span>
+                                </div>
+                            </div>
+                            <div class="form-group row" ng-class="{ 'has-error' : submitted && formSalaryIncrement.Category.$invalid}">
+                                <label class="col-md-6 control-label text-right">
+                                    Employee Category :
+                                    <span class="required">*</span>
+                                </label>
+                                <div class="col-md-6">
+                                    <select class="form-control" ng-model="SalaryIncrement.EmpCategory" name="Category" ng-options="item.CategoryID as item.CategoryName for item in CommonFeilds.Category" required>
+                                        <option value="" selected="selected">Choose Option</option>
+                                    </select>
+                                    <div class="form-control-focus"> </div>
+                                    <span ng-show="submitted && formSalaryIncrement.Category.$error.required" class="help-block">Category Required</span>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-md-6">
+
+                                </div>
+                                <div class="col-md-6">
+                                    <button type="submit" class="btn btn-info btn-sm pull-right" ng-click="submitted=true">Show</button>
+                                    @*<a class="btn btn-danger btn-sm" ng-click="resetForm()">Reset</a>*@
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                        </div>
+
+                    </div>
+
+
+
+                </form>
+                <div class="row">
+                    <div class="col-md-4 col-sm-5 col-xs-6">
+                        <div class="form-group">
+                            <div class="col-lg-3 col-md-5 col-sm-4 col-xs-8" style="padding-left:0px">
+
+                                <select class="form-control kt-font-brand" ng-model="pageSize" ng-options="P.value as P.text for P in pageSizeArray"></select>
+                            </div>
+
+                        </div>
+
+                    </div>
+                    <div class="col-md-4 col-sm-3 col-xs-1">
+                    </div>
+                    <div class="col-md-4 col-sm-4 col-xs-5">
+                        <div id="sample_3_filter" class="pull-right">
+                            <input ng-model="q" id="search" class="form-control" placeholder="Filter text">
+                        </div>
+                    </div>
+                </div>
+                <table class="table table-bordered table-hover rounded">
+                    <thead>
+                        <tr class="btn-primary">
+                            <th>
+                                <input type="checkbox" id="all" ng-change="allItems(allCheck)" ng-model="allCheck" ng-checked="allCheck" />
+                            </th>
+                            <th>SL</th>
+                            <th>Name</th>
+                            <th>ID</th>
+                            <th>Designation</th>
+                            <th>Gross Salary</th>
+                            <th>Increment</th>
+                            <th>Is Percent</th>
+                            <th>Amount after Increment</th>
+                            <th>Remarks</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr dir-paginate="item in SalaryIncrementList | itemsPerPage: pageSize " current-page="currentPage">
+                            <td>
+                                <input type="checkbox" ng-change="singleItem(item.IsChecked)" ng-model="item.IsChecked" ng-checked="item.IsChecked" />
+                            </td>
+                            <td>{{$index+1}}</td>
+                            <td>{{item.FullName}}</td>
+                            <td>{{item.EmpID}}</td>
+                            <td>{{item.DesignationName}}</td>
+                            <td>{{item.GrossSalary}}</td>
+                            <td><input type="number" ng-disabled="!item.IsChecked" ng-model="item.Amount" ng-change="AmountAfterIncrement()" class="form-control" /></td>
+                            <td><input type="checkbox" ng-disabled="!item.IsChecked" ng-change="AmountAfterIncrement()" ng-model="item.IsPercentage" class="form-control" /></td>
+                            <td>{{item.AmountAfterIncrement}}</td>
+                            <td><input type="text" ng-disabled="!item.IsChecked" ng-model="item.Remarks" class="form-control" /></td>
+
+                        </tr>
+
+                    </tbody>
+                </table>
+
+                <div class="row">
+                    <div class="col-md-10">
+                        <div class="form-group row">
+
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="form-group row pull-right">
+                            <button class="btn btn-success" ng-click="Save();submitted = true" type="submit">Process Increment</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <dir-pagination-controls boundary-links="true" template-url="~/assets/angular/lib/dirPagination.tpl.html"></dir-pagination-controls>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+</div>
+<!-- END FORM-->
+@section Scripts{
+
+    <script type="text/javascript">
+        OEMSApp.controller("SalaryIncrementCTRL", ["$scope", "$http", "SweetAlert", "blockUI", "$filter",
+              function ($scope, $http, SweetAlert, blockUI, $filter) {
+                  init();
+                  function init() {
+                      initialize();
+                      getAllCommons();
+
+
+                  }
+                  function initialize() {
+                      $scope.SalaryIncrement = {};
+                      $scope.submitted = false
+                      $scope.showButton = false;
+                      $scope.SalaryIncrementList = [];
+                      $scope.ShowSalaryIncrementList = ShowSalaryIncrementList;
+
+                      $scope.pageSizeArray = [];
+                      $scope.pageSizeArray.push({ value: 5, text: 5 });
+                      $scope.pageSizeArray.push({ value: 10, text: 10 });
+                      $scope.pageSizeArray.push({ value: 20, text: 20 });
+                      $scope.pageSizeArray.push({ value: 50, text: 50 });
+                      $scope.currentPage = 1;
+                      $scope.pageSize = 10;
+                      $scope.CommonFeilds = [];
+                  }
+
+                  $scope.allItems = function allItems(c) {
+                      angular.forEach($scope.SalaryIncrementList, function (value, key) {
+
+                          if (c) {
+                              value.IsChecked = true;
+                          }
+                          else {
+                              value.IsChecked = false;
+                          }
+                      });
+                  };
+
+                  $scope.singleItem = function singleItem(n) {
+                      $scope.DisCountDisplay = false;
+
+                      $scope.allCheck = true;
+                      angular.forEach($scope.SalaryIncrementList, function (value, key) {
+                          if ($scope.IsChecked) {
+                              if (value.IsChecked)
+                                  $scope.allCheck = true;
+                              else
+                                  $scope.allCheck = false;
+                          }
+                      });
+                  };
+
+
+
+                  $scope.Search = function (val) {
+                      return $http.get(baseUrl + 'Employee/SearchEmployee/' + val, {
+                          params: {
+
+                          }
+                      }).then(function (response) {
+                          return response.data.results.map(function (item) {
+                              return item;
+                          });
+                      });
+                  };
+
+                  $scope.onSelect = function onSelect($item, $model, $label) {
+                      $scope.SalaryIncrement.EmpId = $item.Value;
+
+                      // SearchEmployeeId($item.Value);
+                  };
+
+
+                  $scope.resetForm = function resetForm() {
+                      $scope.SalaryIncrement = {};
+                      $scope.submitted = false;
+                  }
+
+                  $scope.AmountAfterIncrement = function AmountAfterIncrement() {
+
+                      $scope.Total = 0;
+                      var totalamount = 0;
+
+                      angular.forEach($scope.SalaryIncrementList, function (item) {
+
+                          if (item.IsPercentage == true && item.Amount > 100) {
+                              toastr["error"]("Please Enter Valid Amount");
+                              return;
+                          }
+                          else {
+                              if (item.IsPercentage == true) {
+
+                                  item.AmountAfterIncrement = 0;
+                                  item.AmountAfterIncrement += (item.GrossSalary + (item.GrossSalary * (item.Amount / 100)));
+
+                              }
+                              else {
+                                  item.AmountAfterIncrement = 0;
+                                  item.AmountAfterIncrement += item.GrossSalary + item.Amount;
+                              }
+                          }
+
+                      });
+
+
+                  }
+
+                  function ShowSalaryIncrementList() {
+                      if ($scope.formSalaryIncrement.$invalid) {
+                          return;
+                      }
+                      else {
+                          $scope.SalaryIncrementList = [];
+                          $http({
+                              method: 'POST',
+                              url: baseUrl + 'Employee/GetSalaryIncrementList/',
+                              data: $scope.SalaryIncrement
+                          }).then(function successCallback(response) {
+                              $scope.SalaryIncrementList = response.data.results;
+                              // AmountAfterIncrement();
+                          }, function errorCallback(response) {
+
+                          })
+                      }
+
+                  }
+
+
+
+
+                  $scope.Save = function Save() {
+                      $scope.EmployeeSalaryIncrementList = [];
+
+                      if ($scope.SalaryIncrementList.length == 0) {
+                          toastr["warning"]('At least One Select.');
+                          return;
+                      }
+                      else {
+
+                          for (var i = 0 ; i < $scope.SalaryIncrementList.length; i++) {
+                              if ($scope.SalaryIncrementList[i].IsChecked == true) {
+
+                                  $scope.EmployeeSalaryIncrementList.push($scope.SalaryIncrementList[i]);
+
+                              }
+                          }
+                      }
+
+                      blockUI.start("Proccessing");
+                      $http({
+                          method: 'POST',
+                          url: baseUrl + 'Employee/AddSalaryIncrement/',
+                          data: $scope.EmployeeSalaryIncrementList
+                      }).then(function successCallback(response) {
+                          toastr["success"](response.data.message);
+                          blockUI.stop();
+                      }, function errorCallback(response) {
+                          toastr["error"](response.data.Message);
+                          blockUI.stop();
+                      });
+                  };
+
+
+                  function getAllCommons() {
+                      $scope.CommonFeilds = [];
+
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Common/GetCommonItemEmp/'
+                      }).then(function successCallback(response) {
+                          $scope.CommonFeilds = response.data.results;
+                          console.log($scope.CommonFeilds);
+                      }, function errorCallback(response) {
+                      });
+                  }
+
+              }]);
+    </script>
+}

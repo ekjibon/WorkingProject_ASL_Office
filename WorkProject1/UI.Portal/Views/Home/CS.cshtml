@@ -1,0 +1,316 @@
+﻿
+@{
+    ViewBag.Title = "NoticeBoard";
+    Layout = "~/Views/Shared/_adminLayout.cshtml";
+}
+
+<div ng-controller="CSClt">
+    <div class="row main-row pl-0 pr-0">
+        <div class="col-lg-12">
+            <div class="routne-head">
+                <h3>CS</h3>
+            </div>
+        </div>
+    </div>
+    <div class="row main-row pl-0 pr-0">
+        <div class="col-lg-12">
+            <iframe src="@Url.Action("GetStudentCSHeader","PortalReport")"  scrolling="auto" height="600" width="100%"></iframe>
+        </div>
+    </div>
+    <div class="col-lg-12 mt-2 p-0">
+        <div class="card">
+            <div class="card-body notice-body">
+                <div class="card-body"> 
+                    <div class="portlet-body">
+                        <div class="table-container">
+                            <div id="sample_3_wrapper" class="dataTables_wrapper no-footer">
+                                <div class="row">
+                                    <div class="col-md-4 col-sm-5 col-xs-1">
+                                        @*<button style="width: 85%;height: 60px;font-size: xx-large;" class="btn btnColor" data-target="#donatemodal" data-toggle="modal">Donate</button>*@
+                                        <a style="width: 85%;height: 60px;font-size: xx-large;" class="btn btnColor" id="pills-Sibling-tab" data-target="#donatemodal" data-toggle="modal" href="#" aria-selected="false">Donate</a>
+                                    </div>
+                                    <div class="col-md-4 col-sm-3 col-xs-1">
+                                        <a style="width: 85%;height: 60px;font-size: xx-large;" class="btn btnColor" id="pills-Sibling-tab" data-target="#csvisitmodal" data-toggle="modal" href="#" aria-selected="false">CS Visit</a>
+                                    </div>
+                                    <div class="col-md-4 col-sm-3 col-xs-1">
+                                        <a style="width: 85%;height: 60px;font-size: xx-large;" class="btn btnColor" id="pills-Sibling-tab" data-target="#volunterreqmodal" data-toggle="modal" href="#" aria-selected="false">Volunter Request</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+          </div>
+        </div>
+    </div>
+    <div id="donatemodal" class="modal fade" tabindex="-1" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <form class="form-horizontal" ng-submit="DonateAdd()" name="Donatefrm" novalidate>
+                    <div class="modal-header" style="display: block;">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">X</button>
+                        <h4 class="modal-title">Donate</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group" ng-class="{ 'has-error' : submitted && Donatefrm.DonateItem.$invalid}">
+                                        <label class="col-lg-4 col-md-6 col-sm-6 control-label">
+                                            Type :
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-lg-8 col-md-6 col-sm-6">
+                                            <select style="width: 150%;" class="form-control" ng-model="DonateModel.DonateItem" required name="DonateItem">
+                                                <option value="">Select</option>
+                                                <option value="Coppies">Coppies</option>
+                                                <option value="Story Books">Story Books</option>
+                                                <option value="Shoes">Shoes</option>
+                                                <option value="Clothes">Clothes</option>
+                                                <option value="Others">Others</option>
+                                            </select>
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted && Donatefrm.DonateItem.$error.required" class="help-block">Type Required</span>
+                                        </div>
+                                    </div>
+                                 
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group" ng-show="DonateModel.DonateItem=='Others'" ng-class="{ 'has-error' : submitted && IsOthers}">
+                                        <label class="col-lg-4 col-md-6 col-sm-6 control-label" style="padding-right:0px">
+                                             Details
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-lg-8 col-md-6">
+                                            <textarea style="width: 150%;" class="form-control" name="OtherDetails" ng-model="DonateModel.OtherDetails"></textarea>
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted && IsOthers" class="help-block">Details Required</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn blue btn-set" ng-click="submitted=true">Submit</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div id="csvisitmodal" class="modal fade" tabindex="-1" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <form class="form-horizontal" ng-submit="CSVisitAdd()" name="CSVisitfrm" novalidate>
+                    <div class="modal-header" style="display: block;">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">X</button>
+                        <h4 class="modal-title">CS Visit</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group" ng-class="{ 'has-error' : submitted2 && CSVisitfrm.CSVisitDateTime.$invalid}">
+                                        <label class="col-lg-4 col-md-6 col-sm-6 control-label">
+                                            Date :
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-lg-8 col-md-6 col-sm-6">
+                                            <input class="form-control" min-date="minDate" name="CSVisitDateTime" type="datetime" style="padding:6px 12px" required min-date="minDate" placeholder="Date" readonly ng-click="p1=true" is-open="p1" uib-datepicker-popup="dd-MM-yyyy" ng-model="CSVisitModel.CSVisitDateTime" />
+                                            @*<input class="form-control" style="padding:6px 12px" type="date" ng-model="CSVisitModel.CSVisitDateTime" required name="CSVisitDateTime" />*@
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted2 && CSVisitfrm.CSVisitDateTime.$error.required" class="help-block">Date Required</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+
+                                    <div class="form-group" ng-class="{ 'has-error' : submitted2 && CSVisitfrm.VolunteerDate.$invalid}">
+                                        <label class="col-lg-4 col-md-6 col-sm-6 control-label" style="padding-right:0px">
+                                            Time
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-lg-8 col-md-6">
+                                            <input class="form-control" style="padding:6px 12px" type="time" ng-model="CSVisitModel.VolunteerDate" required name="VolunteerDate" />
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted2 && CSVisitfrm.VolunteerDate.$error.required" class="help-block">Time Required</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn blue btn-set" ng-click="submitted2=true">Submit</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div id="volunterreqmodal" class="modal fade" tabindex="-1" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <form class="form-horizontal" ng-submit="volunterrequestadd()" name="volunterrequestfrm" novalidate>
+                    <div class="modal-header" style="display: block;">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">X</button>
+                        <h4 class="modal-title">Volunter Request</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group" ng-class="{ 'has-error' : submitted3 && volunterrequestfrm.VolunteerName.$invalid}">
+                                        <label class="col-lg-4 col-md-6 col-sm-6 control-label">
+                                            Name :
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-lg-8 col-md-6 col-sm-6">
+                                            <input class="form-control" style="padding:6px 12px" type="text" ng-model="VRmodel.VolunteerName" required name="VolunteerName" />
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted3 && volunterrequestfrm.VolunteerName.$error.required" class="help-block">Volunteer Name Required</span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group" ng-class="{ 'has-error' : submitted3 && volunterrequestfrm.Relation.$invalid}">
+                                        <label class="col-lg-4 col-md-6 col-sm-6 control-label" style="padding-right:0px">
+                                            Relation :
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-lg-8 col-md-6">
+                                            <select class="form-control" style="padding:6px 12px" type="text" ng-model="VRmodel.Relation" required name="Relation">
+                                                <option value="">Select</option>
+                                                <option value="Brother">Brother</option>
+                                                <option value="Sister">Sister</option>
+                                                <option value="Cousin">Cousin</option>
+                                            </select>
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted3 && volunterrequestfrm.Relation.$error.required" class="help-block">Volunteer Relation Required</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group" ng-class="{ 'has-error' : submitted3 && volunterrequestfrm.VolunteerDate2.$invalid}">
+                                        <label class="col-lg-4 col-md-6 col-sm-6 control-label">
+                                            Date :
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-lg-8 col-md-6 col-sm-6">
+                                            <input class="form-control" min-date="minDate" name="CSVisitDateTime" type="datetime" style="padding:6px 12px" required  placeholder="Date" readonly ng-click="p2=true" is-open="p2" uib-datepicker-popup="dd-MM-yyyy" ng-model="VRmodel.VolunteerDate" />
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted3 && volunterrequestfrm.VolunteerDate2.$error.required" class="help-block">Volunteer Date Required</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn blue btn-set" ng-click="submitted3=true">Submit</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    <script type="text/javascript">
+        OEMSApp.controller("CSClt", ["$scope", "$http", "$window", 'blockUI', "$filter",
+        function ($scope, $http, $window, blockUI, $filter) {
+            init();
+            function init() {
+                $scope.pageSizeArray = [];
+                $scope.pageSizeArray.push({ value: 5, text: 5 });
+                $scope.pageSizeArray.push({ value: 10, text: 10 });
+                $scope.pageSizeArray.push({ value: 20, text: 20 });
+                $scope.pageSizeArray.push({ value: 50, text: 50 });
+                $scope.currentPage = 1;
+                $scope.pageSize = 10;
+                $scope.IsOthers = false;
+                $scope.minDate = $scope.minDate ? null : new Date();
+            }
+
+            $scope.DonateAdd=function DonateAdd()
+            {
+                if ($scope.Donatefrm.$invalid)
+                    return;
+
+                console.log($scope.DonateModel);
+                if ($scope.DonateModel.DonateItem == 'Others')
+                {
+                    if ($scope.DonateModel.OtherDetails == undefined || $scope.DonateModel.OtherDetails=='')
+                    {
+                        $scope.IsOthers = true;
+                        return;
+                    }
+                    $scope.DonateModel.DonateItem = $scope.DonateModel.OtherDetails;
+                }
+                $scope.DonateModel.CSType = 'Donation';
+                $http({
+                    method: 'POST',
+                    url: baseUrl + 'CS/AddCS/',
+                    data: $scope.DonateModel
+                }).then(function SuceesCallback(response) {
+                    //console.log(response);
+                    $('#donatemodal').modal('toggle');
+                    toastr.success(response.data.message);
+                    $scope.DonateModel = {};
+                    $scope.submitted = false;
+                }, function errorCallback() {
+                    $('#donatemodal').modal('toggle');
+                    toastr.error(response.data.message);
+                    $scope.submitted = false;
+             });
+            }
+
+            $scope.CSVisitAdd = function CSVisitAdd() {
+                if ($scope.CSVisitfrm.$invalid)
+                    return;
+                $scope.CSVisitModel.CSType = 'CS Visit Request';
+                
+                $http({
+                    method: 'POST',
+                    url: baseUrl + 'CS/AddCS/',
+                    data: $scope.CSVisitModel
+                }).then(function SuceesCallback(response) {
+                    $('#csvisitmodal').modal('toggle');
+                    toastr.success(response.data.message);
+                    $scope.CSVisitModel = {};
+                    $scope.submitted2 = false;
+                }, function errorCallback() {
+                    $('#csvisitmodal').modal('toggle');
+                    toastr.error(response.data.message);
+                    $scope.submitted2 = false;
+                });
+            }
+
+            $scope.volunterrequestadd = function volunterrequestadd() {
+                if ($scope.volunterrequestfrm.$invalid)
+                    return;
+                $scope.VRmodel.CSType = 'Volunteer Request';
+                $http({
+                    method: 'POST',
+                    url: baseUrl + 'CS/AddCS/',
+                    data: $scope.VRmodel
+                }).then(function SuceesCallback(response) {
+                    $('#volunterreqmodal').modal('toggle');
+                    toastr.success(response.data.message);
+                    $scope.CSVisitModel = {};
+                    $scope.submitted3 = false;
+                }, function errorCallback() {
+                    $('#volunterreqmodal').modal('toggle');
+                    toastr.error(response.data.message);
+                    $scope.submitted3 = false;
+                });
+            }
+
+            function num(val) {
+                if ($.isNumeric(val)) {
+                    return parseFloat(val);
+                } else {
+                    return 0;
+                }
+            }
+        }]);
+    </script>
+}
+

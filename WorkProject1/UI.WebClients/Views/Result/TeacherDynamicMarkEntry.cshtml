@@ -1,0 +1,693 @@
+﻿@{
+    ViewBag.Title = "Students Obtain Marks Entry By ";
+    var VersionID = Request.QueryString["VersionID"];
+    var SessionId = Request.QueryString["SessionId"];
+    var BranchID = Request.QueryString["BranchID"];
+    var ShiftID = Request.QueryString["ShiftID"];
+    var ClassId = Request.QueryString["ClassId"];
+    var GroupId = Request.QueryString["GroupId"];
+    var SectionId = Request.QueryString["SectionId"];
+    var SubjectID = Request.QueryString["SubjectID"];
+    var MainExamId = Request.QueryString["MainExamId"];
+    var SubExamId = Request.QueryString["SubExamId"];
+    var DividedExamId = Request.QueryString["DividedExamId"];
+    var VersionName = Request.QueryString["VersionName"];
+    var SessionName = Request.QueryString["SessionName"];
+    var BranchName = Request.QueryString["BranchName"];
+    var ShiftName = Request.QueryString["ShiftName"];
+    var ClassName = Request.QueryString["ClassName"];
+    var GroupName = Request.QueryString["GroupName"];
+    var SectionName = Request.QueryString["SectionName"];
+    var SubjectName = Request.QueryString["SubjectName"];
+    var MainExamName = Request.QueryString["MainExamName"];
+    var SubExamName = Request.QueryString["SubExamName"];
+    var DividedExamName = Request.QueryString["DividedExamName"];
+    var Name = Request.QueryString["FullName"];
+    Layout = "~/Views/Shared/_EmpLayout.cshtml";
+}
+<style type="text/css">
+    @@media only screen and (max-width: 600px) {
+        #mobileEntry {
+            width: 280px !important;
+            height: 400px !important;
+            overflow: scroll;
+        }
+
+        .size {
+            font-size: 10px !important;
+        }
+
+        .hideColumn {
+            display: none;
+        }
+
+        .showColumn {
+            display: inline-block !important;
+        }
+
+        .form-control {
+            width: 50px;
+            height: 25px;
+            padding: 2px 3px;
+            background-color: #fff;
+            border: 1px solid #c2cad8;
+            border-radius: 2px;
+            -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+            box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+            -webkit-transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
+            -o-transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
+            transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
+        }
+    }    
+</style>
+<style type="text/css">
+    input[type=number]::-webkit-inner-spin-button,
+    input[type=number]::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+
+     .AbsentMark {
+        color: rgba(0,0,0,0.3);
+        background-color: rgba(0,0,0,0.3);
+    }
+
+    .ZeroMark {
+        color: black;
+        /*background-color: wheat !important;*/
+        background-color: #ff6a00;
+    }
+      .Zmark{
+        color: black;
+        /*background-color: wheat !important;*/
+        background-color: #5a6cf7;
+    }
+    .Invalid {
+        color: black;
+        background-color: #ff6a00 !important;
+    }
+
+    .input-group-addon {
+        padding: 6px 6px !important;
+    }
+
+    #Scrollstyle::-webkit-scrollbar-track {
+        -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+        background-color: #F5F5F5;
+    }
+
+    #Scrollstyle::-webkit-scrollbar {
+        width: 6px;
+        background-color: #F5F5F5;
+    }
+
+    #Scrollstyle::-webkit-scrollbar-thumb {
+        background-color: #69c4be;
+    }
+        .table>tbody>tr>td, .table>tbody>tr>th, .table>tfoot>tr>td, .table>tfoot>tr>th, .table>thead>tr>td, .table>thead>tr>th {
+    padding: 0 !important;
+    line-height: 1.42857;
+    vertical-align: top;
+    border-top: 1px solid #e7ecf1;
+}
+</style>
+
+<div class="row" ng-controller="TeacherMarksEntryCntrl">
+    <div class="portlet light bordered card" >
+        <div class="portlet-title">
+            <div class="emp-header">
+                <i class="icon-settings font-green"></i>
+                <span class="caption-subject font-green sbold uppercase size">@ViewBag.Title @Name</span>
+            </div>
+        </div>
+        <div class="card-body">
+            <!-- BEGIN FORM-->
+            <div class="form-body">
+                <table class="table table-bordered table-inverse fixed-table-toolbar">
+                    <tr>
+                     
+                       
+                        <td style="color:#ff6a00">Session</td>
+                        <td>@SessionName</td>
+                        <td style="color:#ff6a00">Branch</td>
+                        <td>@BranchName</td>
+                        <td style="color:#ff6a00">Shift</td>
+                        <td>@ShiftName</td>
+                    </tr>
+                    <tr>
+                       
+                        <td style="color:#ff6a00">Class</td>
+                        <td>@ClassName</td>
+                     
+                        <td style="color:#ff6a00">Section</td>
+                        <td>@SectionName</td>
+                        <td style="color:#ff6a00">Subject Name</td>
+                        <td> @SubjectName</td>
+                    </tr>
+                    <tr>
+                        <td style="color:#ff6a00" >Main Exam Name</td>
+                        <td >{{StudentMarks[0].MainExamName}}</td>
+                    </tr>
+                    </table>
+                <div class="row" style="margin-right:0 !important">
+                    <div class="pull-right">
+                        <button ng-click="StudentMarkEntryReport()" class="btn btn-success">Marks Entry</button>
+                        <button ng-click="BothMarkEntry0AReport()" class="btn btn-primary">Marks 0 A </button>
+                        <a href="/Employee/TeacherMarksEntrySubjectList" class="btn btn-danger">Back</a>
+                        <a data-target="#infomodal" data-toggle="modal" ng-show="StudentMarks.length" ng-click="marksEntryStatus();" class="btn btn-info" style="color:white">Entry Status</a>
+                    </div>
+                </div>
+                  
+            </div>
+            <div class="panel">
+                <!-- Default panel contents onkeypress="return isNumberKey(event);"   onkeypress="return (event.charCode == 8 || event.charCode == 0) ? null : event.charCode >= 48 && (event.charCode <= 57 || event.charCode !=110) "-->
+
+                <div class="panel-body">
+                    <table class="table table-bordered table-inverse fixed-table-toolbar">
+                        <thead class="emp-header">
+                            <tr>
+                                <th rowspan="2"> ID </th>
+                                @*<th rowspan="2" style="text-align: -webkit-center !important;"> Roll </th>*@
+                                <th rowspan="2"> Name </th>
+                                <td colspan="{{item.SubExamCount}}" ng-repeat="item in StudentMarks[0].MarksDetails" style="text-align:center">
+                                    {{item.SubExamName}}
+                                </td>
+                            </tr>
+                            <tr>
+                                <th ng-repeat="item in StudentMarks[0].MarksDetails" style="text-align:center">
+                                    <span>{{item.DividedExamName}}({{item.FullMarks}})</span>
+                                    @*<span class="pull-right">Pass </span>*@
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-class="{'bg-red-haze' : item.ObtainMarks == 0}" ng-repeat="item in StudentMarks track by $index">
+                                <td width="6%"> {{item.StudentInsID}} </td>
+                                @*<td width="5%" style="text-align: -webkit-center !important;
+                                     background-color: #8bb2f5 !important;">
+                                    {{item.RollNo}}
+                                </td>*@
+                                <td style="width:160px !important;"> {{item.FullName}} </td>
+                                <td style="width:85px; height:5px;" ng-repeat="item1 in item.MarksDetails track by $index" ng-class="{ 'has-error' : item1.FullMarks < item1.Marks}">
+                                    @*<div class="input-group">*@
+                                    <span ng-show="item1.IsAbsent==true">A</span>
+                                    <input type="number" data-index="{{$index+1}}{{$parent.$index+1}}" style="width:70px;" onfocus="if (parseFloat(this.value) == 0) { this.value = ''; }" onblur="if (this.value == '') { this.value = '0'; this.style.backgroundColor = 'wheat'; }" ng-disabled="item1.IsAbsent == 1" ng-minlength="0" ng-maxlength="{{item1.FullMarks}}" ng-blur="SaveSingleMark(item,item1,$event)"
+                                           ng-model="item1.Marks" ng-click="Change(item1)" ng-class="{AbsentMark: (item1.Marks == 0 && item1.IsAbsent==true), ZeroMark: (item1.Marks == 0 && item1.IsAbsent==false), Invalid: (item1.Marks > item1.FullMarks), Zmark: (item1.MarksId > 0 && item1.Marks == 0 && item1.IsAbsent==false)}"
+                                           class="inputs{{$index+1}}" placeholder="Obtain Mark" id="{{$index+1}}_{{$parent.$index+1}}">
+                                    <span><input name="IsAbsent" data-indexs="{{$index+1}}{{$parent.$index+1}}" data-id="{{$index+1}}_{{$parent.$index+1}}" type="checkbox" ng-model="item1.IsAbsent" ng-checked="item1.IsAbsent==true" ng-click="SaveAbsentOnChange(item,item1,$event)" /></span>
+                                    <span class="help-block" ng-show="(item1.FullMarks < item1.Marks)">Invalid!</span>
+                                    @*</div>*@
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <!-- Table -->
+            </div>
+        </div>
+    </div>
+    <clearfix></clearfix>    
+       
+        
+    <div id="infomodal" class="modal fade" tabindex="-1" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Marks entry brief Statistic</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="form-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="col-md-8 control-label">
+                                        Total Student :
+                                    </label>
+                                    <div class="col-md-4">
+                                        {{StudentMarksStatus[0].TotalStudent}}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="col-md-8 control-label">
+                                        Total Exam :
+                                    </label>
+                                    <div class="col-md-4">
+                                        {{StudentMarksStatus[0].TotalExam}}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="col-md-8 control-label">
+                                        Total Absent :
+                                    </label>
+                                    <div class="col-md-4">
+                                        {{StudentMarksStatus[0].StudentAbsentMarksEntry}}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="col-md-8 control-label">
+                                        Total Zero Marks:
+                                    </label>
+                                    <div class="col-md-4">
+                                        {{StudentMarksStatus[0].StudentZeroMarksEntry}}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="col-md-8 control-label">
+                                        Total Marks :
+                                    </label>
+                                    <div class="col-md-4">
+                                        {{StudentMarksStatus[0].StudentMarksEntry}}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="col-md-8 control-label">
+                                        Marks Entry Not Yet :
+                                    </label>
+                                    <div class="col-md-4">
+                                        {{StudentMarksStatus[0].StudentMarksNotInputed }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" data-dismiss="modal" name="ColseModal" class="btn dark btn-outline">Close</button>
+                </div>
+
+            </div>
+        </div>
+    </div>          
+</div>
+@section Scripts{
+    <script type="text/javascript">
+        OEMSApp.controller("TeacherMarksEntryCntrl", ["$scope", "$http", "SweetAlert", "blockUI", "$window", "$filter",
+          function ($scope, $http, SweetAlert, blockUI, $window, $filter) {
+              init();
+              function init() {
+                  initialize();                                 
+                  Search();
+              }
+              function initialize() {
+                  $scope.touchList = [];
+                  $scope.indexList = [];
+                  $scope.indexs = {};
+                  $scope.indexs.index = 0;
+                  $scope.index1 =0;
+                  $scope.touch = 0;
+                  $scope.zero = 0;
+                  $scope.notTouch = 0;
+                  $scope.absent = 0;
+                  $scope.mark = 0;
+                  $scope.totalStudent = 0;
+                  $scope.totalExam = 0;
+                  $scope.StudentExamFilter = {};
+                  $scope.studentInfo = {};
+                  $scope.StudentMarks = [];                    
+                  $scope.currentPage = 1;
+                  $scope.pageno = 1;
+                  $scope.pagesize = 10;
+                  $scope.total_count = 12;
+                  $scope.txtsearch = '';                  
+                  $scope.Search = Search;
+                  $scope.btnDis = false;
+                  $scope.spin = false;
+
+              };
+              $scope.StudentMarkEntryReport = function StudentMarkEntryReport() { 
+                  $scope.StudentReports = [];
+                  $scope.StudentExamFilter.VersionID = "@VersionID"
+                  $scope.StudentExamFilter.SessionId = "@SessionId"
+                  $scope.StudentExamFilter.BranchID = "@BranchID"
+                  $scope.StudentExamFilter.ShiftId = "@ShiftID"
+                  $scope.StudentExamFilter.ClassId = "@ClassId"
+                  $scope.StudentExamFilter.GroupId = "@GroupId"
+                  $scope.StudentExamFilter.SectionId = "@SectionId"
+                  $scope.StudentExamFilter.SubjectID = "@SubjectID"
+                  $scope.StudentExamFilter.MainExamId = "@MainExamId"
+                  var form = document.createElement("form");
+                  form.target = "_blank";
+                  form.method = "POST";
+                  form.action = window.location.origin + '/Report/StudentMarkEntryReport/';
+                  form.style.display = "none";
+
+                  for (var key in $scope.StudentExamFilter) {
+                      var input = document.createElement("input");
+                      input.type = "hidden";
+                      input.name = key;
+                      if ($scope.StudentExamFilter[key] != "") {
+                          input.value = $scope.StudentExamFilter[key]
+                      }
+                      else {
+                          input.value = " "
+                      }
+                      form.appendChild(input);
+                  }
+
+                  document.body.appendChild(form);
+                  form.submit();
+                  document.body.removeChild(form);
+
+              };
+              $scope.BothMarkEntry0AReport = function BothMarkEntry0AReport() {   
+                  $scope.StudentReports = [];
+                  $scope.StudentExamFilter.VersionID = "@VersionID"
+                  $scope.StudentExamFilter.SessionId = "@SessionId"
+                  $scope.StudentExamFilter.BranchID = "@BranchID"
+                  $scope.StudentExamFilter.ShiftId = "@ShiftID"
+                  $scope.StudentExamFilter.ClassId = "@ClassId"
+                  $scope.StudentExamFilter.GroupId = "@GroupId"
+                  $scope.StudentExamFilter.SectionId = "@SectionId"
+                  $scope.StudentExamFilter.SubjectID = "@SubjectID"
+                  $scope.StudentExamFilter.MainExamId = "@MainExamId"
+                  var form = document.createElement("form");
+                  form.target = "_blank";
+                  form.method = "POST";
+                  form.action = window.location.origin + '/Report/BothMarkEntry0AReport/';
+                  form.style.display = "none";
+
+                  for (var key in $scope.StudentExamFilter) {
+                      var input = document.createElement("input");
+                      input.type = "hidden";
+                      input.name = key;
+                      if ($scope.StudentExamFilter[key] != "") {
+                          input.value = $scope.StudentExamFilter[key]
+                      }
+                      else {
+                          input.value = " "
+                      }
+                      form.appendChild(input);
+                  }
+
+                  document.body.appendChild(form);
+                  form.submit();
+                  document.body.removeChild(form);
+
+              };
+              $scope.MarksEntryReport = function MarksEntryReport() {
+                  $scope.StudentExamFilter.VersionID = "@VersionID"
+                  $scope.StudentExamFilter.SessionId = "@SessionId"
+                  $scope.StudentExamFilter.BranchID = "@BranchID"
+                  $scope.StudentExamFilter.ShiftId = "@ShiftID"
+                  $scope.StudentExamFilter.ClassId = "@ClassId"
+                  $scope.StudentExamFilter.GroupId = "@GroupId"
+                  $scope.StudentExamFilter.SectionId = "@SectionId"
+                  $scope.StudentExamFilter.SubjectID = "@SubjectID"
+                  $scope.StudentExamFilter.MainExamId = "@MainExamId"
+                  $scope.uri = "@Url.Action("MarksEntryReportForTeacher", "Report")?VersionID=" + $scope.StudentExamFilter.VersionID + "&SessionId=" + $scope.StudentExamFilter.SessionId + "&BranchID=" + $scope.StudentExamFilter.BranchID + "&ShiftID=" + $scope.StudentExamFilter.ShiftId + "&ClassId=" + $scope.StudentExamFilter.ClassId + "&GroupId=" + $scope.StudentExamFilter.GroupId + "&SectionId=" + $scope.StudentExamFilter.SectionId + "&SubjectID=" + $scope.StudentExamFilter.SubjectID + "&MainExamId=" + $scope.StudentExamFilter.MainExamId;
+                  $window.open($scope.uri, '_blank');
+              };
+              function setProgress(s) {
+                  $scope.btnDis = s;
+                  $scope.spin = s;
+              }    
+              $scope.marksEntryStatus = function marksEntryStatus() {
+                  $scope.StudentMarksStatus = [];
+                  $scope.StudentMarks = [];
+                  $scope.StudentExamFilter.VersionID = "@VersionID"
+                  $scope.StudentExamFilter.SessionId = "@SessionId"
+                  $scope.StudentExamFilter.BranchID = "@BranchID"
+                  $scope.StudentExamFilter.ShiftId = "@ShiftID"
+                  $scope.StudentExamFilter.ClassId = "@ClassId"
+                  $scope.StudentExamFilter.GroupId = "@GroupId"
+                  $scope.StudentExamFilter.SectionId = "@SectionId"
+                  $scope.StudentExamFilter.SubjectID = "@SubjectID"
+                  $scope.StudentExamFilter.MainExamId = "@MainExamId"
+                  blockUI.start();
+                  $http({
+                      method: 'POST',
+                      url: baseUrl + 'Result/MarksEntryStatus/',
+                      headers: { 'Content-Type': undefined },
+                      transformRequest: function (data) {
+                          var formData = new FormData();
+                          formData.append('Fill', JSON.stringify($scope.StudentExamFilter));
+                          return formData;
+                      },
+                      data: { studentBasicInfo: $scope.studentInfo }
+                  }).then(function (response) {
+                      $scope.StudentMarksStatus = response.data.results;
+                      Search();
+                      blockUI.stop();
+                  });
+              }
+              function Search() {
+                  blockUI.start();
+                  $scope.indexList = [];
+                  $scope.indexs = {};
+                  $scope.indexs.index = 0;
+                  $scope.index1 = 0;
+                  $scope.touch = 0;
+                  $scope.zero = 0;
+                  $scope.notTouch = 0;
+                  $scope.absent = 0;
+                  $scope.mark = 0;
+                  $scope.StudentMarks = [];                
+                  $scope.StudentExamFilter.VersionID = "@VersionID"
+                  $scope.StudentExamFilter.SessionId = "@SessionId"
+                  $scope.StudentExamFilter.BranchID = "@BranchID"
+                  $scope.StudentExamFilter.ShiftId = "@ShiftID"
+                  $scope.StudentExamFilter.ClassId = "@ClassId"
+                  $scope.StudentExamFilter.GroupId = "@GroupId"
+                  $scope.StudentExamFilter.SectionId = "@SectionId"
+                  $scope.StudentExamFilter.SubjectID = "@SubjectID"
+                  $scope.StudentExamFilter.MainExamId = "@MainExamId"
+                
+                  $http({
+                      method: 'POST',
+                      url: baseUrl + 'Result/GetMarksByMainExam/',
+                      headers: { 'Content-Type': undefined },
+                      transformRequest: function (data) {
+                          var formData = new FormData();
+                          formData.append('Fill', JSON.stringify($scope.StudentExamFilter));
+                          return formData;
+                      },
+                      data: { studentBasicInfo: $scope.studentInfo }
+                  }).then(function (response) {
+                      $scope.StudentMarks = response.data.results;
+                      if ($scope.StudentMarks.length > 0)
+                      {
+                          $scope.totalStudent = $scope.StudentMarks.length;
+                          $scope.totalExam = $scope.StudentMarks.length * $scope.StudentMarks[0].MarksDetails.length;
+                      }
+                      toastr["success"](response.data.message);
+                      blockUI.stop();
+                  }, function errorCallback(response) {
+                      blockUI.stop();
+                      toastr["error"](response.data.Message);
+                  });
+              };
+
+              $scope.SaveAbsentOnChange = function SaveAbsentOnChange(Studl, Marks, ObtainMark) {
+                  setProgress(true);
+                  $scope.SingleMark = {};
+                  $scope.SingleMark.VersionId = "@VersionID"
+                  $scope.SingleMark.SessionId = "@SessionId"
+                  $scope.SingleMark.ShiftId = "@ShiftID"
+                  $scope.SingleMark.ClassId = '@ClassId';
+                  $scope.SingleMark.GroupId = "@GroupId"
+                  $scope.SingleMark.SectionId = "@SectionId"
+                  $scope.SingleMark.StudentIID = Studl.StudentIID;
+                  $scope.SingleMark.StudentInsID = Studl.StudentInsID;
+                  $scope.SingleMark.FullMarks = Marks.FullMarks;
+                  $scope.SingleMark.PassMark = Marks.PassMarks;
+                  $scope.SingleMark.MainExamID = "@MainExamId";
+                  $scope.SingleMark.SubExamID = Marks.SubExamId;
+                  $scope.SingleMark.DividedExamID = Marks.DividedExamId;
+                  $scope.SingleMark.SubjectID = "@SubjectID";
+                  $scope.SingleMark.ObtainMarks = 0;   //ObtainMark.target.value;
+                  $scope.SingleMark.IsAbsent = Marks.IsAbsent;
+                  $scope.SingleMark.MarksId = Marks.MarksId;
+                  $http({
+                      method: 'POST',
+                      url: baseUrl + 'Result/SaveMarksOnChange/',
+                      data: $scope.SingleMark
+                  }).then(function successCallback(response) {
+                      $scope.spin = false;
+                      setProgress(false);
+                      if (response.data.HasError) {
+                          ObtainMark.target.value = 0;
+                          toastr["warning"](response.data.message);
+                      }
+                      else {
+                          if ($scope.SingleMark.IsAbsent == true) {
+                              var id = ObtainMark.target.attributes['data-id'].value;
+                              document.getElementById(id).value = '0';
+                          }
+                          $scope.indexs = {};
+                          $scope.index1 = ObtainMark.target.attributes['data-indexs'].value;
+                          $scope.indexs.index = $scope.index1;
+                          var data = $filter('filter')($scope.indexList, { index: $scope.index1 })[0];
+                          if (data == null || data == 'undefined') {
+                              $scope.indexList.push($scope.indexs);
+                              if ($scope.SingleMark.IsAbsent == true)
+                                  $scope.absent = $scope.absent + 1;
+                          }
+                          else
+                          {
+                              if (Marks.Marks == 0)
+                              {
+                                  if ($scope.SingleMark.IsAbsent == false)
+                                      $scope.absent = $scope.absent - 1;
+                                  else
+                                  $scope.absent = $scope.absent + 1;
+                                  $scope.zero = $scope.zero - 1;
+                              }
+                              else
+                              {
+                                  if ($scope.SingleMark.IsAbsent == false)
+                                      $scope.absent = $scope.absent - 1;
+                                      else
+                                      $scope.absent = $scope.absent + 1;
+                                      $scope.mark = $scope.mark - 1;
+                              }
+                          }
+                      }
+                  }, function errorCallback(response) {
+                      //HasError = true
+                      toastr["warning"](response.data.Message);
+                  });
+              }
+
+
+
+              $scope.SaveSingleMark = function SaveSingleMark(Studl, Marks, ObtainMark) {
+                  if (Marks.Marks > Marks.FullMarks)
+                  {
+                      toastr["warning"]('Obtain marks can not greater than full marks');
+                      return;
+                  }
+                  setProgress(true);
+                  $scope.SingleMark = {};
+                  $scope.SingleMark.VersionId = "@VersionID"
+                  $scope.SingleMark.SessionId = "@SessionId"
+                  $scope.SingleMark.ShiftId = "@ShiftID"
+                  $scope.SingleMark.ClassId = '@ClassId';
+                  $scope.SingleMark.GroupId = "@GroupId"
+                  $scope.SingleMark.SectionId = "@SectionId"
+                  $scope.SingleMark.StudentIID = Studl.StudentIID;
+                  $scope.SingleMark.StudentInsID = Studl.StudentInsID;
+                  $scope.SingleMark.FullMarks = Marks.FullMarks;
+                  $scope.SingleMark.PassMark = Marks.PassMarks;
+                  $scope.SingleMark.MainExamID = "@MainExamId";
+                  $scope.SingleMark.SubExamID = Marks.SubExamId;
+                  $scope.SingleMark.DividedExamID = Marks.DividedExamId;
+                  $scope.SingleMark.SubjectID = "@SubjectID";
+                  $scope.SingleMark.ObtainMarks = Marks.Marks;   //ObtainMark.target.value;
+                  $scope.SingleMark.IsAbsent = Marks.IsAbsent;
+                  $scope.SingleMark.MarksId = Marks.MarksId;                        
+                  $http({
+                      method: 'POST',
+                      url: baseUrl + 'Result/SaveMarksOnChange/',
+                      data: $scope.SingleMark
+                  }).then(function successCallback(response) {
+                      $scope.spin = false;
+                      setProgress(false);
+                      if (response.data.HasError) {
+                          ObtainMark.target.value = 0;
+                          toastr["warning"](response.data.message);
+                      }
+                      else
+                      {
+                          $scope.indexs = {};
+                          $scope.index1 = ObtainMark.target.attributes['data-index'].value;
+                          $scope.indexs.index = $scope.index1;
+                          var data = $filter('filter')($scope.indexList, { index: $scope.index1 })[0];
+                          if (data == null || data == 'undefined') {
+                              $scope.indexList.push($scope.indexs);
+                              if ($scope.SingleMark.ObtainMarks == 0) {
+                                  $scope.zero = $scope.zero + 1;
+                              }
+                              else {
+                                  $scope.mark = $scope.mark + 1;
+                              }
+
+                          }
+                      }
+
+                  }, function errorCallback(response) {
+                      //HasError = true
+                      toastr["warning"](response.data.message);
+                  });
+              }
+
+              $scope.Reset = function Reset() {
+                  initialize();
+                  $scope.frmFilter.$setPristine();
+                  $scope.frmFilter.$setUntouched();                     
+                  $scope.isSubmitted = false;
+              };
+              $scope.ResetSource = function ResetSource() {
+                  $scope.StudentMarks = [];
+              };  
+          }]);
+    </script>
+
+    <script type="text/javascript">
+
+        $(document).ready(function ($) {
+
+            // Disable scroll when focused on a number input.
+            $(document).on('focus', 'input[type=number]', function (e) {
+                $(this).on('wheel', function (e) {
+                    e.preventDefault();
+                });
+            });
+
+            // Restore scroll on number inputs.
+            $(document).on('blur', 'input[type=number]', function (e) {
+                $(this).off('wheel');
+            });
+
+            $(document).on('keydown', 'input[type=number]', function (e) {
+                var id = $(this).attr('id');
+                var data = id.split("_");
+
+
+                if (e.which == 38 || e.which == 40)
+                    e.preventDefault();
+                //if (e.keyCode == 13) {
+                //    $(this).next('input[type=number]').focus();
+                //}
+
+
+                if (e.which === 13 || e.which == 40) {
+                    var num = parseInt(data[1]) + 1;
+                    var ID = "#" + data[0] + "_" + String(num);
+                    $(ID).focus();
+                }
+
+                if (e.which == 38) {
+                    var num = parseInt(data[1]) - 1;
+                    var ID = "#" + data[0] + "_" + String(num);
+                    $(ID).focus();
+                }
+
+            });
+            //// onkeypress="return (event.charCode == 8 || event.charCode == 0) ? null : event.charCode >= 48 && event.charCode <= 57)
+            // function isNumberKey(evt) {
+            //     var charCode = (evt.which) ? evt.which : evt.keyCode;
+            //     var type = true;
+            //     //if (charCode != 46 && charCode > 31 && (charCode < 48 || charCode > 57))
+            //     //    type = false;
+            //     if (charCode == 107 || charCode == 109)
+            //         type = false;
+
+            //     return type;
+            // }
+
+
+        });
+
+    </script>
+}

@@ -1,0 +1,172 @@
+﻿@{
+    ViewBag.Title = "Student ID Config";
+}
+<div ng-controller="idsetup">
+    <!-- Begin: life time stats -->
+    <div id="updateee" class="portlet light bordered">
+        <div class="portlet-title">
+            <div class="caption">
+                <i class="icon-settings font-green"></i>
+                <span class="caption-subject font-green sbold uppercase">@ViewBag.Title</span>
+            </div>
+        </div>
+        <div class="portlet-body">
+            <div class="table-container">
+                <div id="sample_3_wrapper" class="dataTables_wrapper no-footer">
+                    <form>
+                        <div class="form-group col-md-4">
+                            <label class="col-md-5 control-label">
+                                Config Type :
+                            </label>
+                            <div class="col-md-7 col-md-pull-1">
+                                <select class="form-control" ng-model="ConfigType">
+                                    <option selected="selected" value="School">School</option>
+                                    <option value="College">College</option>
+                                </select>
+                                <div class="form-control-focus"> </div>
+                            </div>
+                            </div>
+                        <div class="table-scrollable"> </div>
+                        <table class="table table-bordered table-hover">
+                            <thead>
+                                <tr class="btn-primary">
+                                    <th width="15%">Config Name</th>
+                                    <th width="10%">Is Selected</th>
+                                    <th width="8%">Prefix</th>
+                                    <th width="8%">Length</th>
+                                    <th width="8%">Surfix</th>
+                                    <th width="8%">Is Reset</th>
+                                    <th width="8%">Order</th>
+                                    <th width="10%">Seperator</th>
+                                    <th width="10%">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="idconfig in idconfigs.results | filter:ConfigType">
+                                    <td>
+                                        <input readonly="readonly" type="text" class="form-control input-sm" ng-model="idconfig.ConfigName" />
+                                    </td>
+                                    <td><input type="checkbox" id="inlineCheckbox3" ng-model="idconfig.IsSelected" ng-true-value="true" ng-false-value="false" /></td>
+                                    <td><input type="text" ng-model="idconfig.Prefix" class="form-control input-sm" /></td>
+                                    <td><input type="text" ng-model="idconfig.Length" class="form-control input-sm" /></td>
+                                    <td><input type="text" ng-model="idconfig.Postfix" class="form-control input-sm" /></td>
+                                    <td><input type="checkbox" ng-model="idconfig.IsReset" ng-true-value="true" ng-false-value="false" /></td>
+                                    <td><input type="text" ng-model="idconfig.Order" class="form-control input-sm" /></td>
+                                    <td><input type="text" ng-model="idconfig.Seperator" class="form-control input-sm" /></td>
+                                    <td width="12%">
+                                        <button type="submit" ng-click="save(idconfig)" class="btn green-haze"><i class="fa fa-plus"></i></button>
+                                        @*<button type="button" ng-click="resetForm();submitted=false"  class="btn btn-warning"><i class="fa fa-refresh"></i></button>*@
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- End: life time stats -->
+</div>
+
+@section Scripts{
+
+    <script type="text/javascript">
+        OEMSApp.controller("idsetup", ["$scope", "$http", "SweetAlert",
+              function ($scope, $http, SweetAlert) {
+                  init();
+                  function init() {
+                      initialize();
+                      getIdConfigs(1);
+                  }
+                  function initialize() {
+                      $scope.idconfig = {};
+                      $scope.idconfig.ConfigName = '';
+                      $scope.currentPage = 1;
+                      $scope.pageno = 1;
+                      $scope.pagesize = 10;
+                      $scope.total_count = 12;
+                      $scope.search = '';
+                      $scope.idconfigs = [];
+
+                      $scope.getIdConfigs = getIdConfigs;
+                      $scope.res = {};
+                      $scope.data = {};
+                      $scope.resetForm = resetForm;
+                      $scope.ConfigType = 'School';
+                  }
+                  function resetForm() {
+                      $scope.idconfig = {};
+                      $scope.idconfig.ConfigName = '';
+                      $scope.submitted = false;
+                      $scope.Id = '';
+                  }
+                  function getIdConfigs(pageno) {
+                      $scope.idconfigs = [];
+                      var searchtxt = $scope.search;
+                      if ($scope.search == 'undefined' || $scope.search == '') {
+                          searchtxt = 'null';
+                      }
+                      $scope.pageno = pageno;
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'SetupInstitution/Getidconfig/'
+                      }).then(function successCallback(response) {
+                          $scope.idconfigs = response.data;
+                          $scope.total_count = response.data.totalcount;
+                      }, function errorCallback(response) {
+                          toastr["info"](response.data.message);
+                      });
+                  }
+                  $scope.searchData = function () {
+                      getIdConfigs(1);
+                  };
+                  $scope.edit = function (n) {
+                      $scope.modalTitle = "Update Branch";
+                      $scope.idconfig = n;
+                      $scope.Id = n.Id;
+                  };
+                  $scope.save = function save(idconfig) {
+                      $scope.idconfig = idconfig;
+                      var ConfigType = null;
+                      if ($scope.ConfigType == 'School') {
+                          $scope.idconfig.ConfigType = 'School';
+                      } else {
+                          $scope.idconfig.ConfigType = 'College';
+                      };
+                      if ($scope.ConfigName != '') /// For Update
+                      {
+                          if ($scope.idconfig != '') {
+                              $http({
+                                  method: 'PUT',
+                                  url: baseUrl + 'SetupInstitution/Updateconfig/',
+                                  data: $scope.idconfig
+                              }).then(function successCallback(response) {
+                                  $('#addmodal').modal('toggle');
+                                  getIdConfigs(1);
+                                  toastr["info"](response.data.message);
+                                  resetForm();
+                              }, function errorCallback(response) {
+                                  toastr["warning"](response.data.Message);
+                              });
+                          }
+                      } else {  //  For Add
+                          if ($scope.idconfig != {}) {
+                              $http({
+                                  method: 'POST',
+                                  url: baseUrl + 'SetupInstitution/Updateconfig/',
+                                  data: $scope.idconfig
+                              }).then(function successCallback(response) {
+                                  $('#addmodal').modal('toggle');
+                                  getIdConfigs(1);
+                                  toastr["info"](response.data.message);
+                                  resetForm();
+                              }, function errorCallback(response) {
+                                  toastr["warning"](response.data.Message);
+                              });
+                          }
+                      }
+                  };
+              }]);
+    </script>
+
+}

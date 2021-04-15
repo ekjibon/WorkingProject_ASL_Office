@@ -1,0 +1,290 @@
+﻿
+@{
+    ViewBag.Title = "Asset Sub Category";
+}
+
+<div class="kt-container  kt-container--fluid  kt-grid__item kt-grid__item--fluid" ng-controller="AssetClt">  
+
+    <div class="row">
+        <div class="kt-portlet kt-portlet--mobile">
+            <div class="kt-portlet__head kt-portlet__head--lg">
+                <div class="kt-portlet__head-label">
+                    <h3 class="kt-portlet__head-title">
+                        Asset Sub Category
+                    </h3>
+                </div>
+                <div class="kt-portlet__head-toolbar">
+                    <div class="kt-portlet__head-wrapper">
+                        <div class="dropdown dropdown-inline">
+                            <button type="button" ng-click="resetForm()" class="btn btn-brand btn-icon-sm" data-toggle="modal" data-target="#addmodal" aria-haspopup="true" aria-expanded="false">
+                                <i class="flaticon2-plus"></i>  Add Product Category
+                            </button>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="kt-portlet__body">
+
+                <div class="row">
+                    <div class="col-md-4 col-sm-5 col-xs-6">
+                        <div class="form-group">
+                            <div class="col-lg-3 col-md-5 col-sm-4 col-xs-8" style="padding-left:0px">
+
+                                <select class="form-control kt-font-brand" ng-model="pageSize" ng-options="P.value as P.text for P in pageSizeArray"></select>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="col-md-4 col-sm-3 col-xs-1">
+                    </div>
+                    <div class="col-md-4 col-sm-4 col-xs-5">
+                        <div id="sample_3_filter" class="pull-right">
+                            <input ng-model="q" id="search" class="form-control" placeholder="Filter text">
+                        </div>
+                    </div>
+                </div>
+                <table class="table table-bordered table-hover rounded">
+                    <thead>
+                        <tr class="btn-primary">
+                            <th width="30%">Asset Category</th>
+                            <th width="30%">Asset Sub Category</th>
+                            <th width="15%" style="text-align:center">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-show="AssetSubCategorys.length <= 0"><td colspan="5" style="text-align:center;"><i class="fa fa-refresh"></i> Loading new data!!</td></tr>
+                        <tr dir-paginate="item in AssetSubCategorys | filter:q  | itemsPerPage: pageSize " current-page="currentPage">
+                            <td>{{item.CategoryName}}</td>
+                            <td>{{item.SubCategoryName}}</td>
+                            <td align="center">
+                                <a class="btn btn-outline-brand btn-elevate btn-icon" ng-click="edit(item)" data-target="#addmodal" data-toggle="modal">
+                                    <i class="fa fa-edit"></i>
+                                </a>
+                                <a ng-click="deleteAssetCate(item)" href="javascript:;" class="btn btn-outline-danger btn-elevate btn-icon" id="kt_sweetalert_demo_9">
+                                    <i class="fa fa-trash"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="row">
+                    <dir-pagination-controls boundary-links="true" template-url="~/assets/angular/lib/dirPagination.tpl.html"></dir-pagination-controls>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- End: life time stats -->
+    <!--Modal Area Start-->
+    <div id="addmodal" class="modal fade" tabindex="-1" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form name="addform" ng-submit="save()" class="form-horizontal" id="form_sample_1" novalidate>
+                    <div class="modal-header">
+                        <h4 class="modal-title">{{modalTitle}}</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                       
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-body">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group row" ng-class="{ 'has-error' : submitted && addform.Category.$invalid}">
+                                        <label class="col-md-4 control-label" style="text-align:right">
+                                            Category:
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-8">
+                                            <select class="form-control" required name="Category" ng-model="AssetSubCate.CategoryId" ng-options="a.AssetCateId  as a.CategoryName for a in AssetCategorys">
+                                                <option selected value="">Choose Options</option>
+                                            </select>
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted && addform.Category.$error.required" class="help-block">Category Required</span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group row" ng-class="{ 'has-error' : submitted && addform.SubCategoryName.$invalid}">
+                                        <label class="col-md-4 control-label" style="text-align:right">
+                                            Sub Category :
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-8">
+                                            <input type="text" ng-model="AssetSubCate.SubCategoryName" class="form-control" placeholder="Sub Category Name" name="SubCategoryName" required>
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted && addform.SubCategoryName.$error.required" class="help-block">Sub Category Name Required</span>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" data-dismiss="modal" class="btn  btn-secondary" ng-click="resetForm();">Cancel</button>
+                        <button type="submit" ng-click="submitted=true" class="btn btn-success" ng-disabled="btnDis">Save <i ng-show="spin" class="fa fa-spinner fa-spin" style="font-size:20px"></i></button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!--Modal Area End-->
+</div>
+
+@section Scripts{
+
+    <script type="text/javascript">
+
+        OEMSApp.controller("AssetClt", ["$scope", "$http", "SweetAlert",
+              function ($scope, $http, SweetAlert) {
+
+                  init();
+                  function init() {
+                      initialize();
+                      getAssetCategorys();
+                      getAssetSubCategorys(1);
+
+                  }
+                  function initialize() {
+                      $scope.modalTitle = "Add Product Sub Category";
+                      //object Create
+                      $scope.AssetSubCate = {};
+                      $scope.AssetSubCate.AssetSubCatId = 0;
+                       ///Array Create
+                      $scope.AssetCategorys = [];
+                      $scope.AssetSubCategorys = [];
+                      $scope.pageSizeArray = [];
+
+                      $scope.getAssetCategorys = getAssetCategorys;
+                      $scope.getAssetSubCategorys = getAssetSubCategorys;
+                      $scope.resetForm = resetForm;
+
+                      $scope.pageSizeArray.push({ value: 5, text: 5 });
+                      $scope.pageSizeArray.push({ value: 10, text: 10 });
+                      $scope.pageSizeArray.push({ value: 20, text: 20 });
+                      $scope.pageSizeArray.push({ value: 50, text: 50 });
+                      $scope.currentPage = 1;
+                      $scope.pageSize = 10;
+                      $scope.pageno = 1;
+                      $scope.total_count = 12;
+
+
+
+                  }
+
+                  function resetForm() {
+                      $scope.modalTitle = "Add Asset Sub Category";
+                      $scope.AssetSubCate = {};
+                      $scope.AssetSubCate.AssetSubCatId = 0;
+                      $scope.addform.$setUntouched();
+                      $scope.addform.$setPristine();
+                      $scope.submitted = false;
+                     // getProductSubCategorys(1);
+                  }
+
+
+                  $scope.edit = function (n) {
+                      $scope.modalTitle = "Update Asset Sub Category";
+                      $scope.AssetSubCate = n;
+                      $scope.AssetSubCate.AssetSubCatId = n.AssetSubCatId;
+                  };
+                  $scope.save = function save(e) {
+                      if (Validation()) {
+                          if ($scope.AssetSubCate.AssetSubCatId != 0) /// For Update
+                          {
+                              if ($scope.AssetSubCate != '') {
+                                  $http({
+                                      method: 'PUT',
+                                      url: baseUrl + 'Inventory/UpdateAssetSubCategory/',
+                                      data: $scope.AssetSubCate
+                                  }).then(function successCallback(response) {
+                                      toastr["info"](response.data.message);
+                                      resetForm();
+                                      $('#addmodal').modal('toggle');
+                                  }, function errorCallback(response) {
+                                      toastr["warning"](response.data.Message);
+                                  });
+                              }
+                          } else {  //  For Add
+                              if ($scope.AssetSubCate != {}) {
+                                  $http({
+                                      method: 'POST',
+                                      url: baseUrl + 'Inventory/AddAssetSubCategory/',
+                                      data: $scope.AssetSubCate
+                                  }).then(function successCallback(response) {
+                                      toastr["info"](response.data.message);
+                                      resetForm();
+                                      $('#addmodal').modal('toggle');
+                                  }, function errorCallback(response) {
+                                      toastr["warning"](response.data.Message);
+                                  });
+                              }
+                          }
+                      } else {
+                          toastr["warning"]('Form Invalid');
+                      }
+
+
+                  };
+
+                  $scope.deleteAssetCate = function deleteAssetCate(n) {
+                      // SweetAlert.swal("Good job!", "You clicked the button!", "success");
+                      SweetAlert.swal({
+                          title: "Are you sure to delete it ?", type: "warning", showCancelButton: true, confirmButtonColor: "#DD6B55",
+                          confirmButtonText: "Yes, delete it!",
+                          closeOnConfirm: false
+                      },
+                      function (isConfirm) {
+                          if (isConfirm) {
+                              $http({
+                                  method: 'POST',
+                                  url: baseUrl + 'Inventory/DeleteAssetSubCategory/',
+                                  data: n
+                              }).then(function successCallback(response) {
+                                  SweetAlert.swal("Deleted!", "Your data has been deleted.", "success");
+                                  getAssetSubCategorys(1);
+                              }, function errorCallback(response) {
+                                  toastr["warning"](response.data.Message);
+                              });
+                          }
+                      });
+                  };
+
+                  function getAssetCategorys() {
+                      $scope.AssetCategorys = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Inventory/GetAssetCategorys/'
+                      }).then(function successCallback(response) {
+                          $scope.AssetCategorys = response.data.results;
+                      }, function errorCallback(response) {
+                          toastr["warning"](response.data.Message);
+                      });
+                  }
+                  function getAssetSubCategorys(pageno) {
+                      $scope.AssetSubCategorys = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Inventory/GetAssetSubCategorys/'
+                      }).then(function successCallback(response) {
+                          $scope.AssetSubCategorys = response.data.results;
+                          toastr["info"](response.data.message);
+                      }, function errorCallback(response) {
+                          toastr["warning"](response.data.Message);
+                      });
+                  }
+
+                  function Validation() {
+                      if ($scope.addform.$invalid) {
+                          return false;
+                      }
+                      if ($scope.addform.$valid) {
+                          return true;
+                      }
+                  }
+
+              }]);
+    </script>
+
+}
+

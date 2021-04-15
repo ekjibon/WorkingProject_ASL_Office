@@ -1,0 +1,186 @@
+﻿
+@{
+    ViewBag.Title = "Code Setup";
+}
+
+<div ng-controller="AcGrouprCtrl">
+    <!-- Begin: life time stats -->
+    <div class="portlet light bordered">
+        <div class="portlet-title">
+            <div class="caption">
+                <i class="icon-settings font-green"></i>
+                <span class="caption-subject font-green sbold uppercase">@ViewBag.Title</span>
+            </div>
+        </div>
+        <div class="portlet-body">
+            <div class="table-container">
+                <div id="sample_3_wrapper" class="dataTables_wrapper no-footer">
+                    <div class="row">
+                        <div class="col-md-4 col-sm-5 col-xs-6">
+                            <div class="form-group">
+                                <div class="col-lg-3 col-md-5 col-sm-4 col-xs-8" style="padding-left:0px">
+                                    <select class="form-control" ng-model="pageSize" ng-options="P.value as P.text for P in pageSizeArray"></select>
+                                </div>
+                                <div class="col-md-7  col-sm-8  col-xs-4">
+                                    @*<label for="search" class="control-label" style="padding-top:5px">Items</label>*@
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 col-sm-3 col-xs-1">
+                        </div>
+                        <div class="col-md-4 col-sm-4 col-xs-5">
+                            <div id="sample_3_filter" class="pull-right">
+                                <input ng-model="q" id="search" class="form-control" placeholder="Filter text">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="table-scrollable"> </div>
+                    <table class="table table-bordered table-hover">
+                        <thead>
+                            <tr class="btn-primary">
+                                <th>Root Group Name</th>
+                                <th>Prefix</th>
+                                <th>Suffix</th>
+                                <th>Seperator</th>
+                                <th>Position</th>
+                                <th>Length</th>
+                                @*<th>Order</th>*@
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-show="NewRootGroups.length <= 0"><td colspan="5" style="text-align:center;"><i class="fa fa-refresh"></i> Loading new data!!</td></tr>
+                            <tr dir-paginate="item in NewRootGroups | filter:q  | itemsPerPage: pageSize" current-page="currentPage">
+                                <td>
+                                    {{item.Name}}
+                                </td>
+                                <td>
+                                    <input ng-disabled="item.LedgerId>0" type="text" ng-model="item.Prefix" class="form-control" placeholder="Prefix" name="name" required>
+                                </td>
+                                <td>
+                                    <input ng-disabled="item.LedgerId>0" type="text" ng-model="item.Surfix" class="form-control" placeholder="Suffix" name="name" required>
+                                </td>
+                                <td>
+                                    
+                                    <input ng-disabled="item.LedgerId>0" type="text" ng-model="item.Seperator" class="form-control" placeholder="Seperator" name="name" required>
+                                </td>
+                                <td>
+                                    <input ng-disabled="item.LedgerId>0" type="text" ng-model="item.Position" class="form-control" placeholder="Position" name="name" required>
+                                </td>
+                                <td>
+                                    <input ng-disabled="item.LedgerId>0" type="text" ng-model="item.Lenght" class="form-control" placeholder="Length" name="Length" required>
+                                </td>
+                                @*<td>
+                                    <input type="text" ng-model="item.Order" class="form-control" placeholder="Order" name="name" required>
+                                </td>*@
+                                <td class="center">
+                                    <button type="button" ng-click="updateRoot(item)" class="btn green-haze">Update</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="row">
+                        <dir-pagination-controls boundary-links="true" template-url="~/assets/angular/lib/dirPagination.tpl.html"></dir-pagination-controls>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- End: Portlet -->
+
+</div>
+
+@section Scripts{
+
+    <script type="text/javascript">
+        OEMSApp.controller("AcGrouprCtrl", ["$scope", "$http", "SweetAlert", "$filter",
+              function ($scope, $http, SweetAlert, $filter) {
+
+                  init();
+                  function init() {
+                      initialize();
+                      getAcGroup();
+                      //getAcRootGroups();
+                  }
+                  function initialize() {
+                      $scope.modalTitle = "Add Account Group";
+                      $scope.NewRootGroups = [];
+
+                      $scope.AcGroups = [];
+                      $scope.currentPage = 1;
+                      $scope.pageno = 1;
+                      $scope.pagesize = 10;
+                      $scope.total_count = 12;
+                      $scope.search = '';
+                      $scope.Id = '';
+                      $scope.getAcGroup = getAcGroup;
+                      //$scope.getAcRootGroups = getAcRootGroups;
+                      $scope.res = {};
+                      $scope.data = {};
+                      $scope.resetForm = resetForm;
+                      $scope.hstep = 1;
+                      $scope.mstep = 15;
+
+
+                      $scope.pageSizeArray = [];
+                      $scope.pageSizeArray.push({ value: 5, text: 5 });
+                      $scope.pageSizeArray.push({ value: 10, text: 10 });
+                      $scope.pageSizeArray.push({ value: 20, text: 20 });
+                      $scope.pageSizeArray.push({ value: 50, text: 50 });
+                      $scope.currentPage = 1;
+                      $scope.pageSize = 10;
+
+                  }
+                  function resetForm() {
+                      $scope.modalTitle = "Add Account Group";
+
+                      $scope.AcLedger = {};
+                      $scope.AcLedger.LedgerId = 0;
+                      $scope.addform.$setUntouched();
+                      $scope.addform.$setPristine();
+                      $scope.submitted = false;
+                  }
+
+                  $scope.addNewGroup = function () {
+                      $scope.GroupSets.choices.push('');
+                      $scope.arrNum += 1;
+                      $scope.isGroup = true;
+                  }
+
+
+
+                  function getAcGroup() {
+                      $scope.AcGroups = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Accounts/GetAllRootGroup/'
+                      }).then(function successCallback(response) {
+                          $scope.NewRootGroups = response.data.results;
+                      }, function errorCallback(response) {
+                          toastr["warning"](response.data.Message);
+                      });
+                  }
+
+                  $scope.updateRoot = function updateRoot(item) {
+                      console.log(item);
+                      if (item.Id != 0) /// For Update
+                      {
+                          if (item != '') {
+                              $http({
+                                  method: 'PUT',
+                                  url: baseUrl + 'Accounts/UpdateRootGroup/',
+                                  data: item
+                              }).then(function successCallback(response) {
+                                  $('#addmodal').modal('toggle');
+                                  toastr["info"](response.data.message);
+                              }, function errorCallback(response) {
+                                  toastr["warning"](response.data.Message);
+                                  $('#addmodal').modal('toggle');
+                              });
+                          }
+                      }
+                  }
+
+              }]);
+    </script>
+}

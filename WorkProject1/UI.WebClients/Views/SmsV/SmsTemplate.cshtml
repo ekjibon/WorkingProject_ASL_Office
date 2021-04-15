@@ -1,0 +1,356 @@
+﻿@{
+    ViewBag.Title = "SMS Template";
+}
+<div class="portlet box blue-hoki" ng-controller="MEGR">
+    <div class="portlet-title">
+        <div class="caption">
+            <span class="caption-subject sbold uppercase">SMS Template Creation</span>
+        </div>
+    </div>
+    <div class="portlet-body form">
+        <form class="form-horizontal" name="addform" ng-submit="Save()" novalidate>
+            <div class="form-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group" ng-class="{ 'has-error' : submitted && addform.Title.$invalid}">
+                            <label class="col-md-5 control-label">
+                                Name :
+                                <span class="required">*</span>
+                            </label>
+                            <div class="col-md-7">
+                                <input type="text" ng-model="sms.Title" class="form-control" placeholder="SMS Title Name" name="Title" required>
+                                <div class="form-control-focus"> </div>
+                                <span ng-show="submitted && addform.Title.$error.required" class="help-block">SMS Title Name Required</span>
+                            </div>
+                        </div>
+                        <div class="form-group" ng-class="{ 'has-error' : submitted && addform.TempType.$invalid}">
+                            <label class="col-md-5 control-label">
+                                Template Type :
+                                <span class="required">*</span>
+                            </label>
+                            <div class="col-md-7">
+                                <select class="form-control" required ng-model="sms.TempType" name="TempType">
+                                    <option value="" selected="selected">Choose Option</option>
+                                    <option value="1">Student</option>
+                                    <option value="2">Employee</option>
+                                </select>
+                                <div class="form-control-focus"> </div>
+                                <span ng-show="submitted && addform.TempType.$error.required" class="help-block">Template Type Required</span>
+                            </div>
+                        </div>
+                        <div class="form-group" ng-show="sms.BodyType==2">
+                            <div class="col-md-2"></div>
+                            <label class="col-md-10 control-label" style="text-align:left;padding-bottom:2%;">
+                                Dynamic Fields :
+                            </label>
+                            <br />
+                            <div class="col-md-2"></div>
+                            <label class="col-md-10" style="background-color: #f47920;">Student Info</label>
+                            <div class="col-md-2"></div>
+                            <div class="col-md-10">
+                                <div>
+                                    <span class="btn btn-xs tag" style="margin-right:5px;margin-bottom:5px;"  data-name="{{item.TagName}}" ng-repeat="item in TempTag | filter:TagType='Student'">{{item.TagName}}</span>
+                                </div>
+                            </div>
+                            <br />
+                            <div class="col-md-2"></div>
+                            <label class="col-md-10" style="background-color: #f47920;">Fees Info</label>
+                            <div class="col-md-2"></div>
+                            <div class="col-md-10">
+                                <div>
+                                    <span class="btn btn-xs tag" style="margin-right:5px;margin-bottom:5px;" data-name="{{item.TagName}}" ng-repeat="item in TempTag | filter:TagType='Fees'">{{item.TagName}}</span>
+                                </div>
+                            </div>
+                            <br />
+                            <div class="col-md-2"></div>
+                            <label class="col-md-10" style="background-color: #f47920;">Main Exam Result Info</label>
+                            <div class="col-md-2"></div>
+                            <div class="col-md-10">
+                                <div>
+                                    <span class="btn btn-xs tag" style="margin-right:5px;margin-bottom:5px;" data-name="{{item.TagName}}" ng-repeat="item in TempTag | filter:TagType='Result'">{{item.TagName}}</span>
+                                </div>
+                            </div>
+                            <br />
+                            <div class="col-md-2"></div>
+                            <label class="col-md-10" style="background-color: #f47920;">Grand Exam Result Info</label>
+                            <div class="col-md-2"></div>
+                            <div class="col-md-10">
+                                <div>
+                                    <span class="btn btn-xs tag" style="margin-right:5px;margin-bottom:5px;" data-name="{{item.TagName}}" ng-repeat="item in TempTag | filter:TagType='GResult'">{{item.TagName}}</span>
+                                </div>
+                            </div>
+                            <br />
+                            <div class="col-md-2"></div>
+                            <label class="col-md-10" style="background-color: #f47920;">Employee Info</label>
+                            <div class="col-md-2"></div>
+                            <div class="col-md-10">
+                                <div>
+                                    <span class="btn btn-xs tag" style="margin-right:5px;margin-bottom:5px;" data-name="{{item.TagName}}" ng-repeat="item in TempTag | filter:TagType='Employee'">{{item.TagName}}</span>
+                                </div>
+                            </div>
+                            <br />
+                            <div class="col-md-2"></div>
+                            <label class="col-md-10" style="background-color: #f47920;">Attendance Info</label>
+                            <div class="col-md-2"></div>
+                            <div class="col-md-10">
+                                <div>
+                                    <span class="btn btn-xs tag" style="margin-right:5px;margin-bottom:5px;" data-name="{{item.TagName}}" ng-repeat="item in TempTag | filter:TagType='Attendance'">{{item.TagName}}</span>
+                                </div>
+                            </div>
+                            <br />
+                            <div class="col-md-2"></div>
+                            <label class="col-md-10" style="background-color: #f47920;">Absconding Info</label>
+                            <div class="col-md-2"></div>
+                            <div class="col-md-10">
+                                <div>
+                                    <span class="btn btn-xs tag" style="margin-right:5px;margin-bottom:5px;" data-name="{{item.TagName}}" ng-repeat="item in TempTag | filter:TagType='Absconding'">{{item.TagName}}</span>
+                                </div>
+                            </div>
+                            <br />
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group" ng-class="{ 'has-error' : submitted && addform.BodyType.$invalid}">
+                            <label class="col-md-5 control-label">
+                                SMS Type :
+                                <span class="required">*</span>
+                            </label>
+                            <div class="col-md-7">
+                                <select class="form-control" required ng-model="sms.BodyType" name="BodyType">
+                                    <option value="" selected="selected">Choose Option</option>
+                                    <option value="1">Static</option>
+                                    <option value="2">Dynamic</option>
+                                    <option value="3">Scheduler</option>
+                                    <option value="4">Auto Scheduler</option>
+                                </select>
+                                <div class="form-control-focus"> </div>
+                                <span ng-show="submitted && addform.BodyType.$error.required" class="help-block">SMS Type Required</span>
+                            </div>
+                        </div>
+                        <div class="form-group" ng-class="{ 'has-error' : submitted && addform.CategoryId.$invalid}">
+                            <label class="col-md-5 control-label">
+                                Category :
+                                <span class="required">*</span>
+                            </label>
+                            <div class="col-md-7">
+                                <select class="form-control" ng-model="sms.CategoryId" required name="CategoryId" ng-options="sms.Key as sms.Value for sms in SMSCategorySeed ">
+                                    <option value="" selected="selected">Choose Option</option>
+                                </select>
+                                <div class="form-control-focus"> </div>
+                                <span ng-show="submitted && addform.CategoryId.$error.required" class="help-block">Category Required</span>
+                            </div>
+                        </div>
+                        <div class="form-group" ng-class="{ 'has-error' : submitted && addform.SMSBody.$invalid}">
+                            <label class="col-md-12 control-label" style="text-align:left;">
+                                Template Body :
+                                <span class="required">*</span>
+                            </label>
+                            <div class="col-md-8">
+                                <textarea type="text" id="txtBody" ng-model="sms.SMSBody" ng-change="containsNonLatinCodepoints(sms.SMSBody)" ng-trim="false" maxlength="{{Settings[0].NoSMSPart*maximumLength}}" class="form-control" style="height:300px;width:100%;" name="SMSBody" required></textarea>
+                                <div class="form-control-focus"> </div>
+                                <span ng-show="submitted && addform.SMSBody.$error.required" class="help-block">SMS Body Required</span>
+                            </div>
+                            <div class="col-md-4" ng-show="sms.BodyType==1">
+                                <label class="col-md-12">
+                                    SMS Part:
+                                </label>
+                                <label class="col-md-12">
+                                    {{total()}}
+                                </label>
+                                <label class="col-md-12">
+                                    Total Char :
+                                </label>
+                                <label class="col-md-12">
+                                    {{sms.SMSBody.length}}
+                                </label>
+                                <label class="col-md-12">
+                                    Max SMS Part:
+                                </label>
+                                <label class="col-md-12">
+                                    {{Settings[0].NoSMSPart}}
+                                </label>
+                            </div>
+                        </div>
+                        <div class="pull-left">
+                            <button ng-click="submitted=true" class="btn green">Save</button>
+                            <a ng-click="Reset()" class="btn info">Reset</a>
+                        </div>
+                        <div class="form-group col-md-12" style="padding-top:2%;" ng-hide="Settings[0].AllowUnicode==false">
+                            <input type="radio" ng-model="sms.isUnicode" ng-value="false" /> English
+                            <input type="radio" ng-model="sms.isUnicode" ng-value="true" /> Unicode
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    <br /> 
+</div>
+@section Scripts{
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $(document).on("click", ".tag", function () {
+                var tag = $(this).text();
+                console.log(tag);
+                var el = $("#txtBody").get(0);
+                console.log(el.selectionStart);
+                if(el.setSelectionRange) {
+                    el.value = el.value.substring(0, el.selectionStart) + tag + el.value.substring(el.selectionStart, el.selectionEnd) + el.value.substring(el.selectionEnd, el.value.length);
+                }
+                $("#txtBody").focus();
+                console.log(el.selectionStart);
+            });
+        });
+    </script>
+
+    <script type="text/javascript">
+        OEMSApp.controller("MEGR", ["$scope", "$http", "SweetAlert", "$window",
+          function ($scope, $http, SweetAlert, $window) {
+
+              init();
+              function init() {
+                  initialize();
+                  getAllDropdowns();
+                  getAllSettings();
+                  getAllTempTag();
+                  GetSMSCategorySeed();
+              }
+              function initialize() {                 
+                  $scope.sms = {};
+                  $scope.Settings = {};
+                  $scope.sms.SMSPart = 0;
+                  $scope.sms.SMSLen = 0;
+                  $scope.Dropdowns = [];
+                  $scope.Settings = [];
+                  $scope.TempTag = [];
+                  $scope.CommonFeilds = [];
+                  $scope.sms.SMSBody = [];
+                  $scope.getAllDropdowns = getAllDropdowns;
+                  $scope.getAllSettings = getAllSettings;
+                  $scope.getAllTempTag = getAllTempTag;
+                  // $scope.total = total;
+                  
+              };
+              $scope.Reset = function Reset() {
+                  $scope.sms = {};
+                  $scope.submitted = false;
+              };
+              $scope.total = function total() {
+                  if ($scope.sms.isUnicode)
+                  {
+                      
+                      if ($scope.sms.SMSBody.length > 70) {
+                          $scope.sms.SMSPart = Math.ceil($scope.sms.SMSBody.length / 67);
+                          $scope.maximumLength = 67;
+                      }
+                      else {
+                          $scope.sms.SMSPart = 1;
+                          $scope.maximumLength = 70;
+                      }
+                  }
+                  else
+                  {
+                      if ($scope.sms.SMSBody.length > 160) {
+                          $scope.sms.SMSPart = Math.ceil($scope.sms.SMSBody.length / 153);
+                          $scope.maximumLength = 153;
+                      }
+                      else {
+                          $scope.sms.SMSPart = 1;
+                          $scope.maximumLength = 160;
+                      }
+                  }
+                 
+                  return $scope.sms.SMSPart;
+              }
+              $scope.containsNonLatinCodepoints = function containsNonLatinCodepoints(s) {
+                  $scope.sms.isUnicode = /[^\u0000-\u00ff]/.test(s);
+              }
+              $scope.Save = function Save() {
+                  if ($scope.addform.$invalid == true)
+                      return;
+                  $scope.sms.SMSLen = $scope.sms.SMSBody.length;
+                  if ($scope.sms != {}) {
+                      $http({
+                          method: 'POST',
+                          url: baseUrl + 'SMS/SaveTemplate/',
+                          data: $scope.sms
+                      }).then(function successCallback(response) {
+                          toastr["info"](response.data.message);
+                      }, function errorCallback(response) {
+                          toastr["info"](response.data.message);
+                      });
+                  }
+
+              };
+              function getAllTempTag() {
+                  $scope.TempTag = [];
+                  $http({
+                      method: 'GET',
+                      url: baseUrl + 'SMS/GetAllTempTag/'
+                  }).then(function successCallback(response) {
+                      $scope.TempTag = response.data.results;
+                  }, function errorCallback(response) {
+                      toastr["info"](response.data.message);
+                  });
+              }
+              function GetSMSCategorySeed() {
+                  $scope.TempTag = [];
+                  $http({
+                      method: 'GET',
+                      url: baseUrl + 'SMS/GetSMSCategorySeed/'
+                  }).then(function successCallback(response) {
+                      $scope.SMSCategorySeed = response.data.results;
+                  }, function errorCallback(response) {
+                      toastr["info"](response.data.message);
+                  });
+              }
+              function getAllSettings() {
+                  $scope.Settings = [];
+                  $http({
+                      method: 'GET',
+                      url: baseUrl + 'SMS/GetAllSettings/'
+                  }).then(function successCallback(response) {
+                      $scope.Settings = response.data.results;
+                      $scope.sms.isUnicode = $scope.Settings[0].AllowUnicode;
+                  }, function errorCallback(response) {
+                      toastr["info"](response.data.message);
+                  });
+              }
+              function getAllTempTag() {
+                  $scope.TempTag = [];
+                  $http({
+                      method: 'GET',
+                      url: baseUrl + 'SMS/GetAllTempTag/'
+                  }).then(function successCallback(response) {
+                      $scope.TempTag = response.data.results;
+                  }, function errorCallback(response) {
+                      toastr["info"](response.data.message);
+                  });
+              }
+              function getAllDropdowns() {
+                  $scope.Dropdowns = [];
+                  $http({
+                      method: 'GET',
+                      url: baseUrl + 'Common/GetAllDropDown/'
+                  }).then(function successCallback(response) {
+                      $scope.Dropdowns = response.data.results;
+                  }, function errorCallback(response) {
+                      toastr["info"](response.data.message);
+                  });
+              }
+
+              function getAllCommons() {
+                  $scope.CommonFeilds = [];
+                  $http({
+                      method: 'GET',
+                      url: baseUrl + 'Common/GetCommonItem/'
+                  }).then(function successCallback(response) {
+                      $scope.CommonFeilds = response.data.results;
+                  }, function errorCallback(response) {
+                      toastr["info"](response.data.message);
+                  });
+              }
+          }]);
+    </script>
+} 

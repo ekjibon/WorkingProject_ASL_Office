@@ -1,0 +1,1041 @@
+﻿
+@{
+    ViewBag.Title = "Grand Exam Clone With Mark Setup";
+}
+<style type="text/css">
+    input[type=number]::-webkit-inner-spin-button,
+    input[type=number]::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+</style>
+
+
+<div class="row" ng-controller="CltrGrandExamCloneWithMarkSetup">
+    <div class="portlet light bordered">
+        <div class="portlet-title">
+            <div class="caption">
+                <i class="icon-settings font-green"></i>
+                <span class="caption-subject font-green sbold uppercase">@ViewBag.Title</span>
+            </div>
+        </div>
+        <div class="portlet-body">
+
+            <form class="form-horizontal" ng-submit="cloneMainExam()" id="frmCommon" name="frmMainExamMarks" novalidate>
+                <div class="form-body">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="form-group" ng-class="{ 'has-error' : submited1 && frmMainExamMarks.Version.$invalid}">
+                                <label class="col-md-5 control-label">
+                                    Version :
+                                    <span class="required">*</span>
+                                </label>
+                                <div class="col-md-7">
+                                    <select class="form-control" ng-disabled="MainExamSubjectMarks.length>0" ng-model="MainExamSubjectMark.VersionId" required name="Version" ng-options="MainExamSubjectMark.VersionId as MainExamSubjectMark.VersionName for MainExamSubjectMark in CommonFeilds.Version">
+                                        <option value="" selected="selected">Select</option>
+                                    </select>
+                                    <div class="form-control-focus"> </div>
+                                    <span ng-show="submited1 && frmMainExamMarks.Version.$error.required" class="help-block">Version Required</span>
+                                </div>
+                            </div>
+                            <div class="form-group" ng-class="{ 'has-error' : submited1 && frmMainExamMarks.Session.$invalid}">
+                                <label class="col-md-5 control-label">
+                                    Session :
+                                    <span class="required">*</span>
+                                </label>
+                                <div class="col-md-7">
+                                    <select class="form-control" ng-disabled="MainExamSubjectMarks.length>0" ng-model="MainExamSubjectMark.SessionId" required name="Session" ng-options="MainExamSubjectMark.SessionId as MainExamSubjectMark.SessionName for MainExamSubjectMark in CommonFeilds.Session">
+                                        <option value="" selected="selected">Select</option>
+                                    </select>
+                                    <div class="form-control-focus"> </div>
+                                    <span ng-show="submited1 && frmMainExamMarks.Session.$error.required" class="help-block">Session Required</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="form-group" ng-class="{ 'has-error' : submited1 && frmMainExamMarks.Class.$invalid}">
+                                <label class="col-md-5 control-label">
+                                    Class :
+                                    <span class="required">*</span>
+                                </label>
+                                <div class="col-md-7">
+                                    <select class="form-control" ng-disabled="MainExamSubjectMarks.length>0" ng-change="GetGroup(MainExamSubjectMark.ClassId);" ng-model="MainExamSubjectMark.ClassId" name="Class" required ng-options="MainExamSubjectMark.ClassId as MainExamSubjectMark.ClassName for MainExamSubjectMark in CommonFeilds.ClassInfo | filter:{VersionId:MainExamSubjectMark.VersionId}:true">
+                                        <option value="" selected="selected">Select</option>
+                                    </select>
+                                    <div class="form-control-focus"> </div>
+                                    <span ng-show="submited1 && frmMainExamMarks.Class.$error.required" class="help-block">Class Required</span>
+                                </div>
+                            </div>
+                            <div class="form-group" ng-class="{ 'has-error' : submited1 && frmMainExamMarks.Group.$invalid}">
+                                <label class="col-md-5 control-label">
+                                    Group :
+                                    <span class="required">*</span>
+                                </label>
+                                <div class="col-md-7">
+                                    <select class="form-control" ng-change="getMainExam()" ng-disabled="MainExamSubjectMarks.length>0 " ng-model="MainExamSubjectMark.GroupId" name="Group" ng-options="G.GroupId as G.GroupName for G in Groups" required>
+                                        <option value="" selected="selected">Select</option>
+                                    </select>
+                                    <div class="form-control-focus"> </div>
+                                    <span ng-show="submited1 && frmMainExamMarks.Group.$error.required" class="help-block">Group Required</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="form-group" ng-class="{ 'has-error' : submited1 && frmMainExamMarks.mainExam.$invalid}">
+                                <label class="col-md-5 control-label">
+                                    Main Exam :
+                                    <span class="required">*</span>
+                                </label>
+                                <div class="col-md-7">
+                                    <select id="mExam" class="form-control" ng-disabled="MainExamSubjectMarks.length>0" ng-model="MainExamSubjectMark.MainExamId" required name="mainExam" ng-options="mainexam.MainExamId as mainexam.MainExamName for mainexam in MainExams ">
+                                        <option value="" selected="selected">Select</option>
+                                    </select>
+                                    <div class="form-control-focus"> </div>
+                                    <span ng-show="submited1 && frmMainExamMarks.mainExam.$error.required" class="help-block">Main Exam Required</span>
+                                </div>
+                            </div>
+                            <div class="form-group" ng-class="{ 'has-error' : submited1 && frmMainExamMarks.newMainExamName.$invalid}">
+                                <label class="col-md-5 control-label">
+                                    Grand Exam :
+                                    <span class="required">*</span>
+                                </label>
+                                <div class="col-md-7">
+                                    <input type="text" ng-model="NewMainExamName" class="form-control" placeholder="Main Exam Name" name="newMainExamName" required>
+                                    <div class="form-control-focus"> </div>
+                                    <span ng-show="submited1 && frmMainExamMarks.newMainExamName.$error.required" class="help-block">Target Exam Name Required</span>
+                                </div>
+                            </div>
+                            <div class="form-group pull-right" style="margin-bottom:5px; margin-right:1px;">
+                                <button ng-click="submited1=true" class="btn btn-primary btn-large">Clone </button>
+                                <input type="button" ng-click="Reset()" class="btn btn-danger btn-large" style="margin-left:5px" value="Reset">
+                                <a href="@Url.Action("MainExamMarkSetup","Report")?MainExamId={{MainExamSubjectMark.MainExamId}}" class="btn btn-primary" target="_blank">Report</a>
+
+                            </div>
+                        </div>
+
+                    </div>
+
+
+                </div>
+            </form>
+            <clearfix></clearfix>
+            <form name="frm" novalidate>
+                <div class="table-container">
+                    <table class="table table-bordered table-hover">
+                        <thead>
+                            <tr class="bg-primary">
+                                <th width="25%">Subject Name</th>
+                                <th width="15%">Full Marks</th>
+                                <th width="12%">Pass Depand</th>
+                                <th width="14%">Pass Marks</th>
+                                <th width="6%">Is %?</th>
+                                <th width="15%">Remarks</th>
+                                <th width="20%">SubExam Setup</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+
+                            <tr ng-repeat="S in MainExamSubjectMarks">
+                                <td>{{S.SubjectName}}</td>
+                                <td ng-class="{ 'has-error' : S.MainExamFullMarks < S.MainExamPassMark  || frm.FullMarks_{{$index}}.$invalid  }">
+                                    <input type="number" ng-min="0" ng-model="S.MainExamFullMarks" class="form-control" name="FullMarks_{{$index}}" value="{{S.MainExamFullMarks==0 ? '' : S.MainExamFullMarks}}" required />
+                                    <span class="help-block" ng-show="S.MainExamFullMarks < S.MainExamPassMark || frm.FullMarks_{{$index}}.$invalid ">Invalid!</span>
+
+                                </td>
+                                <td><input type="checkbox" ng-model="S.MainExamIsPassDepend" ng-checked="S.MainExamIsPassDepend==true" /></td>
+
+                                <td ng-class="{ 'has-error' : S.MainExamFullMarks < S.MainExamPassMark  || frm.PassMark_{{$index}}.$invalid  }">
+                                    <input type="number" ng-model="S.MainExamPassMark" ng-disabled="S.MainExamIsPassDepend==false" ng-min="0" class="form-control" name="PassMark_{{$index}}" required />
+                                    <span class="help-block" ng-show="S.MainExamFullMarks < S.MainExamPassMark || frm.PassMark_{{$index}}.$invalid ">Invalid!</span>
+
+                                </td>
+                                <td><input type="checkbox" ng-model="S.MainExamPassMarkIsPercent" ng-disabled="S.MainExamIsPassDepend==false" ng-checked="S.MainExamPassMarkIsPercent==true" /></td>
+                                <td>
+                                    <p style="font-size:12px; color:orangered; margin:0 !important" ng-show="S.Id==0">{{S.MainExmConfigured}}</p>
+                                    <p style="font-size:12px; color:mediumvioletred; font-style:italic; margin:0 !important" ng-show="S.SubExmConfigured != 'SubExamConfigured'">{{S.SubExmConfigured}}</p>
+                                    <p style="font-size:12px; color:orangered; margin:0 !important" ng-show="S.DividedExmConfigured != 'DividedExamConfigured'">{{S.DividedExmConfigured}}</p>
+                                </td>
+                                <td>
+                                    <a href="javascript:;" ng-click="getSubExam(S)" ng-show="S.Id!=0" class="btn green btn-icon-only" data-target="#stack1" data-toggle="modal">
+                                        <i class="fa fa-cog" aria-hidden="true">&nbsp;</i>
+                                    </a>
+                                    <a href="javascript:;" ng-click="MainExamDeleteMark(S.Id)" ng-show="S.Id!=0" class="btn btn-icon-only red">
+                                        <i class="fa fa-trash">&nbsp;</i>
+                                    </a>
+                                </td>
+
+                            </tr>
+
+                            <tr ng-show="MainExamSubjectMarks.length>0">
+                                <td colspan="10">
+                                    <button ng-click="MainExamDeleteAllMark()" ng-disabled="MainExamDeleteValidation()" class="btn red pull-right"> Delete &nbsp;</button>
+                                    <button ng-click="mainExamMarkSetupSave()" ng-disabled="MainExammarkSetpvalid()" class="btn btn-primary pull-right">&nbsp;<i class="fa fa-floppy-o"></i> Update &nbsp;</button>
+
+                                </td>
+                            </tr>
+                        </tbody>
+
+                    </table>
+
+                </div>
+            </form>
+        </div>
+    </div>
+    <div id="stack1" class="modal fade" tabindex="-1" data-width="400">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                    <h4 class="modal-title">SubExam Mark Setup Of {{SubExamSubjectName}}, Full Marks-{{TotalFullMark}}</h4>
+                </div>
+                <div class="modal-body" style="padding:4px;">
+
+                    <div class="table-container">
+
+
+                        <table class="table table-bordered table-hover">
+                            <thead>
+                                <tr class="success">
+
+                                    <th>SubExam</th>
+                                    <th width="13%">Conv. Mark</th>
+                                    <th width="14%">Exam Mark</th>
+                                    <th width="10%">Pass Dependent</th>
+                                    <th width="10%">Pass Mark</th>
+                                    <th width="10%">Pass Is %</th>
+                                    <th width="10%">Is Enable</th>
+                                    <th width="15%">Remarks</th>
+                                    <th width="15%">Devided Setup</th>
+
+
+                                </tr>
+                            </thead>
+                            <tbody>
+
+                                <tr ng-repeat="se in SubExamMarkSetups">
+                                    <td>
+                                        {{se.SubExamName}}
+                                    </td>
+
+                                    <td ng-class="{ 'has-error':SubExamFullMarkVaild()}">
+                                        <input min="0" type="number" ng-model="se.SubExamFullMarks" name="SubExamFullMarks" class="form-control" required>
+                                        <span class="help-block" ng-show="SubExamFullMarkVaild()">Invaild</span>
+                                    </td>
+
+                                    <td ng-class="{ 'has-error' : se.SubExamFullMarks > se.SubExamExamMarks}">
+                                        <input min="0" type="number" ng-model="se.SubExamExamMarks" name="SubExamExamMarks" class="form-control" required>
+                                        <span class="help-block" ng-show="se.SubExamFullMarks > se.SubExamExamMarks">Invaild</span>
+                                    </td>
+
+                                    <td><input type="checkbox" ng-model="se.SubExamIsPassDepend" name="SubExamIsPassDepend" ng-checked="se.SubExamIsPassDepend==true" class="form-control"></td>
+
+                                    <td ng-class="{ 'has-error' : se.SubExamExamMarks < se.SubExamPassMark}">
+                                        <input min="0" type="number" ng-model="se.SubExamPassMark" name="SubExamPassMark" ng-disabled="se.SubExamIsPassDepend==false" class="form-control">
+                                        <span class="help-block" ng-show="se.SubExamExamMarks < se.SubExamPassMark">Invaild</span>
+                                    </td>
+
+
+                                    <td><input type="checkbox" ng-model="se.SubExamPassMarkIsPercent" name="SubExamPassMarkIsPercent" ng-disabled="se.SubExamIsPassDepend==false" ng-checked="se.SubExamPassMarkIsPercent==true" class="form-control"></td>
+                                    <td><input type="checkbox" ng-model="se.SubExamIsEnable" name="SubExamIsEnable" ng-checked="se.SubExamIsEnable==true" class="form-control"></td>
+                                    <td>
+                                        <p style="font-size:12px; color:orangered; margin:0 !important" ng-show="se.Id==0">{{se.SubExmConfigured}}</p>
+                                        <p style="font-size:12px; color:purple; font-style:italic; margin:0 !important" ng-show="se.DividedExmConfigured != 'DividedExamConfigured'">{{se.DividedExmConfigured}}</p>
+                                    </td>
+
+                                    <td>
+                                        <a href="javascript:;" ng-click="getDividedExam(se)" ng-show="se.Id!=0" class="btn green btn-icon-only" data-target="#stack2" data-toggle="modal">
+                                            <i class="fa fa-cog"></i>
+                                        </a>
+                                        <a href="javascript:;" ng-click="SubExamDeleteMark(se.Id)" ng-show="se.Id!=0" class="btn btn-icon-only red">
+                                            <i class="fa fa-trash">&nbsp;</i>
+                                        </a>
+                                    </td>
+
+                                </tr>
+                            </tbody>
+                        </table>
+
+                    </div>
+
+
+
+                </div>
+                <div class="modal-footer" style="margin-top: -25px;">
+                    <div class="form-group">
+                        <button type="button" ng-click="SaveSubExamMark()" ng-disabled="SubExamFullMarkEachVaild() ||  SubExamFullMarkVaild()" class="btn btn-primary"> Update</button>
+                        <button ng-click="SubExamDeleteAllMark()" ng-disabled="SubExamDeleteValidation()" class="btn red"> Delete </button>
+                        <button type="button" data-dismiss="modal" class="btn red">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="stack2" class="modal fade " tabindex="-1" style="margin-top:400px">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header modal-success">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                    <h4 class="modal-title">DevidedExam Mark Setup of {{SubExamSubjectName}}, SubExam Exam Mark-{{SubExamTotalFullMark}} </h4>
+                </div>
+                <div class="modal-body" style="padding:4px;">
+                    <div class="table-container">
+                        <table class="table table-bordered table-hover">
+                            <thead>
+                                <tr style="background-color: #83b3db;">
+                                    <th width="15%">DivideExam</th>
+                                    <th width="10%">Exam Type</th>
+                                    <th width="15%">Convert Mark</th>
+                                    <th width="15%">Exam Marks</th>
+                                    <th width="12%">Pass Depand</th>
+                                    <th width="12%">Pass Marks</th>
+                                    <th width="8%">Is %?</th>
+                                    <th width="15%">Is Enable</th>
+                                    <th width="15%">Remarks</th>
+                                    <th width="15%">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+
+                                <tr ng-repeat="D in DividedExamMarkSetupVMs">
+                                    <td>{{D.DividedExamName}}</td>
+                                    <td>{{D.DividedExamType}}</td>
+                                    <td ng-class="{ 'has-error':DividedExamFullMarkVaild()}">
+                                        <input min="0" type="number" ng-model="D.DividedExamFullMarks" class="form-control" name="DividedExamFullMarks" />
+                                        <span class="help-block" ng-show="DividedExamFullMarkVaild()">Invaild!</span>
+                                    </td>
+                                    <td ng-class="{ 'has-error' : (D.DividedExamFullMarks !=0 && D.DividedExamExamMarks==0)}">
+                                        <input min="0" type="number" ng-model="D.DividedExamExamMarks" class="form-control" name="DividedExamExamMarks" />
+                                        <span class="help-block" ng-show="(D.DividedExamFullMarks !=0 && D.DividedExamExamMarks==0)">Invalid!</span>
+                                    </td>
+                                    <td><input type="checkbox" class="form-control" ng-model="D.DividedExamIsPassDepend" ng-checked="D.DividedExamIsPassDepend==true" /></td>
+                                    <td ng-class="{ 'has-error' : D.DividedExamExamMarks < D.DividedExamPassMarks}">
+                                        <input min="0" type="number" ng-model="D.DividedExamPassMarks" class="form-control" ng-disabled="D.DividedExamIsPassDepend==false" name="DividedExamPassMarks" />
+                                        <span class="help-block" ng-show="D.DividedExamExamMarks < D.DividedExamPassMarks">Invalid!</span>
+                                    </td>
+                                    <td><input type="checkbox" class="form-control" ng-model="D.DividedExamPassMarkIsPercent" ng-disabled="D.DividedExamIsPassDepend==false" ng-checked="D.DividedExamPassMarkIsPercent==true" /></td>
+                                    <td><input type="checkbox" class="form-control" ng-model="D.DividedExamIsEnable" ng-checked="D.DividedExamIsEnable==true" /></td>
+                                    <td>
+                                        <p style="font-size:12px; color:orangered; margin:0 !important" ng-show="D.DividedExmConfigured != 'DividedExamConfigured'">{{D.DividedExmConfigured}}</p>
+                                    </td>
+
+                                    <td>
+                                        <a href="javascript:;" ng-click="DividedExamDeleteMark(D.Id)" ng-show="D.Id!=0" class="btn btn-icon-only red">
+                                            <i class="fa fa-trash">&nbsp;</i>
+                                        </a>
+                                    </td>
+
+                                </tr>
+                            </tbody>
+
+                        </table>
+
+                    </div>
+                </div>
+                <div class="modal-footer" style="margin-top: -25px;">
+                    <div class="form-group">
+                        <button ng-disabled="DividedExamMarkVaild() || DividedExamFullMarkVaild()" ng-click="dividedExamMarkSetupSave()" class="btn btn-primary"> Update &nbsp;</button>
+                        <button ng-click="DividedExamDeleteAllMark()" ng-disabled="DividedExamDeleteValidation()" class="btn red"> Delete</button>
+                        <button type="button" data-dismiss="modal" class="btn red">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts{
+
+    <script type="text/javascript">
+        OEMSApp.controller("CltrGrandExamCloneWithMarkSetup", ["$scope", "$http", "SweetAlert",
+              function ($scope, $http, SweetAlert) {
+
+                  init();
+                  function init() {
+                      initialize();
+                      getAllCommons();
+                  }
+                  function initialize() {
+                      $scope.MainExamSubjectMark = {};
+                      $scope.MainExamSubjectMarks = [];
+                      $scope.MainExamSubjectMark.Id = 0;
+                      $scope.DividedExamMarkSetupVM = {};
+                      $scope.DividedExamMarkSetupVMs = [];
+                      $scope.DividedExamMarkSetupVM.Id = 0;
+                      //$scope.MainExamSubjectMark.MainExamId = 0;
+                      $scope.NewMainExamName = '';
+                      $scope.MainExam = {};
+                      $scope.Mainexam = {};
+                      $scope.MainExam.MainExamId = 0;
+                      $scope.MainExams = [];
+
+                      $scope.SubExam = {};
+                      $scope.Subexam = {};
+                      $scope.SubExam.SubExamId = 0;
+                      $scope.SubExams = [];
+
+                      $scope.DividedExam = {};
+                      $scope.Dividedexam = {};
+                      $scope.DividedExam.DividedExamId = 0;
+                      $scope.DividedExams = [];
+
+                      $scope.CommonFeilds = [];
+
+                      $scope.Reset = Reset;
+
+                      $scope.res = {};
+                      $scope.data = {};
+                      $scope.resetForm = resetForm;
+                      $scope.getAllCommons = getAllCommons;
+                      $scope.getMainExamSubject = getMainExamSubject;
+
+                      $scope.SubExamMarkSetup = {};
+                      $scope.SubExamMarkSetups = [];
+                      $scope.getSubExam = getSubExam;
+                      $scope.getDividedExam = getDividedExam;
+                      $scope.SubExamSubjectName = '';
+                      $scope.TotalFullMark = 0;
+                      $scope.SubExamIDForGet = 0;
+                      $scope.SubExamMarkSetupIDForGet = 0;
+                      $scope.MainExamIDForGet = 0;
+                      $scope.GetSubExamByMainExamID = {};
+                      $scope.GetSubExamMark = {};
+                      $scope.MainExamMarkSetupIdForGet = 0;
+                      $scope.SubExamTotalFullMark = 0;
+                      $scope.getMainExam = getMainExam;
+                      $scope.cloneMainExam = cloneMainExam;
+
+                      $scope.MainExamIDForMarkCheck = 0;
+                      $scope.SubExamIDForMarkCheck = 0;
+                      $scope.DividedExamIDForMarkCheck = 0; //DividedExamId
+                      $scope.SubjectIDForMarkCheck = 0;
+
+
+                  }
+                  function Reset() {
+                      $scope.MainExamSubjectMarks = [];
+                  }
+
+                  function resetForm() {
+                      $scope.modalTitle = "Sub Exam Details";
+                      //$scope.MainExam = {};
+                      $scope.MainExam.MainExamId = 0;
+
+                      $scope.SubExam = {};
+                      $scope.SubExam.SubExamId = 0;
+
+                      $scope.DividedExam = {};
+                      $scope.DividedExam.DividedExamId = 0;
+
+                      $scope.submited2 = false;
+                      $scope.submited1 = false;
+                      $scope.submited = false;
+
+                  }
+                  $scope.GetGroup = function GetGroup(classid) {
+                      $scope.Groups = [];
+
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Common/GetGroup/' + classid
+                      }).then(function successCallback(response) {
+                          $scope.Groups = response.data.results;
+
+                      }, function errorCallback(response) {
+                          toastr["info"](response.data.message);
+                      });
+
+                  }
+
+                  function getAllCommons() {
+                      $scope.CommonFeilds = [];
+
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'Common/GetCommonItem/'
+                      }).then(function successCallback(response) {
+                          $scope.CommonFeilds = response.data.results;
+                      }, function errorCallback(response) {
+                          toastr["info"](response.data.message);
+                      });
+                  }
+
+                  function getMainExam() {
+                      $scope.MainExams = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'ExamSetup/GetMainExamBySession/' + $scope.MainExamSubjectMark.VersionId + '/' + $scope.MainExamSubjectMark.SessionId + '/' + $scope.MainExamSubjectMark.ClassId + '/' + $scope.MainExamSubjectMark.GroupId
+                      }).then(function successCallback(response) {
+                          $scope.MainExams = response.data.results;
+                      }, function errorCallback(response) {
+                          toastr["info"](response.data.message);
+                      });
+                  }
+                  //GetMainExamSubject
+
+                  function getMainExamSubject() {
+                      if ($scope.frmMainExamMarks.$invalid)
+                          return;
+                      $scope.MainExamSubjectMarks = [];
+                      $scope.MainExamIDForMarkCheck = $scope.MainExamSubjectMark.MainExamId;
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'ExamMarkSetup/GetMainExamSubject/' + $scope.MainExamSubjectMark.VersionId + '/' + $scope.MainExamSubjectMark.SessionId + '/' + $scope.MainExamSubjectMark.ClassId + '/' + $scope.MainExamSubjectMark.GroupId + '/' + $scope.MainExamSubjectMark.MainExamId
+                      }).then(function successCallback(response) {
+                          $scope.MainExamSubjectMarks = response.data.results;
+                      }, function errorCallback(response) {
+                          toastr["info"](response.data.message);
+                      });
+
+                  }
+                  function getMainExamSubjectForClone() {
+                      $scope.MainExamSubjectMarks = [];
+                      $scope.MainExamIDForMarkCheck = $scope.MainExamSubjectMark.MainExamId;
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'ExamMarkSetup/GetMainExamSubject/' + $scope.MainExamSubjectMark.VersionId + '/' + $scope.MainExamSubjectMark.SessionId + '/' + $scope.MainExamSubjectMark.ClassId + '/' + $scope.MainExamSubjectMark.GroupId + '/' + $scope.MainExamSubjectMark.MainExamId
+                      }).then(function successCallback(response) {
+                          $scope.MainExamSubjectMarks = response.data.results;
+                          getMainExam();
+                      }, function errorCallback(response) {
+                          toastr["info"](response.data.message);
+                      });
+
+                  }
+                  //EndMainExamSubject
+
+                  //MainExamClone With Mark Setup
+                  function cloneMainExam() {
+                      if ($scope.frmMainExamMarks.$invalid)
+                          return;
+                      $scope.mExam =$("#mExam option:selected").text();
+                      if ($scope.mExam == $scope.NewMainExamName)
+                      {
+                          alert('Main Exam name already exists');
+                          $scope.NewMainExamName = '';
+                          toastr["warning"]("Opps please check exam name!");
+                          return;
+                      }
+
+
+                      $http({
+                          method: 'POST',
+                          url: baseUrl + 'Result/CloneMainExam/' + $scope.MainExamSubjectMark.MainExamId + '/' + $scope.NewMainExamName,
+                          data: $scope.MainExam
+                      }).then(function successCallback(response) {
+                          $scope.MainExamSubjectMark.MainExamId = response.data.results;
+                          getMainExamSubjectForClone();
+                          toastr["info"](response.data.message);
+                      }, function errorCallback(response) {
+                          toastr["info"](response.data.message);
+                      });
+                      //GrandSetup / CloneExamSetup / { mainExamId } / { newMainExamName }
+                  }
+
+                  //mainExam
+                  $scope.mainExamSave = function mainExamSave() {
+
+                      if ($scope.mainForm.$invalid)
+                          return;
+
+                          if ($scope.MainExam != {}) {
+                              $http({
+                                  method: 'POST',
+                                  url: baseUrl + 'ExamSetup/AddMainExam/',
+                                  data: $scope.MainExam
+                              }).then(function successCallback(response) {
+                                  $scope.Mainexam = response.data.results;
+                                  toastr["info"](response.data.message);
+                              }, function errorCallback(response) {
+                                  toastr["info"](response.data.message);
+                              });
+                          }
+
+
+                  };
+                  $scope.MainExamDeleteAllMark = function MainExamDeleteAllMark() {
+                      // SweetAlert.swal("Good job!", "You clicked the button!", "success");
+                      SweetAlert.swal({
+                          title: "Are you sure to delete it ?", type: "warning", showCancelButton: true, confirmButtonColor: "#DD6B55",
+                          confirmButtonText: "Yes, delete it!",
+                          closeOnConfirm: false
+                      },
+                      function (isConfirm) {
+                          if (isConfirm) {
+                              if ($scope.MainExamSubjectMarks.length == 0)
+                                  return;
+                              $http({
+                                  method: 'DELETE',
+                                  url: baseUrl + 'ExamMarkSetup/DeleteAllMainExamSubject/' + $scope.MainExamSubjectMark.VersionId + '/' + $scope.MainExamSubjectMark.SessionId + '/' + $scope.MainExamSubjectMark.ClassId + '/' + $scope.MainExamSubjectMark.GroupId + '/' + $scope.MainExamSubjectMark.MainExamId
+                              }).then(function successCallback(response) {
+                                  SweetAlert.swal("Deleted!", "Your data has been deleted.", "success");
+                                  getMainExamSubject();
+                              }, function errorCallback(response) {
+                                  toastr["info"](response.data.message);
+                              });
+
+                          }
+                      });
+
+
+                  };
+
+                  $scope.MainExamDeleteMark = function MainExamDeleteMark(M) {
+                      SweetAlert.swal({
+                          title: "Are you sure to delete it ?", type: "warning", showCancelButton: true, confirmButtonColor: "#DD6B55",
+                          confirmButtonText: "Yes, delete it!",
+                          closeOnConfirm: false
+                      },
+                      function (isConfirm) {
+                                if (isConfirm) {
+                                    $http({
+                                        method: 'DELETE',
+                                        url: baseUrl + 'ExamMarkSetup/DeleteMainExamMark/'+ M
+                                    }).then(function successCallback(response) {
+                                        SweetAlert.swal("Deleted!", "Your data has been deleted.", "success");
+                                        getMainExamSubject();
+                                       // toastr["info"](response.data.message);
+                                    }, function errorCallback(response) {
+                                        toastr["info"](response.data.message);
+                                    });
+
+                                }
+                            });
+
+                  }
+
+                  //mainExam
+
+                  //subExam
+
+
+                  $scope.mainExamMarkSetupSave = function mainExamMarkSetupSave() {
+
+
+                      if ($scope.MainExamSubjectMarks != []) {
+                              $http({
+                                  method: 'POST',
+                                  url: baseUrl + 'ExamMarkSetup/AddMainExamMark/',
+                                  data: $scope.MainExamSubjectMarks
+                              }).then(function successCallback(response) {
+                                  $scope.MainExamSubjectMarks = response.data.results;
+                                  toastr["info"](response.data.message);
+                                  resetForm();
+                              }, function errorCallback(response) {
+                                  getMainExamSubject();
+                                  toastr["info"](response.data.message);
+                              });
+
+                      }
+                      else {
+                          return;
+                      }
+
+                  };
+                  //DividedExam
+
+                      function getDividedExam(subexamMark) {
+                      $scope.DividedExamMarkSetupVMs = [];
+                      $scope.SubExamTotalFullMark = subexamMark.SubExamExamMarks;
+                      $scope.SubExamIDForGet = subexamMark.SubExamId;
+                      $scope.GetSubExamMark = subexamMark;
+                      $scope.SubExamMarkSetupIDForGet = subexamMark.Id;
+                      $scope.SubExamIDForMarkCheck = subexamMark.SubExamId;
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'ExamMarkSetup/GetDividedExamMark/' + subexamMark.SubExamId + '/' + subexamMark.Id
+                      }).then(function successCallback(response) {
+                          $scope.DividedExamMarkSetupVMs = response.data.results;
+                      }, function errorCallback(response) {
+                          toastr["info"](response.data.message);
+                      });
+                  }
+
+                  $scope.dividedExamMarkSetupSave = function dividedExamMarkSetupSave() {
+                      if ($scope.DividedExamMarkSetupVMs != []) {
+                          $http({
+                              method: 'POST',
+                              url: baseUrl + 'ExamMarkSetup/AddDividedExamMark/' + $scope.SubExamIDForGet + '/' + $scope.MainExamIDForMarkCheck + '/' + $scope.SubjectIDForMarkCheck,
+                              data: $scope.DividedExamMarkSetupVMs
+                          }).then(function successCallback(response) {
+                              $scope.DividedExamMarkSetupVMs = response.data.results;
+                              toastr["info"](response.data.message);
+                              resetForm();
+                          }, function errorCallback(response) {
+                              toastr["info"](response.data.message);
+                          });
+
+                      }
+                      else {
+                          return;
+                      }
+
+                  };
+
+                  $scope.DividedExamDeleteAllMark = function DividedExamDeleteAllMark(subexamMark) {
+                      if ($scope.DividedExamMarkSetupVMs.length == 0)
+                          return;
+                      $http({
+                          method: 'DELETE',
+                          url: baseUrl + 'ExamMarkSetup/DeleteAllDividedExamMarkSetup/' + $scope.SubExamMarkSetupIDForGet + '/' + $scope.SubExamIDForGet + '/' + $scope.MainExamIDForMarkCheck + '/' + $scope.SubjectIDForMarkCheck
+                      }).then(function successCallback(response) {
+                          toastr["info"](response.data.message);
+                          getDividedExam($scope.GetSubExamMark);
+                      }, function errorCallback(response) {
+                          toastr["info"](response.data.message);
+                      });
+                  }
+
+                  $scope.DividedExamDeleteMark = function DividedExamDeleteMark(Id) {
+                      $http({
+                          method: 'DELETE',
+                          url: baseUrl + 'ExamMarkSetup/DeleteDividedExamMark/' + Id + '/' + $scope.SubjectIDForMarkCheck+'/'+   $scope.SubExamIDForMarkCheck +'/'+  $scope.MainExamIDForMarkCheck
+
+                      }).then(function successCallback(response) {
+                          toastr["info"](response.data.message);
+                          getDividedExam($scope.GetSubExamMark);
+                      }, function errorCallback(response) {
+                          toastr["info"](response.data.message);
+                      });
+                  }
+
+
+                  //DividedExam End
+
+                  $scope.editSubExam = function (sube) {
+                      $scope.SubExam = sube;
+                  };
+
+
+                  $scope.deleteSubExam = function (sube) {
+                      SweetAlert.swal({
+                          title: "Are you sure to delete it ?", type: "warning", showCancelButton: true, confirmButtonColor: "#DD6B55",
+                          confirmButtonText: "Yes, delete it!",
+                          closeOnConfirm: false
+                      },
+                      function (isConfirm) {
+                          if (isConfirm) {
+                              $http({
+                                  method: 'DELETE',
+                                  url: baseUrl + '/ExamSetup/DeleteSubExam/' + sube.SubExamId
+                              }).then(function successCallback(response) {
+                                  SweetAlert.swal("Deleted!", "Your data has been deleted.", "success");
+                                  $scope.SubExams = response.data.results;
+                                  resetForm();
+                              }, function errorCallback(response) {
+                                  toastr["info"](response.data.message);
+                              });
+
+                          }
+                      });
+
+
+                  };
+
+                  //subExam
+
+                  //Divided Exam
+
+                  $scope.dividedExamSave = function dividedExamSave() {
+
+                      if ($scope.dividedForm.$invalid)
+                          return;
+
+                      if ($scope.DividedExam != {}) {
+                          if ($scope.DividedExam.DividedExamId != 0) /// For Update
+                          {
+                              if ($scope.DividedExam.DividedExamName != '') {
+                                  $http({
+                                      method: 'PUT',
+                                      url: baseUrl + '/ExamSetup/UpdateDividedExam/',
+                                      data: $scope.DividedExam
+                                  }).then(function successCallback(response) {
+                                      $scope.DividedExams = response.data.results;
+                                      toastr["info"](response.data.message);
+
+                                      resetForm();
+                                  }, function errorCallback(response) {
+                                      toastr["info"](response.data.message);
+                                  });
+                              }
+                          }
+                          else {
+                              $http({
+                                  method: 'POST',
+                                  url: baseUrl + 'ExamSetup/AddDividedExam/',
+                                  data: $scope.DividedExam
+                              }).then(function successCallback(response) {
+                                  $scope.DividedExams = response.data.results;
+                                  toastr["info"](response.data.message);
+
+                                  resetForm();
+                              }, function errorCallback(response) {
+                                  toastr["info"](response.data.message);
+                              });
+                          }
+                      }
+
+
+                  };
+
+                  $scope.editDividedExam = function (dividedExam) {
+                      $scope.DividedExam = dividedExam;
+                  };
+
+
+                  $scope.deleteDividedExam = function (dividedExam) {
+                      $scope.DividedExam = dividedExam;
+                      SweetAlert.swal({
+                          title: "Are you sure to delete it ?", type: "warning", showCancelButton: true, confirmButtonColor: "#DD6B55",
+                          confirmButtonText: "Yes, delete it!",
+                          closeOnConfirm: false
+                      },
+                      function (isConfirm) {
+                          if (isConfirm) {
+                              $http({
+                                  method: 'PUT',
+                                  url: baseUrl + '/ExamSetup/DeleteDividedExam/', // + dividedExam
+                                  data: dividedExam
+                              }).then(function successCallback(response) {
+                                  SweetAlert.swal("Deleted!", "Your data has been deleted.", "success");
+                                  $scope.DividedExams = response.data.results;
+                                  resetForm();
+                              }, function errorCallback(response) {
+                                  toastr["info"](response.data.message);
+                              });
+
+                          }
+                      });
+
+
+                  };
+                  //Divided Exam
+
+
+                  // SubExam MarSetup
+                  function getSubExam(mainExamMarkSetup) {
+                      $scope.GetSubExamByMainExamID = mainExamMarkSetup;
+                      $scope.SubExamSubjectName = mainExamMarkSetup.SubjectName;
+                      $scope.TotalFullMark = mainExamMarkSetup.MainExamFullMarks;
+                      $scope.MainExamMarkSetupIdForGet = mainExamMarkSetup.Id;
+                      $scope.MainExamIDForGet = mainExamMarkSetup.MainExamId;
+                      $scope.SubjectIDForMarkCheck = mainExamMarkSetup.MainExamSubjectID;
+                      $scope.SubExamIDForMarkCheck = 0;
+                      $scope.SubExamMarkSetups = [];
+                      $http({
+                          method: 'GET',
+                          url: baseUrl + 'MarkSetup/GetSubExamMarkSetup/' + mainExamMarkSetup.Id + '/' + mainExamMarkSetup.MainExamId
+                      }).then(function successCallback(response) {
+                          $scope.SubExamMarkSetups = response.data.results;
+                          angular.forEach($scope.SubExamMarkSetups, function (item) {
+                              $scope.SubExamIDForMarkCheck = item.SubExamId; // id is in $scope.Id
+                              return;
+                          });
+                      }, function errorCallback(response) {
+                          toastr["info"](response.data.message);
+                      });
+
+                  };
+
+
+                  $scope.SaveSubExamMark = function SaveSubExamMark() {
+
+                      $scope.SubExamMarkSetups = JSON.parse(angular.toJson($scope.SubExamMarkSetups))
+
+                      if ($scope.SubExamMarkSetups != []) {
+                          $http({
+                              method: 'POST',
+                              url: baseUrl + 'MarkSetup/AddSubExamMarkSetup/' + $scope.MainExamIDForGet + '/' + $scope.SubjectIDForMarkCheck,
+                              data: $scope.SubExamMarkSetups
+                          }).then(function successCallback(response) {
+                              $scope.SubExamMarkSetups = response.data.results;
+                              toastr["info"](response.data.message);
+                              resetForm();
+                          }, function errorCallback(response) {
+                              toastr["info"](response.data.message);
+                          });
+
+                      }
+                      else {
+                          return;
+                      }
+
+                  };
+
+                  $scope.SubExamDeleteAllMark = function SubExamDeleteAllMark() {
+                      if ($scope.SubExamMarkSetups.length == 0)
+                          return;
+                      $http({
+                          method: 'DELETE',
+                          url: baseUrl + 'ExamMarkSetup/DeleteAllSubExamMarkSetup/' + $scope.MainExamMarkSetupIdForGet + '/' + $scope.MainExamIDForGet + '/' + $scope.SubExamIDForMarkCheck + '/' + $scope.SubjectIDForMarkCheck
+                      }).then(function successCallback(response) {
+                          toastr["info"](response.data.message);
+                          getSubExam($scope.GetSubExamByMainExamID);
+                      }, function errorCallback(response) {
+                          toastr["info"](response.data.message);
+                      });
+                  }
+
+                  $scope.SubExamDeleteMark = function SubExamDeleteMark(Id) {
+                              $http({
+                                  method: 'DELETE',
+                                  url: baseUrl + 'ExamMarkSetup/DeleteSubExamMark/' + Id + '/' + $scope.MainExamIDForMarkCheck + '/' + $scope.SubjectIDForMarkCheck
+                              }).then(function successCallback(response) {
+                                  toastr["info"](response.data.message);
+                                  getSubExam($scope.GetSubExamByMainExamID);
+                              }, function errorCallback(response) {
+                                  toastr["info"](response.data.message);
+                              });
+                  }
+
+
+                  // validation
+                  $scope.SubExamFullMarkVaild = function SubExamFullMarkVaild() {
+
+
+                      var total = 0;
+
+                      angular.forEach($scope.SubExamMarkSetups, function (value, key) {
+                          total += value.SubExamFullMarks;
+                      });
+                      if ($scope.TotalFullMark == total)
+                          return false;
+
+                      return true;
+
+                  };                         //SubExamDeleteValidation
+
+                  $scope.SubExamFullMarkEachVaild = function SubExamFullMarkEachVaild() {
+
+
+                      var res = false;
+
+                      angular.forEach($scope.SubExamMarkSetups, function (value, key) {
+                          if (value.SubExamFullMarks > value.SubExamExamMarks || value.SubExamExamMarks < value.SubExamPassMark )
+                              res = true;
+
+                      });
+                      return res;
+                  };
+                  $scope.SubExamDeleteValidation = function SubExamDeleteValidation() {
+
+
+                      var res = false;
+
+                      angular.forEach($scope.SubExamMarkSetups, function (value, key) {
+                          if (value.Id == 0)
+                              res = true;
+
+                      });
+                      return res;
+                  };
+
+                  $scope.MainExammarkSetpvalid = function MainExammarkSetpvalid() {
+
+
+                      var ress = false;
+
+                      angular.forEach($scope.MainExamSubjectMarks, function (value, key) {
+                          if (value.MainExamFullMarks < value.MainExamPassMark)
+                              ress = true;
+
+                      });
+
+
+                      return ress;
+
+
+
+
+                  };
+
+                  $scope.MainExamDeleteValidation = function MainExamDeleteValidation() {
+                      var ress = false;
+                      angular.forEach($scope.MainExamSubjectMarks, function (value, key) {
+                          if (value.Id ==0)
+                              ress = true;
+                      });
+                      return ress;
+                  };
+
+                  $scope.DividedExamDeleteValidation = function DividedExamDeleteValidation() {
+                      var ress = false;
+                      angular.forEach($scope.DividedExamMarkSetupVMs, function (value, key) {
+                          if (value.Id == 0)
+                              ress = true;
+                      });
+                      return ress;
+                  };
+
+                  $scope.DividedExamFullMarkVaild = function DividedExamFullMarkVaild() {
+
+                      var total = 0;
+
+                      angular.forEach($scope.DividedExamMarkSetupVMs, function (value, key) {
+                          total += value.DividedExamFullMarks;
+                      });
+                      if ($scope.SubExamTotalFullMark == total)
+                          return false;
+
+                      return true;
+
+                  };
+                  $scope.DividedExamMarkVaild = function DividedExamMarkVaild() {
+
+
+                      var res = false;
+
+                      angular.forEach($scope.DividedExamMarkSetupVMs, function (value, key) {
+                          //if (value.DividedExamFullMarks > value.DividedExamExamMarks || value.DividedExamExamMarks < value.DividedExamPassMarks || value.DividedExamFullMarks == 0 || value.DividedExamExamMarks == 0)
+                          //if (value.DividedExamExamMarks < value.DividedExamPassMarks || (value.DividedExamFullMarks != 0 && value.DividedExamExamMarks == 0))
+                              if (value.DividedExamExamMarks < value.DividedExamPassMarks )
+                              res = true;
+
+                      });
+
+
+                      return res;
+
+
+
+
+                  };
+
+
+
+
+
+
+              }]);
+
+
+    </script>
+
+    <script type="text/javascript">
+
+
+        $(document).ready(function ($) {
+
+            // Disable scroll when focused on a number input.
+            $(document).on('focus', 'input[type=number]', function (e) {
+                $(this).on('wheel', function (e) {
+                    e.preventDefault();
+                });
+            });
+
+            // Restore scroll on number inputs.
+            $(document).on('blur', 'input[type=number]', function (e) {
+                $(this).off('wheel');
+            });
+
+            // Disable up and down keys.
+            $(document).on('keydown', 'input[type=number]', function (e) {
+                if (e.which == 38 || e.which == 40)
+                    e.preventDefault();
+            });
+
+        });
+    </script>
+}

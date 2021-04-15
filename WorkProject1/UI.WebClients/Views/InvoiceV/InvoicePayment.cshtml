@@ -1,0 +1,554 @@
+﻿
+@{
+    ViewBag.Title = "Invoice Collection";
+}
+<style>
+    .DrpdwnWidth ul {
+        width: 350px;
+    }
+</style>
+<div class="kt-container  kt-container--fluid  kt-grid__item kt-grid__item--fluid" ng-controller="ctrlInvoicePayment">
+    <div class="row">
+        <div class="kt-portlet kt-portlet--mobile">
+            <div class="kt-portlet__head kt-portlet__head--lg">
+                <div class="kt-portlet__head-label">
+                    <h3 class="kt-portlet__head-title">
+                        Invoice Collection
+                    </h3>
+                </div>
+            </div>
+            <div class="kt-portlet__body">
+                <!-- BEGIN FORM-->
+                <form class="form-horizontal" ng-submit="getAllInvoicePayment()" name="addform" id="mainFilter" method="post" enctype="multipart/form-data" novalidate>
+                    <div class="form-body">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group row" ng-class="{ 'has-error' : isSubmitted && addform.Client.$invalid}">
+                                    <label class="col-md-6 control-label" style="text-align:right">
+                                        Client Name:
+                                    </label>
+                                    <div class="col-md-6 DrpdwnWidth">
+                                        <input type="text" ng-model="Client" typeahead-on-select='onSelect($item, $model, $label)' placeholder="Enter client name or ID" uib-typeahead="i  as i.Text for i in Searchtext($viewValue)" typeahead-loading="loadingLocations" typeahead-no-results="noResults" class="form-control">
+                                        <i ng-show="loadingLocations" class="glyphicon glyphicon-refresh"></i>
+                                        <div ng-show="noResults"><i class="glyphicon glyphicon-remove"></i> No Results Found</div>
+                                        <input type="hidden" name="ClientId" ng-model="InvoicePaymentObj.Value" ng-value="Std.Value" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group row" ng-class="{ 'has-error' : isSubmitted && addform.InvoiceNo.$invalid}">
+                                    <label class="col-md-6 control-label" style="text-align:right">
+                                        Invoice No:
+                                    </label>
+                                    <div class="col-md-6 DrpdwnWidth">
+                                        <input type="text" ng-model="InvoiceNo" typeahead-on-select='onSelectInvoiceNo($item, $model, $label)' placeholder="Enter Invoice No" uib-typeahead="i  as i.Text for i in SearchtextInvoiceNo($viewValue)" typeahead-loading="loadingLocationsIn" typeahead-no-results="noResultsIn" class="form-control">
+                                        <i ng-show="loadingLocationsIn" class="glyphicon glyphicon-refresh"></i>
+                                        <div ng-show="noResultsIn"><i class="glyphicon glyphicon-remove"></i> </div>
+                                        <input type="hidden" name="InvoiceNo" ng-model="InvoicePaymentObj.Value" ng-value="Std.Value" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                            </div>
+                            <div class="col-md-2">
+                                <button type="submit" ng-click="isSubmitted=true;" class="btn btn-success">Show</button>
+                                <button type="button" class="btn btn-danger" ng-click="resetFilterForm()">Reset</button>
+                            </div>
+                        </div>
+
+                    </div>
+                </form>
+                <br /><br />
+                <table class="table table-bordered table-hover rounded">
+                    <thead>
+                        <tr class="btn-primary">
+                            <th>SL</th>
+                            <th>Invoice No</th>
+                            <th>Client ID & Name</th>
+                            <th>Invoice Amount</th>
+                            <th>Payment</th>
+                            <th>Billing Head</th>
+                            <th>Rate</th>
+                            <th>Quantity</th>
+                            <th>Total Tk.</th>
+                            <th>Collected</th>
+                            <th>Due</th>
+                            <th>Date</th>
+                            <th>Due Date</th>
+                            <th>Status</th>
+
+                            @* <th>Process Amount</th>*@
+                        </tr>
+                    </thead>
+                    <tbody ng-repeat="x in InvoicePaymentList">
+                        <tr>
+                            <td rowspan="{{x.RequList.length+1}}"> {{$index+1}}</td>
+                            <td rowspan="{{x.RequList.length+1}}"> {{x.InvoiceNo}} </td>
+                            <td rowspan="{{x.RequList.length+1}}">{{x.FullName}}</td>
+                            <td rowspan="{{x.RequList.length+1}}">{{x.InvoiceAmount }} </td>
+                            <td rowspan="{{x.RequList.length+1}}">
+                                <a href="javascript:;" class="btn btn-primary" ng-click="editPayment(x)" data-target="#addmodal" data-toggle="modal">
+                                    Payment
+                                </a>
+                            </td>
+
+                        </tr>
+                        <tr ng-repeat="item in x.RequList">
+                            <td> {{item.BillingHeadName}} </td>
+                            <td> {{item.Rate}}</td>
+                            <td> {{item.Quantity}}</td>
+                            <td> {{item.TotalAmount}}</td>
+                            <td> {{item.CollectionAmount}}</td>
+                            <td> {{item.DueAmount}}</td>
+                            <td> {{item.IssueDate | date : "dd MMM yyyy"}}</td>
+                            <td> {{item.DueDate| date : "dd MMM yyyy"}}</td>
+                            <td> {{item.Status}}</td>
+                        </tr>
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!--Modal Area Start-->
+    <div id="addmodal" class="modal fade bd-example-modal-lg" tabindex="-1" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog  modal-lg">
+            <div class="modal-content">
+                <form name="addBasic" ng-submit="saveInvoicePayment()" class="form-horizontal" id="form_sample_1" novalidate>
+                    <div class="modal-header">
+                        <h4 class="modal-title">{{modalTitle}}</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-body">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="form-group row" style="margin-bottom: -1rem;" ng-class="{ 'has-error' : submitted && addBasic.BillingHeadName.$invalid}">
+                                        <label class="col-md-12 control-label">
+                                            {{FullName}}
+                                        </label>
+                                    </div>
+                                    <div class="form-group row" style="margin-bottom: -1rem;" ng-class="{ 'has-error' : submitted && addBasic.BillingHeadName.$invalid}">
+                                        <label class="col-md-12 control-label">
+                                            {{Address}}
+                                        </label>
+                                    </div>
+
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="form-group row" style="margin-bottom: -1rem;" ng-class="{ 'has-error' : submitted && addBasic.BillingHeadName.$invalid}">
+                                        <label class="col-md-12 control-label">
+                                            Invoice No : {{InvoiceNo}}
+                                        </label>
+                                    </div>
+                                    <div class="form-group row mt-3" style="margin-bottom: -1rem;" ng-class="{ 'has-error' : submitted && addBasic.BillingHeadName.$invalid}">
+                                        <label class="col-md-12 control-label">
+                                            Date : {{IssueDate | date : "dd MMM yyyy"}}
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="col-md-8">
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <div class="form-group row" style="margin-bottom: -1rem;" ng-class="{ 'has-error' : submitted && addBasic.BillingHeadName.$invalid}">
+                                                <label class="col-md-12 control-label">
+                                                    Status : {{Status}}
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-8">
+                                            <div class="form-group row " style="margin-bottom: -1rem;" ng-class="{ 'has-error' : submitted && addBasic.BillingMode.$invalid}">
+                                                <label class="col-md-6 control-label" style="text-align:right">
+                                                    Payment Method:
+                                                    <span class="required">*</span>
+                                                </label>
+                                                <div class="col-md-6">
+                                                    <select ng-model="InvPayment" class="form-control" name="BillingMode" required>
+                                                        <option value="">Select One</option>
+                                                        <option value="Cash" selected="selected">Cash</option>
+                                                        <option value="Cheque">Cheque</option>
+                                                    </select>
+                                                    <div class="form-control-focus"> </div>
+                                                    <span ng-show="submitted &&  addBasic.BillingMode.$error.required" class="help-block">Billing Mode Required</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <div class="form-group row mt-3" style="margin-bottom: -1rem;" ng-class="{ 'has-error' : submitted && addBasic.BillingHeadName.$invalid}">
+                                                <label class="col-md-12 control-label">
+                                                    Due Date : {{DueDate | date :  "dd MMM yyyy"}}
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-8">
+                                            <div class="form-group row mt-3" ng-show="InvPayment =='Cheque'" ng-class="{ 'has-error' : submitted && addBasic.ChequeNo.$invalid}">
+                                                <label class="col-md-6 control-label" style="text-align:right">
+                                                    Cheque No:
+                                                    <span class="required"></span>
+                                                </label>
+                                                <div class="col-md-6">
+                                                    <input type="text" ng-model="ChequeNo" class="form-control" placeholder="Cheque No" name="ChequeNo">
+                                                    <div class="form-control-focus"> </div>
+                                                    <span ng-show="submitted &&  addBasic.ChequeNo.$error.required" class="help-block">Cheque No Required</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row" ng-show="Templetes.length>0">
+                                <table class="table table-bordered table-hover">
+                                    <thead>
+                                        <tr class="btn-primary">
+                                            <th>SL</th>
+                                            <th>Billing Head</th>
+                                            <th>Qty</th>
+                                            <th>Rate</th>
+                                            <th>Total</th>
+                                            <th>Discount</th>
+                                            <th>Due Amount</th>
+                                            <th>Collection</th>
+                                            <th>Adjusted</th>
+                                            <th>Extra</th>
+                                            <th>Narration</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody ng-repeat="item in Templetes">
+
+                                        <tr>
+                                            <td> {{$index+1}}</td>
+                                            <td> {{item.BillingHeadName}} </td>
+                                            <td> {{item.Quantity}}</td>
+                                            <td> {{item.Rate}}</td>
+                                            <td> {{item.TotalAmount }}</td>
+                                            <td> {{item.DiscountAmount }}</td>
+                                            <td> {{item.DueAmount }} </td>
+
+                                            <td>
+                                                <input type="text" ng-model="item.CollectionAmount" onkeypress='return (event.charCode >= 48 && event.charCode <= 57) ||
+                                                event.charCode == 0 || event.charCode == 46' class="form-control" placeholder="Collection" name="Collection" ng-change="CalculateCollection(item)">
+                                            </td>
+                                            <td>
+                                                <input type="text" ng-model="item.AdjustmentAmount" ng-init="item.AdjustmentAmount=0" onkeypress='return (event.charCode >= 48 && event.charCode <= 57) ||
+                                                event.charCode == 0 || event.charCode == 46' class="form-control" placeholder="Adjusted" name="AdjustmentAmount" ng-change="CalculateCollection(item)">
+                                            </td>
+                                            <td>
+                                                <input type="text" ng-model="item.ExtraCollectionAmount" ng-init="item.ExtraCollectionAmount=0" onkeypress='return (event.charCode >= 48 && event.charCode <= 57) ||
+                                                 event.charCode == 0 || event.charCode == 46' class="form-control" placeholder="ExtraAmount" name="ExtraCollectionAmount" ng-change="CalculateCollection(item)">
+                                            </td>
+                                            <td>
+                                                <input type="text" ng-model="item.CollectionNarration" class="form-control" placeholder="Narration" name="CollectionNarration">
+                                            </td>
+
+                                        </tr>
+                                    </tbody>
+                                    <tfoot>
+                                        <tr>
+                                            <td colspan="6"> </td>
+                                            <td> Total Due: {{TotalDueAmount}} </td>
+                                            <td> Total Collection: {{Collection}} </td>
+                                            <td> Total Adjusted: {{Adjusted}} </td>
+                                            <td> Total Extra: {{Extra}} </td>
+                                            <td> </td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group row" ng-class="{ 'has-error' : submitted && addBasic.CollectionDate.$invalid}">
+                                        <label class="col-md-6 control-label" style="text-align:right">
+                                            Collection Date:
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-6">
+                                            <input class="form-control" type="text" ng-click="p2=true" is-open="p2" readonly ng-model="CollectionDate" placeholder="Collection Date" uib-datepicker-popup="dd/MM/yyyy" name="CollectionDate" />
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted && addBasic.CollectionDate.$error.required" class="help-block"> Collection Date Required</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group row" ng-show="TotalDueAmount>0" ng-class="{ 'has-error' : submitted && addBasic.NextPaymentDate.$invalid}">
+                                        <label class="col-md-6 control-label" style="text-align:right">
+                                            Next Payment date:
+                                            <span class="required">*</span>
+                                        </label>
+                                        <div class="col-md-6">
+                                            <input class="form-control" type="text" ng-click="p1=true" is-open="p1" readonly ng-model="NextPaymentDate" placeholder="Next Payment date" uib-datepicker-popup="dd/MM/yyyy" name="NextPaymentDate" />
+                                            <div class="form-control-focus"> </div>
+                                            <span ng-show="submitted && addBasic.NextPaymentDate.$error.required" class="help-block"> Next Payment date Required</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" data-dismiss="modal" class="btn btn-secondary" ng-click="resetForm();submitted=false">Cancel</button>
+                        <button type="submit" ng-click="submitted=true" class="btn btn-success">Pay</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!--Modal Area End-->
+</div>
+
+@section Scripts{
+    <script type="text/javascript">
+        OEMSApp.controller("ctrlInvoicePayment", ["$scope", "$http", "SweetAlert", "$filter",
+            function ($scope, $http, SweetAlert, $filter) {
+                init();
+                function init() {
+                    initialize();
+
+                    getAllYear();
+                    getAllMonth();
+                }
+                function initialize() {
+                    $scope.modalTitle = "Invoice Payment";
+                    $scope.InvoicePayment = {};
+                    $scope.InvoicePaymentObj = {};
+                    $scope.currentPage = 1;
+                    $scope.pageno = 1;
+                    $scope.pagesize = 10;
+                    $scope.total_count = 12;
+                    $scope.search = '';
+                    $scope.categories = [];
+                    $scope.designations = [];
+                    $scope.InvoicePayment.Id = 0;
+                    $scope.saveInvoicePayment = saveInvoicePayment;
+                    $scope.InvoicePaymentList = [];
+                    $scope.disT_Amount = true;
+                    $scope.SearchDate = '';
+                    $scope.isSubmitted = false;
+                    $scope.submitted = false;
+                    $scope.getAllInvoicePayment = getAllInvoicePayment;
+                    $scope.resetFilterForm = resetFilterForm;
+                    $scope.InvPayment = "";
+                    $scope.ChequeNo = "";
+                    $scope.NextPaymentDate = "";
+                    $scope.CollectionDate = "";
+                    $scope.resetForm = resetForm;
+                    $scope.Due = 0;
+                    $scope.Collection = 0;
+                    $scope.TotalDueAmount = 0;
+                    $scope.Adjusted = 0;
+                    $scope.Extra = 0;
+                }
+                $scope.Searchtext = function (val) {
+                    return $http.get(baseUrl + 'Client/SearchClient/' + val
+                        ).then(function (response) {
+                            return response.data.results.map(function (item) {
+                                return item;
+                            });
+                        });
+                };
+                $scope.onSelect = function onSelect($item, $model, $label) {
+                    $scope.InvoicePayment.ClientId = $item.Value;
+                };
+                $scope.SearchtextInvoiceNo = function (val) {
+                    return $http.get(baseUrl + 'Invoice/SearchInvoiceNo/' + val
+                        ).then(function (response) {
+                            return response.data.results.map(function (item) {
+                                return item;
+                            });
+                        });
+                };
+                $scope.onSelectInvoiceNo = function onSelectInvoiceNo($item, $model, $label) {
+                    $scope.InvoicePayment.InvoiceNo = $item.Value;
+                };
+                $scope.selectAll = function () {
+                    angular.forEach($scope.InvoicePaymentList, function (item) {
+                        angular.forEach(item.RequList, function (itemInner) {
+                            itemInner.IsChecked = $scope.CheckedAll;
+                        })
+                    });
+
+                };
+                function getAllYear() {
+                    $scope.YearList = [];
+                    $http({
+                        method: 'GET',
+                        url: baseUrl + 'Common/GetAllYear/'
+                    }).then(function successCallback(response) {
+                        $scope.YearList = response.data.results.Table;
+                    }, function errorCallback(response) {
+                        toastr["warning"](response.data.Message);
+                    });
+                }
+                function getAllMonth() {
+                    $scope.MonthList = [];
+                    $http({
+                        method: 'GET',
+                        url: baseUrl + 'Common/GetAllMonth/'
+                    }).then(function successCallback(response) {
+                        $scope.MonthList = response.data.results.Table;
+                    }, function errorCallback(response) {
+                        toastr["warning"](response.data.Message);
+                    });
+                }
+                function getAllInvoicePayment() {
+                    $scope.InvoicePaymentList = [];
+                    
+                    $http({
+                        method: 'POST',
+                        url: baseUrl + 'Invoice/GetAllInvoicePayment/',
+                        data: $scope.InvoicePayment
+                    }).then(function successCallback(response) {
+                        $scope.InvoicePaymentList = response.data.results;
+
+                    }, function errorCallback(response) {
+                        toastr["info"](response.data.Message);
+                    });
+                }
+                function num(n) {
+
+                    if ($.isNumeric(n)) {
+                        return parseFloat(n);
+                    } else {
+                        return 0;
+                    }
+                }
+                $scope.CalculateCollection = function CalculateCollection(item) {
+                    if (item.CollectionAmount > item.DueAmount) {
+                        toastr["info"]("Collection is greater than Due Amount");
+                        item.CollectionAmount = "";
+                        return;
+                    }
+                    $scope.Due = 0;
+                    $scope.Collection = 0;
+                    $scope.TotalDueAmount = 0;
+                    $scope.Adjusted = 0;
+                    $scope.Extra = 0;
+                    angular.forEach($scope.Templetes, function (aData) {
+
+                        $scope.Due += num(aData.DueAmount);
+                        $scope.Collection += num(aData.CollectionAmount);
+                        $scope.Adjusted += num(aData.AdjustmentAmount);
+                        $scope.Extra += num(aData.ExtraCollectionAmount);
+                    });
+                    $scope.TotalDueAmount = parseFloat($scope.Due) - (parseFloat($scope.Collection) + parseFloat($scope.Adjusted));
+                }
+
+                $scope.editPayment = function editPayment(n) {
+                    $scope.Templetes = [];
+                    $http({
+                        method: 'GET',
+                        url: baseUrl + 'Invoice/EditInvoicePaymentByClientId/' + n.ClientId + "/" + n.InvoiceNo
+                    }).then(function successCallback(response) {
+                        $scope.Templetes = response.data.results;
+                        $scope.FullName = response.data.results[0].FullName;
+                        $scope.Address = response.data.results[0].Address;
+                        $scope.InvoiceNo = response.data.results[0].InvoiceNo;
+                        $scope.Status = response.data.results[0].Status;
+                        $scope.IssueDate = response.data.results[0].IssueDate;
+                        $scope.DueDate = response.data.results[0].DueDate;
+
+                        $scope.Due = 0;
+                        $scope.Collection = 0;
+                        $scope.TotalDueAmount = 0;
+                        angular.forEach($scope.Templetes, function (aData) {
+
+                            $scope.Due += num(aData.DueAmount);
+                            $scope.Collection += num(aData.CollectionAmount);
+                        });
+                        $scope.TotalDueAmount = $scope.Due - $scope.Collection;
+                    }, function errorCallback(response) {
+                        toastr["warning"](response.data.Message);
+                    });
+
+                };
+
+                function saveInvoicePayment() {
+
+                    console.log($scope.ChequeNo);
+
+
+                    var rowLngth = $scope.Templetes.length;
+                    var count = 0;
+                    if ($scope.addBasic.$invalid)
+                        return;
+                    angular.forEach($scope.Templetes, function (aData) {
+                        aData.PaymentMethod = $scope.InvPayment;
+                        aData.ChequeNo = $scope.ChequeNo;
+                        aData.NextPaymentDate = $filter('date')($scope.NextPaymentDate, "MM/dd/yyyy");
+                        aData.CollectionDate = $filter('date')($scope.CollectionDate, "MM/dd/yyyy");
+                        if (aData.CollectionAmount < 1) {
+                            count++;
+                        }
+                    });
+                    if (rowLngth == count) {
+                        toastr["warning"]("Entry at least one collection");
+                        return;
+                    }
+                    else if ($scope.NextPaymentDate == "" && $scope.TotalDueAmount > 0) {
+                        toastr["warning"]("Select Next Payment date");
+                        return;
+                    }
+                    else if ($scope.CollectionDate == "") {
+                        toastr["warning"]("Select Collection Date");
+                        return;
+                    }
+                    else {
+                        SweetAlert.swal({
+                            title: "Are you sure to Pay?", type: "info", showCancelButton: true, confirmButtonColor: "#DD6B55",
+                            confirmButtonText: "Yes, Pay it!",
+                            closeOnConfirm: false
+                        },
+                  function (isConfirm) {
+                      if (isConfirm) {
+                          var Templet = [];
+                          console.log($scope.Templetes);
+                          angular.forEach($scope.Templetes, function (adata) {
+                              Templet.push(adata);
+                          });
+                          $http({
+                              method: 'POST',
+                              url: baseUrl + 'Invoice/SaveInvoicePayment/',
+                              data: Templet
+                          }).then(function successCallback(response) {
+                              $('#addmodal').modal('toggle');
+                              SweetAlert.swal("Payment!", response.data.message, "success");
+                              //toastr["info"](response.data.message);
+                              getAllInvoicePayment();
+                              if (response.data.httpStatusCode != 305) {
+                                  resetForm();
+                              }
+                          }, function errorCallback(response) {
+                              toastr["warning"](response.data.Message);
+                          });
+                      }
+                  });
+                    }
+                }
+
+                function resetFilterForm() {
+                    $scope.isSubmitted = false;
+                    $scope.Client = "";
+                    $scope.InvoiceNo = "";
+                    $scope.InvoicePaymentObj = {};
+                    $scope.InvoicePayment = {};
+                    $scope.InvoicePaymentList = [];
+                }
+                function resetForm() {
+                    $scope.InvPayment = "";
+                    $scope.ChequeNo = "";
+
+                    $scope.addBasic.$setUntouched();
+                    $scope.addBasic.$setPristine();
+                    $scope.submitted = false;
+                }
+            }]);
+    </script>
+}
+
+
+
+

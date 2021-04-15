@@ -1,0 +1,631 @@
+﻿@{
+    ViewBag.Title = "Schedule SMS Config";
+}
+<style>
+    .form-border {
+        padding: 5px;
+        border-radius:5px;
+    }
+    .form-div {
+        background-color:#e3eff9;
+        padding-left:10px!important;
+        padding-right:10px!important;
+    }
+    .form-body {
+        padding-bottom:0px!important;
+        padding-top:0px!important;
+    }
+</style>
+<div class="portlet box blue-hoki" ng-controller="MEGR">
+    <div class="portlet-title">
+        <div class="caption">
+            <span class="caption-subject sbold uppercase">Scheduler SMS</span>
+        </div>
+    </div>
+    <div class="portlet-body form">
+        <form class="form-horizontal form-border" name="addformFees" novalidate  >
+            <div class="form-body form-div" >
+                <div class="row ">
+                    <label class="col-md-3 control-label sbold" style="text-align:left!important;padding-bottom:20px">
+                        <span style="border-bottom:#0094ff 2px solid;"> Daily Fees Collection</span>
+                    </label>
+                </div>
+                <div class="row" >
+                    <div class="col-md-3 form-group" ng-class="{ 'has-error' : submitted && addformFees.Hours.$invalid && addformFees.Min.$invalid}">
+                            <label class="col-md-5 control-label" style="padding:0px!important">
+                                Run Time :
+                                <span class="required">*</span>
+                            </label>
+                            <div class="col-md-7">
+                                <div class="col-md-6" style="padding:0px!important">
+                                    <select class="form-control" ng-model="smsFees.Hours" name="Hours"  style="padding:0px!important">
+                                        <option ng-selected="{{1==item}}" ng-repeat="item in hours" value="{{item}}">{{item}}</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6" style="padding:0px!important">
+                                    <select class="form-control" ng-model="smsFees.Min" name="Min" style="padding:0px!important">
+                                        <option ng-repeat="item in Min" value="{{item}}">{{item}}</option>
+                                    </select>
+                                </div>
+                            </div>
+                                <div class="form-control-focus"> </div>
+                                <span ng-show="submitted && addformFees.Hours.$error.required && addformFees.Min.$error.required" class="help-block">Run Time Required</span>
+                            </div>
+                    <div class="col-md-6 form-group" ng-class="{ 'has-error' : submitted && addformFees.Body.$invalid}">
+                        <label class="col-md-3 control-label">
+                            Body:
+                            <span class="required">*</span>
+                        </label>
+                        <div class="col-md-9">
+                            <textarea rows="4" ng-model="smsFees.Body" placeholder="Write Your Message..." id="txtBody1" required name="Body" class="form-control"></textarea>
+                            <div class="form-control-focus"> </div>
+                            <span ng-show="submitted && addformFees.Body.$error.required" class="help-block">Body Required</span>
+                            <span class="btn btn-xs" ng-click="Tags($event,1)" style="margin-right:5px;margin-bottom:5px;" data-name="[TotalCollection]">[TotalCollection]</span>
+                            <span class="btn btn-xs" ng-click="Tags($event,1)" style="margin-right:5px;margin-bottom:5px;" data-name="[NoOfStudent]">[NoOfStudent]</span>
+                        </div>
+                    </div>
+                    <div class="col-md-4  form-group" ng-class="{ 'has-error' : submitted && addformFees.Recipent.$invalid}">
+                        <label class="col-md-3 control-label" style="padding:0px!important">
+                            Recipent:
+                            <span class="required">*</span>
+                        </label>
+                        <div class="col-md-9">
+                            <textarea rows="4" ng-model="smsFees.Recipent" placeholder="Add Multiple Recipent by Comma(,)" required name="Recipent" class="form-control"></textarea>
+                            <div class="form-control-focus"> </div>
+                            <span ng-show="submitted && addformFees.Recipent.$error.required" class="help-block">Recipent Required</span>
+                        </div>
+                        <div class="pull-right">
+                            <button ng-click="submitted=true;FeesCollectionSave()" class="btn green">Save</button>
+                            <a ng-click="ResetFees()" class="btn info">Reset</a>
+                        </div>
+                    </div>
+                  </div>
+            </div>
+        </form>
+        <form class="form-horizontal form-border" name="addformDA" novalidate>
+            <div class="form-body form-div">
+                <div class="row ">
+                    <label class="col-md-3 control-label sbold" style="text-align:left!important;padding-bottom:20px">
+                        <span style="border-bottom:#0094ff 2px solid;"> Daily Accounts</span>
+                    </label>
+                </div>
+                <div class="row">
+                    <div class="col-md-3 form-group" ng-class="{ 'has-error' : submitted1 && addformDA.Hours.$invalid && addformDA.Min.$invalid}">
+                        <label class="col-md-5 control-label" style="padding:0px!important">
+                            Run Time :
+                            <span class="required">*</span>
+                        </label>
+                        <div class="col-md-7">
+                            <div class="col-md-6" style="padding:0px!important">
+                                <select class="form-control" ng-model="smsDA.Hours" name="Hours" style="padding:0px!important">
+                                    <option ng-selected="{{1==item}}" ng-repeat="item in hours" value="{{item}}">{{item}}</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6" style="padding:0px!important">
+                                <select class="form-control" ng-model="smsDA.Min" name="Min" style="padding:0px!important">
+                                    <option ng-repeat="item in Min" value="{{item}}">{{item}}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-control-focus"> </div>
+                        <span ng-show="submitted1 && addformDA.Hours.$error.required && addformDA.Min.$error.required" class="help-block">Run Time Required</span>
+                    </div>
+                    <div class="col-md-6 form-group" ng-class="{ 'has-error' : submitted1 && addformDA.Body.$invalid}">
+                        <label class="col-md-3 control-label">
+                            Body:
+                            <span class="required">*</span>
+                        </label>
+                        <div class="col-md-9">
+                            <textarea rows="4" ng-model="smsDA.Body" required name="Body" id="txtBody2" class="form-control"></textarea>
+                            <div class="form-control-focus"> </div>
+                            <span ng-show="submitted1 && addformDA.Body.$error.required" class="help-block">Body Required</span>
+                            
+                        </div>
+                        <span class="btn btn-xs" ng-click="Tags($event,2)" style="margin-right:5px;margin-bottom:5px;" data-name="[TotalCollection]">[TotalCollection]</span>
+                        <span class="btn btn-xs" ng-click="Tags($event,2)" style="margin-right:5px;margin-bottom:5px;" data-name="[TotalIncome]">[TotalIncome]</span>
+                        <span class="btn btn-xs" ng-click="Tags($event,2)" style="margin-right:5px;margin-bottom:5px;" data-name="[TotalExpense]">[TotalExpense ]</span>
+                        <span class="btn btn-xs" ng-click="Tags($event,2)" style="margin-right:5px;margin-bottom:5px;" data-name="[HeadName]">[HeadName]</span>
+                        <span class="btn btn-xs" ng-click="Tags($event,2)" style="margin-right:5px;margin-bottom:5px;" data-name="[HeadIncome]">[HeadIncome]</span>
+                        <span class="btn btn-xs" ng-click="Tags($event,2)" style="margin-right:5px;margin-bottom:5px;" data-name="[HeadExpense]">[HeadExpense]</span>
+
+                    </div>
+                    <div class="col-md-4  form-group" ng-class="{ 'has-error' : submitted1 && addformDA.Recipent.$invalid}">
+                        <label class="col-md-3 control-label">
+                            Recipent:
+                            <span class="required">*</span>
+                        </label>
+                        <div class="col-md-9">
+                            <textarea rows="4" ng-model="smsDA.Recipent" required name="Recipent" class="form-control"></textarea>
+                            <div class="form-control-focus"> </div>
+                            <span ng-show="submitted1 && addformDA.Recipent.$error.required" class="help-block">Recipent Required</span>
+                        </div>
+                        <div class="pull-right">
+                            <button ng-click="submitted1=true;DASave()" class="btn green">Save</button>
+                            <a ng-click="ResetDA()" class="btn info">Reset</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+        <form class="form-horizontal form-border" name="addformSAS" novalidate>
+            <div class="form-body form-div">
+                <div class="row ">
+                    <label class="col-md-3 control-label sbold" style="text-align:left!important;padding-bottom:20px">
+                        <span style="border-bottom:#0094ff 2px solid;">Student Attendance Summary</span>
+                    </label>
+                </div>
+                <div class="row">
+                    <div class="col-md-3 form-group" ng-class="{ 'has-error' : submitted2 && addformSAS.Hours.$invalid && addformSAS.Min.$invalid}">
+                        <label class="col-md-5 control-label" style="padding:0px!important">
+                            Run Time :
+                            <span class="required">*</span>
+                        </label>
+                        <div class="col-md-7">
+                            <div class="col-md-6" style="padding:0px!important">
+                                <select class="form-control" ng-model="smsSAS.Hours" name="Hours" style="padding:0px!important">
+                                    <option ng-selected="{{1==item}}" ng-repeat="item in hours" value="{{item}}">{{item}}</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6" style="padding:0px!important">
+                                <select class="form-control" ng-model="smsSAS.Min" name="Min" style="padding:0px!important">
+                                    <option ng-repeat="item in Min" value="{{item}}">{{item}}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-control-focus"> </div>
+                        <span ng-show="submitted2 && addformSAS.Hours.$error.required && addformSAS.Min.$error.required" class="help-block">Run Time Required</span>
+                    </div>
+                    <div class="col-md-6 form-group" ng-class="{ 'has-error' : submitted2 && addformSAS.Body.$invalid}">
+                        <label class="col-md-3 control-label">
+                            Body:
+                            <span class="required">*</span>
+                        </label>
+                        <div class="col-md-9">
+                            <textarea rows="4" ng-model="smsSAS.Body" required name="Body" id="txtBody3" class="form-control"></textarea>
+                            <div class="form-control-focus"> </div>
+                            <span ng-show="submitted2 && addformSAS.Body.$error.required" class="help-block">Body Required</span>
+                        </div>
+                        <span class="btn btn-xs" ng-click="Tags($event,3)" style="margin-right:5px;margin-bottom:5px;" data-name="[TotalStudent]">[TotalStudent]</span>
+                        <span class="btn btn-xs" ng-click="Tags($event,3)" style="margin-right:5px;margin-bottom:5px;" data-name="[TotalPresent]">[TotalPresent]</span>
+                        <span class="btn btn-xs" ng-click="Tags($event,3)" style="margin-right:5px;margin-bottom:5px;" data-name="[TotalAbsent]">[TotalAbsent]</span>
+
+                    </div>
+                    <div class="col-md-4  form-group" ng-class="{ 'has-error' : submitted2 && addformSAS.Recipent.$invalid}">
+                        <label class="col-md-3 control-label">
+                            Recipent:
+                            <span class="required">*</span>
+                        </label>
+                        <div class="col-md-9">
+                            <textarea rows="4" ng-model="smsSAS.Recipent" required name="Recipent" class="form-control"></textarea>
+                            <div class="form-control-focus"> </div>
+                            <span ng-show="submitted2 && addformSAS.Recipent.$error.required" class="help-block">Recipent Required</span>
+                        </div>
+                        <div class="pull-right">
+                            <button ng-click="submitted2=true;SASSave()" class="btn green">Save</button>
+                            <a ng-click="ResetSAS()" class="btn info">Reset</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+        <form class="form-horizontal form-border" name="addformEAS" novalidate>
+            <div class="form-body form-div">
+                <div class="row ">
+                    <label class="col-md-3 control-label sbold" style="text-align:left!important;padding-bottom:20px">
+                        <span style="border-bottom:#0094ff 2px solid;">Employee Attendance Summary</span>
+                    </label>
+                </div>
+                <div class="row">
+                    <div class="col-md-3 form-group" ng-class="{ 'has-error' : submitted3 && addformEAS.Hours.$invalid && addformEAS.Min.$invalid}">
+                        <label class="col-md-5 control-label" style="padding:0px!important">
+                            Run Time :
+                            <span class="required">*</span>
+                        </label>
+                        <div class="col-md-7">
+                            <div class="col-md-6" style="padding:0px!important">
+                                <select class="form-control" ng-model="smsEAS.Hours" name="Hours" style="padding:0px!important">
+                                    <option ng-selected="{{1==item}}" ng-repeat="item in hours" value="{{item}}">{{item}}</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6" style="padding:0px!important">
+                                <select class="form-control" ng-model="smsEAS.Min" name="Min" style="padding:0px!important">
+                                    <option ng-repeat="item in Min" value="{{item}}">{{item}}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-control-focus"> </div>
+                        <span ng-show="submitted3 && addformEAS.Hours.$error.required && addformEAS.Min.$error.required" class="help-block">Run Time Required</span>
+                    </div>
+                    <div class="col-md-6 form-group" ng-class="{ 'has-error' : submitted3 && addformEAS.Body.$invalid}">
+                        <label class="col-md-3 control-label">
+                            Body:
+                            <span class="required">*</span>
+                        </label>
+                        <div class="col-md-9">
+                            <textarea rows="4" ng-model="smsEAS.Body" required id="txtBody4" name="Body" class="form-control"></textarea>
+                            <div class="form-control-focus"> </div>
+                            <span ng-show="submitted3 && addformEAS.Body.$error.required" class="help-block">Body Required</span>
+                        </div>
+                        <span class="btn btn-xs" ng-click="Tags($event,4)" style="margin-right:5px;margin-bottom:5px;" data-name="[TotalEmp]">[TotalEmp]</span>
+                        <span class="btn btn-xs" ng-click="Tags($event,4)" style="margin-right:5px;margin-bottom:5px;" data-name="[TotalPresent]">[TotalPresent]</span>
+                        <span class="btn btn-xs" ng-click="Tags($event,4)" style="margin-right:5px;margin-bottom:5px;" data-name="[TotalAbsent]">[TotalAbsent]</span>
+                        <span class="btn btn-xs" ng-click="Tags($event,4)" style="margin-right:5px;margin-bottom:5px;" data-name="[TotalLeave]">[TotalLeave]</span>
+                    </div>
+                    <div class="col-md-4  form-group" ng-class="{ 'has-error' : submitted3 && addformEAS.Recipent.$invalid}">
+                        <label class="col-md-3 control-label">
+                            Recipent:
+                            <span class="required">*</span>
+                        </label>
+                        <div class="col-md-9">
+                            <textarea rows="4" ng-model="smsEAS.Recipent" required name="Recipent" class="form-control"></textarea>
+                            <div class="form-control-focus"> </div>
+                            <span ng-show="submitted3 && addformEAS.Recipent.$error.required" class="help-block">Recipent Required</span>
+                        </div>
+                        <div class="pull-right">
+                            <button ng-click="submitted3=true;EASSave()" class="btn green">Save</button>
+                            <a ng-click="ResetEAS()" class="btn info">Reset</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+        <form class="form-horizontal form-border" name="addformELS" novalidate>
+            <div class="form-body form-div">
+                <div class="row ">
+                    <label class="col-md-3 control-label sbold" style="text-align:left!important;padding-bottom:20px">
+                        <span style="border-bottom:#0094ff 2px solid;">Employee Leave Summary</span>
+                    </label>
+                </div>
+                <div class="row">
+                    <div class="col-md-3 form-group" ng-class="{ 'has-error' : submitted4 && addformELS.Hours.$invalid && addformELS.Min.$invalid}">
+                        <label class="col-md-5 control-label" style="padding:0px!important">
+                            Run Time :
+                            <span class="required">*</span>
+                        </label>
+                        <div class="col-md-7">
+                            <div class="col-md-6" style="padding:0px!important">
+                                <select class="form-control" ng-model="smsELS.Hours" name="Hours" style="padding:0px!important">
+                                    <option ng-selected="{{1==item}}" ng-repeat="item in hours" value="{{item}}">{{item}}</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6" style="padding:0px!important">
+                                <select class="form-control" ng-model="smsELS.Min" name="Min" style="padding:0px!important">
+                                    <option ng-repeat="item in Min" value="{{item}}">{{item}}</option>
+                                </select>
+                            </div>
+                            </div>
+                        <div class="form-control-focus"> </div>
+                        <span ng-show="submitted4 && addformELS.Hours.$error.required && addformELS.Min.$error.required" class="help-block">Run Time Required</span>
+                    </div>
+                    <div class="col-md-6 form-group" ng-class="{ 'has-error' : submitted4 && addformELS.Body.$invalid}">
+                        <label class="col-md-3 control-label">
+                            Body:
+                            <span class="required">*</span>
+                        </label>
+                        <div class="col-md-9">
+                            <textarea rows="4" ng-model="smsELS.Body" id="txtBody5" required name="Body" class="form-control"></textarea>
+                            <div class="form-control-focus"> </div>
+                            <span ng-show="submitted4 && addformELS.Body.$error.required" class="help-block">Body Required</span>
+                        </div>
+                        <span class="btn btn-xs" ng-click="Tags($event,5)" style="margin-right:5px;margin-bottom:5px;" data-name="[TotalLeaveApplication]">[TotalLeaveApplication]</span>
+                        <span class="btn btn-xs" ng-click="Tags($event,5)" style="margin-right:5px;margin-bottom:5px;" data-name="[TotalPending]">[TotalPending]</span>
+                        <span class="btn btn-xs" ng-click="Tags($event,5)" style="margin-right:5px;margin-bottom:5px;" data-name="[TotalApprove]">[TotalApprove]</span>
+                    </div>
+                    <div class="col-md-4  form-group" ng-class="{ 'has-error' : submitted4 && addformELS.Recipent.$invalid}">
+                        <label class="col-md-3 control-label">
+                            Recipent:
+                            <span class="required">*</span>
+                        </label>
+                        <div class="col-md-9">
+                            <textarea rows="4" ng-model="smsELS.Recipent" required name="Recipent" class="form-control"></textarea>
+                            <div class="form-control-focus"> </div>
+                            <span ng-show="submitted4 && addformELS.Recipent.$error.required" class="help-block">Recipent Required</span>
+                        </div>
+                        <div class="pull-right">
+                            <button ng-click="submitted4=true;ELSSave()" class="btn green">Save</button>
+                            <a ng-click="ResetELS()" class="btn info">Reset</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div id="addformFees" class="modal fade" tabindex="-1" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form name="importform" class="form-horizontal" id="form_sample_1" novalidate>
+                    <div class="modal-body">
+                        <h4 class="modal-title" style="text-align:center">SMS Send Successfully</h4>
+                    </div>
+                    <div class="modal-footer" style="padding-right:10px">
+                        <button type="button" data-dismiss="modal" name="ColseModal" class="btn dark btn-outline" ng-click="submitted=false">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            function Tags(e) {
+                var tag = $(this).text();
+                console.log(tag);
+                var el = $("#txtBody"+e).get(0);
+                console.log(el.selectionStart);
+                if (el.setSelectionRange) {
+                    el.value = el.value.substring(0, el.selectionStart) + tag + el.value.substring(el.selectionStart, el.selectionEnd) + el.value.substring(el.selectionEnd, el.value.length);
+                }
+                console.log(el.selectionStart);
+            }
+            $(document).on("click", ".tag", function () {
+                var tag = $(this).text();
+                console.log(tag);
+                var el = $("#txtBody").get(0);
+                console.log(el.selectionStart);
+                if (el.setSelectionRange) {
+                    el.value = el.value.substring(0, el.selectionStart) + tag + el.value.substring(el.selectionStart, el.selectionEnd) + el.value.substring(el.selectionEnd, el.value.length);
+                }
+                console.log(el.selectionStart);
+            });
+        });
+    </script>
+
+    <script type="text/javascript">
+        OEMSApp.controller("MEGR", ["$scope", "$http", "SweetAlert", "$window", "filterFilter", "$filter",
+        function ($scope, $http, SweetAlert, $window, filterFilter, $filter) {
+              init();
+              function init() {
+                  initialize();
+                  getAllDropdowns();
+                  GetScheduleSMSConfig();
+                  getAllTempTag();
+              }
+              function initialize() {
+                  $scope.smsFees = {};
+                  $scope.smsDA = {};
+                  $scope.smsSAS = {};
+                  $scope.smsEAS = {};
+                  $scope.sms = {};
+                  $scope.Settings = {};
+                  $scope.sms.SMSPart = 0;
+                  $scope.sms.SMSLen = 0;
+                  $scope.Dropdowns = [];
+                  $scope.Settings = [];
+                  $scope.TempTag = [];
+                  $scope.CommonFeilds = [];
+                  $scope.sms.SMSBody = [];
+                  $scope.getAllDropdowns = getAllDropdowns;
+                 
+                  $scope.getAllTempTag = getAllTempTag;
+
+                  $scope.submitted = false;
+                  $scope.submitted1 = false;
+                  $scope.submitted2 = false;
+                  $scope.submitted3 = false;
+                  $scope.submitted4 = false;
+                  // $scope.total = total;
+                  $scope.Min = [ ]
+                  for (var i = 1; i < 60; i++) {
+                      $scope.Min.push(i);
+                  }
+                  $scope.hours = []
+                  for (var i = 1; i < 24; i++) {
+                      $scope.hours.push(i);
+                  }
+                  $scope.smsFees.RunTime = 1;
+              };
+              $scope.Tags = function Tags(e,num) {
+                  var tag = e.target.attributes["data-name"].value;
+                  console.log(tag);
+                  var el = $("#txtBody" + num).get(0);
+                  console.log(el.selectionStart);
+                  if (el.setSelectionRange) {
+                      el.value = el.value.substring(0, el.selectionStart) + tag + el.value.substring(el.selectionStart, el.selectionEnd) + el.value.substring(el.selectionEnd, el.value.length);
+                  }
+                  console.log(el.selectionStart);
+              };
+              $scope.ResetFees = function ResetFees() {
+                  $scope.smsFees = {};
+                  $scope.submitted = false;
+              };
+              $scope.ResetDA = function ResetDA() {
+                  $scope.smsDA = {};
+                  $scope.submitted1 = false;
+              };
+              $scope.ResetSAS = function ResetSAS() {
+                  $scope.smsSAS = {};
+                  $scope.submitted2 = false;
+              };
+              $scope.ResetEAS = function Reset() {
+                  $scope.smsEAS = {};
+                  $scope.submitted3 = false;
+              };
+              $scope.ResetELS = function ResetELS() {
+                  $scope.smsELS = {};
+                  $scope.submitted4 = false;
+              };
+              $scope.total = function total() {
+                  if ($scope.sms.isUnicode)
+                  {
+
+                      if ($scope.sms.SMSBody.length > 70) {
+                          $scope.sms.SMSPart = Math.ceil($scope.sms.SMSBody.length / 67);
+                          $scope.maximumLength = 67;
+                      }
+                      else {
+                          $scope.sms.SMSPart = 1;
+                          $scope.maximumLength = 70;
+                      }
+                  }
+                  else
+                  {
+                      if ($scope.sms.SMSBody.length > 160) {
+                          $scope.sms.SMSPart = Math.ceil($scope.sms.SMSBody.length / 153);
+                          $scope.maximumLength = 153;
+                      }
+                      else {
+                          $scope.sms.SMSPart = 1;
+                          $scope.maximumLength = 160;
+                      }
+                  }
+
+                  return $scope.sms.SMSPart;
+              }
+              $scope.containsNonLatinCodepoints = function containsNonLatinCodepoints(s) {
+                  $scope.sms.isUnicode = /[^\u0000-\u00ff]/.test(s);
+              }
+              $scope.FeesCollectionSave = function FeesCollectionSave() {
+                  if ($scope.addformFees.$invalid == true)
+                      return;
+                  $scope.smsFees.CategoryId = 1;
+                  $scope.smsFees.Type = 'S';
+                  if ($scope.smsFees != {}) {
+                      $http({
+                          method: 'POST',
+                          url: baseUrl + 'SMS/AddUpdateScheduleSMSConfig/',
+                          data: $scope.smsFees
+                      }).then(function successCallback(response) {
+                          toastr["info"](response.data.message);
+                      }, function errorCallback(response) {
+                          toastr["warning"](response.data.Message);
+                      });
+                  }
+              };
+              $scope.DASave = function DASave() {
+                  if ($scope.addformDA.$invalid == true)
+                      return;
+                  $scope.smsDA.CategoryId = 2;
+                  $scope.smsDA.Type = 'S';
+                  if ($scope.smsDA != {}) {
+                      $http({
+                          method: 'POST',
+                          url: baseUrl + 'SMS/AddUpdateScheduleSMSConfig/',
+                          data: $scope.smsDA
+                      }).then(function successCallback(response) {
+                          toastr["info"](response.data.message);
+                      }, function errorCallback(response) {
+                          toastr["warning"](response.data.message);
+                      });
+                  }
+              };
+              $scope.SASSave = function SASSave() {
+                  if ($scope.addformSAS.$invalid == true)
+                      return;
+                  $scope.smsSAS.CategoryId = 3;
+                  $scope.smsSAS.Type = 'S';
+                  if ($scope.smsSAS != {}) {
+                      $http({
+                          method: 'POST',
+                          url: baseUrl + 'SMS/AddUpdateScheduleSMSConfig/',
+                          data: $scope.smsSAS
+                      }).then(function successCallback(response) {
+                          toastr["info"](response.data.message);
+                      }, function errorCallback(response) {
+                          toastr["warning"](response.data.message);
+                      });
+                  }
+              };
+              $scope.EASSave = function EASSave() {
+                  if ($scope.addformEAS.$invalid == true)
+                      return;
+                  $scope.smsEAS.CategoryId = 4;
+                  $scope.smsEAS.Type = 'S';
+                  if ($scope.smsEAS != {}) {
+                      $http({
+                          method: 'POST',
+                          url: baseUrl + 'SMS/AddUpdateScheduleSMSConfig/',
+                          data: $scope.smsEAS
+                      }).then(function successCallback(response) {
+                          toastr["info"](response.data.message);
+                      }, function errorCallback(response) {
+                          toastr["warning"](response.data.Message);
+                      });
+                  }
+              };
+              $scope.ELSSave = function ELSSave() {
+                  if ($scope.addformELS.$invalid == true)
+                      return;
+                  $scope.smsELS.CategoryId = 5;
+                  $scope.smsELS.Type = 'S';
+                  if ($scope.smsELS != {}) {
+                      $http({
+                          method: 'POST',
+                          url: baseUrl + 'SMS/AddUpdateScheduleSMSConfig/',
+                          data: $scope.smsELS
+                      }).then(function successCallback(response) {
+                          toastr["info"](response.data.message);
+                      }, function errorCallback(response) {
+                          toastr["warning"](response.data.Message);
+                      });
+                  }
+
+              };
+              function GetScheduleSMSConfig() {
+                  $scope.Settings = [];
+                  $http({
+                      method: 'GET',
+                      url: baseUrl + 'SMS/GetScheduleSMSConfig/'
+                  }).then(function successCallback(response) {
+                      $scope.Settings = response.data.results;
+                      $scope.smsFees = filterFilter(response.data.results, { CategoryId: 1 })[0];
+                      $scope.smsFees.Hours = $scope.smsFees.RunTime.substring(0, 2);
+                      $scope.smsFees.Min = $scope.smsFees.RunTime.substring(3, 5);
+                      $scope.smsDA = filterFilter(response.data.results, { CategoryId: 2 })[0];
+                      $scope.smsDA.Hours = $scope.smsDA.RunTime.substring(0, 2);
+                      $scope.smsDA.Min = $scope.smsDA.RunTime.substring(3, 5);
+                      $scope.smsSAS = filterFilter(response.data.results, { CategoryId: 3 })[0];
+                      $scope.smsSAS.Hours = $scope.smsSAS.RunTime.substring(0, 2);
+                      $scope.smsSAS.Min = $scope.smsSAS.RunTime.substring(3, 5);
+                      $scope.smsEAS = filterFilter(response.data.results, { CategoryId: 4 })[0];
+                      $scope.smsEAS.Hours = $scope.smsEAS.RunTime.substring(0, 2);
+                      $scope.smsEAS.Min = $scope.smsEAS.RunTime.substring(3, 5);
+                      $scope.smsELS = filterFilter(response.data.results, { CategoryId: 5 })[0];
+                      $scope.smsELS.Hours = $scope.smsELS.RunTime.substring(0, 2);
+                      $scope.smsELS.Min = $scope.smsELS.RunTime.substring(3, 5);
+                  }, function errorCallback(response) {
+                      toastr["info"](response.data.Message);
+                  });
+              }
+              function getAllTempTag() {
+                  $scope.TempTag = [];
+                  $http({
+                      method: 'GET',
+                      url: baseUrl + 'SMS/GetAllTempTag/'
+                  }).then(function successCallback(response) {
+                      $scope.TempTag = response.data.results;
+                  }, function errorCallback(response) {
+                      toastr["info"](response.data.message);
+                  });
+              }
+              function getAllDropdowns() {
+                  $scope.Dropdowns = [];
+                  $http({
+                      method: 'GET',
+                      url: baseUrl + 'Common/GetAllDropDown/'
+                  }).then(function successCallback(response) {
+                      $scope.Dropdowns = response.data.results;
+                  }, function errorCallback(response) {
+                      toastr["info"](response.data.message);
+                  });
+              }
+
+              function getAllCommons() {
+                  $scope.CommonFeilds = [];
+                  $http({
+                      method: 'GET',
+                      url: baseUrl + 'Common/GetCommonItem/'
+                  }).then(function successCallback(response) {
+                      $scope.CommonFeilds = response.data.results;
+                  }, function errorCallback(response) {
+                      toastr["info"](response.data.message);
+                  });
+              }
+          }]);
+    </script>
+}
+
+ 
+

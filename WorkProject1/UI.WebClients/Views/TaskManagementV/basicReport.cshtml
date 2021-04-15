@@ -1,0 +1,73 @@
+﻿
+@{
+    ViewBag.Title = "basicReport";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="form-group" ng-controller="BasicReportClt">
+    <label class="col-md-3 control-label" style="font-size:x-large;text-align:right;">Information Type</label>
+    <form name="frm" novalidate ng-submit="Submit()" role="form">
+        <div class="col-md-9" ng-class="{ 'has-error' : submitted && frm.ListType.$invalid}">
+            <select name="ListType" ng-model="ListType" class="form-control input-lg" required>
+                <option value="">Please Select</option>
+                <option value="1">Project List</option>
+                <option value="2">Department List</option>
+                <option value="3">Designation List</option>
+                <option value="4">Sprint List</option>
+                <option value="5">Client List</option>
+                <option value="6">Ticket Category List</option>
+                <option value="7">Counter Report</option>
+            </select>
+            <span ng-show="submitted &&  frm.ListType.$error.required" class="text-danger">Selection is Required</span>
+
+            <input type="submit" ng-click="submitted=true" style="margin-top:6%;margin-left: 78%;width: 22%;" class="btn btn-success" value="View Report"/>
+        </div>
+    </form>
+
+</div>
+<script type="text/javascript">
+ AddieApp.controller("BasicReportClt", ["$scope", "$http", "SweetAlert",
+          function ($scope, $http,  SweetAlert) {
+                  init();
+                  function init() {
+                      initialize();
+                  }
+                  function initialize() {                     
+                  };
+                  $scope.Submit = function Submit()
+                  {
+                      if ($scope.frm.$invalid)
+                          return;
+                      if ($scope.ListType == 1)
+                      {
+                          var win = window.open('/Report/ProjectListReport', '_blank');
+                          win.focus();
+                      }
+                      else if($scope.ListType == 2)
+                      {
+                          var win = window.open('/Report/DepartmentListReport', '_blank');
+                          win.focus();
+                      }
+                      else if ($scope.ListType == 3) {
+                          var win = window.open('/Report/DesignationListReport', '_blank');
+                          win.focus();
+                      }
+                      else if ($scope.ListType == 4) {
+                          var win = window.open('/Report/SprintListReport', '_blank');
+                          win.focus();
+                      }
+                      else if ($scope.ListType == 5) {
+                          var win = window.open('/Report/ClientListReport', '_blank');
+                          win.focus();
+                      } else if ($scope.ListType == 7) {
+                          var win = window.open('/Report/CounterReport', '_blank');
+                          win.focus();
+                      }
+                      else {
+                          var win = window.open('/Report/TicketCategoryListReport', '_blank');
+                          win.focus();
+                      }
+                  }
+
+              }]);
+</script>

@@ -1,0 +1,109 @@
+﻿
+@{
+    ViewBag.Title = "Employee Calendar View";
+}
+<link href="~/assets/global/plugins/fullcalendar/fullcalendar.min.css" rel="stylesheet" type="text/css" />
+
+
+<div class="kt-container  kt-container--fluid  kt-grid__item kt-grid__item--fluid" ng-controller="ViewCalendarSetupCntrl">
+    <div class="row">
+        <div class="kt-portlet kt-portlet--mobile">
+            <div class="kt-portlet__head kt-portlet__head--lg">
+                <div class="kt-portlet__head-label">
+                    @*<span class="kt-portlet__head-icon">
+                            <i class="kt-font-brand flaticon2-line-chart"></i>
+                        </span>*@
+                    <h3 class="kt-portlet__head-title">
+                        <!----Titel Text-->
+                        @ViewBag.Title
+                        <!----Titel Text -->
+                    </h3>
+                </div>
+                <div class="kt-portlet__head-toolbar">
+                    <div class="kt-portlet__head-wrapper">
+                        <div class="dropdown dropdown-inline">
+                            @*<button type="button" class="btn btn-brand btn-icon-sm" data-toggle="modal" data-target="#addmodal" aria-haspopup="true" aria-expanded="false">
+                                    <!----Add Button -->
+                                    <i class="flaticon2-plus"></i> Add New
+                                    <!----Add Button -->
+                                </button>*@
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="kt-portlet__body">
+
+                <div class="col-md-10 center">
+                    <div id="calendar" class="has-toolbar"> </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts{
+    <script src="~/assets/global/plugins/moment.min.js" type="text/javascript"></script>
+    <script src="~/assets/global/plugins/fullcalendar/fullcalendar.min.js" type="text/javascript"></script>
+    <script src="~/assets/global/plugins/jquery-ui/jquery-ui.min.js" type="text/javascript"></script>
+    <script type="text/javascript">
+
+    
+    OEMSApp.controller("ViewCalendarSetupCntrl", ["$scope", "$http", "SweetAlert",
+             function ($scope, $http, SweetAlert) {
+                 init();
+                 function init() {
+                     initialize();
+                 }
+                 function initialize() {
+                     $scope.Calendar = [];
+                     //getAccademicCalendarSetup()
+                 };
+                 function getAccademicCalendarSetup() {
+                     $scope.Calendar = [];
+                     $http({
+                         method: 'GET',
+                         url: baseUrl + 'Attendance/GetAllWeekend/'
+                     }).then(function successCallback(response) {
+                         $scope.Calendar = response.data.results;
+                     }, function errorCallback(response) {
+                     });
+                 };
+             }]);
+    </script>
+
+<script>
+
+  document.addEventListener('DOMContentLoaded', function() {
+    var calendarEl = document.getElementById('calendar');
+
+    var calendar = new FullCalendar.Calendar(calendarEl, {
+      headerToolbar: {
+        left: 'prev,next today',
+        center: 'title',
+        right: 'dayGridMonth'
+      },
+      initialDate: new Date(),
+      editable: true,
+      navLinks: true, // can click day/week names to navigate views
+      dayMaxEvents: true, // allow "more" link when too many events
+      events: {
+          url: baseUrl + 'Attendance/GetEmpCalendarEvents?id='+@ViewBag.Id,
+        failure: function() {
+          //document.getElementById('script-warning').style.display = 'block'
+        },
+        textColor: 'red',
+          color: 'yellow',
+      },
+      loading: function(bool) {
+        //document.getElementById('loading').style.display =
+        //  bool ? 'block' : 'none';
+      }
+    });
+    //calendar.setOption('themeSystem', 'bootstrap');
+    calendar.render();
+  });
+
+</script>
+}
+

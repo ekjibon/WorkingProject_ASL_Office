@@ -1,0 +1,298 @@
+﻿
+@{
+    ViewBag.Title = "Client";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2 class="SetUpHead">Client List</h2>
+
+<div ng-controller="clientClt">
+    <div class="text-right" style="margin-top: -43px;">
+        <a data-toggle="modal" title="Add Client" href="#draggable" class="btn btn-primary fa-item" style="margin-right: 1.5%;">
+            <i class="fa fa-plus-square"></i> Add Client
+        </a>
+    </div>
+
+    <div class="panel-body">
+        <div class="row" style="margin-bottom:10px">
+            <div class="col-md-4 col-sm-5 col-xs-6">
+                <div class="form-group">
+                    <div class="col-lg-3 col-md-5 col-sm-4 col-xs-8" style="padding-left:0px;width:35%">
+                        <select class="form-control" ng-model="pageSize" ng-options="P.value as P.text for P in pageSizeArray"></select>
+                    </div>
+                    <div class="col-md-7  col-sm-8  col-xs-4">
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 col-sm-3 col-xs-1">
+            </div>
+            <div class="col-md-4 col-sm-4 col-xs-5">
+                <div id="sample_3_filter" class="pull-right">
+                    <input ng-model="q" id="search" class="form-control" placeholder="Filter text">
+                </div>
+            </div>
+        </div>
+        <table class="table table-bordered table-inverse">
+            <thead class="btn-primary">
+                <tr>
+                    @*<th><input type="checkbox" ng-model="selectedAll" ng-click="selectAll()" />  All</th>*@
+                    <th class="text-center">Client Name </th>
+                    <th class="text-center">Short Name</th>
+                    <th class="text-center">Client Code</th>
+                    <th class="text-center">Status</th>
+                    <th class="text-center">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-show="LoadClientList.length <= 0"><td colspan="7" style="text-align:center;"><i class="fa fa-refresh"></i> Loading new data!!</td></tr>
+                <tr dir-paginate="item in LoadClientList| filter:q | itemsPerPage: pageSize" current-page="currentPage">
+                    @*<tr ng-repeat="item in ApplicantList track by $index">*@
+                    @*<td> <input type="checkbox" ng-model="item.Selected" value="false" ng-click="checkIfAllSelected()" /> </td>*@
+                    <td class="text-left">
+                        <a target="_blank" style="text-decoration:none;" href="{{item.BaseUrl}}">{{item.ClientName}}</a>
+                    </td>
+                    <td class="text-center"> {{item.ShortName}} </td>
+                    <td class="text-center">{{item.ClientCode}}</td>
+                    <td class="text-center statusG" ng-show="item.Status=='A'"> Active </td>
+                    <td class="text-center statusR" ng-show="item.Status=='I'"> Inactive </td>
+                    <td class="text-center">
+                        <button type="button" data-toggle="modal" class="btn btn-success fa-item" title="Edit" ng-click="EditClient(item)" data-target="#draggable">
+
+                            <i class="fa fa-edit"></i> Edit
+                        </button>
+                        <button type="button" ng-click="Delete(item)" class="btn btn-danger fa-item" title="Delete"><i class="fa fa-trash-o"></i></button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <div class="row" ng-show="LoadClientList.length>1">
+            <dir-pagination-controls boundary-links="true" template-url="~/assets/dirPagination.tpl.html"></dir-pagination-controls>
+        </div>
+
+    </div>
+    <!-- Table -->
+
+
+    <div class="modal fade draggable-modal" id="draggable" tabindex="-1" role="basic" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content" style="margin: 0% -22%;margin-top: 16%;">
+                <div class="modal-header">
+                    <button type="button" class="close btn-danger" data-dismiss="modal" aria-hidden="true">X</button>
+                    <h4 class="modal-title">Add Client</h4>
+                </div>
+
+                <form class="form-horizontal" name="frmClient" ng-submit="Submit()" novalidate role="form">
+                    <div class="portlet-body form" style="display: block; margin-top: 2%;margin-left: 1%;margin-right: 1%;">
+                        <div class="form-body">
+                            <div class="form-group" style="margin-left: -19%;" ng-class="{ 'has-error' : submitted && frmClient.ClientName.$invalid}">
+                                <label class="col-md-3 control-label">Client Name</label>
+                                <div class="col-md-9">
+                                    <input type="text" ng-model="Client.ClientName" name="ClientName" required class="form-control input-lg" placeholder="Client Name">
+                                    <span ng-show="submitted &&  frmClient.ClientName.$error.required" class="text-danger">Client Name is Required</span>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-6">
+                              
+                                    <div class="form-group" ng-class="{ 'has-error' : submitted && frmClient.ShortName.$invalid}">
+                                        <label class="col-md-3 control-label">Short Name</label>
+                                        <div class="col-md-9">
+                                            <input type="text" ng-model="Client.ShortName" class="form-control input-lg" min="3" required name="ShortName" placeholder="Short Name">
+                                            <span ng-show="submitted &&  frmClient.ShortName.$error.required" class="text-danger">Short Name Minimum 3 Characters is Required</span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group" ng-class="{ 'has-error' : submitted && frmClient.ClientCode.$invalid}">
+                                        <label class="col-md-3 control-label">Client Code</label>
+                                        <div class="col-md-9">
+                                            <input type="text" ng-model="Client.ClientCode" name="ClientCode" required class="form-control input-lg" placeholder="Client Code">
+                                            <span ng-show="submitted &&  frmClient.ClientCode.$error.required" class="text-danger">Client Code is Required</span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group" ng-class="{ 'has-error' : submitted && frmClient.Address.$invalid}">
+                                        <label class="col-md-3 control-label">Client Address</label>
+                                        <div class="col-md-9">
+                                            <input type="text" ng-model="Client.Address" name="Address" required class="form-control input-lg" placeholder="Client Address">
+                                            <span ng-show="submitted &&  frmClient.Address.$error.required" class="text-danger">Address is Required</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="col-md-3 control-label">Base Url</label>
+                                        <div class="col-md-9">
+                                            <input type="text" name="BaseUrl" ng-model="Client.BaseUrl" class="form-control input-lg" placeholder="Base Url">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6">
+
+
+                                    <div class="form-group">
+                                        <label class="col-md-3 control-label">Apps</label>
+                                        <div class="col-md-9">
+                                            <select class="form-control input-lg" ng-model="Client.HasAppsService">
+                                                <option value="">Select Please</option>
+                                                <option ng-selected="Client.HasAppsService==true" value="true">Yes</option>
+                                                <option ng-selected="Client.HasAppsService==false" value="false">No</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="col-md-3 control-label">Web Portal</label>
+                                        <div class="col-md-9">
+                                            <select class="form-control input-lg" ng-model="Client.HasWebPortal">
+                                                <option value="">Select Please</option>
+                                                <option ng-selected="Client.HasWebPortal==true" value="true">Yes</option>
+                                                <option ng-selected="Client.HasWebPortal==false" value="false">No</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="col-md-3 control-label">SMS</label>
+                                        <div class="col-md-9">
+                                            <select class="form-control input-lg" ng-model="Client.HasSMS">
+                                                <option value="">Select Please</option>
+                                                <option ng-selected="Client.HasSMS==true" value="true">Yes</option>
+                                                <option ng-selected="Client.HasSMS==false" value="false">No</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="form-group" ng-class="{ 'has-error' : submitted && frmClient.Status.$invalid}">
+                                        <label class="col-md-3 control-label">Status</label>
+                                        <div class="col-md-9">
+                                            <select class="form-control input-lg" name="Status" required ng-model="Client.Status">
+                                                <option value="">Select Please</option>
+                                                <option ng-selected="Client.Status=='A'" value="A">Active</option>
+                                                <option ng-selected="Client.Status=='I'" value="I">Inactive</option>
+                                            </select>
+                                            <span ng-show="submitted &&  frmClient.Status.$error.required" class="text-danger">Status is Required</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-danger" ng-click="reSetForm()">Close</button>
+                        <input type="submit" class="btn btn-success" ng-click="submitted=true" value="{{btnTitle}}" />
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    AddieApp.controller("clientClt", ["$scope", "$http", "SweetAlert",
+          function ($scope, $http, SweetAlert) {
+              init();
+              function init() {
+                  initialize();
+                  $scope.IsEdit = 0;
+              }
+              function initialize() {
+                  LoadClientList();
+                  $scope.btnTitle = 'Save';
+                  $scope.pageSizeArray = [];
+                  $scope.pageSizeArray.push({ value: 5, text: 5 });
+                  $scope.pageSizeArray.push({ value: 10, text: 10 });
+                  $scope.pageSizeArray.push({ value: 20, text: 20 });
+                  $scope.pageSizeArray.push({ value: 50, text: 50 });
+                  $scope.currentPage = 1;
+                  $scope.pageSize = 10;
+                  $scope.options = [{ name: "Yes", id: true }, { name: "No", id: false }];
+              };
+              $scope.reSetForm = function reSetForm() {
+                  $scope.Client = {};
+                  $scope.Client.Id = 0;
+                  $scope.btnTitle = 'Save';
+                  LoadClientList();
+                  $scope.submitted = false;
+                  $scope.IsEdit = 0;
+                  $('#draggable').modal('hide');
+
+              }
+              $scope.Submit = function (client) {
+                  if ($scope.frmClient.$invalid)
+                      return;
+                  if ($scope.IsEdit == 0) {
+                      $scope.Add();
+                  }
+                  else {
+                      $scope.Update();
+                  }
+              }
+              $scope.Add = function () {
+                  console.log($scope.Client)
+                  //$http.post(baseUrl + 'Setup/AddClient?ClientCode=' + $scope.Client.ClientCode + '&ClientName=' + $scope.Client.ClientName + '&ShortName=' + $scope.Client.ShortName + '&Address=' + $scope.Client.Address + '&HasAppsService=' + $scope.Client.HasAppsService + '&HasWebPortal=' + $scope.Client.HasWebPortal + '&HasSMS=' + $scope.Client.HasSMS + '&DefaultDbId=' + $scope.Client.DefaultDbId + '&BaseUrl=' + $scope.Client.BaseUrl).
+                  $http.post(baseUrl + 'Setup/AddClient', $scope.Client).
+                    then(function (response) {
+                        //console.log(response.data);
+                        if (response.data == 1) {
+                            $scope.Client = {};
+                            toastr.success('Saved Successfully');
+                            $('#draggable').modal('hide');
+                            $scope.reSetForm();
+                        } else {
+                            console.log(response.data);
+                            toastr.error('Error. Please check log.');
+                            toastr.error(response.data);
+                        }
+                    });
+              }
+
+              function LoadClientList() {
+                  $http.post(baseUrl + 'Setup/LoadClientList').
+                    then(function (response) {
+                        $scope.LoadClientList = response.data;
+                        //console.log($scope.LoadClientList);
+                        toastr.success($scope.LoadClientList.length + ' Client found');
+                    });
+              }
+              $scope.Update = function () {
+                  $http.post(baseUrl + 'Setup/UpdateClient', $scope.Client)
+                      .then(function (response) {
+                          toastr.success('Updated Successfully');
+                          $('#draggable').modal('hide');
+                          $scope.reSetForm();
+                      });
+              }
+
+              $scope.Delete = function (client) {
+
+                  swal({
+                      title: "Confirm to delete the client?",
+                      text: "Client data will be deleted permanently.",
+                      icon: "warning",
+                      buttons: true,
+                      dangerMode: false,
+                  })
+                       .then((willDelete) => {
+                           if (willDelete) {
+                               $http.post(baseUrl + 'Setup/DeleteClient', client)
+                              .then(function (response) {
+                                  if (response.data == '0') {
+                                      toastr.warning('Not found');
+                                      LoadClientList();
+                                      return;
+                                  }
+                                  toastr.success('Deleted Successfully');
+                                  LoadClientList();
+
+                              });
+                           } else {
+
+                           }
+                       });
+
+              }
+
+              $scope.EditClient = function (item) {
+                  $scope.Client = item;
+                  $scope.btnTitle = 'Update';
+                  $scope.IsEdit = 1;
+              }
+
+          }]);
+</script>

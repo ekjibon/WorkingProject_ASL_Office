@@ -1,0 +1,28 @@
+<div class="kt-section">
+    <p class="kt-section__content">
+        <!--begin: Pagination-->
+        <div class="kt-pagination  kt-pagination--danger">
+            <div class="kt-pagination__toolbar">                
+                <span class="pagination__desc">
+                    Displaying {{ range.lower }} - {{ range.upper }} of {{ range.total }} records
+                </span>
+            </div>
+            <ul class="kt-pagination__links" ng-if="1 < pages.length || !autoHide">                
+                <li class="kt-pagination__link--next" ng-if="boundaryLinks" ng-class="{ disabled : pagination.current == 1 }">
+                    <a href=""ng-click="setCurrent(pagination.current - 1)"><i class="fa fa-angle-left kt-font-brand"></i></a>
+                </li>
+                <li class=""  ng-repeat="pageNumber in pages track by $index" ng-class="{ 'kt-pagination__link--active': pagination.current == pageNumber, disabled : pageNumber == '...' }">
+                    <a href=""  ng-click="setCurrent(pageNumber)">{{ pageNumber }}</a>
+                </li>
+
+                
+                <li class="kt-pagination__link--prev" ng-if="boundaryLinks" ng-class="{ disabled : pagination.current == pagination.last }">
+                    <a href="" ng-click="setCurrent(pagination.current + 1)"><i class="fa fa-angle-right kt-font-brand"></i></a>
+                </li>
+                
+            </ul>
+
+        </div>
+        <!--end: Pagination-->
+    </p>
+</div>

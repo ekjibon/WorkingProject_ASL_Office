@@ -1,0 +1,331 @@
+﻿
+@{
+    ViewBag.Title = "Leave";
+}
+@*<script src="https://cdnjs.cloudflare.com/ajax/libs/angular-socialshare/2.3.11/angular-socialshare.js"></script>*@
+@section Styles{
+    <link href="~/assets/global/plugins/bootstrap-fileinput/bootstrap-fileinput.css" rel="stylesheet" type="text/css" />
+    <style>
+        .table > tbody > tr > td, .table > tbody > tr > th, .table > tfoot > tr > td, .table > tfoot > tr > th, .table > thead > tr > td, .table > thead > tr > th {
+            padding: 8px;
+            line-height: 1.42857;
+            vertical-align: top;
+            border-top: none;
+        }
+
+        .modal-dialog {
+            left: 0;
+        }
+    </style>
+
+}
+<div class="portlet light bordered" ng-controller="ctrlStdLeave">
+    @*<input type="hidden" name="StudentIID" ng-model="StudentIID" value="@ViewBag.StdIID" />*@
+    <div class="portlet-title">
+        <div class="caption">
+            <i class="fa fa-graduation-cap" style="color:white"></i>Student Leave Apply
+        </div>
+        <div class="actions">
+            <div class="btn-group btn-group-solid">
+                <button ng-click="Reset()" class="btn green" data-target="#large" data-toggle="modal"> Apply Leave</button>
+            </div>
+        </div>
+    </div>
+    <div class="portlet-body">
+        <!-- BEGIN TABLE-->
+        <div ng-cloak ng-show="stdId!=null" style="padding:5px">
+            <div class="table-container">
+                <div class="table-scrollable">
+                    <table class="table table-bordered">
+                        <thead class="btn-primary">
+                            <tr>
+                                <th>Type</th>
+                                <th>Form</th>
+                                <th>To</th>
+                                <th width="3%">Duration</th>
+                                <th>Attached</th>
+                                <th>Requested On</th>
+                                <th>Status</th>
+                                <th>Approved/Disapproved by</th>
+                                <th>Action Date & Time</th>
+                                @*<th>Action</th>*@
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-show="LeaveList.length <= 0"><td colspan="10" style="text-align:center;"><i class="fa fa-refresh"></i> No data found!!</td></tr>
+                            <tr @*dir-paginate="item in LeaveList| filter:q|itemsPerPage:pageSize" current-page="currentPage" style="background-color:{{item.ColorCode}}*@ ">
+                                @*<tr ng-show="AspNetusers.results.length <= 0"><td colspan="5" style="text-align:center;"><i class="fa fa-refresh"></i> Loading new data!!</td></tr>*@
+                            <tr ng-repeat="item in LeaveList">
+                                <td>{{item.LeaveType}}</td>
+                                <td>{{item.FromDate|date:"dd/MM/yyyy"}}</td>
+                                <td>{{item.ToDate|date:"dd/MM/yyyy"}}</td>
+                                <td>{{item.Duration}}</td>
+                                <td><a ng-hide="item.File==null" class="btn btn-xs grey" href="@Url.Action("DownloadImage","Attendence")?LeaveId={{item.LeaveId}}" target="_blank">Download</a><span class="btn btn-xs red" ng-show="item.File==null">No Attached</span> </td>
+                                <td>{{item.RequestOn|date:"dd/MM/yyyy"}}</td>
+                                <td ng-if="item.Status=='Pending'"><span class="label label-sm label-warning">{{item.Status}}</span></td>
+                                <td ng-if="item.Status=='Approved'"><span class="label label-sm label-primary">{{item.Status}}</span></td>
+                                <td ng-if="item.Status=='Disapproved'"><span class="label label-sm label-danger">{{item.Status}}</span></td>
+                                <td>{{item.FullName}}</td>
+                                <td>{{item.UpdateDate |date:"dd/MM/yy h:mm a"}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="row">
+                    <dir-pagination-controls boundary-links="true" template-url="~/assets/angular/lib/dirPagination.tpl.html"></dir-pagination-controls>
+                </div>
+            </div>
+        </div>
+        <!-- END TALE-->
+        <div class="modal fade bs-modal-lg" id="large" tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                        <h4 class="modal-title">Apply For Leave</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div ng-cloak>
+                            <div class="table">
+                                <form class="form-horizontal" id="LeaveApply">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label class="col-md-4 control-label">Leave Type</label>
+                                                <div class="col-md-6">
+                                                    <select class="form-control" ng-model="Leave.LeaveTypeId" name="month" ng-options="m.LeaveId as m.TypeName for m in LeaveType" required>
+                                                        <option value="" selected="selected">Select</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label class="col-md-4 control-label">From Date</label>
+                                                <div class="col-md-6">
+                                                    <input class="form-control" required name="From" type="datetime" placeholder="From Date" readonly ng-click="p1=true" is-open="p1" uib-datepicker-popup="dd-MM-yyyy" ng-model="Leave.From" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label class="col-md-4 control-label">To Date</label>
+                                                <div class="col-md-6">
+                                                    <input class="form-control" required ng-change="CalculateDuratoin()" name="To" type="datetime" placeholder="To Date" readonly ng-click="p2=true" is-open="p2" uib-datepicker-popup="dd-MM-yyyy" ng-model="Leave.To" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label class="col-md-4 control-label">Duration</label>
+                                                <div class="col-md-6">
+                                                    <input class="col-md-6 form-control" required readonly placeholder="_________ Days" type="text" ng-model="Leave.Duration" name="Duration" id="Duration" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label class="col-md-4 control-label">Requested On</label>
+                                                <div class="col-md-6">
+                                                    <input class="form-control" date-disabled="disabled(date, mode)" required name="Request" type="datetime" placeholder="Requested On" readonly ng-click="p3=true" is-open="p3" uib-datepicker-popup="dd-MM-yyyy" ng-model="Leave.Request" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-5 col-md-offset-1">
+                                            <div class="form-group ">
+                                                <div class="fileinput fileinput-new" data-provides="fileinput">
+                                                    <div class="row">
+                                                        <div class="col-md-8">
+                                                            <div class="fileinput-preview thumbnail" data-trigger="fileinput" style="width: 80px; height: 82px;">
+                                                                <img src="~/assets/global/no image.jpg" ng-hide="Leave.file!=null" />
+                                                                <img ng-show="Leave.file!=null" ng-src="@String.Format("data:image/jpg;base64,{0}", "{{Leave.file}}")" id="imagess" alt="...">
+                                                            </div>
+                                                            <button ng-show="Leave.file!=null" class="btn btn-small">Remove</button>
+                                                        </div>
+                                                        <div style="float:right !important" class="col-md-4">
+                                                            <span class="btn red btn-outline btn-file">
+                                                                <span class="fileinput-new"> Select image </span>
+                                                                <span class="fileinput-exists"> Change </span>
+                                                                @*<img ng-src="data:image/png;base64,{{img}}">*@
+                                                                <input type="file" id="file" accept="image/x-png,image/gif,image/jpeg">
+                                                            </span>
+                                                            <a style="margin-top:10px !important" class="btn red fileinput-exists" data-dismiss="fileinput"> Remove </a>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label class="col-md-6 control-label">Leave Description</label>
+                                                <div class="col-md-6">
+                                                    <textarea rows="3" class="form-control" name="Description" ng-model="Leave.Description"></textarea>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" id="applyCancel" class="btn dark btn-outline" data-dismiss="modal">Close</button>
+                        <button class="btn green" ng-click="SaveLeave()">Apply</button>
+                    </div>
+                </div>
+                <!-- /.modal-content -->
+            </div>
+            <!-- /.modal-dialog -->
+        </div>
+    </div>
+
+</div>
+
+@section Scripts{
+    <script src="~/assets/global/plugins/bootstrap-fileinput/bootstrap-fileinput.js" type="text/javascript"></script>
+    <script type="text/javascript">
+        OEMSApp.controller("ctrlStdLeave", ["$scope", "$http", "blockUI", "$window", "$filter",
+                  function ($scope, $http, SweetAlert, blockUI, $window, $filter) {
+                      init();
+                      function init() {
+                          initialize();
+                          LoodTableData($scope.stdId);
+
+                      }
+                      function initialize() {
+                          $scope.pageSizeArray = [];
+                          $scope.pageSizeArray.push({ value: 5, text: 5 });
+                          $scope.pageSizeArray.push({ value: 10, text: 10 });
+                          $scope.pageSizeArray.push({ value: 20, text: 20 });
+                          $scope.pageSizeArray.push({ value: 50, text: 50 });
+                          $scope.currentPage = 1;
+                          $scope.pageSize = 10;
+                          $scope.Student = {};
+                          $scope.Student.Value = null;
+                          $scope.Student.Text = null;
+                          $scope.Img = null;
+                          $scope.LeaveList = [];
+                          $scope.Leave = {};
+                          $scope.LeaveType = [];
+                          $scope.status = true;
+                          $scope.stdId = @ViewBag.StdIID;
+                          // Disable weekend selection
+                          $scope.disabled = function (date, mode) {
+                              return (mode === 'day' && (date.getDay() === 0 || date.getDay() === 6));
+                          };
+                          GetAllLeaveType();
+                      };
+                      $scope.CalculateDuratoin = function CalculateDuratoin() {
+                          var From = new Date($scope.Leave.From);
+                          var To = new Date($scope.Leave.To);
+                          if (To < From) {
+                              toastr["info"]("Please Select a Valid Date Range.");
+                              $scope.Leave.To = null;
+                              $scope.Leave.Duration = null;
+                          } else {
+                              $scope.Leave.Duration = (((((To - From) / 1000) / 60) / 60) / 24) + 1;
+                          }
+                      }
+                      $scope.reset = function reset() {
+                          $scope.Leave.From = null;
+                          $scope.Leave.To = null;
+                          $scope.Leave.Request = null;
+                          $scope.Leave.StudentIId = null;
+                          $scope.Leave.Description = null;
+                          $scope.Leave.LeaveTypeId = null;
+                          $scope.Leave.Duration = null;
+                      }
+
+                      //for Student Leave Apply Save...
+                      $scope.SaveLeave = function SaveLeave() {
+                          //alert($scope.Leave.LeaveType);
+                          if ($scope.Leave.LeaveTypeId == null) {
+                              toastr["info"]("Please Select a Leave Type.");
+                          } else if ($scope.Leave.From == null) {
+                              toastr["info"]("Please Select a From Date.");
+                          } else if ($scope.Leave.To == null) {
+                              toastr["info"]("Please Select a To Date.");
+                          } else if ($scope.Leave.Duration == null) {
+                              //toastr["info"]("Please Select a Leave Type.");
+                          } else if ($scope.Leave.Request == null) {
+                              toastr["info"]("Please Select a Request Date.");
+                          } else if ($scope.Leave.Description == null) {
+                              toastr["info"]("Description Field is Required.");
+                          }
+                          else {
+                              $scope.Leave.From = new Date($scope.Leave.From);
+                              $scope.Leave.To = new Date($scope.Leave.To);
+                              $scope.Leave.Request = new Date($scope.Leave.Request);
+                              $scope.Leave.StudentIId = @ViewBag.StdIID;
+                              var files = $("#file").get(0).files;
+                              if ($scope.Leave.StudentIId != null && $scope.status)
+                                  $http({
+                                      method: 'POST',
+                                      url: baseUrl + 'PortalAttendance/SaveLeaveApply/',
+                                      headers: { 'Content-Type': undefined },
+                                      transformRequest: function (data) {
+                                          var formData = new FormData();
+                                          formData.append('ApplyLeave', JSON.stringify($scope.Leave));
+                                          if (files.length > 0)
+                                              formData.append("file", files[0]);
+                                          return formData;
+                                      },
+                                      data: $scope.Leave
+                                  }).then(function successCallback(response) {
+                                      toastr["success"](response.data.message);
+                                      LoodTableData($scope.stdId);
+                                      $scope.reset();
+                                      if (response.data.message != "Date Range is Not Valid.") {
+                                          $scope.Leave.file = null;
+                                          $("#imagess").val('');
+                                          $('#large').modal('hide');
+                                          $('.modal-backdrop').remove();
+                                      }
+                                  }, function errorCallback(response) {
+                                      toastr["error"](response.data.message);
+                                  });
+                          }
+                      };
+                      // for Lood Table Data....
+                      function LoodTableData(id) {
+                          //$scope.Student = [];
+                          $http({
+                              method: 'POST',
+                              url: baseUrl + 'PortalAttendance/GetStudentLeavesbyId/' + id
+                          }).then(function successCallback(response) {
+                              $scope.LeaveList = response.data.results;
+                          }, function errorCallback(response) {
+                              toastr["error"](response.data.message);
+                          });
+
+
+                      };
+                      function GetAllLeaveType() {
+                          $http({
+                              method: 'GET',
+                              url: baseUrl + 'PortalAttendence/GetAllLeaveType'
+                          }).then(function successCallback(response) {
+                              $scope.LeaveType = response.data.results;
+                          }, function errorCallback(response) {
+                              toastr["warning"](response.data.message);
+                          });
+                      };
+
+                      $('#applyCancel').on('click', function () {
+                          $scope.Leave = {};
+                          $("div.fileinput-preview.thumbnail img").attr("src","");
+                      });
+
+                  }]);
+    </script>
+}
+
+
+
+
+
+

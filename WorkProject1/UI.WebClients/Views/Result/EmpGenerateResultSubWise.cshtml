@@ -1,0 +1,296 @@
+﻿
+@{
+    ViewBag.Title = "Generate Result Subject Wise";
+    Layout = "~/Views/Shared/_EmpLayout.cshtml";
+
+    var SessionId = Request.QueryString["SessionId"];
+    var BranchID = Request.QueryString["BranchID"];
+    var ShiftID = Request.QueryString["ShiftID"];
+    var ClassId = Request.QueryString["ClassId"];
+
+    var SectionId = Request.QueryString["SectionId"];
+    var SubjectID = Request.QueryString["SubjectID"];
+    var MainExamId = Request.QueryString["MainExamId"];
+    var TermId = Request.QueryString["TermId"];
+    var SubjectId = Request.QueryString["SubjectID"];
+
+    var SessionName = Request.QueryString["SessionName"];
+    var BranchName = Request.QueryString["BranchName"];
+    var ShiftName = Request.QueryString["ShiftName"];
+    var ClassName = Request.QueryString["ClassName"];
+
+    var SectionName = Request.QueryString["SectionName"];
+    var SubjectName = Request.QueryString["SubjectName"];
+    var MainExamName = Request.QueryString["MainExamName"];
+    var TermName = Request.QueryString["TermName"]; 
+    var SubExamName = Request.QueryString["SubExamName"];
+
+}
+
+<div class="portlet box blue-hoki" ng-controller="SWGR">
+    <div class="portlet-title">
+        <div class="emp-header">
+            <i class="icon-settings font-green"></i>
+            <span class="caption-subject font-green sbold uppercase size">@ViewBag.Title</span>
+        </div>
+    </div>
+    <div class="portlet-body form">
+        <form novalidate name="mform" class="form-horizontal" id="form_sample_1">
+            <div class="form-body">
+                <div class="row">
+                    <table class="table table-bordered table-inverse fixed-table-toolbar">
+                        <tr>
+                            <td style="color:#ff6a00">Session</td>
+                            <td>@SessionName</td>
+                            <td style="color:#ff6a00">Branch</td>
+                            <td>@BranchName</td>
+                            <td style="color:#ff6a00">Shift</td>
+                            <td>@ShiftName</td>
+                        </tr>
+                        <tr>
+                            <td style="color:#ff6a00">Class</td>
+                            <td>@ClassName</td>
+                            <td style="color:#ff6a00">Section</td>
+                            <td>@SectionName</td>
+                            <td style="color:#ff6a00">Subject Name</td>
+                            <td> @SubjectName</td>
+                        </tr>
+                        <tr>
+                            <td style="color:#ff6a00">Term Name</td>
+                            <td> @TermName</td>
+                            <td style="color:#ff6a00">Main Exam Name</td>
+                            <td>@MainExamName</td>
+                        </tr>
+                    </table>
+
+                </div>
+                
+            </div>
+
+        </form>
+    </div>
+    <div class="panel">
+        <div class="panel-body">
+            <table class="table table-bordered table-inverse">
+                <thead class="btn-primary">
+                    <tr>
+                        <th><input type="checkbox" ng-model="selectedAll" ng-click="selectAll()" />  All</th>
+                        <th> ID </th>
+                        <th> Roll </th>
+                        <th> Name</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="item in StudentInfos">
+                        <td> <input type="checkbox" ng-model="item.Selected" value="false" ng-click="checkIfAllSelected()" /> </td>
+                        <td> {{item.StudentInsID}} </td>
+                        <td> {{item.RollNo}} </td>
+                        <td width="25%"> {{item.FullName}} </td>
+                        <td width="10%">
+                            <a href="@Url.Action("SubjectWiseResult","Report")?MainExamId={{GenerateResult.MainExamId}}&SubjectId={{GenerateResult.SubjectId}}&StuId={{item.StudentIID}}&BranchId={{GenerateResult.BranchID}}&SectionId={{GenerateResult.SectionId}}" class="btn btn-icon-only btn-primary" target="_blank"><i class="fa fa-download" aria-hidden="true"></i></a>
+                        </td>
+                    </tr>
+                    @*<tr>
+                        <td colspan="6">
+                            <a href="@Url.Action("SubjectWiseResult","Report")?MainExamId={{GenerateResult.MainExamId}}&SubjectId={{GenerateResult.SubjectId}}&StuId={{GetSelects()}}" class="btn btn-info btn-sm pull-right" target="_blank">View All Result</a>
+                        </td>
+                    </tr>*@
+
+                </tbody>
+            </table>
+        </div>
+        <!-- Table -->
+
+
+    </div>
+
+
+    <!-- END FORM-->
+</div>
+
+
+
+@section Scripts{
+    <script type="text/javascript">
+        OEMSApp.controller("SWGR", ["$scope", "$http", "SweetAlert",
+          function ($scope, $http, SweetAlert) {
+
+              init();
+              function init() {
+                  initialize();
+                  getAllCommons();
+                  getTerms(1);
+                  getMainExam(1);
+                  Search();
+                  GetSection();
+                  // getMainExam();
+              }
+              function initialize() {
+
+                  $scope.GenerateResult = {};
+                  $scope.GenerateResult.SessionId = @SessionId;
+                  $scope.GenerateResult.BranchID = @BranchID;
+                  $scope.GenerateResult.ShiftID = @ShiftID;
+                  $scope.GenerateResult.ClassId = @ClassId;
+                  $scope.GenerateResult.SectionId = @SectionId;
+                  $scope.GenerateResult.MainExamId = @MainExamId;
+                  $scope.GenerateResult.TermId = @TermId;
+                 
+                  $scope.GenerateResult.SubjectId = @SubjectId;
+
+
+
+                  $scope.StudentInfos = [];
+                  $scope.Dropdowns = [];
+                  $scope.CommonFeilds = [];
+                  $scope.currentPage = 1;
+                  $scope.pageno = 1;
+                  $scope.pagesize = 10;
+                  $scope.total_count = 12;
+                  $scope.txtsearch = '';
+
+                  $scope.getMainExam = getMainExam;
+              };
+              function resetForm() {
+                  $scope.submitted = false;
+              };
+
+              $scope.Reset = function Reset() {
+                  $scope.GenerateResult = {};
+                  $scope.submitted = false;
+                  $scope.selectedAll = false;
+                  $scope.StudentInfos = [];
+              };
+              function getTerms() {
+                  $scope.Terms = [];
+                  $http({
+                      method: 'GET',
+                      url: baseUrl + 'SetupInstitution/GetAllTerm/'
+                  }).then(function successCallback(response) {
+                      // this callback will be called asynchronously
+                      // when the response is available
+                      $scope.Terms = response.data.results;
+                      $scope.total_count = response.data.totalcount;
+                      //console.log(response.data);
+                  }, function errorCallback(response) {
+                      toastr["warning"](response.data.Message);
+                  });
+
+              }
+
+            function GetSection() {
+                  $scope.Sections = [];
+                  $http({
+                      method: 'GET',
+                      url: baseUrl + 'Common/GetSection/' + $scope.GenerateResult.SessionId + "/" + $scope.GenerateResult.ShiftID + "/" + $scope.GenerateResult.ClassId
+                  }).then(function successCallback(response) {
+                      $scope.Sections = response.data.results;
+                  }, function errorCallback(response) {
+                      toastr["error"](response.data.message);
+                  });
+              }
+              function getMainExam() {
+                  $scope.MainExams = [];
+                  $http({
+                      method: 'GET',
+                      url: baseUrl + 'ExamSetup/GetAllMainExam/'
+                  }).then(function successCallback(response) {
+                      $scope.MainExams = response.data.results;
+                      //console.log($scope.mainExams);
+                      // $scope.AspNetRoles = response.data;
+                      $scope.total_count = response.data.totalcount;
+                      //console.log(response.data);
+                  }, function errorCallback(response) {
+                      toastr["warning"](response.data.Message);
+                  });
+              }
+              function getSubject() { // Get Subject List By VSCG
+                  //if ($scope.mform.$invalid)
+                  //    return;
+                  //blockUI.start(); // spinning Start
+                  $scope.SubjectSetups = [];
+                  var searchtxt = $scope.search;
+                  if ($scope.search == 'undefined' || $scope.search == '') {
+                      searchtxt = 'null';
+                  }
+                  $http({
+                      method: 'GET',
+                      url: baseUrl + 'SubjectSetup/GetAllSubject/' + $scope.GenerateResult.ClassId + '/' + $scope.GenerateResult.SessionId
+                  }).then(function successCallback(response) {
+                      $scope.SubjectSetups = response.data;
+                      $scope.total_count = response.data.totalcount;
+                      if ($scope.pagesize == -1)
+                          $scope.pagesize = 500;
+                      //blockUI.stop();  // spinning Finished
+                  }, function errorCallback(response) {
+                      toastr["info"](response.data.message);
+                      blockUI.stop();
+                  });
+              }
+              $scope.selectAll = function () {
+                  angular.forEach($scope.StudentInfos, function (item) {
+                      item.Selected = $scope.selectedAll;
+                  });
+
+              };
+              $scope.GetSelects = function GetSelects() {
+                  var res = '';
+                  angular.forEach($scope.StudentInfos, function (item) {
+                      if(item.Selected)
+                      {
+                          res = res + ',' + item.StudentIID
+                      }
+                  });
+
+                  return  res.trim()
+
+              };
+
+
+              $scope.checkIfAllSelected = function () {
+                  $scope.selectedAll = $scope.StudentInfos.every(function (item) {
+                      return item.Selected == true
+                  })
+              };
+              function Search() {
+
+                  $scope.StudentInfos = [];
+                  $http({
+                      method: 'POST',
+                      url: baseUrl + 'Student/SearchMainExam/',
+                      data: $scope.GenerateResult
+                  }).then(function successCallback(response) {
+                      $scope.StudentInfos = response.data.results;
+                      $scope.selectedAll = true;
+                      angular.forEach($scope.StudentInfos, function (item) {
+                          item.Selected = $scope.selectedAll;
+                      });
+
+                      toastr["success"](response.data.message);
+                  }, function errorCallback(response) {
+                      toastr["error"](response.data.message);
+                  });
+
+              };
+
+
+
+              function getAllCommons() {
+                  $scope.CommonFeilds = [];
+
+                  $http({
+                      method: 'GET',
+                      url: baseUrl + 'Common/GetCommonItem/'
+                  }).then(function successCallback(response) {
+                      $scope.CommonFeilds = response.data.results;
+                  }, function errorCallback(response) {
+                      toastr["error"](response.data.message);
+                  });
+              }
+
+
+
+          }]);
+    </script>
+}

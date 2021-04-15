@@ -1,0 +1,48 @@
+﻿@model UI.Portal.Models.RegisterViewModel
+@{
+    ViewBag.Title = "Register";
+    Layout = "~/Views/Shared/_LayoutLogin.cshtml";
+}
+<!-- BEGIN REGISTRATION FORM -->
+@using (Html.BeginForm("Register", "Account", FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+{
+    @Html.AntiForgeryToken()
+    <h3>Sign Up</h3>
+    @Html.ValidationSummary("", new { @class = "text-danger" })
+    <p> Enter your personal details below: </p>
+    <div class="form-group">
+        @Html.LabelFor(m => m.StudentInsId, new { @class = "control-label visible-ie8 visible-ie9", })
+        <div class="input-icon">
+            <i class="fa fa-font"></i>
+            @Html.TextBoxFor(m => m.StudentInsId, new { @class = "form-control placeholder-no-fix", @placeholder = "Student ID" })
+        </div>
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(m => m.PhoneNumber, new { @class = "control-label visible-ie8 visible-ie9", })
+        <div class="input-icon">
+            <i class="fa fa-font"></i>
+            @Html.TextBoxFor(m => m.PhoneNumber, new { @class = "form-control placeholder-no-fix", @placeholder = "Phone Number" })
+        </div>
+    </div>
+    <div class="form-group">
+        <label class="control-label visible-ie8 visible-ie9">Username</label>
+        @Html.LabelFor(m => m.Password, new { @class = "control-label visible-ie8 visible-ie9" })
+        <div class="input-icon">
+            <i class="fa fa-user"></i>
+            @Html.PasswordFor(m => m.Password, new { @class = "form-control placeholder-no-fix", @placeholder = "Enter Password" })
+        </div>
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(m => m.ConfirmPassword, new { @class = "control-label visible-ie8 visible-ie9" })
+        <label class="control-label visible-ie8 visible-ie9">Password</label>
+        <div class="input-icon">
+            <i class="fa fa-lock"></i>
+            @Html.PasswordFor(m => m.ConfirmPassword, new { @class = "form-control placeholder-no-fix", @placeholder = "Enter Confirm Password" })
+        </div>
+    </div>
+    <div class="form-actions">
+        @(Html.ActionLink("Back", "Login", new { id = 1 }, new { @class = "btn red btn-outline" }))
+        <button type="submit" id="register-submit-btn" class="btn green pull-right"> Sign Up </button>
+    </div>
+}
+<!-- END REGISTRATION FORM -->

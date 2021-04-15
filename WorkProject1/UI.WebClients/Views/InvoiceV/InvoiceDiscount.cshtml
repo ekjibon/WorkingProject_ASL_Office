@@ -1,0 +1,820 @@
+﻿
+@{
+    ViewBag.Title = "Invoice Discount Panel";
+}
+<style type="text/css">
+    input[type=number]::-webkit-inner-spin-button,
+    input[type=number]::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+
+    #ClientId {
+        width: 260px;
+    }
+
+    .DrpdwnWidth ul {
+        width: 350px;
+    }
+</style>
+
+<div class="kt-container  kt-container--fluid  kt-grid__item kt-grid__item--fluid" ng-controller="AdminCollectionCntrl">
+
+    <div class="row">
+        <div class="kt-portlet kt-portlet--mobile">
+            <div class="kt-portlet__head kt-portlet__head--lg">
+                <div class="kt-portlet__head-label">
+                    <h3 class="kt-portlet__head-title">
+                        Invoice Discount Panel
+                    </h3>
+                </div>
+            </div>
+            <div class="kt-portlet__body">
+                <!-- BEGIN FORM-->
+                <form class="form-horizontal" name="searchform" ng-submit="Search()" id="idsearchform" method="post" enctype="multipart/form-data" novalidate>
+                    <div class="form-body">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group row" ng-class="{ 'has-error' : isSubmitted && searchform.Client.$invalid}">
+                                    <label class="col-md-5 control-label" style="text-align:right">
+                                        Client :
+                                        <span class="required">*</span>
+                                    </label>
+                                    <div class="col-md-7 DrpdwnWidth">
+                                        <input type="text" ng-model="Client" typeahead-on-select='onSelect($item, $model, $label)'
+                                               placeholder="Enter client name or ID" uib-typeahead="i  as i.Text for i in Searchtext($viewValue)"
+                                               typeahead-loading="loadingLocations" typeahead-no-results="noResults" required class="form-control">
+                                        <i ng-show="loadingLocations" class="glyphicon glyphicon-refresh"></i>
+                                        <div ng-show="noResults"><i class="glyphicon glyphicon-remove"></i> No Results Found</div>
+                                        <input type="hidden" name="Client" ng-model="mainFilter.Value" ng-value="Std.Value" />
+                                        <span ng-show="isSubmitted && searchform.Client.$error.required" class="help-block">Client Name Required</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group row" ng-class="{ 'has-error' : isSubmitted && searchform.MonthDaySearch.$invalid}">
+                                    <label class="col-md-6 control-label text-right">
+                                        Year and Month:
+                                        <span class="required">*</span>
+
+                                    </label>
+                                    <div class="col-md-6">
+                                        <input class="form-control" ng-model="mainFilter.MonthDaySearch" required name="MonthDaySearch" type="datetime" placeholder="Year and Month" readonly ng-click="p3=true" is-open="p3" datepicker-options="{minMode: 'month'}" datepicker-mode="'month'" uib-datepicker-popup="MM/yyyy" />
+                                        <span ng-show="isSubmitted &&  searchform.MonthDaySearch.$error.required" class="help-block">Month and Year Required</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group row" ng-class="{ 'has-error' : isSubmitted && searchform.FilterType.$invalid}">
+                                    <label class="col-md-5 control-label" style="text-align:right">
+                                        Filter Type:
+                                        <span class="required">*</span>
+                                    </label>
+                                    <div class="col-md-7">
+                                        <select ng-model="mainFilter.FilterType" class="form-control" placeholder="Web Portal" name="FilterType" required>
+                                            <option value='' selected="selected">Select Filter Type</option>
+                                            <option value='1'>Process Month</option>
+                                            <option value='2'>Due Month</option>
+
+                                        </select>
+                                        <div class="form-control-focus"> </div>
+                                        <span ng-show="isSubmitted &&  searchform.FilterType.$error.required" class="help-block">Filter Type is Required</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <button type="submit" ng-click="isSubmitted=true;" class="btn btn-success">Show</button>
+                                <button type="button" class="btn btn-danger" ng-click="resetFilterForm()">Reset</button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+                <table class="table table-bordered table-hover rounded">
+                    <thead>
+                        <tr class="btn-primary">
+                            <th>Client ID &amp; Name  </th>
+                            @*<th>Invoice No</th>*@
+                            <th>Due Amount</th>
+                            <th>Billing Head</th>
+                            <th>Rate</th>
+                            <th>Quantity</th>
+                            <th>Total Tk.</th>
+                            <th>Collected</th>
+                            <th>Due</th>
+                        </tr>
+                    </thead>
+
+                    <tbody ng-repeat="x in InvoiceGeneratelist">
+                        <tr>
+                            <td rowspan="{{x.RequList.length+1}}"> {{x.FullName}}</td>
+                            @*<td rowspan="{{x.RequList.length+1}}"> {{x.InvoiceNo}}</td>*@
+                            <td rowspan="{{x.RequList.length+1}}"> {{x.DueAmount}}</td>
+
+                        </tr>
+                        <tr ng-repeat="item in x.RequList">
+                            <td> {{item.BillingHeadName }} </td>
+                            <td> {{item.Rate}} </td>
+                            <td> {{item.Quantity}}</td>
+                            <td> {{item.TotalAmount}}</td>
+                            <td> {{item.CollectionAmount}}</td>
+                            <td> {{item.DueAmount}}</td>
+                        </tr>
+                        @*<tr>
+                                <td></td>
+                                <td></td>
+                                <td>{{$scope.totalAmount}}</td>
+                                <td>{{$scope.totalColctnAmount}}</td>
+                                <td>{{$scope.totalDueAmount}}</td>
+                            </tr>*@
+                    </tbody>
+                </table>
+
+                <div class="row">
+                    <div class="col-md-8">
+                        <div class="form-group row">
+
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <div class="kt-portlet__body">
+                <form ng-if="InvoiceGeneratelist.length>0" class="form-horizontal" name="addform" ng-submit="AddDiscount()" id="idaddform" method="post" enctype="multipart/form-data" novalidate>
+                    <div class="form-body">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group row" ng-class="{ 'has-error' : submitted && addform.BillingHead.$invalid}">
+                                    <label class="col-md-6 control-label" style="text-align:right">
+                                        Discount Head:
+                                        <span class="required">*</span>
+                                    </label>
+                                    <div class="col-md-6">
+                                        <select class="form-control" ng-model="discountObj.BillingHead" name="BillingHead" ng-options="aBillingHead as aBillingHead.BillingHeadName for aBillingHead in BillingHeadList">
+                                            <option value="" selected="selected">Choose Option</option>
+                                        </select>
+                                        <div class="form-control-focus"> </div>
+                                        <span ng-show="submitted && addform.BillingHead.$error.required" class="help-block">BillingHead Required</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group row" ng-class="{ 'has-error' : submitted && addform.Description.$invalid}">
+                                    <label class="col-md-5 control-label" style="text-align:right">
+                                        Description :
+                                    </label>
+                                    <div class="col-md-7">
+                                        <textarea ng-model="discountObj.Description" class="form-control" placeholder="Description" name="Description"></textarea>
+                                        <div class="form-control-focus"> </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-group row" ng-class="{ 'has-error' : submitted && addform.MonthDay.$invalid}">
+                                    <label class="col-md-6 control-label text-right">
+                                        Year and Month:
+                                        <span class="required">*</span>
+
+                                    </label>
+                                    <div class="col-md-6">
+                                        <input class="form-control" ng-model="mainFilter.MonthDay" name="MonthDay" type="datetime" placeholder="Year and Month" readonly ng-click="p1=true" is-open="p1" datepicker-options="{minMode: 'month'}" datepicker-mode="'month'" uib-datepicker-popup="MM/yyyy" />
+                                        <span ng-show="submitted &&  addform.MonthDay.$error.required" class="help-block">Month and Year Required</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <div class="form-group" ng-class="{ 'has-error' : submitted && addform.FixedAmount.$invalid}">
+                                    <label class="col-md-12 control-label">
+                                        IsFixed Amount
+                                        <span><input type="checkbox" name="IsFixedAmount" ng-model="IsCheck" ng-change="checkStatus(IsCheck)" ng-true-value="true" ng-false-value="false" /></span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group row" ng-class="{ 'has-error' : submitted && addform.DiscountlinkBillingHead.$invalid}">
+                                    <label class="col-md-6 control-label" style="text-align:right">
+                                        Link Billing Head:
+                                        <span class="required">*</span>
+                                    </label>
+                                    <div class="col-md-6">
+                                        <select class="form-control" ng-model="discountObj.DiscountlinkBillingHead" name="DiscountlinkBillingHead" ng-options="aBillingHead as aBillingHead.BillingHeadName for aBillingHead in BillingHeadListDiscountlink" ng-change="GetLinkBillingHeadInvoice()">
+                                            <option value="" selected="selected">Choose Option</option>
+                                        </select>
+                                        <div class="form-control-focus"> </div>
+                                        <span ng-show="submitted && addform.DiscountlinkBillingHead.$error.required" class="help-block">Link Billing Head Required</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3" ng-show="!IsCheck">
+                                <div class="form-group row" ng-class="{ 'has-error' : submitted && addform.Quantity.$invalid}">
+                                    <label class="col-md-6 control-label" style="text-align:right">
+                                        Quantity :
+                                        <span class="required">*</span>
+                                    </label>
+                                    <div class="col-md-6">
+                                        <input type="text" onkeypress='return (event.charCode >= 48 && event.charCode <= 57) ||
+                                            event.charCode == 0 || event.charCode == 46' class="form-control" ng-model="discountObj.Quantity" placeholder="Quantity" name="Quantity" maxlength="10">
+                                        <div class="form-control-focus"> </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3" ng-show="!IsCheck">
+                                <div class="form-group row" ng-class="{ 'has-error' : submitted && addform.Rate.$invalid}">
+                                    <label class="col-md-5 control-label" style="text-align:right">
+                                        Rate :
+                                        <span class="required">*</span>
+                                    </label>
+                                    <div class="col-md-7">
+                                        <input type="text" onkeypress='return (event.charCode >= 48 && event.charCode <= 57) ||
+                                            event.charCode == 0 || event.charCode == 46' class="form-control" ng-model="discountObj.Rate" placeholder="Rate" name="Rate" maxlength="10">
+                                        <div class="form-control-focus"> </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3" ng-show="IsCheck">
+                                <div class="form-group row" ng-class="{ 'has-error' : submitted && addform.DiscountPercentage.$invalid}">
+                                    <label class="col-md-6 control-label" style="text-align:right">
+                                        Percentage(%) :
+                                    </label>
+                                    <div class="col-md-6">
+                                        <input type="text" onkeypress='return (event.charCode >= 48 && event.charCode <= 57) ||
+                                            event.charCode == 0 || event.charCode == 46' class="form-control" ng-model="discountObj.DiscountPercentage" placeholder="Percentage(%)" name="DiscountPercentage" maxlength="3" ng-change="calculationDiscountPercentageAmount()">
+                                        <div class="form-control-focus"> </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3" ng-show="IsCheck">
+                                <div class="form-group row" ng-class="{ 'has-error' : submitted && addform.FixedAmount.$invalid}">
+                                    <label class="col-md-6 control-label" style="text-align:right">
+                                        Fixed Amount :
+                                        <span class="required">*</span>
+                                    </label>
+                                    <div class="col-md-6">
+                                        <input type="text" onkeypress='return (event.charCode >= 48 && event.charCode <= 57) ||
+                                            event.charCode == 0 || event.charCode == 46' class="form-control" ng-model="discountObj.FixedAmount" placeholder="Fixed Amount" name="FixedAmount"  maxlength="10">
+                                        <div class="form-control-focus"> </div>
+                                    </div>
+                                </div>
+                            </div>
+                           
+                            <div class="col-md-2">
+                                <button type="submit" ng-click="submitted=true;" class="btn btn-primary">Add</button>
+                            </div>
+                        </div>
+
+                    </div>
+                </form>
+                <table ng-if="DiscountList.length>0" class="table table-bordered table-hover rounded">
+                    <thead>
+                        <tr class="btn-primary">
+                            <th>SL</th>
+                            <th>Discount Head</th>
+                            <th>Link Billing Head</th>
+                            <th>Description</th>
+                            <th ng-if="!IsCheck">Quantity</th>
+                            <th ng-if="!IsCheck">Rate</th>
+                            <th ng-if="IsCheck">Fixed Amount</th>
+                            <th style="text-align:center">Total Amount</th>
+                            <th style="text-align:center">Action</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        <tr ng-repeat="item in DiscountList">
+                            <td> {{$index+1}} </td>
+                            <td> {{item.BillingHeadName }} </td>
+                            <td> {{item.LinkBillingHeadName }} </td>
+                            <td> {{item.Description }} </td>
+                            <td ng-if="!IsCheck"> {{item.Quantity}}</td>
+                            <td ng-if="!IsCheck"> {{item.Rate}} </td>
+                            <td style="text-align:right" ng-if="!IsCheck"> {{item.TotalAmount}} </td>
+                            <td style="text-align:right" ng-if="IsCheck"> {{item.TotalAmount}} </td>
+                            <td style="text-align:right" ng-if="IsCheck"> {{item.TotalAmount}} </td>
+                            <td style="text-align:center"><button type="button" class="btn btn-danger" ng-click="resetDiscountForm(item)">Remove</button></td>
+                        </tr>
+                        <tr>
+                            <td ng-if="!IsCheck" colspan="6" style="text-align:right">Total</td>
+                            <td ng-if="IsCheck" colspan="5" style="text-align:right">Total</td>
+                            <td style="text-align:right">{{totalDiscount}} /=</td>
+                            <td></td>
+                        </tr>
+                    </tbody>
+
+                </table>
+                <div ng-if="DiscountList.length>0" class="row">
+                    <div class="col-md-10"></div>
+                    <div class="col-md-2">
+                        <button type="button" ng-click="save()" class="btn btn-success">Save</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts{
+    <script type="text/javascript">
+        OEMSApp.controller("AdminCollectionCntrl", ["$scope", "$http", "SweetAlert", "blockUI", "$window", "$filter",
+          function ($scope, $http, SweetAlert, blockUI, $window, $filter) {
+
+              init();
+              function init() {
+                  initialize();
+                  getAllMonth();
+                  getAllYear();
+                  GetAllInvoiceBillingHead();
+                  GetAllInvoiceDiscountBillingHead();
+              }
+              function initialize() {
+
+                  $scope.InvoiceGeneratelist = [];
+                  $scope.Search = Search;
+                  $scope.resetFilterForm = resetFilterForm;
+                  $scope.mainFilter = {};
+                  //$scope.checkAll = checkAll;
+                  $scope.discountObj = {};
+                  $scope.DiscountList = [];
+                  $scope.AddDiscount = AddDiscount;
+                  $scope.totalDiscount = 0;
+                  $scope.IsCheck = false;
+                  $scope.save = save;
+                  $scope.YearId = 0;
+                  $scope.MonthId = 0;
+                  $scope.HeadTotalAmount = 0;
+                  $scope.TotalFixedAmount = 0;
+
+              };
+              function getAllMonth() {
+                  $scope.MonthList = [];
+                  $http({
+                      method: 'GET',
+                      url: baseUrl + 'Common/GetAllMonth/'
+                  }).then(function successCallback(response) {
+                      $scope.MonthList = response.data.results.Table;
+                      angular.forEach($scope.MonthList, function (aMonth) {
+                          aMonth.IsChecked = false;
+                      });
+                  }, function errorCallback(response) {
+                      toastr["warning"](response.data.Message);
+                  });
+              }
+              function getAllYear() {
+                  $scope.YearList = [];
+                  $http({
+                      method: 'GET',
+                      url: baseUrl + 'Common/GetAllYear/'
+                  }).then(function successCallback(response) {
+                      $scope.YearList = response.data.results.Table;
+                  }, function errorCallback(response) {
+                      toastr["warning"](response.data.Message);
+                  });
+              }
+              function GetAllInvoiceBillingHead() {
+                  $scope.BillingHeadListDiscountlink = [];
+                  $http({
+                      method: 'GET',
+                      url: baseUrl + 'Invoice/GetAllActiveInvoiceBillingHead'
+                  }).then(function successCallback(response) {
+                      $scope.BillingHeadListDiscountlink = response.data.results;
+                  }, function errorCallback(response) {
+                      toastr["info"](response.data.Message);
+                  });
+              }
+              function GetAllInvoiceDiscountBillingHead() {
+                  $scope.BillingHeadList = [];
+                  $http({
+                      method: 'GET',
+                      url: baseUrl + 'Invoice/GetAllActiveInvoiceDiscountBillingHead'
+                  }).then(function successCallback(response) {
+                      $scope.BillingHeadList = response.data.results;
+                  }, function errorCallback(response) {
+                      toastr["info"](response.data.Message);
+                  });
+              }
+
+              $scope.checkStatus = function checkStatus(n) {
+                  $scope.IsCheck = n;
+                  $scope.DiscountList = [];
+              }
+              $scope.Searchtext = function (val) {
+                  return $http.get(baseUrl + 'Client/SearchClient/' + val, {
+                      params: {}
+                  }).then(function (response) {
+                      return response.data.results.map(function (item) {
+
+                          return item;
+                      });
+                  });
+              };
+
+              $scope.onSelect = function onSelect($item, $model, $label) {
+                  $scope.mainFilter.ClientId = $item.Value;
+              };
+
+              $scope.selectAll = function () {
+                  angular.forEach($scope.InvoiceGeneratelist, function (item) {
+                      item.Selected = $scope.selectedAll;
+                  });
+
+              };
+
+              $scope.checkIfAllSelected = function () {
+                  $scope.selectedAll = $scope.InvoiceGeneratelist.every(function (item) {
+                      return item.Selected == true;
+                  })
+              };
+
+
+              $scope.IfAllchecked = function IfAllchecked() {
+                  var count = 0;
+                  var count1 = 0;
+                  angular.forEach($scope.InvoiceGeneratelist, function (item) {
+                      angular.forEach(item.RequList, function (adata) {
+                          count++;
+                          if (adata.checked) {
+                              count1++;
+                          }
+                          else {
+                              count1--;
+                          }
+                      })
+                  })
+
+                  if (count == count1) {
+                      $scope.checkedAll = true;
+                  }
+                  else {
+                      $scope.checkedAll = false;
+                  }
+              };
+              function GetSelects() {
+                  var res = '';
+                  angular.forEach($scope.InvoiceGeneratelist, function (item) {
+                      if (item.Selected) {
+                          res += res == '' ? item.ShortName : ',' + item.ShortName;
+                      }
+                  });
+                  return res.trim()
+              };
+
+              function GetInvoiceGenerateId() {
+                  var res = '';
+                  angular.forEach($scope.InvoiceGeneratelist, function (item) {
+                      angular.forEach(item.RequList, function (adata) {
+                          if (adata.checked) {
+                              res += res == '' ? adata.Id : ',' + adata.Id;
+                          }
+                      })
+
+                  });
+                  return res.trim()
+              };
+
+              function Search() {
+                  $scope.DiscountList = [];
+                  if ($scope.mainFilter.ClientId == undefined) {
+                      toastr.options.positionClass = 'toast-bottom-right';
+                      toastr["warning"]("Please Enter Client Name");
+                      return;
+                  }
+                  else if ($scope.mainFilter.FilterType == undefined || $scope.mainFilter.FilterType == null) {
+                      toastr.options.positionClass = 'toast-bottom-right';
+                      toastr["warning"]("Please Select Filter Type");
+                      return;
+                  }
+                  else if ($scope.mainFilter.MonthDaySearch == undefined || $scope.mainFilter.MonthDaySearch == null) {
+                      toastr.options.positionClass = 'toast-bottom-right';
+                      toastr["warning"]("Please Select Year and Month");
+                      return;
+                  }
+                  $scope.YearId = $scope.mainFilter.MonthDaySearch.getFullYear();
+                  $scope.MonthId = $scope.mainFilter.MonthDaySearch.getMonth() + 1;
+
+                  $http({
+                      method: 'GET',
+                      url: baseUrl + '/Invoice/GetInvoiceGenerateDisPanel/' + $scope.YearId + "/" + $scope.MonthId + "/" + $scope.mainFilter.ClientId + "/" + $scope.mainFilter.FilterType
+
+                  }).then(function successCallback(response) {
+                      $scope.InvoiceGeneratelist = response.data.results;
+                      $scope.selectedAll = false;
+                      $scope.checkedAll = true;
+                      GetDiscountByClientYearMonthId();
+                  }, function errorCallback(response) {
+                      toastr.options.positionClass = 'toast-bottom-right';
+                      toastr["info"](response.data.Message);
+                  });
+              };
+              function GetDiscountByClientYearMonthId() {
+                  $scope.YearId = $scope.mainFilter.MonthDaySearch.getFullYear();
+                  $scope.MonthId = $scope.mainFilter.MonthDaySearch.getMonth() + 1;
+                  $http({
+                      method: 'GET',
+                      url: baseUrl + '/Invoice/GetInvoiceDiscountList/' + $scope.YearId + "/" + $scope.MonthId + "/" + $scope.mainFilter.ClientId + "/" + $scope.mainFilter.FilterType
+
+                  }).then(function successCallback(response) {
+                      if (response.data.results[0].Quantity > 1) {
+                          $scope.IsCheck = false;
+                      }
+                      else {
+                          $scope.IsCheck = true;
+                      }
+                      $scope.DiscountList = response.data.results;
+                      console.log($scope.DiscountList);
+                      calculationDiscount();
+                  }, function errorCallback(response) {
+                      toastr["info"](response.data.Message);
+                  });
+              }
+              $scope.GetLinkBillingHeadInvoice = function GetLinkBillingHeadInvoice() {
+                  debugger;
+                  $scope.HeadTotalAmount = 0;
+                  $scope.YearId = $scope.mainFilter.MonthDay.getFullYear();
+                  $scope.MonthId = $scope.mainFilter.MonthDay.getMonth() + 1;
+                  $http({
+                      method: 'GET',
+                      url: baseUrl + '/Invoice/GetLinkBillingHeadInvoice/' + $scope.YearId + "/" + $scope.MonthId + "/" + $scope.mainFilter.ClientId + "/" + $scope.discountObj.DiscountlinkBillingHead.Id
+
+                  }).then(function successCallback(response) {
+                      if (response.data.results[0].TotalAmount > 0) {
+                          $scope.HeadTotalAmount = response.data.results[0].TotalAmount;
+                      }
+                      else {
+                          $scope.HeadTotalAmount = 0;
+                      }
+                     
+                      console.log(response.data.results);
+                      console.log($scope.HeadTotalAmount);
+                  }, function errorCallback(response) {
+                      toastr.options.positionClass = 'toast-bottom-right';
+                      toastr["info"](response.data.Message);
+                  });
+              }
+              function AddDiscount() {
+                  //if ($scope.addform.$invalid)
+                  //    return;
+                  var IsExist = false;
+                  console.log($scope.discountObj.BillingHead);
+                  if ($scope.discountObj.BillingHead == undefined) {
+                      toastr.options.positionClass = 'toast-bottom-right';
+                      toastr["warning"]("Please Select Discount Head");
+                      return;
+                  }
+                  if ($scope.discountObj.DiscountlinkBillingHead == undefined) {
+                      toastr.options.positionClass = 'toast-bottom-right';
+                      toastr["warning"]("Please Select Link Billing Head");
+                      return;
+                  }
+                  if ($scope.IsCheck) {
+                      if ($scope.discountObj.FixedAmount == undefined || $scope.discountObj.FixedAmount == null) {
+                          toastr.options.positionClass = 'toast-bottom-right';
+                          toastr["warning"]("Please Enter FixedAmount");
+                          return;
+                      }
+                  }
+                  else {
+                      if ($scope.discountObj.Quantity == undefined || $scope.discountObj.Quantity == null) {
+                          toastr.options.positionClass = 'toast-bottom-right';
+                          toastr["warning"]("Please Enter Quantity");
+                          return;
+                      }
+                      else if ($scope.discountObj.Rate == "" || $scope.discountObj.Rate == null) {
+                          toastr.options.positionClass = 'toast-bottom-right';
+                          toastr["warning"]("Please Enter Rate");
+                          return;
+                      }
+                  }
+                  angular.forEach($scope.DiscountList, function (adata) {
+                      if (adata.BillingHeadName == $scope.discountObj.BillingHead.BillingHeadName) {
+                          toastr.options.positionClass = 'toast-bottom-right';
+                          toastr["warning"]("Discount Head Already Exists!");
+                          IsExist = true;
+                          return;
+                      }
+                  })
+                  if (IsExist) {
+                      return;
+                  }
+                  if ($scope.IsCheck) {
+                      $scope.discountObj.TotalAmount = $scope.discountObj.FixedAmount;
+                  }
+                  else {
+                      $scope.discountObj.TotalAmount = $scope.discountObj.Rate * $scope.discountObj.Quantity;
+                  }
+                  var disObj = $scope.discountObj;
+                  disObj.BillingHeadId = $scope.discountObj.BillingHead.Id;
+                  disObj.BillingHeadName = $scope.discountObj.BillingHead.BillingHeadName;
+                  disObj.DiscountlinkBillingHeadId = $scope.discountObj.DiscountlinkBillingHead.Id;
+                  disObj.LinkBillingHeadName = $scope.discountObj.DiscountlinkBillingHead.BillingHeadName;
+                  $scope.DiscountList.push(disObj);
+                  $scope.discountObj = {};
+                  disObj = {};
+                  calculationDiscount();
+                  $scope.submitted = false;
+              };
+              function calculationDiscount() {
+                  $scope.totalDiscount = 0;
+                  angular.forEach($scope.DiscountList, function (adata) {
+                      if ($scope.IsCheck) {
+                          var fixdAmnt = 0;
+                          var fixdAmnt = Number(adata.TotalAmount);
+                          $scope.totalDiscount += fixdAmnt;
+
+                      }
+                      else {
+                          $scope.totalDiscount += (adata.Rate * adata.Quantity);
+                      }
+                  })
+              }
+
+              $scope.calculationDiscountPercentageAmount = function calculationDiscountPercentageAmount() {
+                  debugger;
+                  $scope.TotalFixedAmount = 0;
+                  var DiscountPercentage = 0;
+                  var HeadTotalAmount = 0;
+                  if ($scope.discountObj.DiscountPercentage > 100) {
+                      toastr.options.positionClass = 'toast-bottom-right';
+                      toastr["warning"]("Please Enter Valid Percentage!");
+                      $scope.discountObj.DiscountPercentage = 0;
+                      $scope.discountObj.FixedAmount = 0;
+                      return;
+                  }
+                  if ($scope.discountObj.DiscountPercentage > 0)
+                  {
+                      DiscountPercentage = $scope.discountObj.DiscountPercentage;
+                  }
+                  // HeadTotalAmount = num($scope.HeadTotalAmount);
+                   $scope.TotalFixedAmount = (num($scope.HeadTotalAmount) * num(DiscountPercentage)) / 100;
+                   $scope.discountObj.FixedAmount = $scope.TotalFixedAmount;
+                  console.log($scope.TotalFixedAmount);
+              }
+              function num(n) {
+
+                  if ($.isNumeric(n)) {
+                      return parseFloat(n);
+                  } else {
+                      return 0;
+                  }
+              }
+              $scope.resetDiscountForm = function resetDiscountForm(item) {
+                  var indexNum = $scope.DiscountList.indexOf(item);
+                  $scope.DiscountList.splice(indexNum, 1);
+                  calculationDiscount();
+              }
+              function resetFilterForm() {
+                  $scope.isisSubmitted = false;
+                  $scope.selectedAll = false;
+                  $scope.Client = "";
+                  $scope.mainFilter = {};
+                  $scope.InvoiceGeneratelist = [];
+                  $scope.discountObj = {};
+                  $scope.DiscountList = [];
+              }
+              function chkInvoiceGenerateList() {
+                  $scope.count = 0;
+                  $scope.count1 = 0;
+                  angular.forEach($scope.InvoiceGeneratelist, function (item) {
+                      if (item.Selected) {
+                          $scope.count++;
+                      }
+                      angular.forEach(item.RequList, function (adata) {
+                          if (adata.checked) {
+                              $scope.count1++;
+                          }
+                      })
+                  });
+              }
+
+              function save() {
+                  if ($scope.mainFilter.MonthDay == undefined || $scope.mainFilter.MonthDay == null) {
+                      toastr.options.positionClass = 'toast-bottom-right';
+                      toastr["warning"]("Please Select Year and Month");
+                      return;
+                  }
+
+                  var invDiscntList = [];
+
+                  angular.forEach($scope.DiscountList, function (item) {
+                      var invDiscntObj = {};
+                      invDiscntObj = item;
+                      invDiscntObj.ClientId = $scope.mainFilter.ClientId;
+                      invDiscntObj.Year = $scope.mainFilter.MonthDay.getFullYear();
+                      invDiscntObj.MonthId = $scope.mainFilter.MonthDay.getMonth() + 1;
+                      if ($scope.IsCheck) {
+                          invDiscntObj.Quantity = 0;
+                          invDiscntObj.Rate = 0;
+                          //invDiscntObj.TotalAmount = Number(item.FixedAmount);
+                      }
+                      else {
+                          //invDiscntObj.TotalAmount = Number(item.Quantity * item.Rate);
+                      }
+                      var adate = '01/' + invDiscntObj.MonthId + '/' + invDiscntObj.Year;
+                      invDiscntObj.DueDate = adate;
+                      invDiscntList.push(invDiscntObj);
+
+                  })
+                  if ($scope.DiscountList.length < 1) {
+                      toastr.options.positionClass = 'toast-bottom-right';
+                      toastr["info"]("Add discount list.");
+                      return;
+                  }
+                  $http({
+                      method: 'POST',
+                      url: baseUrl + 'Invoice/AddInvoiceDiscount/',
+                      data: invDiscntList
+                  }).then(function successCallback(response) {
+                      toastr.options.positionClass = 'toast-bottom-right';
+                      toastr["info"](response.data.message);
+                      resetFilterForm();
+                  }, function errorCallback(response) {
+                      toastr.options.positionClass = 'toast-bottom-right';
+                      toastr["warning"](response.data.Message);
+                  });
+              }
+
+              $scope.Print = function Print() {
+                  chkInvoiceGenerateList();
+
+                  if ($scope.count < 1) {
+                      toastr["warning"]("Select at least one check box");
+                      return;
+                  }
+                  if ($scope.count1 < 1) {
+                      toastr["warning"]("Select at least one check box");
+                      return;
+                  }
+                  var uri = "@Url.Action("InvoiceGenerate", "Report")?YearID=" + $scope.mainFilter.Year + "&MonthId=" + $scope.mainFilter.Month + "&ClientId=" + $scope.mainFilter.ClientId + "&InvoiceNo=" + GetSelects() + "&InvoiceId=" + GetInvoiceGenerateId();
+                  window.open(uri, '_blank');
+              };
+
+              $scope.PrintInvoiceExcel = function PrintInvoiceExcel() {
+                  chkInvoiceGenerateList();
+                  if ($scope.count < 1) {
+                      toastr["warning"]("Select at least one check box");
+                      return;
+                  }
+                  if ($scope.count1 < 1) {
+                      toastr["warning"]("Select at least one check box");
+                      return;
+                  }
+                  var uri = "@Url.Action("InvoiceExcelReport", "Report")?YearID=" + $scope.mainFilter.Year + "&MonthId=" + $scope.mainFilter.Month + "&ClientId=" + $scope.mainFilter.ClientId + "&InvoiceNo=" + GetSelects() + "&InvoiceId=" + GetInvoiceGenerateId();
+                  window.open(uri, '_blank');
+              };
+              function createStringByArray(array) {
+                  var output = '';
+                  angular.forEach(array, function (value, key) {
+                      if (!isNaN(parseInt(value))) {
+                          output += value + ',';
+                      }
+                      else {
+                          output += "'" + value.toString() + '\',';
+                      }
+                  });
+                  return output;
+              }
+          }]).directive('multiSelect', function () {
+              function link(scope, element) {
+                  var options = {
+                      enableClickableOptGroups: true,
+                      onChange: function () {
+                          element.change();
+                      }
+                  };
+                  element.multiselect(options);
+              }
+              return {
+                  restrict: 'A',
+                  link: link
+              };
+          }).config(['$provide', function ($provide) {
+              $provide.decorator('selectDirective', ['$delegate', function ($delegate) {
+                  var directive = $delegate[0];
+                  directive.compile = function () {
+                      function post(scope, element, attrs, ctrls) {
+                          directive.link.post.apply(this, arguments);
+                          var ngModelController = ctrls[1];
+                          if (ngModelController && attrs.multiple == true) {
+                              originalRender = ngModelController.$render;
+                              ngModelController.$render = function () {
+                                  originalRender();
+                                  element.multiselect('rebuild');
+                              };
+                          }
+                      }
+                      return {
+                          pre: directive.link.pre,
+                          post: post
+                      };
+                  };
+                  return $delegate;
+              }]);
+
+          }]);
+    </script>
+
+}
+
+
+
+

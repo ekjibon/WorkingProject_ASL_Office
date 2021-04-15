@@ -1,0 +1,917 @@
+﻿
+@using UI.Admin.Models.Task;
+@using UI.Admin.Models.Employee;
+@using UI.Admin.Models.Customer;
+@{
+    Tickets ticket = ViewData["Tickets"] as Tickets;
+    List<TicketsAttachment> ticketAttachment = ViewData["TicketAttachments"] as List<TicketsAttachment>;
+    Department department = ViewData["Department"] as Department;
+    Modules modules = ViewData["Module"] as Modules;
+    Project project = ViewData["Project"] as Project;
+    Client client = ViewData["Client"] as Client;
+    TicketCategory ticketCategory = ViewData["Category"] as TicketCategory;
+    TaskInfo task = ViewData["task"] as TaskInfo;
+}
+
+@{
+    ViewBag.Title = "TicketDetails";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<link href="http://cdn.addiesoft.com/admin/assets/global/css/components.min.css" rel="stylesheet" type="text/css" />
+<style>
+    .kyc_card_header {
+        padding: 0px 9px;
+        background: #f0f8ff;
+        border-bottom: 0;
+    }
+
+        .kyc_card_header h3 {
+            font-size: 22px;
+            font-family: 'Ubuntu', sans-serif;
+            font-weight: 500;
+            color: #222;
+        }
+
+        .kyc_card_header p {
+            font-size: 13px;
+            font-family: 'Ubuntu', sans-serif;
+            font-weight: 800;
+            color: #666666;
+        }
+
+        .kyc_card_header span {
+            font-size: 18px;
+            font-family: 'Ubuntu', sans-serif;
+            font-weight: 800;
+            color: #666666;
+        }
+
+    .kyc_card_header {
+        padding: 0px 9px;
+        background: #f0f8ff;
+        border-bottom: 0;
+    }
+
+        .kyc_card_header h3 {
+            font-size: 22px;
+            font-family: 'Ubuntu', sans-serif;
+            font-weight: 500;
+            color: #222;
+        }
+
+        .kyc_card_header p {
+            font-size: 13px;
+            font-family: 'Ubuntu', sans-serif;
+            font-weight: 800;
+            color: #666666;
+        }
+
+        .kyc_card_header span {
+            font-size: 18px;
+            font-family: 'Ubuntu', sans-serif;
+            font-weight: 800;
+            color: #666666;
+        }
+
+    .orange_icon {
+        margin-top: 55px;
+    }
+
+        .orange_icon i {
+            width: 37px;
+            height: 37px;
+            border: 2px solid #777;
+            color: #222;
+            line-height: 35px;
+            font-size: 20px;
+            border-radius: 6px;
+            transition: all linear .3s;
+            cursor: pointer;
+        }
+
+            .orange_icon i:hover {
+                background: #999;
+                color: #fff;
+            }
+
+    .Description_text input {
+        width: 100%;
+        height: 100%;
+    }
+
+    .description_list {
+        border: 0px solid #ddd;
+    }
+
+    .Description_text {
+        width: 100%;
+        height: 50px;
+        border: 2px solid #ddd;
+        margin-bottom: 12px;
+    }
+
+    .description_main p {
+        font-size: 13px;
+        font-weight: 700;
+    }
+
+    .development p {
+        font-size: 11px;
+        font-family: 'Ubuntu', sans-serif;
+        font-weight: 400;
+        color: #444;
+        margin-bottom: 5px;
+    }
+
+    .development span {
+        font-size: 10px;
+        color: #444;
+        margin-bottom: 5px;
+    }
+
+    .man {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        background: #c00;
+        overflow: hidden;
+    }
+
+    .assain p {
+        font-size: 14px;
+        margin-bottom: 1px;
+    }
+
+    .assain h4 {
+        font-size: 13px;
+    }
+
+    .assain h5 {
+        font-size: 10px;
+    }
+
+    #comments_created {
+        height: 60px;
+        margin-bottom: 12px;
+    }
+
+    .comments {
+        border: 2px solid #ddd;
+        padding-left: 10px;
+        height: 90px;
+    }
+
+    .comment_main {
+        width: 28%;
+        float: left;
+    }
+
+    .Progress {
+        width: 72%;
+        display: flex;
+    }
+
+        .Progress td {
+            font-size: 14px;
+        }
+
+    .progress_table {
+        margin-top: 25px;
+    }
+
+    .comments p {
+        font-size: 18px;
+        margin-bottom: 0;
+    }
+
+    .comments span {
+        font-size: 18px;
+        font-family: 'Ubuntu', sans-serif;
+        font-weight: 800;
+    }
+
+    .comments h5 {
+        font-size: 12px;
+        ;
+    }
+
+    .comments_text textarea {
+        height: 100%;
+        width: 100%;
+        resize: none;
+    }
+
+    .comments_text {
+        margin-top: -22px;
+    }
+
+    .date p {
+        font-size: 16px;
+        margin-bottom: 2px;
+    }
+
+    .date i {
+        font-size: 20px;
+        color: #444;
+    }
+
+    .date span {
+        font-size: 18px;
+    }
+
+    .file {
+        margin-top: -10px;
+        background: #faebd7;
+        padding: 5px 0;
+    }
+
+        .file i {
+            font-size: 20px;
+            color: #444;
+        }
+
+        .file span {
+            font-size: 15px;
+        }
+
+    .Activities span {
+        margin-left: 12px;
+        font-size: 16px;
+    }
+
+    .Activities {
+        margin-top: 15px;
+    }
+
+        .Activities i {
+            font-size: 20px;
+        }
+
+        .Activities p {
+            font-size: 12px;
+            margin-bottom: 3px;
+        }
+
+            .Activities p span {
+                font-size: 12px;
+                font-weight: 700;
+            }
+
+    .comments_area {
+        margin-top: -20px;
+    }
+
+        .comments_area textarea {
+            width: 100%;
+            font-size: 18px;
+            height: 60px;
+        }
+
+    .people i {
+        font-size: 20px;
+    }
+
+    .people span {
+        font-size: 16px;
+        padding-left: 0px;
+    }
+
+    .thumbnail {
+        padding: 0px;
+    }
+
+    .panel {
+        position: relative;
+    }
+
+        .panel > .panel-heading:after, .panel > .panel-heading:before {
+            position: absolute;
+            top: 11px;
+            left: -16px;
+            right: 100%;
+            width: 0;
+            height: 0;
+            display: block;
+            content: " ";
+            border-color: transparent;
+            border-style: solid solid outset;
+            pointer-events: none;
+        }
+
+        .panel > .panel-heading:after {
+            border-width: 7px;
+            border-right-color: #f7f7f7;
+            margin-top: 1px;
+            margin-left: 2px;
+        }
+
+        .panel > .panel-heading:before {
+            border-right-color: #ddd;
+            border-width: 8px;
+        }
+
+    .input-lg {
+        border-radius: 8px !important;
+    }
+
+    .attachmentbutton {
+        border-radius: 6px !important;
+        padding: 4px 1px;
+        margin-left: 75px;
+        margin-bottom: 3px !important;
+    }
+</style>
+<div ng-controller="ticketDetails" class="card" id="kyc_card">
+    <div class="row" style="margin-top: -1%;">
+        <div class="col-lg-9 card-header kyc_card_header">
+            <h3>#@ticket.Id Ticket ( @ticket.Title )</h3>
+            <p> <i class="fas fa-plus-circle"></i> Added by: <span>@ticket.AddBy </span>at @ticket.AddDate.ToShortDateString() </p>
+        </div>
+        <div class="col-lg-3  orange_card" style="margin-top: -19px;">
+            <div class="date">
+                <p style="font-size: x-large;background-color: gainsboro;text-align:center"><i class="fas fa-calendar-alt" style="padding-right: 3%;"></i><i style="padding-right: 19%;">Close Date</i></p>
+                <span>@ticket.ClosedDate.ToShortDateString()</span>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-9">
+            <div class="row">
+                <div class="col-lg-4">
+                    <div class="development">
+                        <table class="table table-borderless">
+                            <tbody>
+                                <tr>
+                                    <td class="p-0">Priority:</td>
+                                    @{
+                                        if (ticket.Priority == 0)
+                                        {
+                                            <td style="font-size:15px;" class="p-0"><p class="label label-primary" style="font-style: italic;font-size: medium;padding-left: 32%;padding-right: 32%;color: white;">N/A</p></td>
+                                        }
+                                        else if (ticket.Priority == 1)
+                                        {
+                                            <td style="font-size:15px;" class="p-0"><p class="label label-danger" style="font-style: italic;font-size: medium;padding-left: 30%;padding-right: 30%;color: white;">High</p></td>
+                                        }
+                                        else if (ticket.Priority == 2)
+                                        {
+                                            <td style="font-size:15px;" class="p-0"><p class="label label-success" style="font-style: italic;font-size: medium;padding-left: 20%;padding-right: 20%;color: white;">Medium</p></td>
+                                        }
+                                        else
+                                        {
+                                            <td style="font-size:15px;" class="p-0"><p class="label label-warning" style="font-style: italic;font-size: medium;padding-left: 31%;padding-right: 31%;color: white;">Low</p></td>
+                                        }
+                                    }
+                                </tr>
+                                <tr>
+                                    <td class="p-0">Status:</td>
+                                    @{
+                                        if (ticket.Status == "Open")
+                                        {
+                                            <td style="font-size:15px;" class="p-0"><p class="label label-success" style="font-style: italic;font-size: medium;padding-left: 28%;padding-right: 28%;color: white;">Open</p></td>
+                                        }
+                                        else
+                                        {
+                                            <td style="font-size:15px;" class="p-0"><p class="label label-secondary" style="font-style: italic;font-size: medium;padding-left: 26%;padding-right: 26%;color: white;">Closed</p></td>
+                                        }
+
+
+                                    }
+
+                                </tr>
+                                <tr>
+                                    <td class="p-0">Task Status:</td>
+                                    @if (task == null)
+                                    {
+                                        <td style="font-size:15px;" class="p-0"><p class="label label-warning" style="font-style: italic;font-size: medium;padding-left: 34%;padding-right: 34%;color: white;">N/A</p></td>
+                                    }
+                                    else if (task.Status == "In Progress")
+                                    {
+                                        <td style="font-size:15px;" class="p-0"><p class="label label-info" style="font-style: italic;font-size: medium;padding-left: 9%;padding-right: 9%;color: white;">@task.Status</p></td>
+                                    }
+                                    else if (task.Status == "Pending")
+                                    {
+                                        <td style="font-size:15px;" class="p-0"><p class="label label-primary" style="font-style: italic;font-size: medium;padding-left: 19%;padding-right: 19%;color: white;">@task.Status</p></td>
+                                    }
+                                    else if (task.Status == "Paused")
+                                    {
+                                        <td style="font-size:15px;" class="p-0"><p class="label label-warning" style="font-style: italic;font-size: medium;padding-left: 21%;padding-right: 21%;color: white;">@task.Status</p></td>
+                                    }
+                                    else if (task.Status == "Resolved")
+                                    {
+                                        <td style="font-size:15px;" class="p-0"><p class="label label-success" style="font-style: italic;font-size: medium;padding-left: 15%;padding-right: 15%;color: white;">@task.Status</p></td>
+                                    }
+
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="development">
+                        <table class="table table-borderless">
+                            <tbody>
+                                <tr>
+                                    <td class="p-0">Module :</td>
+
+                                    @{
+                                        if (modules == null)
+                                        {
+                                            <td class="p-0">N/A</td>
+                                        }
+                                        else
+                                        {
+                                            <td class="p-0" style="font-style: italic;">@modules.ModuleName</td>
+                                        }
+                                    }
+
+                                </tr>
+                                <tr>
+                                    <td class="p-0">Department:</td>
+                                    @{
+                                        if (department == null)
+                                        {
+                                            <td class="p-0" style="font-style: italic;">No Department</td>
+                                        }
+                                        else
+                                        {
+                                            <td class="p-0" style="font-style: italic;">@department.DeptName</td>
+                                        }
+                                    }
+                                </tr>
+                                <tr>
+                                    <td class="p-0">Client:</td>
+                                    @if (client != null)
+                                    {
+                                        <td><a target="_blank" style="text-decoration:none;" href="@client.BaseUrl">@client.ClientName</a></td>
+                                    }
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="development">
+                        <table class="table table-borderless">
+                            <tbody>
+                                <tr>
+                                    <td class="p-0">Project:</td>
+
+                                    @{
+                                        if (project == null)
+                                        {
+                                            <td class="p-0">No Project</td>
+                                        }
+                                        else
+                                        {
+
+                                            <td class="p-0"> @project.ProjectName</td>
+                                        }
+                                    }
+
+                                </tr>
+                                <tr>
+                                    <td class="p-0">Category:</td>
+                                    @if (ticketCategory != null)
+                                    {
+                                        <td class="p-0">@ticketCategory.CategoryName</td>
+                                    }
+
+
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3  orange_card text-right">
+            @*<a data-toggle="modal" ng-click="ResetFrm()" title="Add Attachments" href="#draggable" class="btn btn-primary attachmentbutton" style="margin-right: 1.5%;margin-top: -52px;">
+                    <i class="fas fa-paperclip"></i>Add Attachments
+                </a>*@
+            <p style="font-size: x-large;background-color: gainsboro;text-align:center">
+                <i class="fas fa-paperclip" style="padding-right: 3%;"></i><i style="padding-right: 8%;">Attachments</i><a data-toggle="modal" ng-click="ResetFrm()" title="Add Attachments" href="#draggable" class="btn btn-primary attachmentbutton" ;">
+                    <i class="fas fa-plus"></i>Add
+                </a>
+            </p>
+
+            @*Attachment Modal*@
+            <div class="modal fade draggable-modal" id="draggable" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div style="border-radius: 5px !important;border: -11px !important;color: black; height:348px; width:733px;" class="modal-content">
+                        <div class="modal-header" style="text-align: left">
+                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                            <h4 class="modal-title">Add Attachments</h4>
+                        </div>
+                        <form name="modalForm" class="form-horizontal" role="form" action="/Ticket/UpdateAttachment" method="post" enctype="multipart/form-data" novalidate>
+                            <div class="portlet-body form" style="display: block;">
+                                <div class="form-body TopLeftMargin3">
+                                    <div class="form-group" hidden ng-class="{ 'has-error' : submitted && modalForm.ImgUrl.$invalid}">
+                                        <label class="col-md-3 control-label">Url</label>
+                                        <div class="col-md-9">
+                                            <input type="text" name="TicketId" class="form-control input-lg" placeholder="Url" value="@ticket.Id">
+
+                                        </div>
+                                    </div>
+                                    <div class="form-group" ng-class="{ 'has-error' : submitted && modalForm.ImgUrl.$invalid}">
+                                        <label class="col-md-3 control-label">Url</label>
+                                        <div class="col-md-9">
+                                            <input type="text" name="ImgUrl" class="form-control input-lg" placeholder="Url">
+                                            <span ng-show="submitted &&  modalForm.ImgUrl.$error.required" class="text-danger">ImgUrl is Required</span>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <p class="text-center" style="margin-left: 111px;">Or</p>
+                                    </div>
+                                    <div class="form-group" ng-class="{ 'has-error' : submitted && modalForm.File.$invalid}">
+                                        <label class="col-md-3 control-label">File</label>
+                                        <div class="col-md-9">
+                                            <input type="file" name="AttachFile" class="form-control input-lg" accept="image/jpeg,image/gif,image/png,application/pdf,image/x-eps">
+                                            <span ng-show="submitted &&  modalForm.File.$error.required" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="reset" class="btn btn-danger" data-dismiss="modal">Close</button>
+                                <button type="submit" class="btn btn-success">Save</button>
+                                @*<input type="submit" class="btn btn-success" ng-click="SaveAttachment()" value="Save" />*@
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="file">
+                <table>
+                    <tbody>
+                        @{
+                            if (ticketAttachment == null)
+                            {
+                                <tr>
+                                    <td> No File</td>
+                                </tr>
+                            }
+                            else
+                            {
+                                int count = 1;
+                                foreach (TicketsAttachment item in ticketAttachment)
+                                {
+                                    <tr>
+                                        <td class="text-left" style="width:200px;">
+
+                                            <label>@count)</label>
+                                            @if (!string.IsNullOrEmpty(item.Path))
+                                            {
+                                                <a href="@Url.Content(item.Path)" target="_blank">
+                                                    @item.FileName
+                                                </a>
+                                            }
+                                            else
+                                            {
+                                                <a href="@item.ImgUrl" target="_blank">
+                                                    @item.FileName
+                                        </a>
+                                            }
+
+
+                                        </td>
+                                    </tr>
+                                    count++;
+                                }
+                            }
+                        }
+                        <tr></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <div class="form-group">
+        <label class="col-md-3 control-label">Priority</label>
+        <div class="col-md-9" style="border-radius: 17px !important;font-size: 14px; background: #ddd;cursor: pointer;height: 25px;width: 341px;margin-left: -142px;">
+            <label class="" style="color:red;margin-left: 25px;padding-right: 8%;">
+                <input type="radio" ng-checked="@ticket.Priority==1"  name="optionsRadios" id="optionsRadios4" value="1" ng-click="ChangePriority('1')">High
+                <span></span>
+            </label>
+            <label class="" style="color:green;font-size: 14px;padding-right: 8%;">
+                <input type="radio" ng-checked="@ticket.Priority==2"  name="optionsRadios" id="optionsRadios5" value="2" ng-click="ChangePriority('2')"> Medium
+                <span></span>
+            </label>
+            <label class="" style="color:#27a4b0; font-size: 14px;padding-right: 8%;">
+                <input type="radio" ng-checked="@ticket.Priority==3" ng-model="ticket.Priority" name="optionsRadios" id="optionsRadios6" value="3" ng-click="ChangePriority('3')"> Low
+                <span></span>
+            </label>
+        </div>
+    </div>
+    <div class="row" style="margin-top: -1%;">
+        <div class="col-lg-9">
+            <p style="font-size: larger;text-decoration: underline;">Description :</p>
+            <p style="">@ticket.Description</p>
+        </div>
+
+    </div>
+
+    <div class="row" style="margin-top: -1%;">
+        <div class="col-lg-9">
+            <div hidden class="comments  mb-3 mt-4" style="" id="comments_created">
+                <p>Updated by <span>@ticket.UpdateBy</span></p>
+                <h5>@ticket.UpdateDate</h5>
+            </div>
+        </div>
+        <div class="col-lg-3  orange_card">
+            <div class="Activities" style="margin-left: 1%;">
+                <p style="font-size: x-large;background-color: gainsboro;text-align:center"><i class="fas fa-users" style="padding-right: 3%;"></i><i>People Involved</i></p>
+                <p><span></span></p>
+            </div>
+        </div>
+    </div>
+
+    <div class="row" style="margin-top: -1%;">
+        <div class="col-lg-9">
+            <div ng-repeat="item in CommentList">
+                <div class="col-sm-1">
+                    <div class="thumbnail" style="height: 47px;width: 46px;">
+                        <img class="img-responsive user-photo" src="/UserAPI/GetProfileImage?UserName={{item.AddBy}}">
+                    </div>
+                </div>
+                <div class="col-sm-11">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <strong>{{item.FullName}}</strong> <span class="text-muted">at {{item.AddDate.replace('/Date(','').replace(')/','') |   date:'dd-MM-yyyy'}}</span>
+
+                        </div>
+                        <div class="panel-body">
+                            {{item.Description}}
+                        </div>
+                        <div style="margin-left: 2%;margin-bottom: 1%;">
+                            <span class="badge badge-success"> {{item.Like}} </span><a href="#" ng-click="UpdateStatus(item,Type='Like')" style="text-decoration: none;"><i class="far fa-thumbs-up" style="font-size: 20px;"></i>Like</a>
+                            <span class="badge badge-danger"> {{item.Dislike}}  </span>  <a style="text-decoration: none;color: red;" href="#" ng-click="UpdateStatus(item,Type='DisLike')"><i class="far fa-thumbs-down" style="font-size: 20px;"></i>Dislike</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3">
+            <div class="Activities">
+                <p style="font-size: x-large;background-color: gainsboro;text-align:center"><i class="fas fa-chart-line" style="padding-right: 3%;"></i><i style="padding-right: 24%;">Activities</i></p>
+                <ul hidden style="font-size: 11px;">
+                    <li> Created By:@ticket.AddBy at @ticket.AddDate</li>
+                    @if (ticket.UpdateBy != "")
+                    {
+                        <li>Update By: @ticket.UpdateBy at @ticket.UpdateDate</li>
+                    }
+
+                </ul>
+                <div style="margin-left: -10%;" ng-repeat="item in ActivityLogList">
+                    <ul>
+                        <li>
+                            <p><b>{{item.FullName}}</b> {{item.LogDescription}} (#<b>{{item.LogRefId}}</b>) at  {{item.LogDate.replace('/Date(','').replace(')/','') |  date:"dd/MM/yyyy"}}</p>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div>
+    </div>
+    <form class="form-inline" name="frm" role="form" novalidate ng-submit="Submit()">
+        <div class="row" style="margin-top: -1%;" ng-class="{ 'has-error' : submitted && frm.Description.$invalid}">
+            <div class="col-lg-9">
+                <label class="label label-success" style="margin-left: 10%;font-size: initial;">Write your Reply</label>
+                <textarea class="col-lg-9" required ng-model="Comments.Description" name="Description" style="margin-left: 10%;width: 88%;"></textarea>
+            </div>
+            <div class="col-lg-3  orange_card">
+
+            </div>
+        </div>
+        <div class="row" style="margin-left: 8%;">
+            <span ng-show="submitted &&  frm.Description.$error.required" class="text-danger">Description is Required</span>
+        </div>
+        <div class="row" style="margin-top: 1%; margin-left: 6%;">
+            <div class="col-lg-9">
+                <a href="@Url.Action("TicketList","Home")" class="btn btn-primary" title="Go To Task List"><i class="fas fa-arrow-left"><span> Back to List</span></i></a>
+                <input style="margin-left: 70%;" type="submit" class="btn btn-primary" ng-click="submitted=true" value="Post" />
+            </div>
+            <div class="col-lg-3">
+
+            </div>
+        </div>
+    </form>
+
+</div>
+<script type="text/javascript">
+    AddieApp.controller("ticketDetails", ["$scope", "$http", "SweetAlert",
+          function ($scope, $http, SweetAlert) {
+              init();
+              function init() {
+                  initialize();
+                  $scope.Comments = {};
+                  $scope.Comments.RefId = @ticket.Id;
+                  LoadCommentList();
+                  LoadLogList();
+                  $scope.submitted=false;
+                  $scope.TicketId = @ticket.Id;
+              }
+              function initialize() {
+              };
+              
+              $scope.Submit = function () {
+                  if ($scope.frm.$invalid)
+                      return;
+                  $http.post(baseUrl + 'Ticket/AddCommentTicket', $scope.Comments).
+                        then(function (response) {
+                            if (response.data == 1) {
+                                $scope.Comments.Description='';
+                                LoadCommentList();
+                                $scope.submitted=false;
+                            } else {
+                            }
+                        });
+              }
+              $scope.DeleteComment = function (n) {
+                  $http.post(baseUrl + 'Task/DeleteComment', n).
+                      then(function (response) {
+                          if (response.data == 1) {
+                              LoadCommentList(n.RefId);
+                              toastr.success('Deleted Successfully');
+                          } else {
+                              toastr.error('You Dont Have Permission.');
+                          }
+                      });
+              }
+              $scope.UpdateStatus = function (n,Type) {
+                  $http.post(baseUrl + 'Ticket/UpdateStatus?Id=' + n.Id + '&&Type=' + Type).
+                           then(function (response) {
+                               LoadCommentList(n.RefId);
+                           });
+              }
+              function LoadCommentList(){
+                  $http.get(baseUrl + 'Ticket/LoadComment?RefId='+'@ticket.Id').
+                         then(function (response) {
+                             //console.log(response.data);
+                             $scope.CommentList=response.data;
+                         });
+              }
+
+
+              function LoadLogList(){
+                  $http.get(baseUrl + 'Setup/AcitvityLog?type='+2+'&&RefId='+@ticket.Id).
+                         then(function (response) {
+                             console.log(response.data);
+                             $scope.ActivityLogList = response.data;
+
+                         });
+              }
+
+              $scope.TaskStatusStart = function TaskStatusStart(TaskId) {
+                  $http.get(baseUrl + 'Task/UpdateTaskStatus?TaskId=' + TaskId + '&Status=In Progress').
+                    then(function (response) {
+                        if (response.data == 2) {
+                            toastr.error('Task is already closed.');
+                        }
+                        else if (response.data == 3) {
+                            toastr.error('Task already started.');
+                        }
+                        else if (response.data == 4) {
+                            toastr.error('Task has not started yet.');
+                        }
+                        else if (response.data == 5) {
+                            toastr.error('Task is not assign to you. Only assign user can start the task.');
+                        }
+                        else if (response.data == 7) {
+                            toastr.error('Task has not resolved yet.');
+                        }
+                        else if (response.data == 6) {
+                            toastr.error('Task resolved already.');
+                        }
+                        else {
+                            toastr.success('Task started successfully.');
+                            LoadTaskList();
+                            LoadMyTaskList();
+                        }
+                    });
+              }
+              $scope.TaskStatusPause = function TaskStatusPause(TaskId) {
+                  $http.get(baseUrl + 'Task/UpdateTaskStatus?TaskId=' + TaskId + '&Status=Paused').
+                    then(function (response) {
+                        if (response.data == 2) {
+                            toastr.error('Task is already closed.');
+                        }
+                        else if (response.data == 3) {
+                            toastr.error('Task already started.');
+                        }
+                        else if (response.data == 4) {
+                            toastr.error('Task has not started yet.');
+                        }
+                        else if (response.data == 7) {
+                            toastr.error('Task has not resolved yet.');
+                        }
+                        else if (response.data == 5) {
+                            toastr.error('Task is not assign to you. Only assign user can start the task.');
+                        }
+                        else if (response.data == 6) {
+                            toastr.error('Task resolved already.');
+                        }
+                        else {
+                            toastr.success('Task paused successfully.');
+                            LoadTaskList();
+                            LoadMyTaskList();
+                        }
+                    });
+              }
+              $scope.TaskStatusResolve = function TaskStatusResolve(TaskId) {
+                  $http.get(baseUrl + 'Task/UpdateTaskStatus?TaskId=' + TaskId + '&Status=Resolved').
+                    then(function (response) {
+                        if (response.data == 2) {
+                            toastr.error('Task is already closed.');
+                        }
+                        else if (response.data == 3) {
+                            toastr.error('Task already started.');
+                        }
+                        else if (response.data == 4) {
+                            toastr.error('Task has not started yet.');
+                        }
+                        else if (response.data == 7) {
+                            toastr.error('Task has not resolved yet.');
+                        }
+                        else if (response.data == 5) {
+                            toastr.error('Task is not assign to you. Only assign user can start the task.');
+                        }
+                        else if (response.data == 6) {
+                            toastr.error('Task resolved already.');
+                        }
+                        else {
+                            toastr.success('Task Resolved successfully.');
+                            LoadTaskList();
+                            LoadMyTaskList();
+                        }
+                    });
+              }
+
+
+              $scope.Delete = function (taskInfo) {
+                  swal({
+                      title: "Are you sure?",
+                      text: "Once deleted, you will not be able to recover this data!",
+                      icon: "warning",
+                      buttons: true,
+                      dangerMode: true,
+                  })
+                    .then((willDelete) => {
+                        if (willDelete) {
+                            $http.post(baseUrl + 'Task/DeleteTask', taskInfo).
+                              then(function (response) {
+                                  if (response.data == '0') {
+                                      toastr.warning('Not found');
+                                      LoadProjectList();
+                                      return;
+                                  }
+                                  toastr.success('Deleted Successfully');
+                                  LoadTaskList();
+                              });
+
+                        } else {
+
+                        }
+                    });
+
+              }
+
+
+              $scope.SaveAttachment = function(){
+
+                  console.log($scope.TicketId)
+                  $http.post(baseUrl + 'Ticket/UpdateAtachment').
+                   then(function (response) {
+                       if (response.data != '0') {
+                           toastr.success('Update Successfully');
+
+                           return;
+                       }
+                       toastr.error('Update Error');
+                   });
+
+
+              }
+              $scope.ChangePriority = function(value){
+
+                  debugger;
+                  $http.post(baseUrl + 'Ticket/UpdatePriority?TicketId='+@ticket.Id+'&Priority='+value).
+                   then(function (response) {
+                        if (response.data) {
+                           toastr.success('Update Successfully');
+                           window.location.href=baseUrl+"Home/TicketDetails?TicketId="+ @ticket.Id; 
+                           return;
+                       }
+                      
+                   });
+
+
+              }
+
+          }]);
+</script>
+
+
+

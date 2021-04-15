@@ -1,0 +1,192 @@
+﻿@using UI.Portal.Models
+@model LoginViewModel
+@{
+    ViewBag.Title = "Login";
+    Layout = "~/Views/Shared/_LayoutLogin.cshtml";
+}
+
+@using (Html.BeginForm("Login", "Account", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
+{
+    @Html.AntiForgeryToken()
+    
+    <div class="login-div">
+        <div class="logo text-center">
+            <img src="~/assets/img/logo/AddieSoft-Logo-01.svg" class="img-fulid" alt="">
+        </div>
+        <br />
+        <h3 class="text-center">Sign In</h3>
+        <div class="loginHear">
+            <div class="fields singin">
+                <div class="username"><img src="~/assets/img/logo/UserIcon.svg" alt=""><input name="StudentInsId" type="text" class="user-input" placeholder="User Name" autocomplete="off" required/></div>
+                <div class="password"><img src="~/assets/img/logo/passwordicon.svg" alt=""><input name="Password" type="password" class="pass-input" placeholder="Password" autocomplete="off" required/></div>
+            </div>
+            @Html.ValidationSummary("", new { @class = "text-danger text-center font-weight-bold" })
+
+            <button class="signin-button">Login</button>
+            <a href="" data-toggle="modal" data-target="#resetPass"><h5 class="text-center">Forgot Password?</h5></a>
+        </div>
+        <h5 class="text-center">Don’t have an account ?<a href="@Url.Action("Register", "Account")"><span> Sign Up here</span></a></h5>
+    </div>
+}
+
+
+<div class="modal fade" id="resetPass" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header singup-mpdal">
+                <h5 class="modal-title" id="exampleModalLabel">FORGOT PASSWORD</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form id="rest_form" autocomplete="off">
+                <div class="modal-body singup-mpdal-body text-center">
+                    
+                    <div class="fields singin">
+                        <div class="username"><img src="~/assets/img/logo/UserIcon.svg" alt=""><input id="R_StudentInsId" name="StudentInsId" type="text" class="user-input" placeholder="Student Id" autocomplete="off" required /></div>
+                        <div class="username"><img src="~/assets/img/logo/UserIcon.svg" alt=""><input id="R_PhoneNumber" name="PhoneNumber" type="text" class="user-input" placeholder="Phone Number" autocomplete="off" required /></div>
+                    </div>
+                    <button class="signin-button" type="button" id="ViaEmail">Via Email</button>
+                </div>
+                
+                <div class="singup-modal-footer">
+                    @*<button class="signin-button" type="button" id="ViaEmail">Via Email</button>*@
+                    @*<button type="button" id="ViaSMS" class="btn btn-primary btn-lg btn-block">Via SMS</button>
+                    <button type="button" id="ViaEmail" class="btn btn-primary btn-lg btn-block">Via Email</button>*@
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<div class="modal fade sms-modal" id="inpOtp" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content sms-modal-contant">
+            <div class="modal-header singup-mpdal">
+                <h5 class="modal-title" id="exampleModalLabel">SMS TEXT</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body sms-modal-body text-center">
+                <p>
+                    The recovery code was sent
+                    to you mobile number. Please
+                    enter the code:
+                </p>
+                <form id="smsText_form" autocomplete="off">
+                    <div class="code-main text-center">
+                        <div class="code text-center">
+                            <div class="form-group code-form">
+                                <input type="text" class="form-control" id="First" aria-describedby="emailHelp" placeholder="0" required>
+                            </div>
+                        </div>
+                        <div class="code text-center">
+                            <div class="form-group code-form">
+                                <input type="text" class="form-control" id="Second" aria-describedby="emailHelp" placeholder="0" required>
+                            </div>
+                        </div>
+                        <div class="code text-center">
+                            <div class="form-group code-form">
+                                <input type="text" class="form-control" id="Third" aria-describedby="emailHelp" placeholder="0" required>
+                            </div>
+                        </div>
+                        <div class="code text-center">
+                            <div class="form-group code-form">
+                                <input type="text" class="form-control" id="Fourth" aria-describedby="emailHelp" placeholder="0" required>
+                            </div>
+                        </div>
+                    </div>
+
+                </form>
+
+            </div>
+            <div class="sms-modal-footer">
+                <button type="button" id="SMSTEXT" class="btn btn-primary btn-lg btn-block"><i class="fas fa-arrow-right"></i></button>
+            </div>
+
+        </div>
+    </div>
+</div>
+<!-- Modal -->
+<div class="modal fade new-pass" id="Newpassword" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content pass-modal-content">
+            <div class="modal-header singup-mpdal">
+                <h5 class="modal-title" id="exampleModalLabel">New Password</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form id="newPass_Form" autocomplete="off">
+                <div class="modal-body pass-modal">
+                    <div class="form-group">
+                        <input type="password" class="form-control" id="NewPassword" aria-describedby="emailHelp" placeholder="Enter New Password" required>
+
+                    </div>
+                    <div class="form-group">
+                        <input type="password" class="form-control" id="Confirmpassword" aria-describedby="emailHelp" placeholder="Enter Confirm New password" required>
+
+                    </div>
+                </div>
+                <div class="pass-modal-footer">
+                    <button type="button" data-toggle="modal" id="NewpasswordBtn" class="btn btn-primary btn-lg btn-block"><i class="fas fa-arrow-right"></i></button>
+                </div>
+            </form>
+            <!-- Modal -->
+        </div>
+    </div>
+</div>
+<div class="modal fade Successful-modal " id="reset_success" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content Successful-content">
+            <div class="modal-body Successful-modal-body m-auto">
+                <div class="successful-icon text-center">
+                    <i class="fas fa-check"></i>
+                </div>
+
+            </div>
+            <div class="successful-modal-footer">
+                <div class="successful-text text-center">
+                    <h3>
+                        Password reset
+                        Successful
+                    </h3>
+                    <p>
+                        You have successfully reset your
+                        password. Please use your new
+                        password when logging in.
+                    </p>
+                </div>
+
+            </div>
+            <div class="success-footer">
+                <a href="@Url.Action("Login", "Account")" class="btn btn-secondary btn-lg btn-block"><i class="fas fa-arrow-right"></i></a>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+@section Scripts{
+    <script type="text/javascript">
+
+            $(document).on("click", "#ViaEmail", function () {
+
+                if (document.getElementById("rest_form").checkValidity()) {
+
+                    var SId = $("#R_StudentInsId").val();
+                    var Phone = $("#R_PhoneNumber").val();
+
+                    $.post("@Url.Action("ForgotPassword", "Account")", { StudentInsId: SId, PhoneNumber: Phone, Type: 'EMAIL' }, function (data) {
+                        if (data.error == false)
+                            $('#resetPass').modal('toggle');
+                            $('#reset_success').modal('toggle');
+                    });
+                } else {
+                    alert('Please enter all info.');
+                }
+            });
+    </script>
+}
+
